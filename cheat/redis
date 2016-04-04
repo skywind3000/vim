@@ -1,0 +1,18 @@
+cat /etc/passwd | redis-cli -x set mypasswd
+redis-cli get mypasswd
+redis-cli -r 100 lpush mylist x
+redis-cli -r 100 -i 1 info | grep used_memory_human:
+redis-cli --eval myscript.lua key1 key2 , arg1 arg2 arg3
+redis-cli --scan --pattern '*:12345*'
+
+```c
+#include <stdio.h>
+
+int main(void)
+{
+	printf("Hello, World !!\n");
+	return 0
+}
+
+```
+

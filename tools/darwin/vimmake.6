@@ -1,0 +1,10 @@
+#! /bin/bash
+
+cd ~/lab/wind/voice/AudioMain/build
+echo "building ..."
+python ios_build.py iosarm64
+
+echo "copying ..."
+cp ../depends/GlobalCore.iosarm64.so /Users/linwei/lab/wind/ios/IOSAudioTest/AudioTest
+
+

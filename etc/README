@@ -1,0 +1,5 @@
+init.sh   - shell init config, add to your ~/.bashrc or ~/.profile or ~/.zshrc
+login.sh  - shell login config, add to your ~/.profile or ~/.bash_profile
+
+
+
