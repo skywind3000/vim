@@ -161,6 +161,7 @@ let g:fuf_keyOpenTabpage = '<C-t>'
 let g:fuf_dataDir = '~/.vim/fuf-data'
 let g:fuf_mrufile_maxItem = 500
 let g:fuf_mrufile_maxItemDir = 100
+let g:fuf_file_exclude = '\v\~$|\.(o|exe|dll|bak|class|meta|lock|orig|jar|swp)$|/test/data\.|(^|[/\\])\.(hg|git|bzr)($|[/\\])'
 
 
 "----------------------------------------------------------------------
@@ -199,6 +200,12 @@ let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>'], '<Esc>':['<C-q>']}
 
 
 "----------------------------------------------------------------------
+" vim-notes
+"----------------------------------------------------------------------
+let g:notes_directories = ['~/.vim/notes']
+
+
+"----------------------------------------------------------------------
 " UltiSnips
 "----------------------------------------------------------------------
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
@@ -207,6 +214,7 @@ let g:UltiSnipsJumpForwardTrigger="<m-j>"
 let g:UltiSnipsJumpBackwardTrigger="<m-k>"
 let g:UltiSnipsListSnippets="<m-l>"
 let g:UltiSnipsSnippetDirectories=['UltiSnips', s:home."/usnips"]
+let g:snips_author = 'skywind'
 
 
 "----------------------------------------------------------------------

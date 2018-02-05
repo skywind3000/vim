@@ -152,7 +152,7 @@ noremap <space>su :VimMake svn up<cr>
 noremap <space>st :VimMake svn st<cr>
 
 " editing commands
-noremap <space>a ggVG
+noremap <space>aa ggVG
 
 
 "----------------------------------------------------------------------

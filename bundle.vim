@@ -69,6 +69,19 @@ if index(g:bundle_group, 'simple') >= 0 || s:bundle_all
 	Plugin 'Raimondi/delimitMate'
 	Plugin 'godlygeek/tabular'
 	Plugin 'justinmk/vim-dirvish'
+
+	nnoremap <space>a= :Tabularize /=<CR>
+	vnoremap <space>a= :Tabularize /=<CR>
+	nnoremap <space>a/ :Tabularize /\/\//l2c1l0<CR>
+	vnoremap <space>a/ :Tabularize /\/\//l2c1l0<CR>
+	nnoremap <space>a, :Tabularize /,/l0r1<CR>
+	vnoremap <space>a, :Tabularize /,/l0r1<CR>
+	nnoremap <space>al :Tabularize /\|<cr>
+	vnoremap <space>al :Tabularize /\|<cr>
+	nnoremap <space>a<bar> :Tabularize /\|<cr>
+	vnoremap <space>a<bar> :Tabularize /\|<cr>
+	nnoremap <space>ar :Tabularize /\|/r0<cr>
+	vnoremap <space>ar :Tabularize /\|/r0<cr>
 endif
 
 
@@ -80,6 +93,8 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 	Plugin 'lambdalisue/vim-gista'
 	Plugin 'mhinz/vim-startify'
 	Plugin 'flazz/vim-colorschemes'
+	Plugin 'xolox/vim-misc'
+	Plugin 'tpope/vim-unimpaired'
 	" Plugin 'vim-scripts/Colour-Sampler-Pack'
 
 	if has('python') || has('python3')
@@ -120,12 +135,17 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 	Plugin 'vim-scripts/L9'
 	Plugin 'wsdjeg/FlyGrep.vim'
 	Plugin 'tpope/vim-abolish'
+	Plugin 'xolox/vim-notes'
 	" Plugin 'vim-scripts/DrawIt'
 				
 	if has('python')
 		Plugin 'skywind3000/vimpress'
 		" Plugin 'honza/vim-snippets'
 		" Plugin 'SirVer/ultisnips'
+	endif
+
+	if !isdirectory(expand('~/.vim/notes'))
+		silent! call mkdir(expand('~/.vim/notes'), 'p')
 	endif
 
 	noremap <space>bp :BlogPreview local<cr>
@@ -180,9 +200,9 @@ endif
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'opt') >= 0
 	Plugin 'thinca/vim-quickrun'
-	Plugin 'mattn/vim-terminal'
-	Plugin 'Shougo/vimshell.vim'
-	Plugin 'Shougo/vimproc.vim'
+	" Plugin 'mattn/vim-terminal'
+	" Plugin 'Shougo/vimshell.vim'
+	" Plugin 'Shougo/vimproc.vim'
 	" Plugin 'w0rp/ale'
 	" Plugin 'airblade/vim-gitguttr'
 	" let g:gitgutter_enabled = 1
