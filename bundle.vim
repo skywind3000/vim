@@ -161,6 +161,7 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 	noremap <silent><tab>- :FufMruFile<cr>
 	noremap <silent><tab>= :FufFile<cr>
 	noremap <silent><tab>[ :FufBuffer<cr>
+	noremap <silent><tab>] :FufBufferTag<cr>
 
 	map <silent> <leader>ck <Plug>CRV_CRefVimAsk
 	map <silent> <leader>cj <Plug>CRV_CRefVimInvoke
