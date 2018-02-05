@@ -48,7 +48,6 @@ endif
 "----------------------------------------------------------------------
 " Bundle Header
 "----------------------------------------------------------------------
-set nocompatible
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -102,6 +101,7 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 		let g:Lf_ShortcutF = '<c-p>'
 		noremap <c-n> :LeaderfMru<cr>
 		noremap <m-m> :LeaderfTag<cr>
+		noremap <m-]> :LeaderfFunction<cr>
 		" let g:Lf_StlSeparator = { 'left': '♰', 'right': '♱', 'font': '' }
 		let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
 		let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>'], '<Esc>':[ '<C-q>' ]}
@@ -142,6 +142,9 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 		Plugin 'skywind3000/vimpress'
 		" Plugin 'honza/vim-snippets'
 		" Plugin 'SirVer/ultisnips'
+		" Plugin 'garbas/vim-snipmate'
+		" Plugin 'tomtom/tlib_vim'
+		" Plugin 'MarcWeber/vim-addon-mw-utils'
 	endif
 
 	if !isdirectory(expand('~/.vim/notes'))
@@ -167,6 +170,13 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 	map <silent> <leader>sw <Plug>StlRefVimAsk
 	map <silent> <leader>sc <Plug>StlRefVimInvoke
 	map <silent> <leader>se <Plug>StlRefVimExample
+
+	if 0
+		imap <m-j> <Plug>snipMateNextOrTrigger
+		smap <m-j> <Plug>snipMateNextOrTrigger
+		imap <m-k> <Plug>snipMateBack
+		smap <m-k> <Plug>snipMateBack
+	endif
 
 endif
 
