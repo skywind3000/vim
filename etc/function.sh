@@ -130,24 +130,24 @@ fi
 #----------------------------------------------------------------------
 # fish collapsed pwd
 #----------------------------------------------------------------------
-if [[ -n "$BASH_VERSION" ]]; then
-	function _fish_collapsed_pwd() {
-		local pwd="$1"
-		local home="$HOME"
-		local size=${#home}
-		[[ $# == 0 ]] && pwd="$PWD"
-		[[ -z "$pwd" ]] && return
-		if [[ "$pwd" == "/" ]]; then
-			echo "/"
-			return
-		elif [[ "$pwd" == "$home" ]]; then
-			echo "~"
-			return
-		fi
-		case "$pwd" in 
-			("$home") pwd="~" ;;
-			("$home/"*) pwd="~${pwd:$size}" ;;
-		esac
+function _fish_collapsed_pwd() {
+	local pwd="$1"
+	local home="$HOME"
+	local size=${#home}
+	[[ $# == 0 ]] && pwd="$PWD"
+	[[ -z "$pwd" ]] && return
+	if [[ "$pwd" == "/" ]]; then
+		echo "/"
+		return
+	elif [[ "$pwd" == "$home" ]]; then
+		echo "~"
+		return
+	fi
+	case "$pwd" in 
+		("$home") pwd="~" ;;
+		("$home/"*) pwd="~${pwd:$size}" ;;
+	esac
+	if [[ -n "$BASH_VERSION" ]]; then
 		local IFS="/"
 		local elements=($pwd)
 		local length=${#elements[@]}
@@ -157,27 +157,7 @@ if [[ -n "$BASH_VERSION" ]]; then
 				elements[$i]=${elem:0:1}
 			fi
 		done
-		local IFS="/"
-		echo "${elements[*]}"
-	}
-else
-	function _fish_collapsed_pwd () {
-		local pwd="$1"
-		local home="$HOME"
-		local size=${#home}
-		[[ $# == 0 ]] && pwd="$PWD" 
-		[[ "$pwd" == "" ]] && return
-		if [[ "$pwd" == "/" ]]; then
-			echo "/"
-			return
-		elif [[ "$pwd" == "$home" ]]; then
-			echo "~"
-			return
-		fi
-		case $pwd in 
-			("$home") pwd="~" ;;
-			("$home/"*) pwd="~${pwd[$size+1, -1]}" ;;
-		esac
+	else
 		local elements=("${(s:/:)pwd}")
 		local length=${#elements}
 		# print -l $elements
@@ -187,10 +167,10 @@ else
 				elements[$i]=${elem[1]}
 			fi
 		done
-		pwd="${(j./.)elements}"
-		echo "$pwd"
-	}
-fi
+	fi
+	local IFS="/"
+	echo "${elements[*]}"
+}
 
 
 #----------------------------------------------------------------------
