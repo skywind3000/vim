@@ -130,35 +130,67 @@ fi
 #----------------------------------------------------------------------
 # fish collapsed pwd
 #----------------------------------------------------------------------
-function _fish_collapsed_pwd () {
-	local pwd="$1"
-	local home="$HOME"
-	local size=${#home}
-	[[ $# == 0 ]] && pwd="$PWD" 
-	[[ "$pwd" == "" ]] && return
-	if [[ "$pwd" == "/" ]]; then
-		echo "/"
-		return
-	elif [[ "$pwd" == "$home" ]]; then
-		echo "~"
-		return
-	fi
-	case $pwd in 
-		("$home") pwd="~" ;;
-		("$home/"*) pwd="~${pwd[$size+1, -1]}" ;;
-	esac
-	local elements=("${(s:/:)pwd}")
-	local length=${#elements}
-	# print -l $elements
-	for i in {1..$((length-1))}; do
-		local elem=${elements[$i]}
-		if [[ ${#elem} > 1 ]]; then
-			elements[$i]=${elem[1]}
+if [[ -n "$BASH_VERSION" ]]; then
+	function _fish_collapsed_pwd() {
+		local pwd="$1"
+		local home="$HOME"
+		local size=${#home}
+		[[ $# == 0 ]] && pwd="$PWD"
+		[[ -z "$pwd" ]] && return
+		if [[ "$pwd" == "/" ]]; then
+			echo "/"
+			return
+		elif [[ "$pwd" == "$home" ]]; then
+			echo "~"
+			return
 		fi
-	done
-	pwd="${(j./.)elements}"
-	echo "$pwd"
-}
+		case "$pwd" in 
+			("$home") pwd="~" ;;
+			("$home/"*) pwd="~${pwd:$size}" ;;
+		esac
+		local IFS="/"
+		local elements=($pwd)
+		local length=${#elements[@]}
+		for ((i=0;i<length-1;i++)); do
+			local elem=${elements[$i]}
+			if [[ ${#elem} -gt 1 ]]; then
+				elements[$i]=${elem:0:1}
+			fi
+		done
+		local IFS="/"
+		echo "${elements[*]}"
+	}
+else
+	function _fish_collapsed_pwd () {
+		local pwd="$1"
+		local home="$HOME"
+		local size=${#home}
+		[[ $# == 0 ]] && pwd="$PWD" 
+		[[ "$pwd" == "" ]] && return
+		if [[ "$pwd" == "/" ]]; then
+			echo "/"
+			return
+		elif [[ "$pwd" == "$home" ]]; then
+			echo "~"
+			return
+		fi
+		case $pwd in 
+			("$home") pwd="~" ;;
+			("$home/"*) pwd="~${pwd[$size+1, -1]}" ;;
+		esac
+		local elements=("${(s:/:)pwd}")
+		local length=${#elements}
+		# print -l $elements
+		for i in {1..$((length-1))}; do
+			local elem=${elements[$i]}
+			if [[ ${#elem} > 1 ]]; then
+				elements[$i]=${elem[1]}
+			fi
+		done
+		pwd="${(j./.)elements}"
+		echo "$pwd"
+	}
+fi
 
 
 #----------------------------------------------------------------------
@@ -184,6 +216,18 @@ function _prompt_init_theme {
 			export PS1='\n\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m \[\e[38;5;118m\]\w\[\e[0m\]\n\$ '
 		elif [[ "$1" == "skwp256-msys" ]]; then
 			export PS1='\n\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m \[\e[35m\]${MSYSTEM} \[\e[38;5;118m\]\w\[\e[0m\]\n\$ '
+		elif [[ "$1" == "fish" ]]; then
+			if [[ "$UID" -eq 0 ]]; then
+				export PS1='\u@\h \[\e[31m\]$(_fish_collapsed_pwd)\[\e[0m\]> '
+			else
+				export PS1='\u@\h \[\e[32m\]$(_fish_collapsed_pwd)\[\e[0m\]> '
+			fi
+		elif [[ "$1" == "fish-skwp" ]]; then
+			if [[ "$UID" -eq 0 ]]; then
+				export PS1='\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m \[\e[38;5;1m\]$(_fish_collapsed_pwd)\[\e[0m\]> '
+			else
+				export PS1='\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m \[\e[38;5;118m\]$(_fish_collapsed_pwd)\[\e[0m\]> '
+			fi
 		fi
 	else
 		local NEWLINE=$'\n'
