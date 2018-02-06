@@ -213,7 +213,7 @@ let g:UltiSnipsExpandTrigger="<m-h>"
 let g:UltiSnipsJumpForwardTrigger="<m-j>"
 let g:UltiSnipsJumpBackwardTrigger="<m-k>"
 let g:UltiSnipsListSnippets="<m-l>"
-let g:UltiSnipsSnippetDirectories=['UltiSnips', s:home."/usnips"]
+let g:UltiSnipsSnippetDirectories=['UltiSnips', s:home."/usnip"]
 let g:snips_author = 'skywind'
 
 

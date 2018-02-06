@@ -140,12 +140,11 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 				
 	if has('python')
 		Plugin 'skywind3000/vimpress'
-		" Plugin 'honza/vim-snippets'
+		Plugin 'honza/vim-snippets'
 		" Plugin 'SirVer/ultisnips'
-		" Plugin 'garbas/vim-snipmate'
-		" Plugin 'MarcWeber/vim-addon-mw-utils'
-		" Plugin 'vim-scripts/tlib'
-		" Plugin 'tomtom/tlib_vim'
+		Plugin 'garbas/vim-snipmate'
+		Plugin 'MarcWeber/vim-addon-mw-utils'
+		Plugin 'tomtom/tlib_vim'
 	endif
 
 	if !isdirectory(expand('~/.vim/notes'))
@@ -173,11 +172,13 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 	map <silent> <leader>sc <Plug>StlRefVimInvoke
 	map <silent> <leader>se <Plug>StlRefVimExample
 
-	if 0
-		imap <m-j> <Plug>snipMateNextOrTrigger
+	if 1
+		imap <expr> <m-h> pumvisible() ? '<esc>a<Plug>snipMateTrigger' : '<Plug>snipMateTrigger'
+		imap <expr> <m-j> pumvisible() ? '<esc>a<Plug>snipMateNextOrTrigger' : '<Plug>snipMateNextOrTrigger'
 		smap <m-j> <Plug>snipMateNextOrTrigger
-		imap <m-k> <Plug>snipMateBack
+		imap <expr> <m-k> pumvisible() ? '<esc>a<Plug>snipMateBack' : '<Plug>snipMateBack'
 		smap <m-k> <Plug>snipMateBack
+		imap <expr> <m-l> pumvisible() ? '<esc>a<Plug>snipMateShow' : '<Plug>snipMateShow'
 	endif
 
 endif
