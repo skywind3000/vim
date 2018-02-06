@@ -143,8 +143,9 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 		" Plugin 'honza/vim-snippets'
 		" Plugin 'SirVer/ultisnips'
 		" Plugin 'garbas/vim-snipmate'
-		" Plugin 'tomtom/tlib_vim'
 		" Plugin 'MarcWeber/vim-addon-mw-utils'
+		" Plugin 'vim-scripts/tlib'
+		" Plugin 'tomtom/tlib_vim'
 	endif
 
 	if !isdirectory(expand('~/.vim/notes'))
