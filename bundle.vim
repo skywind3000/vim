@@ -107,9 +107,11 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 		let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>'], '<Esc>':[ '<C-q>' ]}
 	else
 		Plugin 'ctrlpvim/ctrlp.vim'
+		Plugin 'tacahiroy/ctrlp-funky'
 		let g:ctrlp_map = ''
 		noremap <c-n> :CtrlPMRUFiles<cr>
 		noremap <c-p> :CtrlP<cr>
+		noremap <m-]> :CtrlPFunky<cr>
 	endif
 
 	let g:zv_file_types = {
