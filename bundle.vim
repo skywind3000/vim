@@ -100,8 +100,9 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 		Plugin 'Yggdroot/LeaderF'
 		let g:Lf_ShortcutF = '<c-p>'
 		noremap <c-n> :LeaderfMru<cr>
+		noremap <m-p> :LeaderfFunction<cr>
+		noremap <m-n> :LeaderfBuffer<cr>
 		noremap <m-m> :LeaderfTag<cr>
-		noremap <m-]> :LeaderfFunction<cr>
 		" let g:Lf_StlSeparator = { 'left': '♰', 'right': '♱', 'font': '' }
 		let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
 		let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>'], '<Esc>':[ '<C-q>' ]}
@@ -109,9 +110,10 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 		Plugin 'ctrlpvim/ctrlp.vim'
 		Plugin 'tacahiroy/ctrlp-funky'
 		let g:ctrlp_map = ''
-		noremap <c-n> :CtrlPMRUFiles<cr>
 		noremap <c-p> :CtrlP<cr>
-		noremap <m-]> :CtrlPFunky<cr>
+		noremap <c-n> :CtrlPMRUFiles<cr>
+		noremap <m-p> :CtrlPFunky<cr>
+		noremap <m-n> :CtrlPBuffer<cr>
 	endif
 
 	let g:zv_file_types = {
