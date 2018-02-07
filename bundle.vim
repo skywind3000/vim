@@ -140,6 +140,7 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 	Plugin 'wsdjeg/FlyGrep.vim'
 	Plugin 'tpope/vim-abolish'
 	Plugin 'xolox/vim-notes'
+	Plugin 'vim-scripts/CRefVim'
 	" Plugin 'vim-scripts/DrawIt'
 				
 	if has('python')
