@@ -630,7 +630,16 @@ function! s:Vimmake_Build_Start(cmd)
 		endfor
 		let l:name = join(l:vector, ', ')
 	endif
+	let s:build_state = 0
+	let s:build_output = {}
+	let s:build_head = 0
+	let s:build_tail = 0
 	let s:build_efm = &errorformat
+	let s:build_info.post = s:build_info.postsave
+	let s:build_info.auto = s:build_info.autosave
+	let s:build_info.postsave = ''
+	let s:build_info.autosave = ''
+	let g:vimmake_text = s:build_info.text
 	call s:AutoCmd('Pre')
 	if s:build_nvim == 0
 		let l:options = {}
@@ -657,9 +666,9 @@ function! s:Vimmake_Build_Start(cmd)
 		let l:success = (s:build_job > 0)? 1 : 0
 	endif
 	if l:success != 0
-		let s:build_output = {}
-		let s:build_head = 0
-		let s:build_tail = 0
+		let s:build_state = or(s:build_state, 1)
+		let g:vimmake_build_status = "running"
+		let s:build_start = float2nr(reltimefloat(reltime()))
 		let l:arguments = "[".l:name."]"
 		let l:title = ':VimMake '.l:name
 		if s:build_nvim == 0
@@ -672,16 +681,8 @@ function! s:Vimmake_Build_Start(cmd)
 			call setqflist([], ' ', l:title)
 		endif
 		call setqflist([{'text':l:arguments}], 'a')
-		let s:build_start = float2nr(reltimefloat(reltime()))
 		let l:name = 'g:Vimmake_Build_OnTimer'
 		let s:build_timer = timer_start(100, l:name, {'repeat':-1})
-		let s:build_state = 1
-		let g:vimmake_build_status = "running"
-		let s:build_info.post = s:build_info.postsave
-		let s:build_info.auto = s:build_info.autosave
-		let s:build_info.postsave = ''
-		let s:build_info.autosave = ''
-		let g:vimmake_text = s:build_info.text
 		call s:Vimmake_Build_AutoCmd(0, s:build_info.auto)
 		call s:AutoCmd('Start')
 		redrawstatus!

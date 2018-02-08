@@ -217,6 +217,7 @@ function! s:task_start(task, cmd, opts) abort
 	if l:shellcmdflag != ''
 		let args += [l:shellcmdflag]
 	endif
+	let task.__private.state = 0
 	let task.__private.args = args + [a:cmd]
 	let task.__private.cmd = a:cmd
 	let task.__private.id = 0
@@ -249,7 +250,7 @@ function! s:task_start(task, cmd, opts) abort
 			let success = (task.__private.job > 0)? 1 : 0
 		endif
 		if success
-			let task.__private.state = 1
+			let task.__private.state = or(task.__private.state, 1)
 			let task.__private.id = s:allocate()
 			let s:tasks[task.__private.id] = task
 		endif
