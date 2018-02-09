@@ -226,6 +226,7 @@ endif
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'opt') >= 0
 	Plugin 'thinca/vim-quickrun'
+	Plugin 'junegunn/fzf'
 	" Plugin 'mattn/vim-terminal'
 	" Plugin 'Shougo/vimshell.vim'
 	" Plugin 'Shougo/vimproc.vim'

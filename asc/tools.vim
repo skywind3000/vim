@@ -840,5 +840,38 @@ function! UpdateLastModified()
 endfunc
 
 
+"----------------------------------------------------------------------
+" Fzf
+"----------------------------------------------------------------------
+function! Tools_FileSearch(...)
+	let path = vimmake#get_root('%')
+	let mode = 0
+	if path == ''
+		return
+	endif
+	if executable('fzf') && exists(':FZF') == 2
+		let mode = 0
+	elseif exists(':LeaderfFile') == 2
+		let mode = 1
+	elseif exists(':CtrlP') == 2
+		let mode = 2
+	endif
+	if a:0 >= 0 && a:1 >= 0
+		let mode = a:1
+	endif
+	if a:0 >= 2 && a:2 != ''
+		let path = a:2
+	endif
+	if mode == 0
+		exec 'FZF '. fnameescape(path)
+	elseif mode == 1
+		exec 'LeaderfFile '. fnameescape(path)
+	elseif mode == 2
+		exec 'CtrlP '. fnameescape(path)
+	endif
+endfunc
+
+
+command! -nargs=? FuzzyFileSearch call Tools_FileSearch(-1, <q-args>)
 
 
