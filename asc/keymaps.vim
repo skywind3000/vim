@@ -1,9 +1,9 @@
 "======================================================================
 "
-" keymaps.vim - keymaps start with using <space> 
+" keymaps.vim - keymaps start with using <space>
 "
 " Created by skywind on 2016/10/12
-" Last change: 2016/10/12 16:37:25
+" Last Modified: 2018/02/10 02:08
 "
 "======================================================================
 
@@ -69,7 +69,7 @@ noremap <silent><tab>8 :VinegarOpen belowright sp<cr>
 noremap <silent><tab>9 :VinegarOpen tabedit<cr>
 noremap <silent>+ :VinegarOpen edit<cr>
 
-noremap <silent><space>ha :GuiSignRemove 
+noremap <silent><space>ha :GuiSignRemove
 			\ errormarker_error errormarker_warning<cr>
 
 " replace
@@ -145,7 +145,7 @@ endif
 
 
 "----------------------------------------------------------------------
-" space + s : svn 
+" space + s : svn
 "----------------------------------------------------------------------
 noremap <space>sc :VimMake svn co -m "update from vim"<cr>
 noremap <space>su :VimMake svn up<cr>
@@ -229,7 +229,7 @@ inoremap <silent><m-a> <c-\><c-o>:call asclib#function_echo(1)<cr>
 
 
 "----------------------------------------------------------------------
-" GUI/Terminal 
+" GUI/Terminal
 "----------------------------------------------------------------------
 noremap <silent><M-[> :call Tools_QuickfixCursor(2)<cr>
 noremap <silent><M-]> :call Tools_QuickfixCursor(3)<cr>

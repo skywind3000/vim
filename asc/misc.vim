@@ -1,9 +1,9 @@
 "======================================================================
 "
-" misc.vim - edit details
+" misc.vim - 
 "
-" created by: skywind in 2016/9/19 1:00:44
-" last change: 2016/9/19 1:00:44
+" Created by skywind on 2018/02/10
+" Last Modified: 2018/02/19 02:07:04
 "
 "======================================================================
 
@@ -32,7 +32,7 @@ function! s:comment()
 		return '//'
 	elseif index(['coffee'], &filetype) >= 0
 		return '//'
-	elseif index(['sh', 'bash', 'python', 'php', 'perl'], $filetype) >= 0
+	elseif index(['sh', 'bash', 'python', 'php', 'perl', 'zsh'], $filetype) >= 0
 		return '#'
 	elseif index(['make', 'ruby'], $filetype) >= 0
 		return '#'
@@ -93,6 +93,12 @@ function! <SID>snip_copyright(author)
 		let l:text += ['# -*- coding: utf-8 -*-']
 	elseif &filetype == 'sh'
 		let l:text += ['#! /bin/sh']
+	elseif &filetype == 'perl'
+		let l:text += ['#! /usr/bin/env perl']
+	elseif &filetype == 'bash'
+		let l:text += ['#! /usr/bin/env bash']
+	elseif &filetype == 'zsh'
+		let l:text += ['#! /usr/bin/env zsh']
 	elseif &filetype == 'php'
 	endif
 	let l:text += [l:complete]
@@ -100,7 +106,7 @@ function! <SID>snip_copyright(author)
 	let l:text += [l:c . ' ' . l:filename . ' - ' ]
 	let l:text += [l:c]
 	let l:text += [l:c . ' Created by ' . a:author . ' on '. l:t]
-	let l:text += [l:c . ' Last change: ' . strftime('%Y/%m/%d %H:%M:%S') ]
+	let l:text += [l:c . ' Last Modified: ' . strftime('%Y/%m/%d %H:%M:%S') ]
 	let l:text += [l:c]
 	let l:text += [l:complete]
 	call append(0, l:text)

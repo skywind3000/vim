@@ -1,3 +1,12 @@
+"======================================================================
+"
+" tools.vim - tool functions
+"
+" Created by skywind on 2018/02/10
+" Last Modified: 2018/02/10 02:34:43
+"
+"======================================================================
+
 " global settings
 let s:winopen = 0
 let g:status_var = ""
@@ -757,5 +766,79 @@ endfunc
 
 
 command! -nargs=0 PasteVimModeLine call s:paste_mode_line()
+
+
+"----------------------------------------------------------------------
+" https://github.com/lilydjwg/dotvim 
+"----------------------------------------------------------------------
+function! GetPatternAtCursor(pat)
+	let col = col('.') - 1
+	let line = getline('.')
+	let ebeg = -1
+	let cont = match(line, a:pat, 0)
+	while (ebeg >= 0 || (0 <= cont) && (cont <= col))
+		let contn = matchend(line, a:pat, cont)
+		if (cont <= col) && (col < contn)
+			let ebeg = match(line, a:pat, cont)
+			let elen = contn - ebeg
+			break
+		else
+			let cont = match(line, a:pat, contn)
+		endif
+	endwhile
+	if ebeg >= 0
+		return strpart(line, ebeg, elen)
+	else
+		return ""
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" https://github.com/Shougo/shougo-s-github 
+"----------------------------------------------------------------------
+function! ToggleOption(option_name)
+	execute 'setlocal' a:option_name.'!'
+	execute 'setlocal' a:option_name.'?'
+endfunc
+
+
+"----------------------------------------------------------------------
+" https://github.com/asins/vim 
+"----------------------------------------------------------------------
+function! StripTrailingWhitespace()
+	" Preparation: save last search, and cursor position.
+	let _s=@/
+	let l = line(".")
+	let c = col(".")
+	" do the business:
+	exec '%s/\r$\|\s\+$//e'
+	" clean up: restore previous search history, and cursor position
+	let @/=_s
+	call cursor(l, c)
+endfunc
+
+
+"----------------------------------------------------------------------
+" update last change time
+"----------------------------------------------------------------------
+function! UpdateLastModified()
+	" preparation: save last search, and cursor position.
+	let _s=@/
+	let l = line(".")
+	let c = col(".")
+
+	let n = min([10, line('$')]) " check head
+	let timestamp = strftime('%Y/%m/%d %H:%M') " time format
+	let timestamp = substitute(timestamp, '%', '\%', 'g')
+	let pat = substitute('Last Modified:\s*\zs.*\ze', '%', '\%', 'g')
+	keepjumps silent execute '1,'.n.'s%^.*'.pat.'.*$%'.timestamp.'%e'
+
+	" clean up: restore previous search history, and cursor position
+	let @/=_s
+	call cursor(l, c)
+endfunc
+
+
 
 

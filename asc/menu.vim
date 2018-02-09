@@ -251,6 +251,8 @@ endif
 
 call quickmenu#append('# Tools', '')
 
+call quickmenu#append('Trailing Space', 'call StripTrailingWhitespace()', 'Strip trailing whitespace')
+call quickmenu#append('Update ModTime', 'call UpdateLastModified()', 'Update last modified time')
 call quickmenu#append('Tool help', 'call menu#ToolHelp()', 'show the help of user tools')
 call quickmenu#append('Signify refresh', 'SignifyRefresh', 'update signify')
 call quickmenu#append('Calendar', 'Calendar', 'show Calendar')

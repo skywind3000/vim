@@ -94,6 +94,7 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 	Plugin 'flazz/vim-colorschemes'
 	Plugin 'xolox/vim-misc'
 	Plugin 'tpope/vim-unimpaired'
+	Plugin 'octol/vim-cpp-enhanced-highlight'
 	" Plugin 'vim-scripts/Colour-Sampler-Pack'
 
 	if has('python') || has('python3')
@@ -126,6 +127,12 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 	noremap <space>ht :Startify<cr>
 	noremap <space>hy :tabnew<cr>:Startify<cr> 
 
+	let g:cpp_class_scope_highlight = 1
+	let g:cpp_member_variable_highlight = 1
+	let g:cpp_class_decl_highlight = 1
+	let g:cpp_experimental_simple_template_highlight = 1
+	let g:cpp_concepts_highlight = 1
+	let g:cpp_no_function_highlight = 1
 endif
 
 
@@ -140,6 +147,7 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 	Plugin 'wsdjeg/FlyGrep.vim'
 	Plugin 'tpope/vim-abolish'
 	Plugin 'xolox/vim-notes'
+	Plugin 'mhartington/oceanic-next'
 	" Plugin 'vim-scripts/CRefVim'
 	" Plugin 'vim-scripts/DrawIt'
 				
