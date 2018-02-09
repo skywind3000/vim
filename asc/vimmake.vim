@@ -1575,6 +1575,7 @@ endif
 
 function! vimmake#grep(text, cwd)
 	let mode = get(g:, 'vimmake_grep_mode', '')
+	let fixed = get(g:, 'vimmake_grep_fixed', 0)
 	if mode == ''
 		let mode = (s:vimmake_windows == 0)? 'grep' : 'findstr'
 	endif
@@ -1589,7 +1590,8 @@ function! vimmake#grep(text, cwd)
             let l:full = vimmake#fullname(a:cwd)
             let l:inc .= ' '.shellescape(l:full)
         endif
-		let cmd = 'grep -n -s -R ' .shellescape(a:text). l:inc .' /dev/null'
+		let cmd = 'grep -n -s -R ' . (fixed? '-F ' : '')
+		let cmd .= shellescape(a:text). l:inc .' /dev/null'
 		call vimmake#run('', {}, cmd)
 	elseif mode == 'findstr'
 		let l:inc = ''
@@ -1608,7 +1610,7 @@ function! vimmake#grep(text, cwd)
 		for item in g:vimmake_grep_exts
 			let inc += ['\.'.item]
 		endfor
-		let cmd = 'ag '
+		let cmd = 'ag ' . (fixed? '-F ' : '')
 		if len(inc) > 0
 			let cmd .= '-G '.shellescape('('.join(inc, '|').')$'). ' '
 		endif
@@ -1618,7 +1620,7 @@ function! vimmake#grep(text, cwd)
         endif
 		call vimmake#run('', {'mode':0}, cmd)
 	elseif mode == 'rg'
-		let cmd = 'rg -n --no-heading --color never '
+		let cmd = 'rg -n --no-heading --color never '. (fixed? '-F ' : '')
 		for item in g:vimmake_grep_exts
 			let cmd .= ' -g *.'. item
 		endfor
