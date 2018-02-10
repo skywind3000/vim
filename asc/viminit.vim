@@ -1,7 +1,7 @@
 " viminit.vim - Vim initialize script
 "
 " Maintainer: skywind3000 (at) gmail.com
-" Last change: 2016.4.6
+" Last Modified: 2018/02/10 12:52
 "
 " Tiny script which makes vim become neat and handy, supports vim.tiny
 "
@@ -89,7 +89,7 @@ inoremap <silent><s-tab> <ESC>:tabnext<CR>
 
 
 " keymap to switch tab in both gui and terminal (need config)
-if has('gui_running') 
+if has('gui_running')
 	noremap <silent><c-tab> :tabprev<CR>
 	inoremap <silent><c-tab> <ESC>:tabprev<CR>
 	noremap <silent><m-1> :tabn 1<cr>
