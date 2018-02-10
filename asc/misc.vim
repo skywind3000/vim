@@ -34,7 +34,7 @@ function! s:comment()
 		return '//'
 	elseif index(['sh', 'bash', 'python', 'php', 'perl', 'zsh'], $filetype) >= 0
 		return '#'
-	elseif index(['make', 'ruby'], $filetype) >= 0
+	elseif index(['make', 'ruby', 'text'], $filetype) >= 0
 		return '#'
 	elseif index(['py', 'sh', 'pl', 'php', 'rb'], l:ext) >= 0
 		return '#'
@@ -47,7 +47,7 @@ function! s:comment()
 	elseif index(['basic'], &filetype) >= 0
 		return "'"
 	endif
-	return ""
+	return "#"
 endfunc
 
 
@@ -204,6 +204,7 @@ endfunc
 "-----------------------------------------------------------------------
 noremap <space>e- :call <SID>snip_comment_block('-')<cr>
 noremap <space>e= :call <SID>snip_comment_block('=')<cr>
+noremap <space>e# :call <SID>snip_comment_block('#')<cr>
 noremap <space>ec :call <SID>snip_copyright('skywind')<cr>
 noremap <space>eb :call <SID>snip_bundle()<cr>
 noremap <space>em :call <SID>snip_main()<cr>

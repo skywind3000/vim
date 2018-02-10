@@ -406,3 +406,12 @@ nnoremap <silent>g9 :call vimmake#update_tags('!', 'ctags', '.tags')<cr>
 nnoremap <silent><space>ww :call asclib#touch_file('wsgi')<cr>
 
 
+"----------------------------------------------------------------------
+" others
+"----------------------------------------------------------------------
+nnoremap <silent><space>at :MyCheatSheetAlign<cr>
+vnoremap <silent><space>at :MyCheatSheetAlign<cr>
+
+
+
+

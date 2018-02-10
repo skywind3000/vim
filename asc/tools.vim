@@ -875,3 +875,22 @@ endfunc
 command! -nargs=? FuzzyFileSearch call Tools_FileSearch(-1, <q-args>)
 
 
+
+"----------------------------------------------------------------------
+" Align cheatsheet
+"----------------------------------------------------------------------
+function! s:Tools_CheatSheetAlign(...)
+	let size = get(g:, 'tools_align_width', 20)
+	let size = (a:0 >= 1 && a:1 > 0)? a:1 : size
+	let text = 's/^\(\S\+\%( \S\+\)*\)\s\s\+/\=printf("%-'
+	let text.= size
+	let text.= 'S",submatch(1))/'
+	let text = 's/^\(.\{-}\) \{2,}/\=printf("%-'. size
+	let text.= 'S", submatch(1))/'
+	silent! keepjumps exec text
+endfunc
+
+command! -nargs=? -range MyCheatSheetAlign <line1>,<line2>call s:Tools_CheatSheetAlign(<q-args>)
+
+
+
