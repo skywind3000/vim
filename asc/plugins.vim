@@ -80,6 +80,8 @@ function! s:setup_dirvish()
 	" let name = '\V\^'.escape(text, '\').'\$'
 	" echom "search: ".name
 	call search(name, 'wc')
+	noremap <silent><buffer> ~ :Dirvish ~<cr>
+	noremap <buffer> % :e %
 endfunc
 
 function! DirvishSetup()
