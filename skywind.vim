@@ -122,6 +122,7 @@ let g:vimmake_run_guess = ['go']
 let g:vimmake_ftrun = {}
 let g:vimmake_ftrun['make'] = 'make -f'
 let g:vimmake_ftrun['zsh'] = 'zsh'
+let g:vimmake_ftrun['erlang'] = 'escript'
 
 let g:vimmake_extrun = {'hs': 'runghc', 'lisp': 'sbcl --script'}
 
