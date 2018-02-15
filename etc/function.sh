@@ -143,7 +143,7 @@ function _fish_collapsed_pwd() {
 		echo "~"
 		return
 	fi
-	[[ "$pwd" == "$home/" ]] && pwd="~${pwd:$size}"
+	[[ "$pwd" == "$home/"* ]] && pwd="~${pwd:$size}"
 	if [[ -n "$BASH_VERSION" ]]; then
 		local IFS="/"
 		local elements=($pwd)
