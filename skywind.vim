@@ -55,7 +55,17 @@ augroup SkywindGroup
 	au FileType lisp setlocal ts=8 sts=2 sw=2 et
 	au FileType scala setlocal sts=4 sw=4 noet
 	au FileType haskell setlocal et
+	au FileType c,cpp call s:language_cpp()
 augroup END
+
+
+"----------------------------------------------------------------------
+" languages
+"----------------------------------------------------------------------
+function s:language_cpp()
+	syntax match cCustomFunc /\w\+\s*(/me=e-1,he=e-1
+	highlight def link cCustomFunc Function
+endfunc
 
 
 "----------------------------------------------------------------------
