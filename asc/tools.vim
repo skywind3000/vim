@@ -893,4 +893,20 @@ endfunc
 command! -nargs=? -range MyCheatSheetAlign <line1>,<line2>call s:Tools_CheatSheetAlign(<q-args>)
 
 
+"----------------------------------------------------------------------
+" Load url
+"----------------------------------------------------------------------
+function! s:Tools_ReadUrl(url)
+	if executable('wget')
+		exec 'r !wget --no-check-certificate -qO- '.shellescape(a:url)
+	elseif executable('curl')
+		exec 'r !curl -sL '.shellescape(a:url)
+	else
+		echo "require wget or curl"
+	endif
+endfunc
+
+command! -nargs=1 MyUrlRead call s:Tools_ReadUrl(<q-args>)
+
+
 

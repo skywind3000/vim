@@ -173,6 +173,26 @@ function! menu#EmacsGdb()
 	call asclib#utils#emacs_gdb(name)
 endfunc
 
+function! menu#ReadUrl()
+	let t = expand('<cword>')
+	echohl Type
+	call inputsave()
+	let t = input('Read URL from: ')
+	call inputrestore()
+	echohl None
+	redraw | echo "" | redraw
+	if t == ''
+		return 0
+	endif
+	if executable('wget')
+		exec 'r !wget --no-check-certificate -qO- '.shellescape(t)
+	elseif executable('curl')
+		exec 'r !curl -sL '.shellescape(t)
+	else
+		echo "require wget or curl"
+	endif
+endfunc
+
 
 "----------------------------------------------------------------------
 " menu initialize
@@ -259,6 +279,7 @@ call quickmenu#append('Calendar', 'Calendar', 'show Calendar')
 call quickmenu#append('Paste mode line', 'PasteVimModeLine', 'paste vim mode line here')
 call quickmenu#append('Dash Help', 'call menu#DashHelp()', 'open dash or zeal to view keywords in docsets')
 call quickmenu#append('Emacs GDB', 'call menu#EmacsGdb()', 'debug with emacs gdb-mode', 'c,cpp,objc,objcpp')
+call quickmenu#append('Read URL', 'call menu#ReadUrl()', 'load content from url')
 
 if has('win32') || has('win64') || has('win16') || has('win95')
 	let s:cmd = '!start /b cmd.exe /C start https://wakatime.com/dashboard'
