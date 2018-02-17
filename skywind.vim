@@ -63,8 +63,8 @@ augroup END
 " languages
 "----------------------------------------------------------------------
 function s:language_cpp()
-	syntax match cCustomFunc /\w\+\s*(/me=e-1,he=e-1
-	highlight def link cCustomFunc Function
+	" syntax match cCustomFunc /\w\+\s*(/me=e-1,he=e-1
+	" highlight def link cCustomFunc Function
 endfunc
 
 

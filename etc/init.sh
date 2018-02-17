@@ -37,7 +37,7 @@ if [ -z $_INIT_SH_LOADED ]; then
 	export PATH
 
 	# check if bash or zsh
-	if [ -n "$BASH_VERSION" ] || [ -z "$ZSH_VERSION" ]; then
+	if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
 
 		# run script for interactive shell of bash/zsh
 		if [[ $- == *i* ]] && [ -z "$_INIT_SH_NOFUN" ]; then
