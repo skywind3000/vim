@@ -186,12 +186,12 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 	map <silent> <leader>se <Plug>StlRefVimExample
 
 	if 1
-		imap <expr> <m-h> pumvisible() ? '<esc>a<Plug>snipMateTrigger' : '<Plug>snipMateTrigger'
-		imap <expr> <m-j> pumvisible() ? '<esc>a<Plug>snipMateNextOrTrigger' : '<Plug>snipMateNextOrTrigger'
+		imap <expr> <m-i> pumvisible() ? '<esc>a<Plug>snipMateTrigger' : '<Plug>snipMateTrigger'
+		imap <expr> <m-n> pumvisible() ? '<esc>a<Plug>snipMateNextOrTrigger' : '<Plug>snipMateNextOrTrigger'
 		smap <m-j> <Plug>snipMateNextOrTrigger
-		imap <expr> <m-k> pumvisible() ? '<esc>a<Plug>snipMateBack' : '<Plug>snipMateBack'
+		imap <expr> <m-p> pumvisible() ? '<esc>a<Plug>snipMateBack' : '<Plug>snipMateBack'
 		smap <m-k> <Plug>snipMateBack
-		imap <expr> <m-l> pumvisible() ? '<esc>a<Plug>snipMateShow' : '<Plug>snipMateShow'
+		imap <expr> <m-m> pumvisible() ? '<esc>a<Plug>snipMateShow' : '<Plug>snipMateShow'
 	endif
 
 endif

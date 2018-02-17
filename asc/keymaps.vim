@@ -93,10 +93,14 @@ noremap <M-j> 10j
 noremap <M-k> 10k
 noremap <M-J> gj
 noremap <M-K> gk
+noremap <M-y> d$
 inoremap <M-h> <c-left>
 inoremap <M-l> <c-right>
 inoremap <M-j> <c-\><c-o>10j
 inoremap <M-k> <c-\><c-o>10k
+inoremap <M-J> <c-\><c-o>gj
+inoremap <M-K> <c-\><c-o>gk
+inoremap <M-y> <c-\><c-o>d$
 cnoremap <M-h> <c-left>
 cnoremap <M-l> <c-right>
 cnoremap <M-b> <c-left>

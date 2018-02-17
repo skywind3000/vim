@@ -211,10 +211,10 @@ let g:notes_directories = ['~/.vim/notes']
 " UltiSnips
 "----------------------------------------------------------------------
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
-let g:UltiSnipsExpandTrigger="<m-h>"
-let g:UltiSnipsJumpForwardTrigger="<m-j>"
-let g:UltiSnipsJumpBackwardTrigger="<m-k>"
-let g:UltiSnipsListSnippets="<m-l>"
+let g:UltiSnipsExpandTrigger="<m-i>"
+let g:UltiSnipsJumpForwardTrigger="<m-n>"
+let g:UltiSnipsJumpBackwardTrigger="<m-p>"
+let g:UltiSnipsListSnippets="<m-m>"
 let g:UltiSnipsSnippetDirectories=['UltiSnips', s:home."/usnip"]
 let g:snips_author = 'skywind'
 
