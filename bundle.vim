@@ -68,6 +68,7 @@ if index(g:bundle_group, 'simple') >= 0 || s:bundle_all
 	Plugin 'Raimondi/delimitMate'
 	Plugin 'godlygeek/tabular'
 	Plugin 'justinmk/vim-dirvish'
+	Plugin 'tpope/vim-unimpaired'
 
 	nnoremap <space>a= :Tabularize /=<CR>
 	vnoremap <space>a= :Tabularize /=<CR>
@@ -93,7 +94,6 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 	Plugin 'mhinz/vim-startify'
 	Plugin 'flazz/vim-colorschemes'
 	Plugin 'xolox/vim-misc'
-	Plugin 'tpope/vim-unimpaired'
 	Plugin 'octol/vim-cpp-enhanced-highlight'
 	" Plugin 'vim-scripts/Colour-Sampler-Pack'
 
