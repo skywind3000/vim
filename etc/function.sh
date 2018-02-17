@@ -252,8 +252,10 @@ function _prompt_title_init
 	if [ -n "$BASH_VERSION" ]; then
 		if [[ "$1" == "" ]]; then
 			export PS1="\[\e]0;\w\a\]$PS1"
-		else
+		elif [[ "$1" == "yes" ]]; then
 			export PS1="\[\e]0;\u@\h: \w\a\]$PS1"
+		elif [[ "$1" == "mini" ]]; then
+			export PS1="\[\e]0;\u@\h\a\]$PS1"
 		fi
 	else
 		DISABLE_AUTO_TITLE="false"
@@ -270,6 +272,7 @@ function _prompt_theme_title
 	if [ -n "$SSH_CLIENT" ]; then
 		settitle "$(whoami)@$(hostname)"
 		if [ -n "$ZSH_VERSION" ]; then
+			_prompt_title_init "mini"
 			DISABLE_AUTO_TITLE="true"
 		fi
 	else
