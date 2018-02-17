@@ -271,8 +271,9 @@ function _prompt_theme_title
 	_prompt_init_theme $1
 	if [ -n "$SSH_CLIENT" ]; then
 		settitle "$(whoami)@$(hostname)"
-		if [ -n "$ZSH_VERSION" ]; then
+		if [ -n "$BASH_VERSION" ]; then
 			_prompt_title_init "mini"
+		else
 			DISABLE_AUTO_TITLE="true"
 		fi
 	else
