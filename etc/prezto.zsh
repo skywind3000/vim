@@ -70,6 +70,7 @@ zstyle ':prezto:module:python' autovenv 'yes'
 zstyle ':prezto:load' pmodule \
 	'environment' \
 	'editor' \
+	'history' \
 	'git' \
 	'utility' \
 	'completion' \
@@ -132,6 +133,7 @@ antigen apply
 
 # options
 unsetopt correct_all
+setopt prompt_subst
 
 setopt BANG_HIST                 # Treat the '!' character specially during expansion.
 setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
