@@ -63,12 +63,13 @@ Plugin 'VundleVim/Vundle.vim'
 " Group - simple
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'simple') >= 0 || s:bundle_all
-	Plugin 'pprovost/vim-ps1'
 	Plugin 'easymotion/vim-easymotion'
 	Plugin 'Raimondi/delimitMate'
 	Plugin 'godlygeek/tabular'
 	Plugin 'justinmk/vim-dirvish'
+	Plugin 'justinmk/vim-sneak'
 	Plugin 'tpope/vim-unimpaired'
+	Plugin 'pprovost/vim-ps1'
 
 	nnoremap <space>a= :Tabularize /=<CR>
 	vnoremap <space>a= :Tabularize /=<CR>
@@ -82,6 +83,8 @@ if index(g:bundle_group, 'simple') >= 0 || s:bundle_all
 	vnoremap <space>a<bar> :Tabularize /\|<cr>
 	nnoremap <space>ar :Tabularize /\|/r0<cr>
 	vnoremap <space>ar :Tabularize /\|/r0<cr>
+	map <space>z <Plug>Sneak_s
+	map <space>Z <Plug>Sneak_S
 endif
 
 
@@ -203,7 +206,7 @@ endif
 if index(g:bundle_group, 'high') >= 0
 	Plugin 'kshenoy/vim-signature'
 	Plugin 'mh21/errormarker.vim'
-	Plugin 'dracula/vim'
+	" Plugin 'dracula/vim'
 	Plugin 'mhinz/vim-signify'
 
 	let g:syntastic_always_populate_loc_list = 1
