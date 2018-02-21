@@ -64,6 +64,10 @@
 
   :w !sudo tee > /dev/null %
 
+- apt-get upgrade: The following packages have been kept back
+
+  sudo apt-get --with-new-pkgs upgrade
+
 - Bash arguments:
 
   $0,$1,$2  Positional parameters, passed from command line or function caller
