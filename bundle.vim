@@ -83,8 +83,8 @@ if index(g:bundle_group, 'simple') >= 0 || s:bundle_all
 	vnoremap <space>a<bar> :Tabularize /\|<cr>
 	nnoremap <space>ar :Tabularize /\|/r0<cr>
 	vnoremap <space>ar :Tabularize /\|/r0<cr>
-	map <space>z <Plug>Sneak_s
-	map <space>Z <Plug>Sneak_S
+	map gz <Plug>Sneak_s
+	map gZ <Plug>Sneak_S
 endif
 
 
