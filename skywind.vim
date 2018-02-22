@@ -9,7 +9,6 @@ set hlsearch
 set incsearch
 set wildmenu
 set ignorecase
-set path=.,,.;
 set cpo-=<
 noremap <tab>/ :emenu <C-Z>
 " noremap <c-n>  :emenu <C-Z>
@@ -65,6 +64,7 @@ augroup END
 function s:language_cpp()
 	" syntax match cCustomFunc /\w\+\s*(/me=e-1,he=e-1
 	" highlight def link cCustomFunc Function
+	setlocal commentstring=//\ %s
 endfunc
 
 
