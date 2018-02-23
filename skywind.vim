@@ -10,7 +10,6 @@ set incsearch
 set wildmenu
 set ignorecase
 set cpo-=<
-set viewdir=~/.vim/view
 noremap <tab>/ :emenu <C-Z>
 " noremap <c-n>  :emenu <C-Z>
 set lazyredraw
@@ -67,6 +66,17 @@ function s:language_cpp()
 	" highlight def link cCustomFunc Function
 	setlocal commentstring=//\ %s
 endfunc
+
+
+
+"----------------------------------------------------------------------
+" fold restore
+"----------------------------------------------------------------------
+augroup SkywindView
+	au! 
+	au BufWrite,VimLeave * silent! mkview
+	au BufRead * silent! loadview
+augroup END
 
 
 "----------------------------------------------------------------------
