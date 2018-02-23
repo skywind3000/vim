@@ -72,11 +72,19 @@ endfunc
 "----------------------------------------------------------------------
 " fold restore
 "----------------------------------------------------------------------
-augroup SkywindView
-	au! 
-	au BufWrite,VimLeave * silent! mkview
-	au BufRead * silent! loadview
-augroup END
+function! SkywindFoldRestore(enable)
+	if a:enable != 0
+		augroup SkywindViewRestore
+			au! 
+			au BufWrite,VimLeave * silent! mkview
+			au BufRead * silent! loadview
+		augroup END
+	else
+		augroup SkywindViewRestore
+			au!
+		augroup END
+	endif
+endfunc
 
 
 "----------------------------------------------------------------------
