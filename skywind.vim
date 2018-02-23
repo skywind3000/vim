@@ -10,6 +10,7 @@ set incsearch
 set wildmenu
 set ignorecase
 set cpo-=<
+set viewdir=~/.vim/view
 noremap <tab>/ :emenu <C-Z>
 " noremap <c-n>  :emenu <C-Z>
 set lazyredraw
