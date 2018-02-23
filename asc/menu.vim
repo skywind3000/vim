@@ -184,10 +184,10 @@ function! menu#ReadUrl()
 	if t == ''
 		return 0
 	endif
-	if executable('wget')
-		exec 'r !wget --no-check-certificate -qO- '.shellescape(t)
-	elseif executable('curl')
+	if executable('curl')
 		exec 'r !curl -sL '.shellescape(t)
+	elseif executable('wget')
+		exec 'r !wget --no-check-certificate -qO- '.shellescape(t)
 	else
 		echo "require wget or curl"
 	endif
