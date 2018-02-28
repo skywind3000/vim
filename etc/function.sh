@@ -471,8 +471,7 @@ function _colorize_via_pygmentize() {
 
     for FNAME in $@
     do
-        filename=$(basename "$FNAME")
-        lexer=`pygmentize -N \"$filename\"`
+        lexer=`pygmentize -N \"$FNAME\"`
         if [ "Z$lexer" != "Ztext" ]; then
 			if [ -n "$style" ]; then
 				pygmentize -P style=$style -f terminal256 -l $lexer "$FNAME"
