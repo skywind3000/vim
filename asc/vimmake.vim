@@ -1,7 +1,7 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
 " Maintainer: skywind3000 (at) gmail.com
-" Last Modified: 2018/02/10 04:19
+" Last Modified: 2018/02/28 23:32
 "
 " Execute customize tools: ~/.vim/vimmake.{name} directly:
 "     :VimTool {name}
@@ -176,6 +176,11 @@ endif
 " filetype -> command
 if !exists('g:vimmake_ftrun')
 	let g:vimmake_ftrun = {}
+endif
+
+" filetype -> VimMake sub command
+if !exists('g:vimmake_ftmake')
+	let g:vimmake_ftmake = {}
 endif
 
 
@@ -1477,18 +1482,23 @@ function! s:Cmd_VimBuild(bang, ...)
 		let vimmake .= '-auto='.fnameescape(g:vimmake_build_name).' '
 	endif
 	if index(['0', 'gcc', 'cc'], l:what) >= 0
-		let l:filename = expand("%")
-		let l:source = shellescape(l:filename)
-		let l:output = shellescape(fnamemodify(l:filename, ':r'))
-		let l:cc = (g:vimmake_cc == '')? 'gcc' : g:vimmake_cc
-		let l:flags = join(g:vimmake_cflags, ' ')
-		let l:extname = expand("%:e")
-		if index(['cpp', 'cc', 'cxx', 'mm'], l:extname) >= 0
-			let l:flags .= ' -lstdc++'
+		if has_key(g:vimmake_ftmake, &ft)
+			let command = g:vimmake_ftmake[&ft]
+			exec vimmake .command
+		else
+			let l:filename = expand("%")
+			let l:source = shellescape(l:filename)
+			let l:output = shellescape(fnamemodify(l:filename, ':r'))
+			let l:cc = (g:vimmake_cc == '')? 'gcc' : g:vimmake_cc
+			let l:flags = join(g:vimmake_cflags, ' ')
+			let l:extname = expand("%:e")
+			if index(['cpp', 'cc', 'cxx', 'mm'], l:extname) >= 0
+				let l:flags .= ' -lstdc++'
+			endif
+			let l:cmd = l:cc . ' -Wall '. l:source . ' -o ' . l:output
+			let l:cmd .= (l:conf == '')? '' : (' '. l:conf)
+			exec vimmake .l:cmd . ' ' . l:flags
 		endif
-		let l:cmd = l:cc . ' -Wall '. l:source . ' -o ' . l:output
-		let l:cmd .= (l:conf == '')? '' : (' '. l:conf)
-		exec vimmake .l:cmd . ' ' . l:flags
 	elseif index(['1', 'make'], l:what) >= 0
 		if l:conf == ''
 			exec vimmake .'@ make'
