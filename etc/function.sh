@@ -463,28 +463,18 @@ function _colorize_via_pygmentize() {
 
     if [ $# -eq 0 ]; then
 		if [ -n "$style" ]; then
-			pygmentize -P style=$style -f terminal256 -g $@
+			pygmentize -P style=$style -P tabsize=4 -f terminal256 -g $@
 		else
-			pygmentize -g $@
+			pygmentize -P tabsize=4 -g $@
 		fi
     fi
 
-    for FNAME in $@
-    do
-        lexer=`pygmentize -N \"$FNAME\"`
-        if [ "Z$lexer" != "Ztext" ]; then
-			if [ -n "$style" ]; then
-				pygmentize -P style=$style -f terminal256 -l $lexer "$FNAME"
-			else
-				pygmentize -l $lexer "$FNAME"
-			fi
-        else
-			if [ -n "$style" ]; then
-				pygmentize -P style=$style -f terminal256 -g "$FNAME"
-			else
-				pygmentize -g "$FNAME"
-			fi
-        fi
+    for NAME in $@; do
+		if [ -n "$style" ]; then
+			pygmentize -P style=$style -P tabsize=4 -f terminal256 -g "$NAME"
+		else
+			pygmentize -P tabsize=4 -g "$NAME"
+		fi
     done
 }
 
