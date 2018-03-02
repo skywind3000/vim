@@ -1,7 +1,7 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
-" Maintainer: skywind3000 (at) gmail.com
-" Last Modified: 2018/02/28 23:32
+" Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
+" Last Modified: 2018/03/02 10:52
 "
 " Execute customize tools: ~/.vim/vimmake.{name} directly:
 "     :VimTool {name}
@@ -198,7 +198,7 @@ let g:vimmake_windows = 0	" external reference, may be modified by user
 
 " check has advanced mode
 if v:version >= 800 || has('patch-7.4.1829') || has('nvim')
-	if has('job') && has('channel') && has('timers') && has('reltime')
+	if has('job') && has('channel') && has('timers')
 		let s:vimmake_advance = 1
 		let g:vimmake_advance = 1
 	elseif has('nvim')
@@ -255,7 +255,7 @@ endfunc
 
 " show not support message
 function! s:NotSupport()
-	let msg = "required: +timers +channel +job +reltime and vim >= 7.4.1829"
+	let msg = "required: +timers +channel +job and vim >= 7.4.1829"
 	call s:ErrorMsg(msg)
 endfunc
 
@@ -277,7 +277,7 @@ let s:build_head = 0
 let s:build_tail = 0
 let s:build_code = 0
 let s:build_state = 0
-let s:build_start = 0.0
+let s:build_start = 0
 let s:build_debug = 0
 let s:build_quick = 0
 let s:build_scroll = 0
@@ -469,7 +469,7 @@ function! s:Vimmake_Build_OnFinish()
 		unlet s:build_timer
 	endif
 	call s:Vimmake_Build_Update(-1)
-	let l:current = float2nr(reltimefloat(reltime()))
+	let l:current = localtime()
 	let l:last = l:current - s:build_start
 	let l:check = s:Vimmake_Build_CheckScroll()
 	if s:build_code == 0
@@ -673,7 +673,7 @@ function! s:Vimmake_Build_Start(cmd)
 	if l:success != 0
 		let s:build_state = or(s:build_state, 1)
 		let g:vimmake_build_status = "running"
-		let s:build_start = float2nr(reltimefloat(reltime()))
+		let s:build_start = localtime()
 		let l:arguments = "[".l:name."]"
 		let l:title = ':VimMake '.l:name
 		if s:build_nvim == 0
