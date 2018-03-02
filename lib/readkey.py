@@ -23,6 +23,7 @@ names = {
 }
 
 index = 0
+print 'press CTRL+D to quit ...'
 while 1:
 	ch = sys.stdin.read(1)
 	x = ord(ch)
@@ -33,7 +34,7 @@ while 1:
 	else:
 		print '[%2x]: ?'%(x)
 	index += 1
-	if ch == '\n': break
+	if ord(ch) == 4: break
 
 
 
