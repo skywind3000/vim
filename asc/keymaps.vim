@@ -111,10 +111,6 @@ cnoremap <M-f> <c-right>
 " gui hotkeys - alt + ?
 "----------------------------------------------------------------------
 if has('gui_running') || (has('nvim') && (has('win32') || has('win64')))
-	noremap <M-=> :resize +3<cr>
-	noremap <M--> :resize -3<cr>
-	noremap <M-,> :vertical resize -3<cr>
-	noremap <M-.> :vertical resize +3<cr>
 	noremap <silent><A-o> :call Open_Browse(2)<cr>
 	inoremap <silent><A-o> <ESC>:call Open_Browse(2)<cr>
 	noremap <S-cr> o<ESC>
@@ -146,6 +142,8 @@ if has('gui_running') || (has('nvim') && (has('win32') || has('win64')))
 		noremap <silent><m-g> :VimMake -mode=4 -cwd=<root> make -f Makefile test<cr>
 	endif
 endif
+
+nnoremap <m--> za
 
 
 "----------------------------------------------------------------------
