@@ -172,4 +172,8 @@ setopt HIST_VERIFY # Don't execute immediately upon history expansion.
 # ignore complition
 zstyle ':completion:*:complete:-command-:*:*' ignored-patterns '*.pdf|*.exe|*.dll'
 
+# completion detail
+compdef '_files' sh
+compdef '_files' bash
+
 

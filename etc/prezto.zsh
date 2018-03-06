@@ -180,3 +180,8 @@ alias ll='ls -l'
 [ -f "$HOME/.local/etc/function.sh" ] && . "$HOME/.local/etc/function.sh"
 
 
+# completion detail
+compdef '_files' sh
+compdef '_files' bash
+
+
