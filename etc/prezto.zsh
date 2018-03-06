@@ -181,7 +181,7 @@ alias ll='ls -l'
 
 
 # completion detail
-compdef '_files' sh
-compdef '_files' bash
+zstyle ':completion:*:complete:-command-:*:*' ignored-patterns '*.pdf|*.exe|*.dll'
+zstyle ':completion:*:*sh:*:' tag-order files
 
 
