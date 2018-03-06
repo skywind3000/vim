@@ -239,7 +239,7 @@ function _prompt_init_theme {
 				export PROMPT='%F{135}%n%f@%F{166}%m%f %F{118}$(_fish_collapsed_pwd)%f> '
 			fi
 		fi
-		RPROMPT="%{$_prompt_skwp_colors[6]%}%(?..%?)%f"
+		RPROMPT="%F{160}%(?..%?)%f"
 	fi
 }
 
@@ -329,7 +329,7 @@ function q-compress
 		*.rar) shift && rar $FILE $* ;;
 		esac
 	else
-		echo "usage: compress <foo.tar.gz> ./foo ./bar"
+		echo "usage: q-compress <foo.tar.gz> ./foo ./bar"
 	fi
 }
 
