@@ -239,7 +239,7 @@ function _prompt_init_theme {
 				export PROMPT='%F{135}%n%f@%F{166}%m%f %F{118}$(_fish_collapsed_pwd)%f> '
 			fi
 		fi
-		RPROMPT="%F{160}%(?..%?)%f"
+		RPROMPT="%F{red}%(?..%?)%f"
 	fi
 }
 
