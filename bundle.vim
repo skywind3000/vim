@@ -208,6 +208,7 @@ if index(g:bundle_group, 'high') >= 0
 	Plugin 'mh21/errormarker.vim'
 	" Plugin 'dracula/vim'
 	Plugin 'mhinz/vim-signify'
+	" Plugin 'Yggdroot/indentLine'
 
 	let g:syntastic_always_populate_loc_list = 1
 	let g:syntastic_auto_loc_list = 0
@@ -220,6 +221,14 @@ if index(g:bundle_group, 'high') >= 0
 	nnoremap <silent> <leader>cM :RemoveErrorMarkers<cr>
 
 	"let &errorformat="%f:%l:%c: %t%*[^:]:%m,%f:%l: %t%*[^:]:%m," . &errorformat
+	let g:indentLine_color_term = 239
+	let g:indentLine_color_gui = '#A4E57E'
+	let g:indentLine_color_tty_light = 7 " (default: 4)
+	let g:indentLine_color_dark = 1 " (default: 2)
+	let g:indentLine_bgcolor_term = 202
+	let g:indentLine_bgcolor_gui = '#FF5F00'
+	let g:indentLine_char = '|'
+	let g:indentLine_enabled = 1
 endif
 
 

@@ -179,6 +179,10 @@ alias ll='ls -l'
 # source function.sh if it exists
 [ -f "$HOME/.local/etc/function.sh" ] && . "$HOME/.local/etc/function.sh"
 
+# Disable correction
+unsetopt correct_all
+unsetopt correct
+DISABLE_CORRECTION="true" 
 
 # completion detail
 zstyle ':completion:*:complete:-command-:*:*' ignored-patterns '*.pdf|*.exe|*.dll'
