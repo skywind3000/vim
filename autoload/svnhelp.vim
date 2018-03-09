@@ -168,6 +168,20 @@ function! svnhelp#svn_log(filename)
 	endif
 endfunc
 
+function! svnhelp#svn_add(filename)
+	let mode = svnhelp#svn_or_git(a:filename)
+	let name = fnamemodify(expand(a:filename), ':p')
+	let home = fnameescape(fnamemodify(name, ':h'))
+	let name = shellescape(name)
+	if mode == 0
+		call svnhelp#errmsg('not a svn/git repository')
+		return
+	elseif mode == 1
+		exec 'VimMake! -raw svn add '.name
+	else
+		exec 'VimMake! -raw -cwd='.home'.' git add '.name
+	endif
+endfunc
 
 
 "----------------------------------------------------------------------
@@ -355,56 +369,41 @@ endfunc
 " file 
 "----------------------------------------------------------------------
 
-function! svnhelp#tf_diff() abort
+function! svnhelp#tf_command(cmd) abort
 	let info = svnhelp#tinfo()
 	if info.mode == 0
 		call svnhelp#errmsg('not in a git/svn repository')
 		return 0
 	endif
 	if info.mode == 1
-		call svnhelp#tsvn('/command:diff /path:'.shellescape(info.filepath))
+		call svnhelp#tsvn('/command:'.a:cmd.' /path:'.shellescape(info.filepath))
 	else
-		call svnhelp#tgit('/command:diff /path:'.shellescape(info.filepath))
+		call svnhelp#tgit('/command:'.a:cmd.' /path:'.shellescape(info.filepath))
 	endif
+endfunc
+
+function! svnhelp#tf_diff() abort
+	call svnhelp#tf_command('diff')
 endfunc
 
 function! svnhelp#tf_log() abort
-	let info = svnhelp#tinfo()
-	if info.mode == 0
-		call svnhelp#errmsg('not in a git/svn repository')
-		return 0
-	endif
-	if info.mode == 1
-		call svnhelp#tsvn('/command:log /path:'.shellescape(info.filepath))
-	else
-		call svnhelp#tgit('/command:log /path:'.shellescape(info.filepath))
-	endif
+	call svnhelp#tf_command('log')
 endfunc
 
 function! svnhelp#tf_commit() abort
-	let info = svnhelp#tinfo()
-	if info.mode == 0
-		call svnhelp#errmsg('not in a git/svn repository')
-		return 0
-	endif
-	if info.mode == 1
-		call svnhelp#tsvn('/command:commit /path:'.shellescape(info.filepath))
-	else
-		call svnhelp#tgit('/command:commit /path:'.shellescape(info.filepath))
-	endif
+	call svnhelp#tf_command('commit')
 endfunc
 
 function! svnhelp#tf_blame() abort
-	let info = svnhelp#tinfo()
-	if info.mode == 0
-		call svnhelp#errmsg('not in a git/svn repository')
-		return 0
-	endif
-	if info.mode == 1
-		call svnhelp#tsvn('/command:blame /path:'.shellescape(info.filepath))
-	else
-		call svnhelp#tgit('/command:blame /path:'.shellescape(info.filepath))
-	endif
+	call svnhelp#tf_command('blame')
+endfunc
+
+function! svnhelp#tf_add() abort
+	call svnhelp#tf_command('add')
+endfunc
+
+function! svnhelp#tf_revert() abort
+	call svnhelp#tf_command('revert')
 endfunc
 
 
