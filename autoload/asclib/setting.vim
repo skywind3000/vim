@@ -47,7 +47,7 @@ endfunc
 let s:persist_loaded = 0
 let s:persist_config = {}
 let s:persist_dirty = 0
-let s:persist_name = expand('~/.vim/config.cfg')
+let s:persist_name = expand('~/.vim/vim.cfg')
 
 function! s:persist_init()
 	if s:persist_loaded == 0
