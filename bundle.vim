@@ -107,6 +107,8 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 		noremap <m-p> :LeaderfFunction<cr>
 		noremap <m-n> :LeaderfBuffer<cr>
 		noremap <m-m> :LeaderfTag<cr>
+		let g:Lf_MruMaxFiles = 2048
+		let g:Lf_MruFileExclude = ['*.so', '*.tmp']
 		" let g:Lf_StlSeparator = { 'left': '♰', 'right': '♱', 'font': '' }
 		let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
 		let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>'], '<Esc>':[ '<C-q>' ]}
