@@ -298,6 +298,10 @@ endif
 call quickmenu#current(2)
 call quickmenu#reset()
 
+call quickmenu#append('# Terminal', '')
+call quickmenu#append('Open Terminal Below', 'belowright term ++rows=10', 'Open terminal below current window')
+call quickmenu#append('Open Python Below', 'belowright term ++rows=10 python', 'Open python below current window')
+
 call quickmenu#append('# Debug', '')
 
 

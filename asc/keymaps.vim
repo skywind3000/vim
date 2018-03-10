@@ -3,7 +3,7 @@
 " keymaps.vim - keymaps start with using <space>
 "
 " Created by skywind on 2016/10/12
-" Last Modified: 2018/02/10 02:08
+" Last Modified: 2018/03/10 23:44
 "
 "======================================================================
 
@@ -406,6 +406,11 @@ nnoremap <silent>g7 :call vimmake#update_tags('!', 'py', '.cscopy')<cr>
 nnoremap <silent>g9 :call vimmake#update_tags('!', 'ctags', '.tags')<cr>
 
 nnoremap <silent><space>ww :call asclib#touch_file('wsgi')<cr>
+
+noremap <space>m0 :call quickmenu#toggle(0)<cr>
+noremap <space>m1 :call quickmenu#toggle(1)<cr>
+noremap <space>m2 :call quickmenu#toggle(2)<cr>
+noremap <space>m3 :call quickmenu#toggle(3)<cr>
 
 
 "----------------------------------------------------------------------
