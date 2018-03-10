@@ -37,7 +37,10 @@ endif
 "----------------------------------------------------------------------
 if has('nvim')
 	set guicursor=
-elseif !has('gui_running') && has('terminal') && has('patch-8.0.1200')
+elseif (!has('gui_running')) && has('terminal') && has('patch-8.0.1200')
+	let g:termcap_guicursor = &guicursor
+	let g:termcap_t_RS = &t_RS
+	let g:termcap_t_SH = &t_SH
 	set guicursor=
 	set t_RS=
 	set t_SH=
