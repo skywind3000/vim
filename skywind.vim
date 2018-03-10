@@ -32,8 +32,15 @@ if has('patch-7.4.500') || v:version >= 800
 endif
 
 
+"----------------------------------------------------------------------
+" builtin terminal settings 
+"----------------------------------------------------------------------
 if has('nvim')
 	set guicursor=
+elseif !has('gui_running') && has('terminal') && has('patch-8.0.1200')
+	set guicursor=
+	set t_RS=
+	set t_SH=
 endif
 
 
