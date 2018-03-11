@@ -253,7 +253,7 @@ inoremap <silent><M-d> <c-\><c-o>:call Tools_PreviousCursor(7)<cr>
 " space + f : open tools
 "----------------------------------------------------------------------
 noremap <silent><space>fd :call Open_Dictionary("<C-R>=expand("<cword>")<cr>")<cr>
-noremap <silent><space>fm :!man -S 3:2:1 "<C-R>=expand("<cword>")<CR>"<CR>
+noremap <silent><space>fm :!man -S 3:2:1 "<C-R>=expand("<cword>")"<CR>
 noremap <silent><space>fh :call Open_HeaderFile(1)<cr>
 noremap <silent><space>ff :call Open_Explore(-1)<cr>
 noremap <silent><space>ft :call Open_Explore(0)<cr>
@@ -344,6 +344,15 @@ endif
 
 
 "----------------------------------------------------------------------
+" visual mode
+"----------------------------------------------------------------------
+vnoremap <space>gp :!python<cr>
+" vmap <space>gs y/<c-r>"<cr>
+vmap <space>gs y/<C-R>=escape(@", '\\/.*$^~[]')<CR>
+vmap <space>gr y:%s/<C-R>=escape(@", '\\/.*$^~[]')<CR>//gc<Left><Left><Left>
+
+
+"----------------------------------------------------------------------
 " linting
 "----------------------------------------------------------------------
 noremap <silent><space>lp :call asclib#lint_pylint('')<cr>
@@ -366,8 +375,8 @@ endif
 noremap <C-F10> :VimBuild gcc -pg<cr>
 
 if has('gui_running') && 0
-	noremap <silent> <m-U> :call asclib#smooth_scroll_up(&scroll, 0, 4)<CR>
-	noremap <silent> <m-D> :call asclib#smooth_scroll_down(&scroll, 0, 4)<CR>
+	noremap <silent> <m-U> :call asclib#smooth_scroll_up(&scroll, 0, 4)
+	noremap <silent> <m-D> :call asclib#smooth_scroll_down(&scroll, 0, 4)
 endif
 
 
@@ -375,10 +384,10 @@ endif
 "----------------------------------------------------------------------
 " g command
 "----------------------------------------------------------------------
-nnoremap gb :YcmCompleter GoToDeclaration<CR>
-nnoremap gl :YcmCompleter GoToDefinition<CR>
-nnoremap gx :YcmCompleter GoToDefinitionElseDeclaration<CR>
-nnoremap gy :YcmCompleter GoToReferences<CR>
+nnoremap gb :YcmCompleter GoToDeclaration
+nnoremap gl :YcmCompleter GoToDefinition
+nnoremap gx :YcmCompleter GoToDefinitionElseDeclaration
+nnoremap gy :YcmCompleter GoToReferences
 
 
 "----------------------------------------------------------------------

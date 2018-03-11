@@ -31,7 +31,7 @@ let s:module.groups = {
       \ 'perl' : ['perl', 'manpages'],
       \ 'php': ['php', 'wordpress', 'drupal', 'zend', 'laravel', 'yii', 'joomla', 'ee', 'codeigniter', 'cakephp', 'phpunit', 'phpp', 'symfony', 'typo3', 'twig', 'smarty', 'html', 'statamic', 'mysql', 'sqlite', 'mongodb', 'psql', 'redis'],
       \ 'puppet' : ['puppet'],
-      \ 'python' : ['python', 'django', 'twisted', 'sphinx', 'flask', 'tornado', 'sqlalchemy', 'numpy', 'scipy', 'salt', 'cvp'],
+      \ 'python' : ['python2', 'django', 'twisted', 'flask', 'tornado', 'numpy', 'scipy', ],
       \ 'r' : ['r'],
       \ 'ruby' : ['ruby', 'rubygems', 'rails'],
       \ 'rust' : ['rust'],
