@@ -29,6 +29,7 @@
 " Settings:
 "     g:vimmake_path - change the path of tools rather than ~/.vim/
 "     g:vimmake_mode - dictionary of invoke mode of each tool
+"     g:vimmake_open - open quickfix window at given height
 "
 " Setup mode for command: ~/.vim/vimmake.{name}
 "     let g:vimmake_mode["name"] = "{mode}"
@@ -1912,6 +1913,21 @@ function! vimmake#python_system(command)
 	return content
 endfunc
 
+
+
+" auto open quickfix window
+if has("autocmd")
+	function! s:check_quickfix()
+		let height = get(g:, "vimmake_open", 0)
+		if height > 0
+			call vimmake#toggle_quickfix(height, 1)
+		endif
+	endfunc
+	augroup vimmake_augroup
+		au!
+		au User VimMakeStart call s:check_quickfix()
+	augroup END
+endif
 
 
 
