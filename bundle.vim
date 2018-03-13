@@ -361,7 +361,7 @@ endif
 
 if index(g:bundle_group, 'grammer') >= 0
 	Plugin 'rhysd/vim-grammarous'
-	noremap <space>rg :GrammarousCheck --lang=en-US --no-move-to-first-error<cr>
+	noremap <space>rg :GrammarousCheck --lang=en-US --no-move-to-first-error --no-preview<cr>
 	map <space>rr <Plug>(grammarous-open-info-window)
 	map <space>rv <Plug>(grammarous-move-to-info-window)
 	map <space>rs <Plug>(grammarous-reset)
