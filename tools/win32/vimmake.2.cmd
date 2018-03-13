@@ -12,6 +12,7 @@ if "%VIM_FILEEXT%" == ".gv" GOTO COMPILE_GV
 if "%VIM_FILEEXT%" == ".dot" GOTO COMPILE_GV
 if "%VIM_FILEEXT%" == ".v" GOTO COMPILE_VERILOG
 if "%VIM_FILEEXT%" == ".vl" GOTO COMPILE_VERILOG
+if "%VIM_FILEEXT%" == ".txt" GOTO COMPILE_TXT
 
 :COMPILE_C
 REM CD /D "%VIM_FILEDIR%"
@@ -34,6 +35,10 @@ GOTO END
 
 :COMPILE_VERILOG
 d:\dev\iverilog\bin\iverilog -o "%VIM_FILEDIR%\%VIM_FILENOEXT%.vvp" "%VIM_FILEPATH%"
+GOTO END
+
+:COMPILE_TXT
+D:\Software\LanguageTool\LanguageTool-4.0-stable\langtool.cmd -l en-US "%VIM_FILEPATH%"
 GOTO END
 
 :ERROR_NO_FILE
