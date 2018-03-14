@@ -152,7 +152,7 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 	Plugin 'wsdjeg/FlyGrep.vim'
 	Plugin 'tpope/vim-abolish'
 	Plugin 'xolox/vim-notes'
-	Plugin 'mhartington/oceanic-next'
+	" Plugin 'mhartington/oceanic-next'
 	" Plugin 'vim-scripts/CRefVim'
 	" Plugin 'vim-scripts/DrawIt'
 				
@@ -239,7 +239,7 @@ endif
 " group opt 
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'opt') >= 0
-	Plugin 'thinca/vim-quickrun'
+	" Plugin 'thinca/vim-quickrun'
 	Plugin 'junegunn/fzf'
 	" Plugin 'mattn/vim-terminal'
 	" Plugin 'Shougo/vimshell.vim'
