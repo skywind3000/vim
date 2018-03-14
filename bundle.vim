@@ -358,6 +358,9 @@ if index(g:bundle_group, 'nerdtree') >= 0
 	" let g:NERDTreePatternMatchHighlightFullName = 1
 endif
 
+if index(g:bundle_group, 'bgimg') >= 0
+	Plugin 'skywind3000/vim-bgimg'
+endif
 
 if index(g:bundle_group, 'grammer') >= 0
 	Plugin 'rhysd/vim-grammarous'

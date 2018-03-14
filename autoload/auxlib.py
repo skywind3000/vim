@@ -200,6 +200,35 @@ class VimTweak (object):
 					SWP_NOSIZE | SWP_NOMOVE)
 		return 0
 
+	def ConvertImage (self, dstname, srcname, resize, color, alpha = 255):
+		if '~' in dstname:
+			dstname = os.path.expanduser(dstname)
+		if '~' in srcname:
+			srcname = os.path.expanduser(srcname)
+		import PIL
+		import PIL.Image
+		if os.path.exists(dstname):
+			try: os.remove(dstname)
+			except: pass
+		if not os.path.exists(srcname):
+			return False
+		Image = PIL.Image
+		img = Image.open(srcname)
+		if not img:
+			return False
+		alpha = max(0, min(alpha, 255))
+		cc = [0, 0, 0, (255 - (alpha & 255))]
+		cc[0] = color >> 24
+		cc[1] = (color >> 8) & 0xff
+		cc[2] = color & 0xff
+		dst = img.convert('RGBA')
+		new = Image.new('RGBA', size = dst.size, color = tuple(cc))
+		dst = Image.alpha_composite(dst, new)
+		dst = dst.convert('RGB')
+		if resize:
+			dst = dst.resize(resize, Image.ANTIALIAS)
+		dst.save(dstname, 'BMP')
+		return True
 
 
 #----------------------------------------------------------------------
