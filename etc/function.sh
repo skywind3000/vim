@@ -372,13 +372,11 @@ function q-ips
 }
 
 
-
 # lazy gcc, default outfile: filename_prefix.out, eg: hello.c -> hello.out
 function q-gcc
 {
 	gcc -o ${1%.*}{.out,.${1##*.}} $2 $3 $4 $5
 }
-
 
 
 # Display ANSI colours. Found this on the interwebs, credited
@@ -476,6 +474,11 @@ function _colorize_via_pygmentize() {
 			pygmentize -P tabsize=4 -g "$NAME"
 		fi
     done
+}
+
+
+function q-cheat() {
+	curl -L "cheat.sh/$1"
 }
 
 
