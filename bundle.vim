@@ -70,6 +70,7 @@ if index(g:bundle_group, 'simple') >= 0 || s:bundle_all
 	Plugin 'justinmk/vim-sneak'
 	Plugin 'tpope/vim-unimpaired'
 	Plugin 'pprovost/vim-ps1'
+	Plugin 'mhartington/oceanic-next'
 
 	nnoremap <space>a= :Tabularize /=<CR>
 	vnoremap <space>a= :Tabularize /=<CR>
