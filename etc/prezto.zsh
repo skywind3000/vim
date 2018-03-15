@@ -89,6 +89,9 @@ antigen bundle rupa/z z.sh
 antigen bundle Vifon/deer
 # antigen bundle zsh-users/zsh-autosuggestions
 
+antigen bundle willghatch/zsh-cdr
+antigen bundle zsh-users/zaw
+
 # check login shell
 if [[ -o login ]]; then
 	[ -f "$HOME/.local/etc/login.sh" ] && source "$HOME/.local/etc/login.sh"
