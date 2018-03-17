@@ -97,7 +97,7 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 	Plugin 'mhinz/vim-startify'
 	Plugin 'flazz/vim-colorschemes'
 	Plugin 'xolox/vim-misc'
-	Plugin 'octol/vim-cpp-enhanced-highlight'
+	" Plugin 'octol/vim-cpp-enhanced-highlight'
 	" Plugin 'vim-scripts/Colour-Sampler-Pack'
 
 	if has('python') || has('python3')
