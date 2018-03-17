@@ -98,7 +98,6 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 	Plugin 'flazz/vim-colorschemes'
 	Plugin 'xolox/vim-misc'
 	Plugin 'octol/vim-cpp-enhanced-highlight'
-	" Plugin 'vim-scripts/Colour-Sampler-Pack'
 
 	if has('python') || has('python3')
 		Plugin 'Yggdroot/LeaderF'
@@ -152,7 +151,6 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 	Plugin 'wsdjeg/FlyGrep.vim'
 	Plugin 'tpope/vim-abolish'
 	Plugin 'xolox/vim-notes'
-	" Plugin 'mhartington/oceanic-next'
 	" Plugin 'vim-scripts/CRefVim'
 	" Plugin 'vim-scripts/DrawIt'
 				
