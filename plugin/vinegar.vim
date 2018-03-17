@@ -1,9 +1,9 @@
 "======================================================================
 "
-" vinegar2.vim - Vinegar & Oil (my own version)
+" vinegar.vim - Vinegar & Oil (fork from tpope/vim-vinegar)
 "
 " Created by skywind on 2017/06/30
-" Last modified: 2017/06/30 13:33:48
+" Last Modified: 2018/03/16 22:33
 "
 " Split windows and the project drawer go together like oil and 
 " vinegar. I don't mean to say that you can combine them to create a 
@@ -176,9 +176,7 @@ function! s:setup_vinegar()
 			nnoremap <silent><buffer> <cr> :call <SID>nerdtree_enter()<cr>
 		endif
 	elseif &ft == 'dirvish'
-		if key != '-'
-			exec 'nnoremap <buffer><silent> ' . key. ' :VinegarOpen edit<cr>'
-		endif
+        exec 'nnoremap <buffer><silent> ' . key. ' :VinegarOpen edit<cr>'
 		nnoremap <silent><buffer> r :Dirvish %<cr>
 	endif
 endfunc
@@ -195,15 +193,20 @@ augroup VinegarGroup
 augroup END
 
 
-
 "----------------------------------------------------------------------
 " initialize NERDTree
 "----------------------------------------------------------------------
-" let NERDTreeCascadeSingleChildDir = 0
-" let NERDTreeCascadeOpenSingleChildDir = 0
-
 if g:vinegar_nerdtree_as_netrw
+    " let NERDTreeCascadeSingleChildDir = 0
+    " let NERDTreeCascadeOpenSingleChildDir = 0
 endif
 
 
+"----------------------------------------------------------------------
+" Setup keymap
+"----------------------------------------------------------------------
+if g:vinegar_key != ''
+	exec 'noremap <silent> '.g:vinegar_key. ' :VinegarOpen edit<cr>'
+endif
 
+" vim: set ts=4 sw=4 tw=78 et :
