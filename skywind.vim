@@ -116,6 +116,9 @@ call asclib#setting#update(s:settings)
 
 if has('win32') || has('win64') || has('win16') || has('win95')
 	call asclib#setting#update(s:settings_win)
+	if has('gui_running')
+
+	endif
 endif
 
 
@@ -393,10 +396,11 @@ nnoremap <leader><F2> :call Tools_ProfileStop()<cr>
 
 
 "----------------------------------------------------------------------
-" 
+" color scheme
 "----------------------------------------------------------------------
 let s:colors = ['biogoo', 'calmbreeze', 'dawn', 'dejavu', 'eclipse2', 'paradox', 'gaea', 'github', 'greyhouse', 'habiLight', 'imperial']
 let s:colors += ['mayansmoke', 'mickeysoft', 'newspaper', 'nuvola', 'oceanlight', 'peaksea', 'pyte', 'summerfruit256', 'tomorrow']
+let s:colors += ['monokai-vim']
 
 function! SkywindSwitchColor()
 	call asclib#color_switch(s:colors)
