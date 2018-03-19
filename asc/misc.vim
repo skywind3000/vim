@@ -42,7 +42,7 @@ function! s:comment()
 		return ';'
 	elseif index(['asm'], &filetype) >= 0
 		return ';'
-	elseif index(['sql'], l:ext) >= 0
+	elseif index(['sql', 'lua'], l:ext) >= 0
 		return '--'
 	elseif index(['basic'], &filetype) >= 0
 		return "'"
