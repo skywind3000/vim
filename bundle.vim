@@ -69,7 +69,6 @@ if index(g:bundle_group, 'simple') >= 0 || s:bundle_all
 	Plugin 'justinmk/vim-dirvish'
 	Plugin 'justinmk/vim-sneak'
 	Plugin 'tpope/vim-unimpaired'
-	Plugin 'pprovost/vim-ps1'
 
 	nnoremap <space>a= :Tabularize /=<CR>
 	vnoremap <space>a= :Tabularize /=<CR>
@@ -98,6 +97,8 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 	Plugin 'flazz/vim-colorschemes'
 	Plugin 'xolox/vim-misc'
 	Plugin 'octol/vim-cpp-enhanced-highlight'
+	Plugin 'pprovost/vim-ps1'
+	Plugin 'tbastos/vim-lua'
 
 	if has('python') || has('python3')
 		Plugin 'Yggdroot/LeaderF'
