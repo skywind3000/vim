@@ -189,13 +189,20 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 	map <silent> <leader>sc <Plug>StlRefVimInvoke
 	map <silent> <leader>se <Plug>StlRefVimExample
 
-	if 1
+	if 0
 		imap <expr> <m-e> pumvisible() ? '<esc>a<Plug>snipMateTrigger' : '<Plug>snipMateTrigger'
 		imap <expr> <m-n> pumvisible() ? '<esc>a<Plug>snipMateNextOrTrigger' : '<Plug>snipMateNextOrTrigger'
-		smap <m-j> <Plug>snipMateNextOrTrigger
+		smap <m-n> <Plug>snipMateNextOrTrigger
 		imap <expr> <m-p> pumvisible() ? '<esc>a<Plug>snipMateBack' : '<Plug>snipMateBack'
-		smap <m-k> <Plug>snipMateBack
+		smap <m-p> <Plug>snipMateBack
 		imap <expr> <m-m> pumvisible() ? '<esc>a<Plug>snipMateShow' : '<Plug>snipMateShow'
+	else
+		imap <expr> <m-e> pumvisible() ? '<c-g>u<Plug>snipMateTrigger' : '<Plug>snipMateTrigger'
+		imap <expr> <m-n> pumvisible() ? '<c-g>u<Plug>snipMateNextOrTrigger' : '<Plug>snipMateNextOrTrigger'
+		smap <m-n> <Plug>snipMateNextOrTrigger
+		imap <expr> <m-p> pumvisible() ? '<c-g>u<Plug>snipMateBack' : '<Plug>snipMateBack'
+		smap <m-p> <Plug>snipMateBack
+		imap <expr> <m-m> pumvisible() ? '<c-g>u<Plug>snipMateShow' : '<Plug>snipMateShow'
 	endif
 
 endif
@@ -373,6 +380,10 @@ if index(g:bundle_group, 'grammer') >= 0
 	map <space>rd <Plug>(grammarous-disable-rule)
 	map <space>rn <Plug>(grammarous-move-to-next-error)
 	map <space>rp <Plug>(grammarous-move-to-previous-error)
+endif
+
+if index(g:bundle_group, 'vcm') >= 0
+	Plugin 'ajh17/VimCompletesMe'
 endif
 
 
