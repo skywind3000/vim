@@ -387,6 +387,15 @@ if index(g:bundle_group, 'vcm') >= 0
 	Plugin 'ajh17/VimCompletesMe'
 endif
 
+if index(g:bundle_group, 'complete') >= 0
+	Plugin 'othree/vim-autocomplpop'
+	Plugin 'ervandew/supertab'
+	let g:SuperTabDefaultCompletionType = "<c-n>"
+	let g:SuperTabContextDefaultCompletionType = "<c-p>"
+	set completeopt=longest,menuone
+	set complete+=k
+endif
+
 
 "----------------------------------------------------------------------
 " Bundle Footer
