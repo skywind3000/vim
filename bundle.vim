@@ -108,10 +108,10 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 		noremap <m-n> :LeaderfBuffer<cr>
 		noremap <m-m> :LeaderfTag<cr>
 		let g:Lf_MruMaxFiles = 2048
-		let g:Lf_MruFileExclude = ['*.so', '*.tmp']
+		let g:Lf_MruFileExclude = ['*.so', '*.tmp', '*.bak', '*.exe', '*.dll']
 		" let g:Lf_StlSeparator = { 'left': '♰', 'right': '♱', 'font': '' }
 		let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
-		let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>'], '<Esc>':[ '<C-q>' ]}
+		let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>'], '<Esc>':[ '<tab>' ]}
 	else
 		Plugin 'ctrlpvim/ctrlp.vim'
 		Plugin 'tacahiroy/ctrlp-funky'
@@ -389,9 +389,9 @@ endif
 
 if index(g:bundle_group, 'complete') >= 0
 	Plugin 'othree/vim-autocomplpop'
-	Plugin 'ervandew/supertab'
+	" Plugin 'ervandew/supertab'
 	let g:SuperTabDefaultCompletionType = "<c-n>"
-	let g:SuperTabContextDefaultCompletionType = "<c-p>"
+	let g:SuperTabContextDefaultCompletionType = "<c-n>"
 	set completeopt=longest,menuone
 	set complete+=k
 endif
