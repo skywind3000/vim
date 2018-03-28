@@ -103,6 +103,7 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 	if has('python') || has('python3')
 		Plugin 'Yggdroot/LeaderF'
 		let g:Lf_ShortcutF = '<c-p>'
+		let g:Lf_ShortcutB = '<m-n>'
 		noremap <c-n> :LeaderfMru<cr>
 		noremap <m-p> :LeaderfFunction<cr>
 		noremap <m-n> :LeaderfBuffer<cr>
@@ -111,7 +112,18 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 		let g:Lf_MruFileExclude = ['*.so', '*.tmp', '*.bak', '*.exe', '*.dll']
 		" let g:Lf_StlSeparator = { 'left': '♰', 'right': '♱', 'font': '' }
 		let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
-		let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>'], '<Esc>':[ '<tab>' ]}
+		" let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>'], '<Esc>':[ '<tab>' ]}
+		let g:Lf_NormalMap = {
+			\ "File":   [["<ESC>", ':exec g:Lf_py "fileExplManager.quit()"<CR>'],
+			\            ["<F6>", ':exec g:Lf_py "fileExplManager.quit()"<CR>']
+			\           ],
+			\ "Buffer": [["<ESC>", ':exec g:Lf_py "bufExplManager.quit()"<CR>'],
+			\            ["<F6>", ':exec g:Lf_py "bufExplManager.quit()"<CR>']
+			\           ],
+			\ "Mru":    [["<ESC>", ':exec g:Lf_py "mruExplManager.quit()"<CR>']],
+			\ "Tag":    [["<ESC>", ':exec g:Lf_py "tagExplManager.quit()"<CR>']],
+			\ "Function":    [["<ESC>", ':exec g:Lf_py "functionExplManager.quit()"<CR>']],
+			\ }
 	else
 		Plugin 'ctrlpvim/ctrlp.vim'
 		Plugin 'tacahiroy/ctrlp-funky'
