@@ -225,9 +225,11 @@ endif
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'high') >= 0
 	Plugin 'kshenoy/vim-signature'
-	Plugin 'mh21/errormarker.vim'
-	" Plugin 'dracula/vim'
 	Plugin 'mhinz/vim-signify'
+	Plugin 'mh21/errormarker.vim'
+	Plugin 't9md/vim-choosewin'
+	Plugin 'francoiscabrol/ranger.vim'
+	" Plugin 'dracula/vim'
 	" Plugin 'Yggdroot/indentLine'
 
 	let g:syntastic_always_populate_loc_list = 1
@@ -239,6 +241,9 @@ if index(g:bundle_group, 'high') >= 0
 	nnoremap <silent> <leader>cm :ErrorAtCursor<CR>
 	nnoremap <silent> [e :ErrorAtCursor<CR>
 	nnoremap <silent> <leader>cM :RemoveErrorMarkers<cr>
+
+	nmap <m-e> <Plug>(choosewin)
+	let g:ranger_map_keys = 0
 
 	"let &errorformat="%f:%l:%c: %t%*[^:]:%m,%f:%l: %t%*[^:]:%m," . &errorformat
 	let g:indentLine_color_term = 239

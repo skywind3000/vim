@@ -89,6 +89,8 @@ noremap <silent><space>en :call Tools_SwitchNumber()<cr>
 "----------------------------------------------------------------------
 noremap <M-h> b
 noremap <M-l> w
+noremap <M-H> B
+noremap <M-L> W
 noremap <M-j> 10j
 noremap <M-k> 10k
 noremap <M-J> gj
