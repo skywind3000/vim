@@ -146,6 +146,15 @@ if has('gui_running') || (has('nvim') && (has('win32') || has('win64')))
 endif
 
 nnoremap <m--> za
+nnoremap <m-_> zA
+
+
+"----------------------------------------------------------------------
+" terminal
+"----------------------------------------------------------------------
+if has('terminal')
+	tnoremap <m-=> <c-w>N
+endif
 
 
 "----------------------------------------------------------------------
@@ -267,7 +276,7 @@ noremap <silent><space>fs :mksession! ~/.vim/session.txt<cr>
 noremap <silent><space>fl :so ~/.vim/session.txt<cr>
 
 set ssop-=options    " do not store global and local values in a session
-set ssop-=folds      " do not store folds
+" set ssop-=folds      " do not store folds
 
 for s:index in range(5)
 	exec 'noremap <silent><space>f'.s:index.'s :mksession! ~/.vim/session.'.s:index.'<cr>'
