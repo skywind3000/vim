@@ -405,8 +405,8 @@ if index(g:bundle_group, 'vcm') >= 0
 endif
 
 if index(g:bundle_group, 'complete') >= 0
-	Plugin 'othree/vim-autocomplpop'
-	" Plugin 'ervandew/supertab'
+	" Plugin 'othree/vim-autocomplpop'
+	Plugin 'ervandew/supertab'
 	let g:SuperTabDefaultCompletionType = "<c-n>"
 	let g:SuperTabContextDefaultCompletionType = "<c-n>"
 	set completeopt=longest,menuone
