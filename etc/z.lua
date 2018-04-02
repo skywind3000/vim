@@ -1,7 +1,7 @@
 #! /usr/bin/env lua
 --=====================================================================
 --
--- z.lua - z.sh implementation for lua
+-- z.lua - z.sh implementation in lua
 --
 -- Created by skywind on 2018/03/19
 -- Last Modified: 2018/04/02 19:37
