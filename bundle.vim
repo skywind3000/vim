@@ -414,6 +414,16 @@ if index(g:bundle_group, 'complete') >= 0
 endif
 
 
+if index(g:bundle_group, 'textobj') >= 0
+	Plugin 'kana/vim-textobj-user'
+	Plugin 'kana/vim-textobj-function'
+	Plugin 'sgur/vim-textobj-parameter'
+	Plugin 'bps/vim-textobj-python'
+	Plugin 'jceb/vim-textobj-uri'
+	Plugin 'kana/vim-textobj-indent'
+endif
+
+
 "----------------------------------------------------------------------
 " Bundle Footer
 "----------------------------------------------------------------------
