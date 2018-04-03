@@ -145,8 +145,8 @@ if has('gui_running') || (has('nvim') && (has('win32') || has('win64')))
 	endif
 endif
 
-nnoremap <m--> za
-nnoremap <m-_> zA
+nnoremap <m-z> za
+nnoremap <m-Z> zA
 
 
 "----------------------------------------------------------------------

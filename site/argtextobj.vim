@@ -4,7 +4,7 @@
 "
 " Author:  Takahiro SUZUKI <takahiro.suzuki.ja@gmDELETEMEail.com>
 " Version: 1.1.1 (Vim 7.1), patched by Gaving (2010-2013)
-" (https://github.com/gaving/vim-textobj-argument)
+" Homepage: https://github.com/gaving/vim-textobj-argument
 " Licence: MIT Licence
 "
 "=============================================================================

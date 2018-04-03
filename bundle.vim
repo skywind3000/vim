@@ -99,6 +99,7 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 	Plugin 'octol/vim-cpp-enhanced-highlight'
 	Plugin 'pprovost/vim-ps1'
 	Plugin 'tbastos/vim-lua'
+	Plugin 'terryma/vim-expand-region'
 
 	if has('python') || has('python3')
 		Plugin 'Yggdroot/LeaderF'
@@ -150,6 +151,9 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 	let g:cpp_experimental_simple_template_highlight = 1
 	let g:cpp_concepts_highlight = 1
 	let g:cpp_no_function_highlight = 1
+
+	map <m-=> <Plug>(expand_region_expand)
+	map <m--> <Plug>(expand_region_shrink)
 endif
 
 
