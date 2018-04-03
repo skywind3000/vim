@@ -4,10 +4,10 @@
 -- z.lua - z.sh implementation in lua, by skywind (2018/03/19)
 -- Licensed under MIT license.
 --
--- Version 29, Last Modified: 2018/04/02 19:37
+-- Version 30, Last Modified: 2018/04/03 17:49
 --
--- * x10 times faster than fasd and autojump
--- * x3 times faster than rupa/z
+-- * 10x times faster than fasd and autojump
+-- * 3x times faster than rupa/z
 -- * supports: Bash, Zsh and Windows Cmd
 --
 -- USE:
@@ -999,6 +999,8 @@ function main(argv)
 		for _, item in pairs(M) do
 			print(item.name)
 		end
+	elseif options['--help'] ~= nil or options['-h'] ~= nil then
+		z_help()
 	end
 	return true
 end
@@ -1271,6 +1273,20 @@ function z_windows_init(opts)
 	print('set "LuaExe=' .. os.interpreter() .. '"')
 	print('set "LuaScript=' .. os.scriptname() .. '"')
 	print(script_init_cmd)
+end
+
+
+-----------------------------------------------------------------------
+-- help
+-----------------------------------------------------------------------
+function z_help()
+	local cmd = Z_CMD .. ' '
+	print(cmd .. 'foo       # cd to most frecent dir matching foo')
+	print(cmd .. 'foo bar   # cd to most frecent dir matching foo and bar')
+	print(cmd .. '-r bar    # cd to highest ranked dir matching foo')
+	print(cmd .. '-t bar    # cd to most recently accessed dir matching foo')
+	print(cmd .. '-l bar    # list matches instead of cd')
+	print(cmd .. '-c foo    # restrict matches to subdirs of $PWD')
 end
 
 
