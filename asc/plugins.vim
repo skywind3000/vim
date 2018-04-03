@@ -198,6 +198,7 @@ let g:Lf_MruFileExclude = ['*.so', '*.exe', '*.py[co]', '*.sw?', '~$*', '*.bak']
 let g:Lf_MruMaxFiles = 2048
 let g:Lf_StlColorscheme = 'powerline'
 let g:Lf_ShortcutF = '<c-p>'
+let g:Lf_ShortcutB = '<m-n>'
 let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
 
 
