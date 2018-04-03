@@ -270,6 +270,8 @@ if index(g:bundle_group, 'opt') >= 0
 	Plugin 'junegunn/fzf'
 	Plugin 'mhartington/oceanic-next'
 	Plugin 'asins/vim-dict'
+	Plugin 'jceb/vim-orgmode'
+	Plugin 'tpope/vim-speeddating'
 	" Plugin 'mattn/vim-terminal'
 	" Plugin 'Shougo/vimshell.vim'
 	" Plugin 'Shougo/vimproc.vim'
@@ -427,6 +429,7 @@ if index(g:bundle_group, 'textobj') >= 0
 	Plugin 'bps/vim-textobj-python'
 	Plugin 'jceb/vim-textobj-uri'
 endif
+
 
 
 "----------------------------------------------------------------------
