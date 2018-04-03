@@ -262,7 +262,7 @@ endfunc
 
 " run autocmd
 function! s:AutoCmd(name)
-	if has('autocmd') && and(g:vimmake_build_skip, 2) == 0
+	if has('autocmd') && ((g:vimmake_build_skip / 2) % 2) == 0
 		exec 'silent doautocmd User VimMake'.a:name
 	endif
 endfunc
@@ -413,7 +413,7 @@ function! s:Vimmake_Build_AutoCmd(mode, auto)
 	if name !~ '^\w\+$' || name == 'NONE' || name == '<NONE>'
 		return
 	endif
-	if and(g:vimmake_build_skip, 4) != 0
+	if ((g:vimmake_build_skip / 4) % 2) != 0
 		return
 	endif
 	if a:mode == 0
