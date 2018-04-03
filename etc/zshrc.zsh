@@ -72,7 +72,7 @@ antigen bundle zsh-users/zsh-completions
 antigen bundle Vifon/deer
 
 antigen bundle willghatch/zsh-cdr
-antigen bundle zsh-users/zaw
+# antigen bundle zsh-users/zaw
 
 # uncomment the line below to enable theme
 # antigen theme fishy

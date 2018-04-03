@@ -90,7 +90,7 @@ antigen bundle Vifon/deer
 # antigen bundle zsh-users/zsh-autosuggestions
 
 antigen bundle willghatch/zsh-cdr
-antigen bundle zsh-users/zaw
+# antigen bundle zsh-users/zaw
 
 # check login shell
 if [[ -o login ]]; then
