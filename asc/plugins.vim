@@ -61,7 +61,7 @@ endfor
 
 let NERDTreeRespectWildIgnore = 1
 
-let g:vinegar_nerdtree_as_netrw = 1
+" let g:vinegar_nerdtree_as_netrw = 1
 
 
 "----------------------------------------------------------------------
