@@ -427,7 +427,7 @@ endif
 if index(g:bundle_group, 'textobj') >= 0
 	Plugin 'kana/vim-textobj-user'
 	Plugin 'kana/vim-textobj-function'
-	Plugin 'kana/vim-textobj-indent'
+	" Plugin 'kana/vim-textobj-indent'
 	Plugin 'kana/vim-textobj-syntax'
 	Plugin 'sgur/vim-textobj-parameter'
 	Plugin 'bps/vim-textobj-python'
