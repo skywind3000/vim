@@ -124,6 +124,7 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 			\ "Mru":    [["<ESC>", ':exec g:Lf_py "mruExplManager.quit()"<CR>']],
 			\ "Tag":    [["<ESC>", ':exec g:Lf_py "tagExplManager.quit()"<CR>']],
 			\ "Function":    [["<ESC>", ':exec g:Lf_py "functionExplManager.quit()"<CR>']],
+			\ "Colorscheme":    [["<ESC>", ':exec g:Lf_py "colorschemeExplManager.quit()"<CR>']],
 			\ }
 	else
 		Plugin 'ctrlpvim/ctrlp.vim'
@@ -274,13 +275,8 @@ if index(g:bundle_group, 'opt') >= 0
 	Plugin 'tpope/vim-speeddating'
 	Plugin 'itchyny/calendar.vim'
 	" Plugin 'ryanoasis/vim-devicons'
-	" Plugin 'mattn/vim-terminal'
-	" Plugin 'Shougo/vimshell.vim'
-	" Plugin 'Shougo/vimproc.vim'
 	" Plugin 'w0rp/ale'
 	" Plugin 'airblade/vim-gitguttr'
-	" let g:gitgutter_enabled = 1
-	" let g:gitgutter_sign_column_always = 1
 endif
 
 
