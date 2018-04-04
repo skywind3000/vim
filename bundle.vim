@@ -272,6 +272,8 @@ if index(g:bundle_group, 'opt') >= 0
 	Plugin 'asins/vim-dict'
 	Plugin 'jceb/vim-orgmode'
 	Plugin 'tpope/vim-speeddating'
+	Plugin 'itchyny/calendar.vim'
+	" Plugin 'ryanoasis/vim-devicons'
 	" Plugin 'mattn/vim-terminal'
 	" Plugin 'Shougo/vimshell.vim'
 	" Plugin 'Shougo/vimproc.vim'
