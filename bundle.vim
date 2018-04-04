@@ -391,6 +391,10 @@ if index(g:bundle_group, 'nerdtree') >= 0
 	" let g:NERDTreeFileExtensionHighlightFullName = 1
 	" let g:NERDTreeExactMatchHighlightFullName = 1
 	" let g:NERDTreePatternMatchHighlightFullName = 1
+	noremap <space>tn :NERDTree<cr>
+	noremap <space>to :NERDTreeFocus<cr>
+	noremap <space>tm :NERDTreeMirror<cr>
+	noremap <space>tt :NERDTreeToggle<cr>
 endif
 
 if index(g:bundle_group, 'bgimg') >= 0
@@ -432,6 +436,7 @@ if index(g:bundle_group, 'textobj') >= 0
 	Plugin 'sgur/vim-textobj-parameter'
 	Plugin 'bps/vim-textobj-python'
 	Plugin 'jceb/vim-textobj-uri'
+	" Plugin 'wellle/targets.vim'
 endif
 
 

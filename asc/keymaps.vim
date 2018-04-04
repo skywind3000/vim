@@ -67,6 +67,7 @@ noremap <silent><tab>6 :VinegarOpen leftabove vs<cr>
 noremap <silent><tab>7 :VinegarOpen vs<cr>
 noremap <silent><tab>8 :VinegarOpen belowright sp<cr>
 noremap <silent><tab>9 :VinegarOpen tabedit<cr>
+noremap <silent><tab>g <c-w>p
 noremap <silent>+ :VinegarOpen edit<cr>
 
 noremap <silent><space>ha :GuiSignRemove
@@ -192,7 +193,6 @@ noremap <silent><space>jm :call Tools_SwitchMakeFile()<cr>
 "----------------------------------------------------------------------
 " space + t : toggle plugins
 "----------------------------------------------------------------------
-noremap <silent><space>tt :TagbarToggle<cr>
 noremap <silent><space>tq :call Toggle_QuickFix(6)<cr>
 noremap <silent><space>tb :TagbarToggle<cr>
 noremap <silent><space>tf :FuzzyFileSearch<cr>
