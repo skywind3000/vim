@@ -238,6 +238,7 @@ endfor
 "----------------------------------------------------------------------
 " VimImport site/echofunc.vim
 VimImport site/argtextobj.vim
+VimImport site/indent-object.vim
 VimImport site/calendar.vim
 "VimImport site/hilinks.vim
 
