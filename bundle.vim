@@ -336,20 +336,28 @@ if index(g:bundle_group, 'deoplete') >= 0
 		Plugin 'roxma/vim-hug-neovim-rpc'
 	endif
 	Plugin 'zchee/deoplete-clang'
+	Plugin 'zchee/deoplete-jedi'
 	let g:deoplete#enable_at_startup = 1
+	let g:deoplete#enable_smart_case = 1
+	let g:deoplete#enable_refresh_always = 1
+	inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<tab>"
+	inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+	inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+	inoremap <expr><BS> deoplete#smart_close_popup()."\<bs>"
+	inoremap <expr> <cr> pumvisible() ? "\<C-y>\<cr>" : "\<cr>"
+	" <CR>: close popup and save indent.
+	" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+	function! s:my_cr_function() abort
+	  return deoplete#close_popup() . "\<CR>"
+	endfunction
+
 	let g:deoplete#sources = {}
 	let g:deoplete#sources._ = ['buffer', 'dictionary']
-	let g:deoplete#sources.cpp = ['buffer', 'dictionary', 'libclang']
-	function! s:setup_deoplete()
-		call deoplete#initialize()
-		call deoplete#enable()
-	endfunc
-	augroup Deoplete
-		au!
-		" au VimEnter * call s:setup_deoplete()
-	augroup END
+	let g:deoplete#sources.cpp = ['libclang']
+	let g:deoplete#sources.python = ['jedi']
 	" let g:deoplete#sources#clang#libclang_path = '/usr/lib/llvm-3.8/lib/libclang.so.1'
 	" let g:deoplete#sources#clang#clang_header = '/usr/include'
+	let g:deoplete#sources#jedi#python_path = g:python_host_prog
 endif
 
 if index(g:bundle_group, 'airline') >= 0
@@ -458,7 +466,7 @@ let g:startify_session_dir = '~/.vim/session'
 
 
 "----------------------------------------------------------------------
-" keymaps
+" remove python27 path
 "----------------------------------------------------------------------
 
 

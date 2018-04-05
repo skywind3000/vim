@@ -912,3 +912,39 @@ command! -nargs=1 MyUrlRead call s:Tools_ReadUrl(<q-args>)
 
 
 
+"----------------------------------------------------------------------
+" Remove some path from $PATH
+"----------------------------------------------------------------------
+function! s:Tools_RemovePath(path) abort
+	let windows = 0
+	let path = a:path
+	let sep = ':'
+	let parts = []
+	function! s:StringReplace(text, old, new)
+		let l:data = split(a:text, a:old, 1)
+		return join(l:data, a:new)
+	endfunc
+	if has('win32') || has('win64') || has('win32unix') || has('win95')
+		let windows = 1
+		let path = tolower(path)
+		let path = s:StringReplace(path, '\', '/')
+		let sep = ';'
+	endif
+	for n in split($PATH, sep)
+		let key = n
+		if windows != 0 
+			let key = tolower(key)
+			let key = s:StringReplace(key, '\', '/')
+		endif
+		if key != path 
+			let parts += [n]
+		endif
+	endfor
+	let text = join(parts, sep)
+	let $PATH = text
+endfunc
+
+command! -nargs=1 EnvPathRemove call s:Tools_RemovePath(<q-args>)
+
+
+
