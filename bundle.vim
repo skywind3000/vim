@@ -346,10 +346,10 @@ if index(g:bundle_group, 'deoplete') >= 0
 	endfunc
 	augroup Deoplete
 		au!
-		au VimEnter * call s:setup_deoplete()
+		" au VimEnter * call s:setup_deoplete()
 	augroup END
-	let g:deoplete#sources#clang#libclang_path = '/usr/lib/llvm-3.8/lib/libclang.so.1'
-	let g:deoplete#sources#clang#clang_header = '/usr/include'
+	" let g:deoplete#sources#clang#libclang_path = '/usr/lib/llvm-3.8/lib/libclang.so.1'
+	" let g:deoplete#sources#clang#clang_header = '/usr/include'
 endif
 
 if index(g:bundle_group, 'airline') >= 0
