@@ -194,12 +194,25 @@ let g:Lf_WildIgnore = {
             \ 'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]']
 			\ }
 
-let g:Lf_MruFileExclude = ['*.so', '*.exe', '*.py[co]', '*.sw?', '~$*', '*.bak']
+let g:Lf_MruFileExclude = ['*.so', '*.exe', '*.py[co]', '*.sw?', '~$*', '*.bak', '*.tmp', '*.dll']
 let g:Lf_MruMaxFiles = 2048
 let g:Lf_StlColorscheme = 'powerline'
 let g:Lf_ShortcutF = '<c-p>'
 let g:Lf_ShortcutB = '<m-n>'
 let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
+
+let g:Lf_NormalMap = {
+	\ "File":   [["<ESC>", ':exec g:Lf_py "fileExplManager.quit()"<CR>'],
+	\            ["<F6>", ':exec g:Lf_py "fileExplManager.quit()"<CR>']
+	\           ],
+	\ "Buffer": [["<ESC>", ':exec g:Lf_py "bufExplManager.quit()"<CR>'],
+	\            ["<F6>", ':exec g:Lf_py "bufExplManager.quit()"<CR>']
+	\           ],
+	\ "Mru":    [["<ESC>", ':exec g:Lf_py "mruExplManager.quit()"<CR>']],
+	\ "Tag":    [["<ESC>", ':exec g:Lf_py "tagExplManager.quit()"<CR>']],
+	\ "Function":    [["<ESC>", ':exec g:Lf_py "functionExplManager.quit()"<CR>']],
+	\ "Colorscheme":    [["<ESC>", ':exec g:Lf_py "colorschemeExplManager.quit()"<CR>']],
+	\ }
 
 
 "----------------------------------------------------------------------
@@ -254,13 +267,25 @@ if filereadable(s:launch)
 endif
 
 
-
 "----------------------------------------------------------------------
 " delimitmate
 "----------------------------------------------------------------------
 let delimitMate_expand_cr = 1
 let delimitMate_expand_space = 1
 let delimitMate_offByDefault = 1
+
+
+"----------------------------------------------------------------------
+" indentLine
+"----------------------------------------------------------------------
+let g:indentLine_color_term = 239
+let g:indentLine_color_gui = '#A4E57E'
+let g:indentLine_color_tty_light = 7 " (default: 4)
+let g:indentLine_color_dark = 1 " (default: 2)
+let g:indentLine_bgcolor_term = 202
+let g:indentLine_bgcolor_gui = '#FF5F00'
+let g:indentLine_char = '|'
+let g:indentLine_enabled = 1
 
 
 "----------------------------------------------------------------------

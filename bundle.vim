@@ -1,74 +1,46 @@
 "----------------------------------------------------------------------
-" check vundle existance
-"----------------------------------------------------------------------
-if !filereadable(expand('~/.vim/bundle/Vundle.vim/autoload/vundle.vim'))
-	echom "cannot find vundle in ~/.vim/bundle/Vundle.vim"
-	finish
-endif
-
-
-"----------------------------------------------------------------------
-" bundle group
-"----------------------------------------------------------------------
-if !exists('g:bundle_group')
-	let g:bundle_group = []
-endif
-
-let s:bundle_all = 0
-
-if index(g:bundle_group, 'all') >= 0 
-	let s:bundle_all = 1
-endif
-
-
-"----------------------------------------------------------------------
-" check os
+" system detection 
 "----------------------------------------------------------------------
 if has('win32') || has('win64') || has('win95') || has('win16')
 	let s:uname = 'windows'
-	let g:bundle_group += ['windows']
 elseif has('win32unix')
 	let s:uname = 'cygwin'
 elseif has('unix')
 	let s:uname = system("echo -n \"$(uname)\"")
 	if !v:shell_error && s:uname == "Linux"
 		let s:uname = 'linux'
-		let g:bundle_group += ['linux']
 	else
 		let s:uname = 'darwin'
-		let g:bundle_group += ['darwin']
 	endif
 else
 	let s:uname = 'posix'
-	let g:bundle_group += ['posix']
 endif
 
 
+"----------------------------------------------------------------------
+" packages begin
+"----------------------------------------------------------------------
+if !exists('g:bundle_group')
+	let g:bundle_group = []
+endif
+
+if !exists('g:bundle_post')
+	let g:bundle_post = ''
+endif
+
+call plug#begin('~/.vim/bundles')
+
 
 "----------------------------------------------------------------------
-" Bundle Header
+" package group - simple
 "----------------------------------------------------------------------
-filetype off
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-Plugin 'VundleVim/Vundle.vim'
-
-
-"----------------------------------------------------------------------
-" Plugins
-"----------------------------------------------------------------------
-
-
-"----------------------------------------------------------------------
-" Group - simple
-"----------------------------------------------------------------------
-if index(g:bundle_group, 'simple') >= 0 || s:bundle_all
-	Plugin 'easymotion/vim-easymotion'
-	Plugin 'Raimondi/delimitMate'
-	Plugin 'godlygeek/tabular'
-	Plugin 'justinmk/vim-dirvish'
-	Plugin 'justinmk/vim-sneak'
-	Plugin 'tpope/vim-unimpaired'
+if index(g:bundle_group, 'simple') >= 0
+	Plug 'easymotion/vim-easymotion'
+	Plug 'Raimondi/delimitMate'
+	Plug 'justinmk/vim-dirvish'
+	Plug 'justinmk/vim-sneak'
+	Plug 'tpope/vim-unimpaired'
+	Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
 
 	nnoremap <space>a= :Tabularize /=<CR>
 	vnoremap <space>a= :Tabularize /=<CR>
@@ -88,21 +60,21 @@ endif
 
 
 "----------------------------------------------------------------------
-" Group - basic
+" package group - basic
 "----------------------------------------------------------------------
-if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
-	Plugin 'tpope/vim-fugitive'
-	Plugin 'lambdalisue/vim-gista'
-	Plugin 'mhinz/vim-startify'
-	Plugin 'flazz/vim-colorschemes'
-	Plugin 'xolox/vim-misc'
-	Plugin 'octol/vim-cpp-enhanced-highlight'
-	Plugin 'pprovost/vim-ps1'
-	Plugin 'tbastos/vim-lua'
-	Plugin 'terryma/vim-expand-region'
-
+if index(g:bundle_group, 'basic') >= 0
+	Plug 'tpope/vim-fugitive'
+	Plug 'mhinz/vim-startify'
+	Plug 'flazz/vim-colorschemes'
+	Plug 'xolox/vim-misc'
+	Plug 'terryma/vim-expand-region'
+	Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
+	Plug 'pprovost/vim-ps1', { 'for': 'ps1' }
+	Plug 'tbastos/vim-lua', { 'for': 'lua' }
+	Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['c', 'cpp'] }
+	
 	if has('python') || has('python3')
-		Plugin 'Yggdroot/LeaderF'
+		Plug 'Yggdroot/LeaderF'
 		let g:Lf_ShortcutF = '<c-p>'
 		let g:Lf_ShortcutB = '<m-n>'
 		noremap <c-n> :LeaderfMru<cr>
@@ -110,38 +82,16 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 		noremap <m-n> :LeaderfBuffer<cr>
 		noremap <m-m> :LeaderfTag<cr>
 		let g:Lf_MruMaxFiles = 2048
-		let g:Lf_MruFileExclude = ['*.so', '*.tmp', '*.bak', '*.exe', '*.dll']
-		" let g:Lf_StlSeparator = { 'left': '♰', 'right': '♱', 'font': '' }
 		let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
-		" let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>'], '<Esc>':[ '<tab>' ]}
-		let g:Lf_NormalMap = {
-			\ "File":   [["<ESC>", ':exec g:Lf_py "fileExplManager.quit()"<CR>'],
-			\            ["<F6>", ':exec g:Lf_py "fileExplManager.quit()"<CR>']
-			\           ],
-			\ "Buffer": [["<ESC>", ':exec g:Lf_py "bufExplManager.quit()"<CR>'],
-			\            ["<F6>", ':exec g:Lf_py "bufExplManager.quit()"<CR>']
-			\           ],
-			\ "Mru":    [["<ESC>", ':exec g:Lf_py "mruExplManager.quit()"<CR>']],
-			\ "Tag":    [["<ESC>", ':exec g:Lf_py "tagExplManager.quit()"<CR>']],
-			\ "Function":    [["<ESC>", ':exec g:Lf_py "functionExplManager.quit()"<CR>']],
-			\ "Colorscheme":    [["<ESC>", ':exec g:Lf_py "colorschemeExplManager.quit()"<CR>']],
-			\ }
 	else
-		Plugin 'ctrlpvim/ctrlp.vim'
-		Plugin 'tacahiroy/ctrlp-funky'
+		Plug 'ctrlpvim/ctrlp.vim'
+		Plug 'tacahiroy/ctrlp-funky'
 		let g:ctrlp_map = ''
 		noremap <c-p> :CtrlP<cr>
 		noremap <c-n> :CtrlPMRUFiles<cr>
 		noremap <m-p> :CtrlPFunky<cr>
 		noremap <m-n> :CtrlPBuffer<cr>
 	endif
-
-	let g:zv_file_types = {
-				\ "^c$" : 'cpp,c',
-				\ "^cpp$" : 'cpp,c',
-				\ "python": 'python',
-				\ "vim": 'vim'
-				\ }
 
 	noremap <space>ht :Startify<cr>
 	noremap <space>hy :tabnew<cr>:Startify<cr> 
@@ -155,65 +105,45 @@ if index(g:bundle_group, 'basic') >= 0 || s:bundle_all
 
 	map <m-=> <Plug>(expand_region_expand)
 	map <m--> <Plug>(expand_region_shrink)
-endif
+end
 
 
 "----------------------------------------------------------------------
-" Group - inter
+" package group - inter
 "----------------------------------------------------------------------
-if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
-	Plugin 'rust-lang/rust.vim'
-	Plugin 'skywind3000/vimoutliner'
-	Plugin 'vim-scripts/FuzzyFinder'
-	Plugin 'vim-scripts/L9'
-	Plugin 'wsdjeg/FlyGrep.vim'
-	Plugin 'tpope/vim-abolish'
-	Plugin 'xolox/vim-notes'
-	" Plugin 'vim-scripts/CRefVim'
-	" Plugin 'vim-scripts/DrawIt'
-				
+if index(g:bundle_group, 'inter') >= 0
+	Plug 'vim-scripts/L9'
+	Plug 'wsdjeg/FlyGrep.vim'
+	Plug 'tpope/vim-abolish'
+	Plug 'skywind3000/vimoutliner'
+	Plug 'honza/vim-snippets'
+	Plug 'garbas/vim-snipmate'
+	Plug 'MarcWeber/vim-addon-mw-utils'
+	Plug 'tomtom/tlib_vim'
+	Plug 'vim-scripts/FuzzyFinder'
+	Plug 'rust-lang/rust.vim', { 'for': 'rust' }
+	Plug 'xolox/vim-notes', { 'on': ['Note', 'SearchNotes', 'DeleteNotes', 'RecentNotes'] }
+
 	if has('python')
-		Plugin 'skywind3000/vimpress'
-		Plugin 'honza/vim-snippets'
-		" Plugin 'SirVer/ultisnips'
-		Plugin 'garbas/vim-snipmate'
-		Plugin 'MarcWeber/vim-addon-mw-utils'
-		Plugin 'tomtom/tlib_vim'
+		Plug 'skywind3000/vimpress', { 'on': ['BlogPreview', 'BlogSave', 'BlogNew', 'BlogList'] }
+		noremap <space>bp :BlogPreview local<cr>
+		noremap <space>bb :BlogPreview publish<cr>
+		noremap <space>bs :BlogSave<cr>
+		noremap <space>bd :BlogSave draft<cr>
+		noremap <space>bn :BlogNew post<cr>
+		noremap <space>bl :BlogList<cr>
 	endif
 
 	if !isdirectory(expand('~/.vim/notes'))
 		silent! call mkdir(expand('~/.vim/notes'), 'p')
 	endif
 
-	noremap <space>bp :BlogPreview local<cr>
-	noremap <space>bb :BlogPreview publish<cr>
-	noremap <space>bs :BlogSave<cr>
-	noremap <space>bd :BlogSave draft<cr>
-	noremap <space>bn :BlogNew post<cr>
-	noremap <space>bl :BlogList<cr>
-
 	noremap <silent><tab>- :FufMruFile<cr>
 	noremap <silent><tab>= :FufFile<cr>
 	noremap <silent><tab>[ :FufBuffer<cr>
 	noremap <silent><tab>] :FufBufferTag<cr>
 
-	map <silent> <leader>ck <Plug>CRV_CRefVimAsk
-	map <silent> <leader>cj <Plug>CRV_CRefVimInvoke
-
-	vmap <silent> <leader>sr <Plug>StlRefVimVisual
-	map <silent> <leader>sr <Plug>StlRefVimNormal
-	map <silent> <leader>sw <Plug>StlRefVimAsk
-	map <silent> <leader>sc <Plug>StlRefVimInvoke
-	map <silent> <leader>se <Plug>StlRefVimExample
-
-	if 0
-		imap <expr> <m-e> pumvisible() ? '<esc>a<Plug>snipMateTrigger' : '<Plug>snipMateTrigger'
-		imap <expr> <m-n> pumvisible() ? '<esc>a<Plug>snipMateNextOrTrigger' : '<Plug>snipMateNextOrTrigger'
-		smap <m-n> <Plug>snipMateNextOrTrigger
-		imap <expr> <m-p> pumvisible() ? '<esc>a<Plug>snipMateBack' : '<Plug>snipMateBack'
-		smap <m-p> <Plug>snipMateBack
-		imap <expr> <m-m> pumvisible() ? '<esc>a<Plug>snipMateShow' : '<Plug>snipMateShow'
-	else
+	if 1
 		imap <expr> <m-e> pumvisible() ? '<c-g>u<Plug>snipMateTrigger' : '<Plug>snipMateTrigger'
 		imap <expr> <m-n> pumvisible() ? '<c-g>u<Plug>snipMateNextOrTrigger' : '<Plug>snipMateNextOrTrigger'
 		smap <m-n> <Plug>snipMateNextOrTrigger
@@ -221,26 +151,18 @@ if index(g:bundle_group, 'inter') >= 0 || s:bundle_all
 		smap <m-p> <Plug>snipMateBack
 		imap <expr> <m-m> pumvisible() ? '<c-g>u<Plug>snipMateShow' : '<Plug>snipMateShow'
 	endif
-
 endif
 
 
 "----------------------------------------------------------------------
-" Group - special
+" package group - high
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'high') >= 0
-	Plugin 'kshenoy/vim-signature'
-	Plugin 'mhinz/vim-signify'
-	Plugin 'mh21/errormarker.vim'
-	Plugin 't9md/vim-choosewin'
-	Plugin 'francoiscabrol/ranger.vim'
-	" Plugin 'dracula/vim'
-	" Plugin 'Yggdroot/indentLine'
-
-	let g:syntastic_always_populate_loc_list = 1
-	let g:syntastic_auto_loc_list = 0
-	let g:syntastic_check_on_open = 0
-	let g:syntastic_check_on_wq = 0
+	Plug 'kshenoy/vim-signature'
+	Plug 'mhinz/vim-signify'
+	Plug 'mh21/errormarker.vim'
+	Plug 't9md/vim-choosewin'
+	Plug 'francoiscabrol/ranger.vim'
 
 	let g:errormarker_disablemappings = 1
 	nnoremap <silent> <leader>cm :ErrorAtCursor<CR>
@@ -250,119 +172,69 @@ if index(g:bundle_group, 'high') >= 0
 	nmap <m-e> <Plug>(choosewin)
 	let g:ranger_map_keys = 0
 
-	"let &errorformat="%f:%l:%c: %t%*[^:]:%m,%f:%l: %t%*[^:]:%m," . &errorformat
-	let g:indentLine_color_term = 239
-	let g:indentLine_color_gui = '#A4E57E'
-	let g:indentLine_color_tty_light = 7 " (default: 4)
-	let g:indentLine_color_dark = 1 " (default: 2)
-	let g:indentLine_bgcolor_term = 202
-	let g:indentLine_bgcolor_gui = '#FF5F00'
-	let g:indentLine_char = '|'
-	let g:indentLine_enabled = 1
-endif
-
+end
 
 
 "----------------------------------------------------------------------
-" group opt 
+" package group - opt
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'opt') >= 0
-	" Plugin 'thinca/vim-quickrun'
-	Plugin 'junegunn/fzf'
-	Plugin 'mhartington/oceanic-next'
-	Plugin 'asins/vim-dict'
-	Plugin 'jceb/vim-orgmode'
-	Plugin 'tpope/vim-speeddating'
-	Plugin 'itchyny/calendar.vim'
-	" Plugin 'ryanoasis/vim-devicons'
-	" Plugin 'w0rp/ale'
-	" Plugin 'airblade/vim-gitguttr'
-endif
-
-
-
-
-"----------------------------------------------------------------------
-" Group - windows
-"----------------------------------------------------------------------
-if index(g:bundle_group, 'windows') >= 0
+	Plug 'junegunn/fzf'
+	Plug 'mhartington/oceanic-next'
+	Plug 'asins/vim-dict'
+	Plug 'tpope/vim-speeddating'
+	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
+	Plug 'jceb/vim-orgmode', { 'for': 'org' }
 endif
 
 
 "----------------------------------------------------------------------
-" Group - linux
+" optional 
 "----------------------------------------------------------------------
-if index(g:bundle_group, 'linux') >= 0
-endif
 
-
-"----------------------------------------------------------------------
-" Group - posix
-"----------------------------------------------------------------------
-if index(g:bundle_group, 'posix') >= 0
-endif
-
-
-
-"----------------------------------------------------------------------
-" Other plugins
-"----------------------------------------------------------------------
-if index(g:bundle_group, 'wakatime') >= 0
-	if has('python')
-		Plugin 'skywind3000/wakatime'
-		" Plugin 'wakatime/vim-wakatime'
-	endif
-endif
-
-if index(g:bundle_group, 'vimuiex') >= 0
-	if !has('gui_running')
-		Plugin 'skywind3000/vimuiex'
-	endif
-endif
-
-if index(g:bundle_group, 'echodoc') >= 0
-	Plugin 'Shougo/echodoc.vim'
-	set noshowmode
-	set shortmess+=c
-	let g:echodoc#enable_at_startup = 1
-endif
-
+" deoplete
 if index(g:bundle_group, 'deoplete') >= 0
 	if has('nvim')
-		Plugin 'Shougo/deoplete.nvim'
+		Plug 'Shougo/deoplete.nvim'
 	else
-		Plugin 'Shougo/deoplete.nvim'
-		Plugin 'roxma/nvim-yarp'
-		Plugin 'roxma/vim-hug-neovim-rpc'
+		Plug 'Shougo/deoplete.nvim'
+		Plug 'roxma/nvim-yarp'
+		Plug 'roxma/vim-hug-neovim-rpc'
 	endif
-	Plugin 'zchee/deoplete-clang'
-	Plugin 'zchee/deoplete-jedi'
+
+	Plug 'zchee/deoplete-clang'
+	Plug 'zchee/deoplete-jedi'
+	Plug 'Shougo/echodoc.vim'
+
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#enable_smart_case = 1
 	let g:deoplete#enable_refresh_always = 1
+
 	inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<tab>"
 	inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 	inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 	inoremap <expr><BS> deoplete#smart_close_popup()."\<bs>"
 	inoremap <expr> <cr> pumvisible() ? "\<C-y>\<cr>" : "\<cr>"
-	" <CR>: close popup and save indent.
-	" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-	function! s:my_cr_function() abort
-	  return deoplete#close_popup() . "\<CR>"
-	endfunction
 
 	let g:deoplete#sources = {}
 	let g:deoplete#sources._ = ['buffer', 'dictionary']
 	let g:deoplete#sources.cpp = ['libclang']
 	let g:deoplete#sources.python = ['jedi']
-	" let g:deoplete#sources#clang#libclang_path = '/usr/lib/llvm-3.8/lib/libclang.so.1'
-	" let g:deoplete#sources#clang#clang_header = '/usr/include'
-	let g:deoplete#sources#jedi#python_path = g:python_host_prog
+
+	set noshowmode
+	set shortmess+=c
+	let g:echodoc#enable_at_startup = 1
+
+	if exists('g:python_host_prog')
+		let g:deoplete#sources#jedi#python_path = g:python_host_prog
+	endif
 endif
 
+
+" airline
 if index(g:bundle_group, 'airline') >= 0
-	Plugin 'bling/vim-airline'
-	Plugin 'vim-airline/vim-airline-themes'
+	Plug 'bling/vim-airline'
+	Plug 'vim-airline/vim-airline-themes'
 	let g:airline_left_sep = ''
 	let g:airline_left_alt_sep = ''
 	let g:airline_right_sep = ''
@@ -372,24 +244,10 @@ if index(g:bundle_group, 'airline') >= 0
 	" let g:airline_theme='bubblegum'
 endif
 
-if index(g:bundle_group, 'completor') >= 0
-	Plugin 'maralla/completor.vim'
-endif
-
-if index(g:bundle_group, 'neocomplete') >= 0
-	if has('lua')
-		Plugin 'Shougo/neocomplete.vim'
-	endif
-	set completeopt=longest,menuone
-	"inoremap <expr> <TAB> pumvisible() ? "\<C-n>" : "\<tab>"
-	"au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
-	let g:neocomplete#enable_at_startup = 1 
-endif
-
 
 if index(g:bundle_group, 'nerdtree') >= 0
-	Plugin 'scrooloose/nerdtree'
-	Plugin 'tiagofumo/vim-nerdtree-syntax-highlight'
+	Plug 'scrooloose/nerdtree', {'on': ['NERDTree', 'NERDTreeFocus', 'NERDTreeToggle', 'NERDTreeCWD', 'NERDTreeFind'] }
+	Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 	let g:NERDTreeMinimalUI = 1
 	let g:NERDTreeDirArrows = 1
 	" let g:NERDTreeFileExtensionHighlightFullName = 1
@@ -401,12 +259,8 @@ if index(g:bundle_group, 'nerdtree') >= 0
 	noremap <space>tt :NERDTreeToggle<cr>
 endif
 
-if index(g:bundle_group, 'bgimg') >= 0
-	Plugin 'skywind3000/vim-bgimg'
-endif
-
 if index(g:bundle_group, 'grammer') >= 0
-	Plugin 'rhysd/vim-grammarous'
+	Plug 'rhysd/vim-grammarous'
 	noremap <space>rg :GrammarousCheck --lang=en-US --no-move-to-first-error --no-preview<cr>
 	map <space>rr <Plug>(grammarous-open-info-window)
 	map <space>rv <Plug>(grammarous-move-to-info-window)
@@ -418,56 +272,28 @@ if index(g:bundle_group, 'grammer') >= 0
 	map <space>rp <Plug>(grammarous-move-to-previous-error)
 endif
 
-if index(g:bundle_group, 'vcm') >= 0
-	Plugin 'ajh17/VimCompletesMe'
-endif
-
-if index(g:bundle_group, 'complete') >= 0
-	" Plugin 'othree/vim-autocomplpop'
-	Plugin 'ervandew/supertab'
-	let g:SuperTabDefaultCompletionType = "<c-n>"
-	let g:SuperTabContextDefaultCompletionType = "<c-n>"
-	set completeopt=longest,menuone
-	set complete+=k
-endif
-
 
 if index(g:bundle_group, 'textobj') >= 0
-	Plugin 'kana/vim-textobj-user'
-	Plugin 'kana/vim-textobj-function'
-	" Plugin 'kana/vim-textobj-indent'
-	Plugin 'kana/vim-textobj-syntax'
-	Plugin 'sgur/vim-textobj-parameter'
-	Plugin 'bps/vim-textobj-python'
-	Plugin 'jceb/vim-textobj-uri'
-	" Plugin 'wellle/targets.vim'
+	Plug 'kana/vim-textobj-user'
+	" Plug 'kana/vim-textobj-indent'
+	Plug 'kana/vim-textobj-syntax'
+	Plug 'kana/vim-textobj-function', { 'for':['c', 'cpp', 'vim', 'java'] }
+	Plug 'sgur/vim-textobj-parameter'
+	Plug 'bps/vim-textobj-python', {'for': 'python'}
+	Plug 'jceb/vim-textobj-uri'
+	" Plug 'wellle/targets.vim'
 endif
 
 
 
 "----------------------------------------------------------------------
-" Bundle Footer
+" packages end
 "----------------------------------------------------------------------
-call vundle#end()
-filetype on
-
-
-"----------------------------------------------------------------------
-" Settings
-"----------------------------------------------------------------------
-let g:pydoc_cmd = 'python -m pydoc'
-let g:gist_use_password_in_gitconfig = 1
-
-if !exists('g:startify_disable_at_vimenter')
-	let g:startify_disable_at_vimenter = 1
+if g:bundle_post != ''
+	exec g:bundle_post
 endif
 
-let g:startify_session_dir = '~/.vim/session'
-
-
-"----------------------------------------------------------------------
-" remove python27 path
-"----------------------------------------------------------------------
+call plug#end()
 
 
 
