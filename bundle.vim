@@ -218,7 +218,7 @@ if index(g:bundle_group, 'deoplete') >= 0
 
 	let g:deoplete#sources = {}
 	let g:deoplete#sources._ = ['buffer', 'dictionary']
-	let g:deoplete#sources.cpp = ['libclang']
+	let g:deoplete#sources.cpp = ['libclang', 'clang']
 	let g:deoplete#sources.python = ['jedi']
 
 	set noshowmode
@@ -228,6 +228,9 @@ if index(g:bundle_group, 'deoplete') >= 0
 	if exists('g:python_host_prog')
 		let g:deoplete#sources#jedi#python_path = g:python_host_prog
 	endif
+
+	let g:deoplete#sources#jedi#enable_cache = 1
+
 endif
 
 
@@ -250,6 +253,7 @@ if index(g:bundle_group, 'nerdtree') >= 0
 	Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 	let g:NERDTreeMinimalUI = 1
 	let g:NERDTreeDirArrows = 1
+	let g:NERDTreeHijackNetrw = 0
 	" let g:NERDTreeFileExtensionHighlightFullName = 1
 	" let g:NERDTreeExactMatchHighlightFullName = 1
 	" let g:NERDTreePatternMatchHighlightFullName = 1

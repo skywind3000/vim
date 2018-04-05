@@ -35,12 +35,8 @@ else
 	let g:vim_startup = ''
 endif
 
-" you may install vundle from: 
-" https://github.com/VundleVim/Vundle.vim
-if filereadable(expand('~/.vim/bundle/Vundle.vim/autoload/vundle.vim'))
-	if len(g:bundle_group) > 0
-		exec 'so '.fnameescape(s:home).'/bundle.vim'
-	endif
+if len(g:bundle_group) > 0
+	exec 'so '.fnameescape(s:home).'/bundle.vim'
 endif
 
 hi LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
