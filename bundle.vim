@@ -218,7 +218,7 @@ if index(g:bundle_group, 'deoplete') >= 0
 
 	let g:deoplete#sources = {}
 	let g:deoplete#sources._ = ['buffer', 'dictionary']
-	let g:deoplete#sources.cpp = ['libclang', 'clang']
+	let g:deoplete#sources.cpp = ['clang']
 	let g:deoplete#sources.python = ['jedi']
 
 	set noshowmode

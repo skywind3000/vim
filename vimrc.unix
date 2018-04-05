@@ -20,14 +20,16 @@ if !exists('g:bundle_group')
 	let g:bundle_group = []
 endif
 
-if exists('g:vim_startup') && get(g:, 'vim_manual', 0) == 0
-	let g:bundle_group += ['simple']
+if exists('g:vim_startup') 
+	if get(g:, 'vim_manual', 0) == 0
+		let g:bundle_group += ['simple']
 
-	if g:vim_startup == 'nvim'
-		let g:bundle_group += ['basic']
-	elseif g:vim_startup == 'mvim'
-		let g:bundle_group += ['basic', 'inter', 'high']
-		set signcolumn=yes
+		if g:vim_startup == 'nvim'
+			let g:bundle_group += ['basic']
+		elseif g:vim_startup == 'mvim'
+			let g:bundle_group += ['basic', 'inter', 'high']
+			set signcolumn=yes
+		endif
 	endif
 
 	call Tools_SwitchLayout()
