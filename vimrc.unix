@@ -31,8 +31,6 @@ if exists('g:vim_startup') && get(g:, 'vim_manual', 0) == 0
 	endif
 
 	call Tools_SwitchLayout()
-else
-	let g:vim_startup = ''
 endif
 
 if len(g:bundle_group) > 0
