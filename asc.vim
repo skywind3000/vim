@@ -14,6 +14,7 @@ IncScript asc/ignores.vim
 IncScript asc/tools.vim
 IncScript asc/keymaps.vim
 IncScript asc/plugins.vim
+IncScript asc/status.vim
 
 IncScript asc/misc.vim
 IncScript asc/gui.vim
