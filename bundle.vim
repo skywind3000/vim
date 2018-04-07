@@ -189,6 +189,14 @@ if index(g:bundle_group, 'opt') >= 0
 
 	let g:gutentags_project_root = ['.root']
 	let g:gutentags_ctags_tagfile = '.tags'
+
+	let vim_tags = expand('~/.vim/cache/tags')
+
+	if !isdirectory(vim_tags)
+		silent! call mkdir(vim_tags, 'p')
+	endif
+
+	let g:gutentags_cache_dir = vim_tags
 endif
 
 
