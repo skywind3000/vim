@@ -204,7 +204,6 @@ if index(g:bundle_group, 'deoplete') >= 0
 
 	Plug 'zchee/deoplete-clang'
 	Plug 'zchee/deoplete-jedi'
-	Plug 'Shougo/echodoc.vim'
 
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#enable_smart_case = 1
@@ -221,7 +220,6 @@ if index(g:bundle_group, 'deoplete') >= 0
 	let g:deoplete#sources.cpp = ['clang']
 	let g:deoplete#sources.python = ['jedi']
 
-	set noshowmode
 	set shortmess+=c
 	let g:echodoc#enable_at_startup = 1
 
@@ -233,6 +231,12 @@ if index(g:bundle_group, 'deoplete') >= 0
 
 endif
 
+" echodoc
+if index(g:bundle_group, 'echodoc') >= 0
+	Plug 'Shougo/echodoc.vim'
+	set noshowmode
+	let g:echodoc#enable_at_startup = 1
+endif
 
 " airline
 if index(g:bundle_group, 'airline') >= 0
