@@ -332,6 +332,29 @@ function! asclib#taglist(pattern)
         let ftags = taglist(a:pattern)
         let &tagbsearch = bak
     endtry
+	" deal with ctags windows filename bug
+	for item in ftags
+		let name = get(item, 'filename', '')
+		let item.baditem = 0
+		if has('win32') || has('win64') || has('win16') || has('win95') 
+			if stridx(name, '\\') >= 0
+				let part = split(name, '\\', 1)
+				let elem = []
+				for n in part
+					if n != ''
+						let elem += [n]
+					endif
+				endfor
+				let name = join(elem, '\')
+				let item.filename = name
+				if has_key(item, 'line') == 0
+					if has_key(item, 'signature') == 0
+						let item.baditem = 1
+					endif
+				endif
+			end
+		endif
+	endfor
     return ftags
 endfunc
 
@@ -350,7 +373,13 @@ function! asclib#tagfind(tagname)
 	if type(result) == 0 || (type(result) == 3 && result == [])
 		return []
 	endif
-	return result
+	let final = []
+	for item in result
+		if item.baditem == 0
+			let final += [item]
+		endif
+	endfor
+	return final
 endfunc
 
 
@@ -418,10 +447,10 @@ function! asclib#preview_tag(tagname)
 	call settabwinvar(l:tabnr, l:winnr, varname, opt)
 	call asclib#window_goto_uid(uid)
 	if 0
-		let saveview = winsaveview()
+		call asclib#window_saveview()
 		silent exec 'pedit '.fnameescape(filename)
-		call winrestview(saveview)
 		call asclib#window_goto_tabwin(l:tabnr, l:winnr)
+		call asclib#window_loadview()
 	else
 		call asclib#window_saveview()
 		call asclib#window_goto_tabwin(l:tabnr, l:winnr)
@@ -437,6 +466,7 @@ function! asclib#preview_tag(tagname)
 	else
 		silent! exec "1"
 		silent! exec taginfo.cmd
+		silent! exec "nohl"
 	endif
 	if has("folding")
 		silent! .foldopen!

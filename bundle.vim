@@ -185,6 +185,10 @@ if index(g:bundle_group, 'opt') >= 0
 	Plug 'tpope/vim-speeddating'
 	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
+	Plug 'ludovicchabant/vim-gutentags'
+
+	let g:gutentags_project_root = ['.root']
+	let g:gutentags_ctags_tagfile = '.tags'
 endif
 
 
@@ -291,7 +295,6 @@ if index(g:bundle_group, 'textobj') >= 0
 	Plug 'jceb/vim-textobj-uri'
 	" Plug 'wellle/targets.vim'
 endif
-
 
 
 "----------------------------------------------------------------------
