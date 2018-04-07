@@ -386,6 +386,13 @@ augroup END
 
 let g:solarized_termcolors=256
 
+let s:vim_tags = expand('~/.vim/cache/tags')
+
+if !isdirectory(s:vim_home)
+	silent! call mkdir(s:vim_tags, 'p')
+endif
+
+let g:gutentags_cache_dir = s:vim_tags
 
 if !exists(":DiffOrig")
   command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
