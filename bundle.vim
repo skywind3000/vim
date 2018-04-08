@@ -197,7 +197,9 @@ if index(g:bundle_group, 'opt') >= 0
 	endif
 
 	let g:gutentags_cache_dir = vim_tags
-	let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']
+	let g:gutentags_ctags_extra_args = []
+	" let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']
+	let g:gutentags_ctags_extra_args = ['--fields=+iazS', '--extra=+q']
 	let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
 	let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
 	" let g:gutentags_ctags_extra_args += ['--objectivec-kinds=+px']

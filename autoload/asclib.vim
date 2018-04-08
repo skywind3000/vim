@@ -332,7 +332,7 @@ function! asclib#taglist(pattern)
         let ftags = taglist(a:pattern)
         let &tagbsearch = bak
     endtry
-	" deal with ctags windows filename bug
+	" take care ctags windows filename bug
 	for item in ftags
 		let name = get(item, 'filename', '')
 		let item.baditem = 0
@@ -349,7 +349,10 @@ function! asclib#taglist(pattern)
 				let item.filename = name
 				if has_key(item, 'line') == 0
 					if has_key(item, 'signature') == 0
-						let item.baditem = 1
+						let kind = get(item, 'kind', '')
+						if kind != 'p' && kind != 'f'
+							let item.baditem = 1
+						endif
 					endif
 				endif
 			end
@@ -386,7 +389,7 @@ endfunc
 "----------------------------------------------------------------------
 " preview word highlight
 "----------------------------------------------------------------------
-hi previewWord term=bold ctermbg=green ctermfg=black guibg=green guifg=black
+hi! previewWord term=bold ctermbg=green ctermfg=black guibg=green guifg=black
 
 
 "----------------------------------------------------------------------
@@ -461,12 +464,12 @@ function! asclib#preview_tag(tagname)
 		match none
 	endif
 	normal! gg
-	if has_key(taginfo, 'line')
-		silent! exec "".taginfo.line
-	else
+	if has_key(taginfo, 'cmd')
 		silent! exec "1"
 		silent! exec taginfo.cmd
 		silent! exec "nohl"
+	elseif has_key(taginfo, 'line')
+		silent! exec "".taginfo.line
 	endif
 	if has("folding")
 		silent! .foldopen!
@@ -810,7 +813,7 @@ function! asclib#function_signature(funname, fn_only, filetype)
 		endif
 	endfor
 	let res = []
-	let index = 1
+	let check = {}
 	for i in fill_tag
 		if has_key(i, 'kind') && has_key(i, 'signature')
 			if i.cmd[:1] == '/^' && i.cmd[-2:] == '$/'
@@ -826,15 +829,15 @@ function! asclib#function_signature(funname, fn_only, filetype)
 				endif
 				let name = substitute(i.cmd[2:-3],tmppat,'','').
 							\ i.name . i.signature
-                if i.kind == 'm'
-                    if has_key(i, 'class')
-                        let name = name . ' <-- class ' . i.class
-                    elseif has_key(i, 'struct')
-                        let name = name . ' <-- struct ' . i.struct
-                    elseif has_key(i, 'union')
-                        let name = name . ' <-- union ' . i.union
-                    endif
-                endif
+				if i.kind == 'm'
+					if has_key(i, 'class')
+						let name = name . ' <-- class ' . i.class
+					elseif has_key(i, 'struct')
+						let name = name . ' <-- struct ' . i.struct
+					elseif has_key(i, 'union')
+						let name = name . ' <-- union ' . i.union
+					endif
+				endif
 			else
 				let name = i.name . i.signature
 				if has_key(i, 'kind') && match('fm', i.kind) >= 0
@@ -861,36 +864,40 @@ function! asclib#function_signature(funname, fn_only, filetype)
 						\(has_key(i, 'cmd') && i.cmd[0] == '/')
 				let tmppat = '\(\<'.i.name.'\>.\{-}\)'
 				if index(['c', 'cpp', 'cs', 'java', 'javascript'], ft) >= 0
-					let tmppat = tmppat . ';.*'
+					" let tmppat = tmppat . ';.*'
 				elseif ft == 'python' && (i.kind == 'm' || i.kind == 'f')
 					let tmppat = tmppat . ':.*'
 				elseif ft == 'tcl' && (i.kind == 'm' || i.kind == 'p')
 					let tmppat = tmppat . '\({\)\?$'
 				endif
-                if i.kind == 'm' && &filetype == 'cpp'
-                    let tmppat=substitute(tmppat,'^\(.*::\)','\\(\1\\)\\?','')
-                endif
-                if match(i.cmd[2:-3], tmppat) != -1
-                    let name=substitute(i.cmd[2:-3], tmppat, '\1', '')
-                    if i.kind == 't' && name !~ '^\s*typedef\>'
-                        let name = 'typedef ' . i.name
-                    endif
-                elseif i.kind == 't'
-                    let name = 'typedef ' . i.name
-                elseif i.kind == 'v'
-                    let name = 'var ' . i.name
-                else
-                    let name = i.name
-                endif
-                if i.kind == 'm'
-                    if has_key(i, 'class')
-                        let name = name . ' <-- class ' . i.class
-                    elseif has_key(i, 'struct')
-                        let name = name . ' <-- struct ' . i.struct
-                    elseif has_key(i, 'union')
-                        let name = name . ' <-- union ' . i.union
-                    endif
-                endif
+				if i.kind == 'm' && &filetype == 'cpp'
+					let tmppat=substitute(tmppat,'^\(.*::\)','\\(\1\\)\\?','')
+				endif
+				if match(i.cmd[2:-3], tmppat) != -1
+					let name=substitute(i.cmd[2:-3], tmppat, '\1', '')
+					if i.kind == 't' && name !~ '^\s*typedef\>'
+						let name = 'typedef ' . i.name
+					endif
+				elseif i.kind == 't'
+					let name = 'typedef ' . i.name
+				elseif i.kind == 'v'
+					let name = 'var ' . i.name
+				else
+					let name = i.name
+				endif
+				if i.kind == 'm'
+					if has_key(i, 'class')
+						let name = name . ' <-- class ' . i.class
+					elseif has_key(i, 'struct')
+						let name = name . ' <-- struct ' . i.struct
+					elseif has_key(i, 'union')
+						let name = name . ' <-- union ' . i.union
+					endif
+				endif
+				let name = substitute(name, '^\s*\(.\{-}\)\s*$', '\1', '')
+				if name[-1:] == ';'
+					let name = name[0:-2]
+				endif
 			else
 				let name = i.name
 			endif
@@ -900,6 +907,16 @@ function! asclib#function_signature(funname, fn_only, filetype)
 		let name = substitute(name, '^\s\+', '', '')
 		let name = substitute(name, '\s\+$', '', '')
 		let name = substitute(name, '\s\+', ' ', 'g')
+		let i.func_prototype = name
+		if !has_key(check, name)
+			let check[name] = 1
+			let res += [i]
+		endif
+	endfor
+	let result = []
+	let index = 1
+	for i in res
+		let name = i.func_prototype
 		let file_line = ''
 		if has_key(i, 'filename')
 			let file_line = fnamemodify(i.filename, ':t')
@@ -909,11 +926,11 @@ function! asclib#function_signature(funname, fn_only, filetype)
 				let file_line .= ':'. i.cmd
 			endif
 		endif
-		let desc = name. ' ('.index.'/'.len(fill_tag).') '.file_line
-		let res += [desc]
+		let desc = name. ' ('.index.'/'.len(res).') '.file_line
+		let result += [desc]
 		let index += 1
 	endfor
-	return res
+	return result
 endfunc
 
 
