@@ -115,7 +115,6 @@ if index(g:bundle_group, 'inter') >= 0
 	Plug 'vim-scripts/L9'
 	Plug 'wsdjeg/FlyGrep.vim'
 	Plug 'tpope/vim-abolish'
-	Plug 'skywind3000/vimoutliner'
 	Plug 'honza/vim-snippets'
 	Plug 'garbas/vim-snipmate'
 	Plug 'MarcWeber/vim-addon-mw-utils'
@@ -123,6 +122,7 @@ if index(g:bundle_group, 'inter') >= 0
 	Plug 'vim-scripts/FuzzyFinder'
 	Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 	Plug 'xolox/vim-notes', { 'on': ['Note', 'SearchNotes', 'DeleteNotes', 'RecentNotes'] }
+	Plug 'skywind3000/vimoutliner', { 'for': 'votl' }
 
 	if has('python')
 		Plug 'skywind3000/vimpress', { 'on': ['BlogPreview', 'BlogSave', 'BlogNew', 'BlogList'] }

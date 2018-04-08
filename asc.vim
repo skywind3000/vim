@@ -19,5 +19,6 @@ IncScript asc/status.vim
 IncScript asc/misc.vim
 IncScript asc/gui.vim
 IncScript asc/menu.vim
+IncScript asc/unix.vim
 
 

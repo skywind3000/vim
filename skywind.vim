@@ -1,51 +1,11 @@
 "----------------------------------------------------------------------
 "- Global Settings
 "----------------------------------------------------------------------
-let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
-
-filetype plugin indent on
-set hlsearch
-set incsearch
-set wildmenu
-set ignorecase
-set cpo-=<
-noremap <tab>/ :emenu <C-Z>
-" noremap <c-n>  :emenu <C-Z>
-set lazyredraw
-set errorformat+=[%f:%l]\ ->\ %m,[%f:%l]:%m
-command! -nargs=1 VimImport exec 'so '.s:home.'/'.'<args>'
-command! -nargs=1 VimLoad exec 'set rtp+='.s:home.'/'.'<args>'
-
-let g:vimmake_open = 6
-let g:asyncrun_open = 6
-
 highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE 
 	\ gui=NONE guifg=DarkGrey guibg=NONE
 
-call Backup_Directory()
-
 let g:ycm_goto_buffer_command = 'new-or-existing-tab'
 
-if has('patch-7.4.500') || v:version >= 800
-	if !has('nvim')
-		set cryptmethod=blowfish2
-	endif
-endif
-
-
-"----------------------------------------------------------------------
-" builtin terminal settings 
-"----------------------------------------------------------------------
-if has('nvim')
-	set guicursor=
-elseif (!has('gui_running')) && has('terminal') && has('patch-8.0.1200')
-	let g:termcap_guicursor = &guicursor
-	let g:termcap_t_RS = &t_RS
-	let g:termcap_t_SH = &t_SH
-	set guicursor=
-	set t_RS=
-	set t_SH=
-endif
 
 
 "----------------------------------------------------------------------
@@ -53,20 +13,11 @@ endif
 "----------------------------------------------------------------------
 augroup SkywindGroup
 	au!
-	" au User AsyncRunStart call asyncrun#quickfix_toggle(6, 1)
-	" au User VimMakeStart call vimmake#toggle_quickfix(6, 1)
-	au User VimScope call vimmake#toggle_quickfix(6, 1)
-	au BufNewFile,BufRead *.as setlocal filetype=actionscript
-	au BufNewFile,BufRead *.pro setlocal filetype=prolog
-	au BufNewFile,BufRead *.es setlocal filetype=erlang
-	au BufNewFile,BufRead *.asc setlocal filetype=asciidoc
-	au BufNewFile,BufRead *.vl setlocal filetype=verilog
 	au FileType python setlocal shiftwidth=4 tabstop=4 noexpandtab
 	au FileType lisp setlocal ts=8 sts=2 sw=2 et
 	au FileType scala setlocal sts=4 sw=4 noet
 	au FileType haskell setlocal et
 	au FileType c,cpp call s:language_cpp()
-	au FileType * call s:language_tag()
 augroup END
 
 
@@ -78,16 +29,6 @@ function! s:language_cpp()
 	" highlight def link cCustomFunc Function
 	setlocal commentstring=//\ %s
 endfunc
-
-
-"----------------------------------------------------------------------
-" language tag 
-"----------------------------------------------------------------------
-function! s:language_tag()
-	let path = expand("~/.vim/tags") . '/' . &ft
-	exec "setlocal tags+=" . fnameescape(path)
-endfunc
-
 
 
 "----------------------------------------------------------------------
@@ -156,16 +97,6 @@ if has('win32') || has('win16') || has('win64') || has('win95')
 	noremap <space>hw :FileSwitch tabe e:/svn/doc/linwei/GTD.otl<cr>
 else
 endif
-
-
-"----------------------------------------------------------------------
-"- Return last position
-"----------------------------------------------------------------------
-autocmd BufReadPost *
-	\ if line("'\"") > 1 && line("'\"") <= line("$") |
-	\	 exe "normal! g`\"" |
-	\ endif
-
 
 
 "----------------------------------------------------------------------
@@ -239,9 +170,6 @@ for s:i in range(10)
 endfor
 
 
-
-
-
 "----------------------------------------------------------------------
 "- OptImport
 "----------------------------------------------------------------------
@@ -268,87 +196,6 @@ let OmniCpp_MayCompleteDot = 1
 let OmniCpp_MayCompleteArrow = 1 
 let OmniCpp_MayCompleteScope = 1
 let OmniCpp_DefaultNamespaces = ["std", "_GLIBCXX_STD"]
-
-
-"----------------------------------------------------------------------
-"- neocomplete
-"----------------------------------------------------------------------
-if 0
-	let g:acp_enableAtStartup = 0
-	" Use neocomplete.
-	let g:neocomplete#enable_at_startup = 1
-	" Use smartcase.
-	let g:neocomplete#enable_smart_case = 1
-	" Set minimum syntax keyword length.
-	let g:neocomplete#sources#syntax#min_keyword_length = 3
-	let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
-
-	" Define dictionary.
-	let g:neocomplete#sources#dictionary#dictionaries = {
-				\ 'default' : '',
-				\ 'vimshell' : $HOME.'/.vimshell_hist',
-				\ 'scheme' : $HOME.'/.gosh_completions'
-				\ }
-
-	" Define keyword.
-	if !exists('g:neocomplete#keyword_patterns')
-		let g:neocomplete#keyword_patterns = {}
-	endif
-	let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-	" Plugin key-mappings.
-	inoremap <expr><C-g>     neocomplete#undo_completion()
-	"inoremap <expr><C-l>     neocomplete#complete_common_string()
-
-	" Recommended key-mappings.
-	" <CR>: close popup and save indent.
-	inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-	function! s:my_cr_function()
-		return neocomplete#close_popup() . "\<CR>"
-		" For no inserting <CR> key.
-		"return pumvisible() ? neocomplete#close_popup() : "\<CR>"
-	endfunction
-	" <TAB>: completion.
-	inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-	" <C-h>, <BS>: close popup and delete backword char.
-	"inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-	inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-	inoremap <expr><C-y>  neocomplete#close_popup()
-	inoremap <expr><C-e>  neocomplete#cancel_popup()
-	" Close popup by <Space>.
-	inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
-
-	" AutoComplPop like behavior.
-	let g:neocomplete#enable_auto_select = 1
-
-	" Shell like behavior(not recommended).
-	set completeopt+=longest
-	let g:neocomplete#enable_auto_select = 1
-	let g:neocomplete#disable_auto_complete = 1
-	inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
-
-	" Enable omni completion.
-	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-	" Enable heavy omni completion.
-	if !exists('g:neocomplete#sources#omni#input_patterns')
-		let g:neocomplete#sources#omni#input_patterns = {}
-	endif
-
-	"let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-	"let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
-	"let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-
-	" For perlomni.vim setting.
-	" https://github.com/c9s/perlomni.vim
-	let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
-endif
-
-
 
 
 "----------------------------------------------------------------------
@@ -386,19 +233,7 @@ map <leader><F3> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '
 	\ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
 	\ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
-augroup ThemeUpdateGroup
-	au!
-	"au Syntax netrw call s:netrw_highlight()
-	"au ColorScheme * GuiThemeHighlight
-augroup END
-
-
 let g:solarized_termcolors=256
-
-if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
-          \ | wincmd p | diffthis
-endif
 
 nnoremap <leader><F1> :call Tools_ProfileStart('~/.vim/profile.log')<cr>
 nnoremap <leader><F2> :call Tools_ProfileStop()<cr>
