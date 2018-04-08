@@ -377,9 +377,20 @@ function! asclib#tagfind(tagname)
 		return []
 	endif
 	let final = []
+	let check = {}
 	for item in result
-		if item.baditem == 0
+		if item.baditem != 0
+			continue
+		endif
+		" remove duplicated tags
+		let signature = get(item, 'name', '') . ':'
+		let signature .= get(item, 'cmd', '') . ':'
+		let signature .= get(item, 'kind', '') . ':'
+		let signature .= get(item, 'line', '') . ':'
+		let signature .= get(item, 'filename', '')
+		if !has_key(check, signature)
 			let final += [item]
+			let check[signature] = 1
 		endif
 	endfor
 	return final
