@@ -1,7 +1,7 @@
-" unix tools wrappers
+" just another setup file yet, some handy stuff
 
 "----------------------------------------------------------------------
-" Better setup for VIM
+" Better setup for VIM 7.0 and later
 "----------------------------------------------------------------------
 filetype plugin indent on
 set hlsearch
@@ -82,5 +82,23 @@ function! s:language_setup()
 	exec "setlocal dict+=" . fnameescape(dict)
 endfunc
 
+
+" Persistent folding information
+function! s:fold_restore(enable)
+	if a:enable == 'true' || a:enable == 'yes' || a:enable != 0
+		augroup VimUnixFoldGroup
+			au! 
+			au BufWrite,VimLeave * silent! mkview
+			au BufRead * silent! loadview
+		augroup END
+	else
+		augroup VimUnixFoldGroup
+			au!
+		augroup END
+	endif
+endfunc
+
+
+command! -nargs=1 PersistFoldEnable call s:fold_restore(<q-args>)
 
 

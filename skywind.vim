@@ -7,7 +7,6 @@ highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE
 let g:ycm_goto_buffer_command = 'new-or-existing-tab'
 
 
-
 "----------------------------------------------------------------------
 "- Autocmds
 "----------------------------------------------------------------------
@@ -17,36 +16,7 @@ augroup SkywindGroup
 	au FileType lisp setlocal ts=8 sts=2 sw=2 et
 	au FileType scala setlocal sts=4 sw=4 noet
 	au FileType haskell setlocal et
-	au FileType c,cpp call s:language_cpp()
 augroup END
-
-
-"----------------------------------------------------------------------
-" languages
-"----------------------------------------------------------------------
-function! s:language_cpp()
-	" syntax match cCustomFunc /\w\+\s*(/me=e-1,he=e-1
-	" highlight def link cCustomFunc Function
-	setlocal commentstring=//\ %s
-endfunc
-
-
-"----------------------------------------------------------------------
-" fold restore
-"----------------------------------------------------------------------
-function! SkywindFoldRestore(enable)
-	if a:enable != 0
-		augroup SkywindViewRestore
-			au! 
-			au BufWrite,VimLeave * silent! mkview
-			au BufRead * silent! loadview
-		augroup END
-	else
-		augroup SkywindViewRestore
-			au!
-		augroup END
-	endif
-endfunc
 
 
 "----------------------------------------------------------------------
@@ -169,6 +139,8 @@ for s:i in range(10)
 	endif
 endfor
 
+command! -bang -nargs=* -complete=file Make VimMake -program=make @ <args>
+
 
 "----------------------------------------------------------------------
 "- OptImport
@@ -182,7 +154,6 @@ VimImport site/calendar.vim
 if has('gui_running')
 	VimImport site/hexhigh.vim
 endif
-
 
 
 "----------------------------------------------------------------------
@@ -209,7 +180,6 @@ hi! default link KeyHint Statement
 hi! default link AtHint Identifier
 
 
-
 "----------------------------------------------------------------------
 " Enable vim-diff-enhanced (Christian Brabandt)
 "----------------------------------------------------------------------
@@ -220,10 +190,6 @@ endfunc
 if executable('git')
 	let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
 endif
-
-
-command! -bang -nargs=* -complete=file Make VimMake -program=make @ <args>
-
 
 
 "----------------------------------------------------------------------
