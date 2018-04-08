@@ -23,9 +23,14 @@ set statusline+=\ %0(%{&fileformat}\ [%{(&fenc==\"\"?&enc:&fenc).(&bomb?\",BOM\"
 let g:lightline = {
 			\ 'active': {
 			\   'left': [ [ 'mode', 'paste' ],
-			\             [ 'filename', 'status' ] ]
+			\             [ 'absolutepath', 'status' ] ]
+			\ },
+			\ 'inactive': {
+			\   'left': [ [ 'mode' ],
+			\             [ 'absolutepath', 'status' ] ]
 			\ },
 			\ 'component': {
+			\   'fullname': '%F',
 			\   'status': '[%M%n%R%H%W]'
 			\ },
 			\ 'component_function': {
@@ -36,7 +41,8 @@ let g:lightline = {
 function! LightlineMode()
 	if &bt != ''
 		if &ft == 'qf' 
-			return 'QuickFix'
+		elseif &ft == 'dirvish'
+			" return 'Dirvish'
 		endif
 	endif
 	return expand('%:t') ==# '__Tagbar__' ? 'Tagbar':
@@ -46,14 +52,4 @@ function! LightlineMode()
 				\ &filetype ==# 'vimshell' ? 'VimShell' :
 				\ lightline#mode()
 endfunc
-
-function! LightlineBufferNumber()
-	let text = ''. bufnr("%")
-	if &modified
-		let text = '+' . text
-	endif
-	return text
-endfunc
-
-
 

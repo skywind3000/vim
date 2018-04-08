@@ -246,7 +246,7 @@ endif
 
 " airline
 if index(g:bundle_group, 'airline') >= 0
-	Plug 'bling/vim-airline'
+	Plug 'vim-airline/vim-airline'
 	Plug 'vim-airline/vim-airline-themes'
 	let g:airline_left_sep = ''
 	let g:airline_left_alt_sep = ''
@@ -254,7 +254,9 @@ if index(g:bundle_group, 'airline') >= 0
 	let g:airline_right_alt_sep = ''
 	let g:airline_exclude_preview = 1
 	let g:airline_powerline_fonts = 1
-	let g:airline_section_b = '%{bufnr("%")}'
+	let g:airline_section_b = '%n'
+	" let g:airline_section_z = '%P %l/%L%{g:airline_symbols.maxlinenr} : %v'
+	" let g:airline_section_z = '%{AirlineLineNumber()}'
 	" let g:airline_theme='bubblegum'
 endif
 
