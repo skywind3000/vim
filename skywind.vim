@@ -2,7 +2,6 @@
 "- Global Settings
 "----------------------------------------------------------------------
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
-let &tags = './.tags;,.tags,' . expand('~/.vim/tags/standard.tags')
 
 filetype plugin indent on
 set hlsearch
@@ -67,16 +66,26 @@ augroup SkywindGroup
 	au FileType scala setlocal sts=4 sw=4 noet
 	au FileType haskell setlocal et
 	au FileType c,cpp call s:language_cpp()
+	au FileType * call s:language_tag()
 augroup END
 
 
 "----------------------------------------------------------------------
 " languages
 "----------------------------------------------------------------------
-function s:language_cpp()
+function! s:language_cpp()
 	" syntax match cCustomFunc /\w\+\s*(/me=e-1,he=e-1
 	" highlight def link cCustomFunc Function
 	setlocal commentstring=//\ %s
+endfunc
+
+
+"----------------------------------------------------------------------
+" language tag 
+"----------------------------------------------------------------------
+function! s:language_tag()
+	let path = expand("~/.vim/tags") . '/' . &ft
+	exec "setlocal tags+=" . fnameescape(path)
 endfunc
 
 
