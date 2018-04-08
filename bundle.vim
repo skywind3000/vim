@@ -74,6 +74,7 @@ if index(g:bundle_group, 'basic') >= 0
 	Plug 'pprovost/vim-ps1', { 'for': 'ps1' }
 	Plug 'tbastos/vim-lua', { 'for': 'lua' }
 	Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['c', 'cpp'] }
+	Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
 	
 	if has('python') || has('python3')
 		Plug 'Yggdroot/LeaderF'

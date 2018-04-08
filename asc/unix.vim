@@ -12,6 +12,9 @@ set ignorecase
 set cpo-=<
 set lazyredraw
 set errorformat+=[%f:%l]\ ->\ %m,[%f:%l]:%m
+set vop=folds,cursor
+set fdm=indent
+set foldlevel=99
 noremap <tab>/ :emenu <C-Z>
 
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
@@ -101,28 +104,6 @@ endfunc
 
 command! -nargs=1 PersistFoldEnable call s:fold_restore(<q-args>)
 
-
-"----------------------------------------------------------------------
-" system detection
-"----------------------------------------------------------------------
-if has('win32') || has('win64') || has('win95') || has('win16')
-	let g:asc_uname = 'windows'
-elseif has('win32unix')
-	let g:asc_uname = 'cygwin'
-elseif has('unix') && (has('mac') || has('macunix'))
-	let g:asc_uname = 'darwin'
-elseif has('unix')
-	let s:uname = system("echo -n \"$(uname)\"")
-	if v:shell_error == 0 && match(s:uname, 'Linux') >= 0
-		let g:asc_uname = 'linux'
-	elseif v:shell_erro == 0 && match(s:uname, 'FreeBSD') >= 0
-		let g:asc_uname = 'freebsd'
-	else
-		let g:asc_uname = 'darwin'
-	endif
-else
-	let g:asc_uname = 'posix'
-endif
 
 
 
