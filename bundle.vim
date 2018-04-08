@@ -188,23 +188,7 @@ if index(g:bundle_group, 'opt') >= 0
 	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
 	Plug 'ludovicchabant/vim-gutentags'
-
-	let g:gutentags_project_root = ['.root']
-	let g:gutentags_ctags_tagfile = '.tags'
-
-	let vim_tags = expand('~/.cache/tags')
-
-	if !isdirectory(vim_tags)
-		silent! call mkdir(vim_tags, 'p')
-	endif
-
-	let g:gutentags_cache_dir = vim_tags
-	let g:gutentags_ctags_extra_args = []
-	let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']
-	" let g:gutentags_ctags_extra_args = ['--fields=+iazS', '--extra=+q']
-	let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
-	let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
-	" let g:gutentags_ctags_extra_args += ['--objectivec-kinds=+px']
+	" Plug 'itchyny/vim-cursorword'
 endif
 
 
