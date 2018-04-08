@@ -1,7 +1,9 @@
 "----------------------------------------------------------------------
 " system detection 
 "----------------------------------------------------------------------
-if has('win32') || has('win64') || has('win95') || has('win16')
+if exists('g:asc_uname')
+	let s:uname = g:asc_uname
+elseif has('win32') || has('win64') || has('win95') || has('win16')
 	let s:uname = 'windows'
 elseif has('win32unix')
 	let s:uname = 'cygwin'

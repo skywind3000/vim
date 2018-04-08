@@ -1,5 +1,6 @@
 " just another setup file yet, some handy stuff
 
+
 "----------------------------------------------------------------------
 " Better setup for VIM 7.0 and later
 "----------------------------------------------------------------------
@@ -98,7 +99,30 @@ function! s:fold_restore(enable)
 	endif
 endfunc
 
-
 command! -nargs=1 PersistFoldEnable call s:fold_restore(<q-args>)
+
+
+"----------------------------------------------------------------------
+" system detection
+"----------------------------------------------------------------------
+if has('win32') || has('win64') || has('win95') || has('win16')
+	let g:asc_uname = 'windows'
+elseif has('win32unix')
+	let g:asc_uname = 'cygwin'
+elseif has('unix') && (has('mac') || has('macunix'))
+	let g:asc_uname = 'darwin'
+elseif has('unix')
+	let s:uname = system("echo -n \"$(uname)\"")
+	if v:shell_error == 0 && match(s:uname, 'Linux') >= 0
+		let g:asc_uname = 'linux'
+	elseif v:shell_erro == 0 && match(s:uname, 'FreeBSD') >= 0
+		let g:asc_uname = 'freebsd'
+	else
+		let g:asc_uname = 'darwin'
+	endif
+else
+	let g:asc_uname = 'posix'
+endif
+
 
 
