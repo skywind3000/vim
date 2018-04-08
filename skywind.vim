@@ -21,6 +21,7 @@ else
 endif
 
 
+let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 let s:tool_name = (g:asc_uname == 'windows')? 'win32': g:asc_uname
 let g:vimmake_path = expand(s:home . '/tools/' . s:tool_name)
 

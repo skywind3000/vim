@@ -17,3 +17,43 @@ set statusline+=\ %y                            " file type
 set statusline+=\ %0(%{&fileformat}\ [%{(&fenc==\"\"?&enc:&fenc).(&bomb?\",BOM\":\"\")}]\ %v:%l/%L%)
 
 
+"----------------------------------------------------------------------
+" lightline components
+"----------------------------------------------------------------------
+let g:lightline = {
+			\ 'active': {
+			\   'left': [ [ 'mode', 'paste' ],
+			\             [ 'filename', 'status' ] ]
+			\ },
+			\ 'component': {
+			\   'status': '[%M%n%R%H%W]'
+			\ },
+			\ 'component_function': {
+			\   'mode': 'LightlineMode',
+			\ },
+			\ }
+
+function! LightlineMode()
+	if &bt != ''
+		if &ft == 'qf' 
+			return 'QuickFix'
+		endif
+	endif
+	return expand('%:t') ==# '__Tagbar__' ? 'Tagbar':
+				\ expand('%:t') ==# 'ControlP' ? 'CtrlP' :
+				\ &filetype ==# 'unite' ? 'Unite' :
+				\ &filetype ==# 'vimfiler' ? 'VimFiler' :
+				\ &filetype ==# 'vimshell' ? 'VimShell' :
+				\ lightline#mode()
+endfunc
+
+function! LightlineBufferNumber()
+	let text = ''. bufnr("%")
+	if &modified
+		let text = '+' . text
+	endif
+	return text
+endfunc
+
+
+

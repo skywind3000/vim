@@ -75,6 +75,7 @@ if index(g:bundle_group, 'basic') >= 0
 	Plug 'tbastos/vim-lua', { 'for': 'lua' }
 	Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['c', 'cpp'] }
 	Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
+	Plug 'vim-python/python-syntax', { 'for': ['python'] }
 	
 	if has('python') || has('python3')
 		Plug 'Yggdroot/LeaderF'
@@ -257,6 +258,10 @@ if index(g:bundle_group, 'airline') >= 0
 	" let g:airline_theme='bubblegum'
 endif
 
+" lightline
+if index(g:bundle_group, 'lightline') >= 0
+	Plug 'itchyny/lightline.vim'
+endif
 
 if index(g:bundle_group, 'nerdtree') >= 0
 	Plug 'scrooloose/nerdtree', {'on': ['NERDTree', 'NERDTreeFocus', 'NERDTreeToggle', 'NERDTreeCWD', 'NERDTreeFind'] }
