@@ -908,15 +908,6 @@ function! asclib#function_signature(funname, fn_only, filetype)
 		let name = substitute(name, '\s\+$', '', '')
 		let name = substitute(name, '\s\+', ' ', 'g')
 		let i.func_prototype = name
-		if !has_key(check, name)
-			let check[name] = 1
-			let res += [i]
-		endif
-	endfor
-	let result = []
-	let index = 1
-	for i in res
-		let name = i.func_prototype
 		let file_line = ''
 		if has_key(i, 'filename')
 			let file_line = fnamemodify(i.filename, ':t')
@@ -926,6 +917,18 @@ function! asclib#function_signature(funname, fn_only, filetype)
 				let file_line .= ':'. i.cmd
 			endif
 		endif
+		let i.file_line = file_line
+		let key = name . ':' . file_line
+		if !has_key(check, key)
+			let check[key] = 1
+			let res += [i]
+		endif
+	endfor
+	let result = []
+	let index = 1
+	for i in res
+		let name = i.func_prototype
+		let file_line = i.file_line
 		let desc = name. ' ('.index.'/'.len(res).') '.file_line
 		let result += [desc]
 		let index += 1
