@@ -11,7 +11,7 @@ elseif has('unix')
 	let s:uname = system("echo -n \"$(uname)\"")
 	if v:shell_error == 0 && match(s:uname, 'Linux') >= 0
 		let g:asc_uname = 'linux'
-	elseif v:shell_erro == 0 && match(s:uname, 'FreeBSD') >= 0
+	elseif v:shell_error == 0 && match(s:uname, 'FreeBSD') >= 0
 		let g:asc_uname = 'freebsd'
 	else
 		let g:asc_uname = 'darwin'
