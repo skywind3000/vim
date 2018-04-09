@@ -3,8 +3,9 @@
 "=============================================================================
 "
 " Author:  Takahiro SUZUKI <takahiro.suzuki.ja@gmDELETEMEail.com>
-" Version: 1.1.1 (Vim 7.1), patched by Gaving (2010-2013)
-" Homepage: https://github.com/gaving/vim-textobj-argument
+" Version: 1.1.1 (Vim 7.1), patched by inkarkat (2014)
+" https://github.com/inkarkat/argtextobj.vim
+"
 " Licence: MIT Licence
 "
 "=============================================================================
@@ -94,11 +95,11 @@
 "     - Initial release
 " }}}1
 "=============================================================================
+" if exists('loaded_argtextobj') || &cp || version < 700
+"   finish
+" endif
 
-"if exists('loaded_argtextobj') || v:version < 701
-"  finish
-"endif
-"let loaded_argtextobj = 1
+" let loaded_argtextobj = 1
 
 function! s:GetOutOfDoubleQuote()
   " get out of double quoteed string (one letter before the beginning)
@@ -164,7 +165,12 @@ endfunction
 function! s:GetPair(pos)
   let pos_save = getpos('.')
   call setpos('.', a:pos)
-  normal! %h
+  normal! %
+  if a:pos == getpos('.')
+    call setpos('.', pos_save)
+    return []
+  endif
+  normal! h
   let pair_pos = getpos('.')
   call setpos('.', pos_save)
   return pair_pos
@@ -214,7 +220,6 @@ endfunction
 function! s:MoveToNextNonSpace()
   let oldp = getpos('.')
   let moved = 0
-  """echo 'move:' . getline('.')[getpos('.')[2]-1]
   while getline('.')[getpos('.')[2]-1]=~'\s'
     normal! l
     if oldp == getpos('.')
@@ -240,6 +245,7 @@ endfunction
 
 function! s:MotionArgument(inner, visual)
   let cnt = v:count1
+  let operator = v:operator
   let current_c = getline('.')[getpos('.')[2]-1]
   if current_c==',' || current_c=='('
     normal! l
@@ -255,13 +261,25 @@ function! s:MotionArgument(inner, visual)
     return
   endif
   let rightup_pair = <SID>GetPair(rightup)                    " before )
-  if rightup_pair == rightup
+  if empty(rightup_pair)
     " no matching right parenthesis found, search for incomplete function
     " definition until end of current line.
     let rightup_pair = [0, line('.'), col('$'), 0]
+  " empty function argument
+  elseif rightup_pair == rightup
+    " select both parenthesis
+    if !a:inner
+      normal! vh
+    elseif !a:visual
+      if current_c == '('
+        " insert single space and visually select it
+        silent! execute "normal! i \<Esc>v"
+      endif
+    endif
+    return s:Repeat(cnt, a:inner, a:visual, operator)
   endif
   let arglist_str  = <SID>GetInnerText(rightup, rightup_pair) " inside ()
-  if getline('.')[rightup[2]-1]=='('
+  if line('.')==rightup[1]
     " left parenthesis in the current line
     " cursor offset from rightup
     let offset  = getpos('.')[2] - rightup[2] - 1 " -1 for the removed parenthesis
@@ -282,12 +300,9 @@ function! s:MotionArgument(inner, visual)
   let arglist_sub = substitute(arglist_sub, '\[\([^'."'".']\{-}\)\]', '\="(".substitute(submatch(1), ".", "_", "g").")"', 'g')     " replace [..] => (__)
   let arglist_sub = substitute(arglist_sub, '<\([^'."'".']\{-}\)>', '\="(".substitute(submatch(1), ".", "_", "g").")"', 'g')       " replace <..> => (__)
   let arglist_sub = substitute(arglist_sub, '"\([^'."'".']\{-}\)"', '(\1)', 'g') " replace ''..'' => (..)
-  """echo 'transl quotes: ' . arglist_sub
   while stridx(arglist_sub, '(')>=0 && stridx(arglist_sub, ')')>=0
     let arglist_sub = substitute(arglist_sub , '(\([^()]\{-}\))', '\="<".substitute(submatch(1), ",", "_", "g").">"', 'g')
-    """echo 'sub single quot: ' . arglist_sub
   endwhile
-
   " the beginning/end of this argument
   let thisargbegin = <SID>GetPrevCommaOrBeginArgs(arglist_sub, offset)
   let thisargend   = <SID>GetNextCommaOrEndArgs(arglist_sub, offset, cnt)
@@ -297,15 +312,9 @@ function! s:MotionArgument(inner, visual)
   let left  = offset - thisargbegin
   let right = thisargend - thisargbegin
 
-  """echo 'on(='. rightup[2] . ' before)=' . rightup_pair[2]
-  """echo arglist_str
-  """echo arglist_sub strlen(arglist_sub)
-  """echo offset
-  """echo 'argbegin='. thisargbegin . '  argend='. thisargend
-  """echo 'left=' . left . '  right='. right
-
   let delete_trailing_space = 0
-  if a:inner
+  " only do inner matching when argument list is not empty
+  if a:inner && arglist_sub !~# "^\s\+$"
     " ia
     call <SID>MoveLeft(left)
     let right -= <SID>MoveToNextNonSpace()
@@ -338,15 +347,40 @@ function! s:MotionArgument(inner, visual)
   if &selection ==# 'exclusive'
     normal! l
   endif
+
+  call s:Repeat(cnt, a:inner, a:visual, operator)
 endfunction
 
-" maping definition
-xnoremap <silent> ia :<C-U>call <SID>MotionArgument(1, 1)<CR>
-xnoremap <silent> aa :<C-U>call <SID>MotionArgument(0, 1)<CR>
-onoremap <silent> ia :<C-U>call <SID>MotionArgument(1, 0)<CR>
-onoremap <silent> aa :<C-U>call <SID>MotionArgument(0, 0)<CR>
+function! s:Repeat(cnt, inner, visual, operator)
+  let l:mapping = (a:inner ? "\<Plug>(argtextobjI)" : "\<Plug>(argtextobjA)")
+  if !a:visual
+    silent! call ingo#motion#omap#repeat(l:mapping, a:operator, a:cnt)
+  endif
+endfunction
+
+
+
 
 " option. turn 1 to search the most toplevel function
-let g:argumentobject_force_toplevel = 0
+let g:argumentobject_force_toplevel =
+  \ get(g:, 'argumentobject_force_toplevel', 0)
+
+vnoremap <silent> <Plug>(argtextobjI) :<C-U>call <SID>MotionArgument(1, 1)<CR>
+vnoremap <silent> <Plug>(argtextobjA) :<C-U>call <SID>MotionArgument(0, 1)<CR>
+onoremap <silent> <Plug>(argtextobjI) :<C-U>call <SID>MotionArgument(1, 0)<CR>
+onoremap <silent> <Plug>(argtextobjA) :<C-U>call <SID>MotionArgument(0, 0)<CR>
+if ! hasmapto('<Plug>(argtextobjI)', 'v')
+  xmap ia <Plug>(argtextobjI)
+endif
+if ! hasmapto('<Plug>(argtextobjA)', 'v')
+  xmap aa <Plug>(argtextobjA)
+endif
+if ! hasmapto('<Plug>(argtextobjI)', 'o')
+  omap ia <Plug>(argtextobjI)
+endif
+if ! hasmapto('<Plug>(argtextobjA)', 'o')
+  omap aa <Plug>(argtextobjA)
+endif
 
 " vim: set foldmethod=marker et ts=2 sts=2 sw=2:
+
