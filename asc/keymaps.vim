@@ -359,6 +359,12 @@ endif
 
 
 "----------------------------------------------------------------------
+" square brackets: g,h,j,k,r,v,w
+"----------------------------------------------------------------------
+
+
+
+"----------------------------------------------------------------------
 " visual mode
 "----------------------------------------------------------------------
 vnoremap <space>gp :!python<cr>
@@ -388,12 +394,6 @@ if has('gui_running') && (has('win32') || has('win64'))
 endif
 
 noremap <C-F10> :VimBuild gcc -pg<cr>
-
-if has('gui_running') && 0
-	noremap <silent> <m-U> :call asclib#smooth_scroll_up(&scroll, 0, 4)
-	noremap <silent> <m-D> :call asclib#smooth_scroll_down(&scroll, 0, 4)
-endif
-
 
 
 "----------------------------------------------------------------------

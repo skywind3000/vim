@@ -322,13 +322,17 @@ endif
 " ale
 "----------------------------------------------------------------------
 let g:ale_linters = {
-			\ 'c': ['gcc'], 
-			\ 'cpp': ['gcc'], 
+			\ 'c': ['gcc', 'cppcheck'], 
+			\ 'cpp': ['gcc', 'cppcheck'], 
 			\ 'python': ['flake8', 'pylint'], 
 			\ 'lua': ['luac'], 
 			\ }
 
 let s:conf = s:path('tools/conf/')
+let g:ale_completion_delay = 500
+let g:ale_echo_delay = 20
+let g:ale_lint_delay = 500
+let g:ale_echo_msg_format = '[%linter%] %code: %%s'
 let g:ale_python_flake8_options = '--conf="'.s:conf.'flake8.conf"'
 let g:ale_python_pylint_options = '--rcfile="'.s:conf.'pylint.conf"'
 
