@@ -303,12 +303,6 @@ endif
 
 if index(g:bundle_group, 'ale') >= 0
 	Plug 'w0rp/ale'
-	let g:ale_linters = {
-				\ 'c': ['gcc'], 
-				\ 'cpp': ['gcc'], 
-				\ 'python': ['flake8', 'pylint'], 
-				\ 'lua': ['luac'], 
-				\ }
 	let g:airline#extensions#ale#enabled = 1
 endif
 

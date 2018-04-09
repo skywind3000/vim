@@ -321,6 +321,13 @@ endif
 "----------------------------------------------------------------------
 " ale
 "----------------------------------------------------------------------
+let g:ale_linters = {
+			\ 'c': ['gcc'], 
+			\ 'cpp': ['gcc'], 
+			\ 'python': ['flake8', 'pylint'], 
+			\ 'lua': ['luac'], 
+			\ }
+
 let s:conf = s:path('tools/conf/')
 let g:ale_python_flake8_options = '--conf="'.s:conf.'flake8.conf"'
 let g:ale_python_pylint_options = '--rcfile="'.s:conf.'pylint.conf"'
