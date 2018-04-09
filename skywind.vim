@@ -38,7 +38,7 @@ let g:ycm_goto_buffer_command = 'new-or-existing-tab'
 
 
 "----------------------------------------------------------------------
-"- Autocmds
+"- FileType Preference
 "----------------------------------------------------------------------
 augroup SkywindGroup
 	au!

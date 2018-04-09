@@ -3,7 +3,7 @@
 "=============================================================================
 "
 " Author:  Takahiro SUZUKI <takahiro.suzuki.ja@gmDELETEMEail.com>
-" Version: 1.1.1 (Vim 7.1), patched by inkarkat (2014)
+" Version: 1.1.1 (Vim 7.1, 2009), forked and patched by inkarkat (2010-2014)
 " https://github.com/inkarkat/argtextobj.vim
 "
 " Licence: MIT Licence
@@ -95,6 +95,40 @@
 "     - Initial release
 " }}}1
 "=============================================================================
+
+" ChangeLog in https://github.com/inkarkat/argtextobj.vim
+"
+" 2014-06-02  o [master] ENH: Support repeat of operator-pending text objects.
+" 2014-05-07  M─┐ Merge pull request #2 from UnrealQuester/master
+" 2014-05-03  │ o Fixing empty function arguments bug
+" 2014-05-03  │ o Fixed bug with trailing whitespace
+" 2014-05-03  │ o Removed debug
+" 2014-05-03  │ o Return to old position when no matching parenthesis is found
+" 2014-05-02  │ o Trying to fix empty argument list bug
+" 2014-05-02  │ o Removed now unused option argument_mapping
+" 2014-04-30  o─┘ Fixed bug in multiline arguments
+" 2014-04-30  o Removed debug
+" 2014-04-30  M─┐ Merge pull request #1 from inkarkat/master
+" 2014-04-29  │ o Use proper syntax for help tag definitions.
+" 2014-04-29  │ o Use canonical <Plug>(argtextobj...) mappings to allow remapping.
+" 2014-04-29  o─┘ Added docs
+" 2014-03-26  o Put most of the stuff in autoload
+" 2014-03-26  o Made mapping configurable
+" 2014-03-25  o Added include guard again
+" 2012-01-20  o FIX: Don't define text objects for select mode.
+" 2011-11-15  o ENH: Support whitespace other than <Space> (i.e. <Tab>).
+" 2011-11-15  o ENH: Support arguments spread over multiple lines.
+" 2011-11-15  o FIX: Prevent yank message when args are distributed over multi-lines.
+" 2011-11-15  o ENH: Beep when no or too few arguments found.
+" 2011-11-15  o ENH: Support [count] to select multiple arguments.
+" 2011-11-15  o ENH: Avoid clobbering the regtype, selection and clipboard registers.
+" 2011-11-15  o ENH: Avoid modification of buffer in s:GetOutOfDoubleQuote().
+" 2011-11-15  o ENH: Handle selection=exclusive.
+" 2011-11-15  o FIX: Use :normal! everywhere to avoid interference with custom mappings.
+" 2009-12-30  o <1.1.1> Version 1.1.1: debug (stop beeping)
+" 2009-07-04  o <1.1> Version 1.1
+" 2009-07-04  I <1.0> Version 1.0: Initial upload
+" 
 " if exists('loaded_argtextobj') || &cp || version < 700
 "   finish
 " endif

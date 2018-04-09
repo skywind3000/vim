@@ -30,7 +30,7 @@ if !exists('g:bundle_post')
 	let g:bundle_post = ''
 endif
 
-call plug#begin('~/.vim/bundles')
+call plug#begin(get(g:, 'bundle_home', '~/.vim/bundles'))
 
 
 "----------------------------------------------------------------------
