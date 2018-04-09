@@ -167,6 +167,13 @@ if index(g:bundle_group, 'high') >= 0
 	Plug 'mh21/errormarker.vim'
 	Plug 't9md/vim-choosewin'
 	Plug 'francoiscabrol/ranger.vim'
+	Plug 'kana/vim-textobj-user'
+	" Plug 'kana/vim-textobj-indent'
+	Plug 'kana/vim-textobj-syntax'
+	Plug 'kana/vim-textobj-function', { 'for':['c', 'cpp', 'vim', 'java'] }
+	Plug 'sgur/vim-textobj-parameter'
+	Plug 'bps/vim-textobj-python', {'for': 'python'}
+	Plug 'jceb/vim-textobj-uri'
 
 	let g:errormarker_disablemappings = 1
 	nnoremap <silent> <leader>cm :ErrorAtCursor<CR>
@@ -294,16 +301,17 @@ if index(g:bundle_group, 'grammer') >= 0
 endif
 
 
-if index(g:bundle_group, 'textobj') >= 0
-	Plug 'kana/vim-textobj-user'
-	" Plug 'kana/vim-textobj-indent'
-	Plug 'kana/vim-textobj-syntax'
-	Plug 'kana/vim-textobj-function', { 'for':['c', 'cpp', 'vim', 'java'] }
-	Plug 'sgur/vim-textobj-parameter'
-	Plug 'bps/vim-textobj-python', {'for': 'python'}
-	Plug 'jceb/vim-textobj-uri'
-	" Plug 'wellle/targets.vim'
+if index(g:bundle_group, 'ale') >= 0
+	Plug 'w0rp/ale'
+	let g:ale_linters = {
+				\ 'c': ['gcc'], 
+				\ 'cpp': ['gcc'], 
+				\ 'python': ['flake8', 'pylint'], 
+				\ 'lua': ['luac'], 
+				\ }
+	let g:airline#extensions#ale#enabled = 1
 endif
+
 
 
 "----------------------------------------------------------------------

@@ -1,3 +1,16 @@
+"----------------------------------------------------------------------
+" functions
+"----------------------------------------------------------------------
+let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
+
+function! s:path(path)
+	let path = expand(s:home . '/' . a:path )
+	return substitute(path, '\\', '/', 'g')
+endfunc
+
+" echo s:path('tools/win32')
+
+
 "-----------------------------------------------------
 " netrw
 "-----------------------------------------------------
@@ -224,7 +237,6 @@ let g:notes_directories = ['~/.vim/notes']
 "----------------------------------------------------------------------
 " UltiSnips
 "----------------------------------------------------------------------
-let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
 let g:UltiSnipsExpandTrigger="<m-e>"
 let g:UltiSnipsJumpForwardTrigger="<m-n>"
 let g:UltiSnipsJumpBackwardTrigger="<m-p>"
@@ -304,6 +316,14 @@ let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
 if !isdirectory(s:vim_tags)
 	silent! call mkdir(s:vim_tags, 'p')
 endif
+
+
+"----------------------------------------------------------------------
+" ale
+"----------------------------------------------------------------------
+let s:conf = s:path('tools/conf/')
+let g:ale_python_flake8_options = '--conf="'.s:conf.'flake8.conf"'
+let g:ale_python_pylint_options = '--rcfile="'.s:conf.'pylint.conf"'
 
 
 "----------------------------------------------------------------------
