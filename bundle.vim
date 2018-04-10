@@ -317,8 +317,8 @@ if index(g:bundle_group, 'ale') >= 0
 	let g:airline#extensions#ale#enabled = 1
 	let g:ale_linters = {
 				\ 'c': ['gcc', 'cppcheck'], 
-				\ 'cpp': ['gcc', 'g++', 'cppcheck'], 
-				\ 'python': ['flake8', 'pylint'], 
+				\ 'cpp': ['gcc', 'cppcheck'], 
+				\ 'python': [ 'pylint'], 
 				\ 'lua': ['luac'], 
 				\ }
 
