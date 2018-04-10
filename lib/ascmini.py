@@ -98,7 +98,7 @@ def call(args, input_data = None, combine = False):
 	parameters = []
 	for n in args:
 		if sys.platform[:3] != 'win':
-			replace = { ' ':'\\ ', '\\':'\\\\', '\"':'\\\"', '\t':'\\t', \
+			replace = { ' ':'\\ ', '\\':'\\\\', '\"':'\\\"', '\t':'\\t', 
 				'\n':'\\n', '\r':'\\r' }
 			text = ''.join([ replace.get(ch, ch) for ch in n ])
 			parameters.append(text)
@@ -422,11 +422,11 @@ def load_config(path):
 		if text is None:
 			return None
 		if sys.version_info[0] < 3:
-			if text[:3] == '\xef\xbb\xbf':	# remove BOM+
+			if text[:3] == '\xef\xbb\xbf':  	# remove BOM+
 				text = text[3:]
 			return json.loads(text, encoding = "utf-8")
 		else:
-			if text[:3] == b'\xef\xbb\xbf':	# remove BOM+
+			if text[:3] == b'\xef\xbb\xbf':		# remove BOM+
 				text = text[3:]
 			text = text.decode('utf-8', 'ignore')
 			return json.loads(text)
@@ -623,10 +623,10 @@ class ConfigReader (object):
 			for key, val in cp.items(sect):
 				lowsect, lowkey = sect.lower(), key.lower()
 				config.setdefault(lowsect, {})[lowkey] = val
-		if not 'default' in config:
+		if 'default' not in config:
 			config['default'] = {}
 		self.config = config
-	
+
 	def option (self, section, item, default = None):
 		sect = self.config.get(section, None)
 		if not sect:
@@ -737,12 +737,12 @@ def csv_save (filename, rows, encoding = 'utf-8'):
 # object pool
 #----------------------------------------------------------------------
 class ObjectPool (object):
-	
+
 	def __init__ (self):
 		import threading
 		self._pools = {}
 		self._lock = threading.Lock()
-	
+
 	def get (self, name):
 		hr = None
 		self._lock.acquire()
@@ -774,7 +774,7 @@ class WebKit (object):
 	# Check IS FastCGI 
 	def IsFastCGI (self):
 		import socket, errno
-		if not 'fromfd' in socket.__dict__:
+		if 'fromfd' not in socket.__dict__:
 			return False
 		try:
 			s = socket.fromfd(sys.stdin.fileno(), socket.AF_INET, 
@@ -803,7 +803,7 @@ class WebKit (object):
 				part.append((0, html[pos:]))
 				break
 			text = html[pos:f1]
-			flag = html[f1:f2+1]
+			flag = html[f1:f2 + 1]
 			pos = f2 + 1
 			if text:
 				part.append((0, text))
@@ -836,7 +836,7 @@ class WebKit (object):
 		p2 = text.find(ends, p1 + len(starts))
 		if p2 < 0:
 			return None, position
-		value = text[p1+len(starts):p2]
+		value = text[p1 + len(starts):p2]
 		return value, p2 + len(ends)
 
 
@@ -902,7 +902,6 @@ class LazyRequests (object):
 		else:
 			if data is not None:
 				argv['data'] = data
-		exception = None
 		try:
 			if not post:
 				r = s.get(url, **argv)
@@ -940,7 +939,7 @@ class LazyRequests (object):
 		if name is None:
 			self._option[opt] = value
 		else:
-			if not name in self._options:
+			if name not in self._options:
 				self._options[name] = {}
 			opts = self._options[name]
 			opts[opt] = value
@@ -973,7 +972,7 @@ class ShellUtilita (object):
 	def zip_compress (self, zipname, srcnames, mode = 'w'):
 		import zipfile
 		if isinstance(srcnames, dict):
-			names = [ (v and v or k, k) for k, v in srcdict.items() ]
+			names = [ (v and v or k, k) for k, v in srcnames.items() ]
 		else:
 			names = []
 			for item in srcnames:
