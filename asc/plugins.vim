@@ -323,7 +323,7 @@ endif
 "----------------------------------------------------------------------
 let g:ale_linters = {
 			\ 'c': ['gcc', 'cppcheck'], 
-			\ 'cpp': ['gcc', 'cppcheck'], 
+			\ 'cpp': ['gcc', 'g++', 'cppcheck'], 
 			\ 'python': ['flake8', 'pylint'], 
 			\ 'lua': ['luac'], 
 			\ }
