@@ -318,7 +318,7 @@ if index(g:bundle_group, 'ale') >= 0
 	let g:ale_linters = {
 				\ 'c': ['gcc', 'cppcheck'], 
 				\ 'cpp': ['gcc', 'cppcheck'], 
-				\ 'python': [ 'pylint'], 
+				\ 'python': ['flake8', 'pylint'], 
 				\ 'lua': ['luac'], 
 				\ }
 

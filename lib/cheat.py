@@ -10,7 +10,6 @@
 #======================================================================
 from __future__ import print_function
 import sys
-import time
 import os
 import subprocess
 import shutil
@@ -29,7 +28,7 @@ class CheatUtils (object):
 		""" Colorizes cheatsheet content if so configured """
 
 		# only colorize if so configured
-		if not 'CHEATCOLORS' in os.environ:
+		if 'CHEATCOLORS' not in os.environ:
 			return sheet_content
 
 		try:
@@ -67,7 +66,7 @@ class CheatUtils (object):
 			or False
 
 		# assert that the editor is set
-		if editor == False:
+		if not editor:
 			die(
 				'You must set a CHEAT_EDITOR, VISUAL, or EDITOR environment '
 				'variable in order to create/edit a cheatsheet.'
@@ -178,9 +177,9 @@ class CheatSheets (object):
 
 		# assert that the DEFAULT_CHEAT_DIR is readable and writable
 		if not os.access(default_sheets_dir, os.R_OK):
-			die('The DEFAULT_CHEAT_DIR (' + default_sheets_dir +') is not readable.')
+			die('The DEFAULT_CHEAT_DIR (' + default_sheets_dir + ') is not readable.')
 		if not os.access(default_sheets_dir, os.W_OK):
-			die('The DEFAULT_CHEAT_DIR (' + default_sheets_dir +') is not writable.')
+			die('The DEFAULT_CHEAT_DIR (' + default_sheets_dir + ') is not writable.')
 
 		# return the default dir
 		return default_sheets_dir
@@ -217,7 +216,7 @@ class CheatSheets (object):
 	def list (self):
 		""" Lists the available cheatsheets """
 		sheet_list = ''
-		pad_length = max([len(x) for x in self.get().keys()]) + 4
+		pad_length = max([len(x) for x in self.get()]) + 4
 		for sheet in sorted(self.get().items()):
 			sheet_list += sheet[0].ljust(pad_length) + sheet[1] + "\n"
 		return sheet_list
@@ -337,9 +336,8 @@ def display(text):
 			if sys.platform[:3] != 'win':
 				print(utils.colorize(text))
 				return 0
-			else:
-				print(text)
-				return 0
+			print(text)
+			return 0
 		colors = []
 		if ',' in cheat_colors:
 			colors = cheat_colors.split(',')
@@ -435,7 +433,7 @@ def main(args = None):
 
 	args = [ n for n in (args and args or sys.argv) ]
 	
-	keywords = ['-e', '--edit', '-s', '--search', '-l', '--list', \
+	keywords = ['-e', '--edit', '-s', '--search', '-l', '--list', 
 			'-d', '--directories', '-v', '--version', '-h', '--help']
 
 	if len(args) < 2:
