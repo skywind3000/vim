@@ -329,13 +329,22 @@ let g:ale_linters = {
 			\ 'lua': ['luac'], 
 			\ }
 
-let s:conf = s:path('tools/conf/')
+function s:lintcfg(name)
+	let conf = s:path('tools/conf/')
+	let path1 = conf . a:name
+	let path2 = expand('~/.vim/linter/'. a:name)
+	if filereadable(path2)
+		return path2
+	endif
+	return shellescape(filereadable(path2)? path2 : path1)
+endfunc
+
 let g:ale_completion_delay = 500
 let g:ale_echo_delay = 20
 let g:ale_lint_delay = 500
 let g:ale_echo_msg_format = '[%linter%] %code: %%s'
-let g:ale_python_flake8_options = '--conf="'.s:conf.'flake8.conf"'
-let g:ale_python_pylint_options = '--rcfile="'.s:conf.'pylint.conf"'
+let g:ale_python_flake8_options = '--conf='.s:lintcfg('flake8.conf')
+let g:ale_python_pylint_options = '--rcfile='.s:lintcfg('pylint.conf')
 
 if s:windows == 0 && has('win32unix') == 0
 	let g:ale_command_wrapper = 'nice -n5'
