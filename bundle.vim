@@ -11,12 +11,22 @@ elseif has('unix')
 	let s:uname = system("echo -n \"$(uname)\"")
 	if !v:shell_error && s:uname == "Linux"
 		let s:uname = 'linux'
-	else
+	elseif v:shell_error == 0 && match(s:uname, 'Darwin') >= 0
 		let s:uname = 'darwin'
+	else
+		let s:uname = 'posix'
 	endif
 else
 	let s:uname = 'posix'
 endif
+
+
+let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+
+function! s:path(path)
+	let path = expand(s:home . '/' . a:path )
+	return substitute(path, '\\', '/', 'g')
+endfunc
 
 
 "----------------------------------------------------------------------
@@ -303,7 +313,33 @@ endif
 
 if index(g:bundle_group, 'ale') >= 0
 	Plug 'w0rp/ale'
+
 	let g:airline#extensions#ale#enabled = 1
+	let g:ale_linters = {
+				\ 'c': ['gcc', 'cppcheck'], 
+				\ 'cpp': ['gcc', 'g++', 'cppcheck'], 
+				\ 'python': ['flake8', 'pylint'], 
+				\ 'lua': ['luac'], 
+				\ }
+
+	function s:lintcfg(name)
+		let conf = s:path('tools/conf/')
+		let path1 = conf . a:name
+		let path2 = expand('~/.vim/linter/'. a:name)
+		if filereadable(path2)
+			return path2
+		endif
+		return shellescape(filereadable(path2)? path2 : path1)
+	endfunc
+
+	let g:ale_python_flake8_options = '--conf='.s:lintcfg('flake8.conf')
+	let g:ale_python_pylint_options = '--rcfile='.s:lintcfg('pylint.conf')
+	let g:ale_python_pylint_options .= ' --disable=W'
+
+	if executable('gcc') == 0 && executable('clang')
+		let g:ale_linters.c += ['clang']
+		let g:ale_linters.cpp += ['clang']
+	endif
 endif
 
 

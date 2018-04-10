@@ -13,8 +13,10 @@ elseif has('unix')
 		let g:asc_uname = 'linux'
 	elseif v:shell_error == 0 && match(s:uname, 'FreeBSD') >= 0
 		let g:asc_uname = 'freebsd'
-	else
+	elseif v:shell_error == 0 && match(s:uname, 'Darwin') >= 0
 		let g:asc_uname = 'darwin'
+	else
+		let g:asc_uname = 'posix'
 	endif
 else
 	let g:asc_uname = 'posix'

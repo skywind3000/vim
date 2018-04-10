@@ -4,10 +4,6 @@
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
 let s:windows = has('win32') || has('win64') || has('win95') || has('win16')
 
-function! s:path(path)
-	let path = expand(s:home . '/' . a:path )
-	return substitute(path, '\\', '/', 'g')
-endfunc
 
 " echo s:path('tools/win32')
 
@@ -322,30 +318,11 @@ endif
 "----------------------------------------------------------------------
 " ale
 "----------------------------------------------------------------------
-let g:ale_linters = {
-			\ 'c': ['gcc', 'cppcheck'], 
-			\ 'cpp': ['gcc', 'g++', 'cppcheck'], 
-			\ 'python': ['flake8', 'pylint'], 
-			\ 'lua': ['luac'], 
-			\ }
-
-function s:lintcfg(name)
-	let conf = s:path('tools/conf/')
-	let path1 = conf . a:name
-	let path2 = expand('~/.vim/linter/'. a:name)
-	if filereadable(path2)
-		return path2
-	endif
-	return shellescape(filereadable(path2)? path2 : path1)
-endfunc
-
 let g:ale_linters_explicit = 1
 let g:ale_completion_delay = 500
 let g:ale_echo_delay = 20
 let g:ale_lint_delay = 500
 let g:ale_echo_msg_format = '[%linter%] %code: %%s'
-let g:ale_python_flake8_options = '--conf='.s:lintcfg('flake8.conf')
-let g:ale_python_pylint_options = '--rcfile='.s:lintcfg('pylint.conf')
 
 if s:windows == 0 && has('win32unix') == 0
 	let g:ale_command_wrapper = 'nice -n5'

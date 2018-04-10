@@ -909,10 +909,6 @@ class LazyRequests (object):
 				r = s.post(url, **argv)
 		except requests.exceptions.ConnectionError:
 			r = None
-		except requests.exceptions.ProxyError:
-			r = None
-		except requests.exceptions.ConnectTimeout:
-			r = None
 		except requests.exceptions.RetryError as e:
 			r = requests.Response()
 			r.status_code = -1
