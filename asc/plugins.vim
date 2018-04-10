@@ -2,6 +2,7 @@
 " functions
 "----------------------------------------------------------------------
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
+let s:windows = has('win32') || has('win64') || has('win95') || has('win16')
 
 function! s:path(path)
 	let path = expand(s:home . '/' . a:path )
@@ -335,6 +336,10 @@ let g:ale_lint_delay = 500
 let g:ale_echo_msg_format = '[%linter%] %code: %%s'
 let g:ale_python_flake8_options = '--conf="'.s:conf.'flake8.conf"'
 let g:ale_python_pylint_options = '--rcfile="'.s:conf.'pylint.conf"'
+
+if s:windows == 0 && has('win32unix') == 0
+	let g:ale_command_wrapper = 'nice -n5'
+endif
 
 
 "----------------------------------------------------------------------
