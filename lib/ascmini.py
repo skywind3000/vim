@@ -49,7 +49,7 @@ def execute(args, shell = False, capture = False):
 			args = shlex.split(cmd)
 	for n in args:
 		if sys.platform[:3] != 'win':
-			replace = { ' ':'\\ ', '\\':'\\\\', '\"':'\\\"', '\t':'\\t', \
+			replace = { ' ':'\\ ', '\\':'\\\\', '\"':'\\\"', '\t':'\\t',
 				'\n':'\\n', '\r':'\\r' }
 			text = ''.join([ replace.get(ch, ch) for ch in n ])
 			parameters.append(text)
@@ -152,7 +152,7 @@ def redirect(args, reader, combine = True):
 	parameters = []
 	for n in args:
 		if sys.platform[:3] != 'win':
-			replace = { ' ':'\\ ', '\\':'\\\\', '\"':'\\\"', '\t':'\\t', \
+			replace = { ' ':'\\ ', '\\':'\\\\', '\"':'\\\"', '\t':'\\t', 
 				'\n':'\\n', '\r':'\\r' }
 			text = ''.join([ replace.get(ch, ch) for ch in n ])
 			parameters.append(text)
@@ -181,7 +181,7 @@ def redirect(args, reader, combine = True):
 		if text == b'' or text == '':
 			break
 		reader('stdout', text)
-	while stderr != None:
+	while stderr is not None:
 		text = stderr.readline()
 		if text == b'' or text == '':
 			break
@@ -324,7 +324,7 @@ class PosixKit (object):
 					ext = os.path.splitext(name)[-1]
 					if UNIX == 0:
 						ext = ext.lower()
-					if not ext in extnames:
+					if ext not in extnames:
 						continue
 				result.append(os.path.abspath(os.path.join(root, name)))
 		return result
@@ -345,7 +345,7 @@ class PosixKit (object):
 
 	# search executable
 	def search_exe (self, exename):
-		path = which(exename)
+		path = self.which(exename)
 		if path is None:
 			return None
 		return self.pathshort(path)
@@ -1009,7 +1009,6 @@ if __name__ == '__main__':
 		print(config.option('transmod', 'portu'))
 		return 0
 	test2()
-
 
 
 
