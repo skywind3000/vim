@@ -151,7 +151,7 @@ class FasdData (object):
 				return string.endswith(lastarg[:-1])
 			lastpath = os.path.split(string)[-1]
 			lastpath = lastpath and lastpath or string
-			if not lastarg in lastpath:
+			if lastarg not in lastpath:
 				return False
 		return True
 
@@ -328,7 +328,7 @@ class FasdData (object):
 				key = item[0]
 				if self.nocase:
 					key = key.lower()
-				if not key in path_dict:
+				if key not in path_dict:
 					path_dict[key] = item
 				else:
 					oi = path_dict[key]
@@ -608,7 +608,7 @@ def command_proc(fn, fmt, args, pwd = True):
 			paths.append(os.path.abspath(arg))
 	if pwd:
 		dir = os.getcwd()
-		if not dir in paths:
+		if dir not in paths:
 			paths.append(dir)
 	if paths:
 		fn.add(paths)
@@ -782,8 +782,8 @@ def main(args = None):
 		mode = ''
 		if first.startswith(head):
 			mode = first[len(head):].strip('\r\n\t ')
-		command_complete(fn, mode, args[2:])
-		return 0
+		# command_complete(fn, mode, args[2:])
+		return mode
 	# show help
 	elif first in ('-h', '--help'):
 		print(doc_help)
@@ -800,11 +800,11 @@ def main(args = None):
 			break
 		if arg == '-b':
 			if pos + 1 < len(args):
-				fd.backends = [arg[pos + 1]]
+				fn.backends = [arg[pos + 1]]
 			pos += 2
 		elif arg == '-B':
 			if pos + 1 < len(args):
-				fd.backends.append(args[pos + 1])
+				fn.backends.append(args[pos + 1])
 			pos += 2
 		elif arg == '-e':
 			if pos + 1 < len(args):

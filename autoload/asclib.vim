@@ -1155,7 +1155,8 @@ endfunc
 function! asclib#lint_pylint(filename)
 	let filename = (a:filename == '')? expand('%') : a:filename
 	let rc = asclib#path_runtime('tools/conf/pylint.conf') 
-	let cmd = 'pylint --rcfile='.shellescape(rc).' '.shellescape(filename)
+	let cmd = 'pylint --rcfile='.shellescape(rc).' --disable=W'
+	let cmd = cmd .' '.shellescape(filename)
 	let opt = {'auto': "make"}
 	call vimmake#run('', opt, cmd)
 endfunc
