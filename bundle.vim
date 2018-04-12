@@ -130,7 +130,6 @@ if index(g:bundle_group, 'inter') >= 0
 	Plug 'wsdjeg/FlyGrep.vim'
 	Plug 'tpope/vim-abolish'
 	Plug 'honza/vim-snippets'
-	Plug 'garbas/vim-snipmate'
 	Plug 'MarcWeber/vim-addon-mw-utils'
 	Plug 'tomtom/tlib_vim'
 	Plug 'vim-scripts/FuzzyFinder'
@@ -148,6 +147,10 @@ if index(g:bundle_group, 'inter') >= 0
 		noremap <space>bl :BlogList<cr>
 	endif
 
+	if has('python') || has('python3')
+		Plug 'SirVer/ultisnips'
+	endif
+
 	if !isdirectory(expand('~/.vim/notes'))
 		silent! call mkdir(expand('~/.vim/notes'), 'p')
 	endif
@@ -157,7 +160,7 @@ if index(g:bundle_group, 'inter') >= 0
 	noremap <silent><tab>[ :FufBuffer<cr>
 	noremap <silent><tab>] :FufBufferTag<cr>
 
-	if 1
+	if 0
 		imap <expr> <m-e> pumvisible() ? '<c-g>u<Plug>snipMateTrigger' : '<Plug>snipMateTrigger'
 		imap <expr> <m-n> pumvisible() ? '<c-g>u<Plug>snipMateNextOrTrigger' : '<Plug>snipMateNextOrTrigger'
 		smap <m-n> <Plug>snipMateNextOrTrigger
