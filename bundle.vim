@@ -132,6 +132,7 @@ if index(g:bundle_group, 'inter') >= 0
 	Plug 'honza/vim-snippets'
 	Plug 'MarcWeber/vim-addon-mw-utils'
 	Plug 'tomtom/tlib_vim'
+	Plug 'garbas/vim-snipmate'
 	Plug 'vim-scripts/FuzzyFinder'
 	Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 	Plug 'xolox/vim-notes', { 'on': ['Note', 'SearchNotes', 'DeleteNotes', 'RecentNotes'] }
@@ -148,7 +149,7 @@ if index(g:bundle_group, 'inter') >= 0
 	endif
 
 	if has('python') || has('python3')
-		Plug 'SirVer/ultisnips'
+		" Plug 'SirVer/ultisnips'
 	endif
 
 	if !isdirectory(expand('~/.vim/notes'))
@@ -160,7 +161,7 @@ if index(g:bundle_group, 'inter') >= 0
 	noremap <silent><tab>[ :FufBuffer<cr>
 	noremap <silent><tab>] :FufBufferTag<cr>
 
-	if 0
+	if 1
 		imap <expr> <m-e> pumvisible() ? '<c-g>u<Plug>snipMateTrigger' : '<Plug>snipMateTrigger'
 		imap <expr> <m-n> pumvisible() ? '<c-g>u<Plug>snipMateNextOrTrigger' : '<Plug>snipMateNextOrTrigger'
 		smap <m-n> <Plug>snipMateNextOrTrigger
