@@ -947,4 +947,19 @@ endfunc
 command! -nargs=1 EnvPathRemove call s:Tools_RemovePath(<q-args>)
 
 
+"----------------------------------------------------------------------
+" Spell Highlighting
+"----------------------------------------------------------------------
+function Tools_SpellHighlight()
+	if has('gui_running')
+		hi! clear SpellBad
+		hi! clear SpellCap
+		hi! clear SpellRare
+		hi! SpellBad gui=undercurl guisp=red
+		hi! SpellCap gui=undercurl guisp=blue
+		hi! SpellRare gui=undercurl guisp=magenta
+	endif
+endfunc
+
+
 
