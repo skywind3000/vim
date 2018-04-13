@@ -324,6 +324,9 @@ if index(g:bundle_group, 'ale') >= 0
 				\ 'cpp': ['gcc', 'cppcheck'], 
 				\ 'python': ['flake8', 'pylint'], 
 				\ 'lua': ['luac'], 
+				\ 'go': ['go build', 'gofmt'],
+				\ 'java': ['javac'],
+				\ 'javascript': ['eslint'], 
 				\ }
 
 	function s:lintcfg(name)

@@ -318,12 +318,13 @@ endif
 "----------------------------------------------------------------------
 " ale
 "----------------------------------------------------------------------
-let g:ale_lint_on_text_changed = 'normal'
 let g:ale_linters_explicit = 1
 let g:ale_completion_delay = 500
 let g:ale_echo_delay = 20
 let g:ale_lint_delay = 500
 let g:ale_echo_msg_format = '[%linter%] %code: %%s'
+" let g:ale_lint_on_text_changed = 'normal'
+" let g:ale_lint_on_insert_leave = 1
 
 if s:windows == 0 && has('win32unix') == 0
 	let g:ale_command_wrapper = 'nice -n5'
