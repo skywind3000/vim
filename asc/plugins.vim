@@ -318,6 +318,7 @@ endif
 "----------------------------------------------------------------------
 " ale
 "----------------------------------------------------------------------
+let g:ale_lint_on_text_changed = 'normal'
 let g:ale_linters_explicit = 1
 let g:ale_completion_delay = 500
 let g:ale_echo_delay = 20

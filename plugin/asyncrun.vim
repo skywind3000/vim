@@ -332,6 +332,7 @@ function! s:AsyncRun_Job_Update(count)
 			catch /.*/
 			endtry
 		endif
+		let l:text = substitute(l:text, '\r$', '', 'g')
 		if l:text != ''
 			if l:raw == 0
 				if and(g:asyncrun_skip, 1) == 0

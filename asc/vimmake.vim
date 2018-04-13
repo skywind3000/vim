@@ -372,6 +372,7 @@ function! s:Vimmake_Build_Update(count)
 			catch /.*/
 			endtry
 		endif
+		let l:text = substitute(l:text, '\r$', '', 'g')
 		if l:text != ''
 			if l:raw == 0
 				if and(g:vimmake_build_skip, 1) == 0
