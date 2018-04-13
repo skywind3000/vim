@@ -1,7 +1,7 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
-" Last Modified: 2018/04/03 18:30
+" Last Modified: 2018/04/13 16:42
 "
 " Execute customize tools: ~/.vim/vimmake.{name} directly:
 "     :VimTool {name}
