@@ -1140,7 +1140,7 @@ function! vimmake#run(bang, opts, args)
 	endif
 
 	" update info (current running command text)
-	let g:vimmake_build_info = l:command
+	let g:vimmake_build_info = a:args
 
 	" check cwd
 	if l:opts.cwd != ''
