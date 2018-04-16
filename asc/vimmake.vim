@@ -1,7 +1,7 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
-" Last Modified: 2018/04/16 19:24
+" Last Modified: 2018/04/16 21:23
 "
 " Execute customize tools: ~/.vim/vimmake.{name} directly:
 "     :VimTool {name}
@@ -157,6 +157,11 @@ endif
 " skip autocmd ?
 if !exists('g:vimmake_build_skip')
 	let g:vimmake_build_skip = 0
+endif
+
+" last command
+if !exists('g:vimmake_build_info')
+	let g:vimmake_build_info = ''
 endif
 
 " build info
@@ -1133,6 +1138,9 @@ function! vimmake#run(bang, opts, args)
 		let s:build_program_cmd = l:command
 		return s:build_program_cmd
 	endif
+
+	" update info (current running command text)
+	let g:vimmake_build_info = l:command
 
 	" check cwd
 	if l:opts.cwd != ''
