@@ -1,7 +1,7 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
-" Last Modified: 2018/04/16 16:12
+" Last Modified: 2018/04/16 19:24
 "
 " Execute customize tools: ~/.vim/vimmake.{name} directly:
 "     :VimTool {name}
@@ -958,6 +958,12 @@ function! s:run(opts)
 		echom "E471: Command required"
 		echohl NONE
 		return
+	endif
+
+	let l:wrapper = get(g:, 'vimmake_build_wrapper', '')
+
+	if l:wrapper != ''
+		let l:command = l:wrapper . ' ' . l:command
 	endif
 
 	if l:mode >= 10
