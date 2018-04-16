@@ -1,7 +1,7 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
-" Last Modified: 2018/04/13 16:42
+" Last Modified: 2018/04/16 16:12
 "
 " Execute customize tools: ~/.vim/vimmake.{name} directly:
 "     :VimTool {name}
@@ -948,6 +948,9 @@ function! s:run(opts)
 			let l:command = l:program
 		endif
 		let l:command = s:StringStrip(l:command)
+		let s:build_program_cmd = ''
+		silent exec 'VimMake -program=parse @ '. l:command
+		let l:command = s:build_program_cmd
 	endif
 
 	if l:command =~ '^\s*$'
@@ -1117,6 +1120,12 @@ function! vimmake#run(bang, opts, args)
 		for [l:key, l:val] in items(a:opts)
 			let l:opts[l:key] = l:val
 		endfor
+	endif
+
+	" parse makeprg/grepprg and return
+	if l:opts.program == 'parse'
+		let s:build_program_cmd = l:command
+		return s:build_program_cmd
 	endif
 
 	" check cwd
