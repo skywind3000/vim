@@ -663,13 +663,13 @@ function! s:AsyncRun_Job_Start(cmd)
 				let l:lines = getline(l:top, l:bot)
 				if exists('*chansend')
 					call chansend(s:async_job, l:lines)
-				else
+				elseif exists('*jobsend')
 					call jobsend(s:async_job, l:lines)
 				endif
 			endif
 			if exists('*chanclose')
 				call chanclose(s:async_job, 'stdin')
-			else
+			elseif exists('*jobclose')
 				call jobclose(s:async_job, 'stdin')
 			endif
 		endif

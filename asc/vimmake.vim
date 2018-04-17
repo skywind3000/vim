@@ -689,13 +689,13 @@ function! s:Vimmake_Build_Start(cmd)
 				let l:lines = getline(l:top, l:bot)
 				if exists('*chansend')
 					call chansend(s:build_job, l:lines)
-				else
+				elseif exists('*jobsend')
 					call jobsend(s:build_job, l:lines)
 				endif
 			endif
 			if exists('*chanclose')
 				call chanclose(s:build_job, 'stdin')
-			else
+			elseif exists('*jobclose')
 				call jobclose(s:build_job, 'stdin')
 			endif
 		endif
