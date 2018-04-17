@@ -155,11 +155,6 @@ else
 	let g:ft_man_open_mode = 'vert'
 endif
 
-if has('nvim')
-	let g:asyncrun_trim = 1
-	let g:vimmake_build_trim = 1
-endif
-
 let g:vimmake_mode = {}
 
 for s:i in range(10)
