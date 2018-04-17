@@ -661,9 +661,17 @@ function! s:AsyncRun_Job_Start(cmd)
 				let l:top = s:async_info.range_top
 				let l:bot = s:async_info.range_bot
 				let l:lines = getline(l:top, l:bot)
-				call chansend(s:async_job, l:lines)
+				if exists('*chansend')
+					call chansend(s:async_job, l:lines)
+				else
+					call jobsend(s:async_job, l:lines)
+				endif
 			endif
-			call chanclose(s:async_job, 'stdin')
+			if exists('*chanclose')
+				call chanclose(s:async_job, 'stdin')
+			else
+				call jobclose(s:async_job, 'stdin')
+			endif
 		endif
 	endif
 	if l:success != 0

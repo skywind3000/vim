@@ -687,9 +687,17 @@ function! s:Vimmake_Build_Start(cmd)
 				let l:top = s:build_info.range_top
 				let l:bot = s:build_info.range_bot
 				let l:lines = getline(l:top, l:bot)
-				call chansend(s:build_job, l:lines)
+				if exists('*chansend')
+					call chansend(s:build_job, l:lines)
+				else
+					call jobsend(s:build_job, l:lines)
+				endif
 			endif
-			call chanclose(s:build_job, 'stdin')
+			if exists('*chanclose')
+				call chanclose(s:build_job, 'stdin')
+			else
+				call jobclose(s:build_job, 'stdin')
+			endif
 		endif
 	endif
 	if l:success != 0
