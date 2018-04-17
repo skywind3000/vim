@@ -1182,11 +1182,13 @@ function! asyncrun#run(bang, opts, args, ...)
 	let l:opts.range_bot = 0
 	let l:opts.range_buf = 0
 
-	if a:0 >= 3 
-		let l:opts.range = a:1
-		let l:opts.range_top = a:2
-		let l:opts.range_bot = a:3
-		let l:opts.range_buf = bufnr('%')
+	if a:0 >= 3
+		if a:1 > 0 && a:2 <= a:3
+			let l:opts.range = a:1
+			let l:opts.range_top = a:2
+			let l:opts.range_bot = a:3
+			let l:opts.range_buf = bufnr('%')
+		endif
 	endif
 
 	" check cwd
@@ -1274,8 +1276,8 @@ endfunc
 "----------------------------------------------------------------------
 " Commands
 "----------------------------------------------------------------------
-command! -bang -nargs=+ -range -complete=file AsyncRun 
-	\ call asyncrun#run('<bang>', '', <q-args>, <range>, <line1>, <line2>)
+command! -bang -nargs=+ -range=0 -complete=file AsyncRun 
+	\ call asyncrun#run('<bang>', '', <q-args>, <count>, <line1>, <line2>)
 
 command! -bang -nargs=0 AsyncStop call asyncrun#stop('<bang>')
 
