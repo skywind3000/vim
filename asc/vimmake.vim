@@ -667,6 +667,12 @@ function! s:Vimmake_Build_Start(cmd)
 		if g:vimmake_build_stop != ''
 			let l:options['stoponexit'] = g:vimmake_build_stop
 		endif
+		if s:build_info.range > 0
+			let l:options['in_io'] = 'buffer'
+			let l:options['in_buf'] = s:build_info.range_buf
+			let l:options['in_top'] = s:build_info.range_top
+			let l:options['in_bot'] = s:build_info.range_bot
+		endif
 		let s:build_job = job_start(l:args, l:options)
 		let l:success = (job_status(s:build_job) != 'fail')? 1 : 0
 	else
@@ -676,6 +682,15 @@ function! s:Vimmake_Build_Start(cmd)
 		let l:callbacks['on_exit'] = function('s:Vimmake_Build_NeoVim')
 		let s:build_job = jobstart(l:args, l:callbacks)
 		let l:success = (s:build_job > 0)? 1 : 0
+		if l:success != 0
+			if s:build_info.range > 0
+				let l:top = s:build_info.range_top
+				let l:bot = s:build_info.range_bot
+				let l:lines = getline(l:top, l:bot)
+				call chansend(s:build_job, l:lines)
+			endif
+			call chanclose(s:build_job, 'stdin')
+		endif
 	endif
 	if l:success != 0
 		let s:build_state = or(s:build_state, 1)
@@ -984,6 +999,10 @@ function! s:run(opts)
 		let s:build_info.autosave = opts.auto
 		let s:build_info.text = opts.text
 		let s:build_info.raw = opts.raw
+		let s:build_info.range = opts.range
+		let s:build_info.range_top = opts.range_top
+		let s:build_info.range_bot = opts.range_bot
+		let s:build_info.range_buf = opts.range_buf
 		if s:Vimmake_Build_Start(l:command) != 0
 			call s:AutoCmd('Error')
 		endif
@@ -1100,7 +1119,7 @@ endfunc
 "----------------------------------------------------------------------
 " run command
 "----------------------------------------------------------------------
-function! vimmake#run(bang, opts, args)
+function! vimmake#run(bang, opts, args, ...)
 	let l:macros = {}
 	let l:macros['VIM_FILEPATH'] = expand("%:p")
 	let l:macros['VIM_FILENAME'] = expand("%:t")
@@ -1141,6 +1160,19 @@ function! vimmake#run(bang, opts, args)
 
 	" update info (current running command text)
 	let g:vimmake_build_info = a:args
+
+	" setup range
+	let l:opts.range = 0
+	let l:opts.range_top = 0
+	let l:opts.range_bot = 0
+	let l:opts.range_buf = 0
+
+	if a:0 >= 3 
+		let l:opts.range = a:1
+		let l:opts.range_top = a:2
+		let l:opts.range_bot = a:3
+		let l:opts.range_buf = bufnr('%')
+	endif
 
 	" check cwd
 	if l:opts.cwd != ''
@@ -1217,8 +1249,8 @@ endfunc
 "----------------------------------------------------------------------
 " define commands
 "----------------------------------------------------------------------
-command! -bang -nargs=+ -complete=file VimMake
-		\ call vimmake#run("<bang>", '', <q-args>)
+command! -bang -nargs=+ -range -complete=file VimMake
+		\ call vimmake#run("<bang>", '', <q-args>, <range>, <line1>, <line2>)
 
 command! -bang -nargs=0 VimStop call vimmake#stop('<bang>')
 

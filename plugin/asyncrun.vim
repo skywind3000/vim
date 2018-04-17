@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2018/04/16 21:23
+" Last Modified: 2018/04/17 18:13
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -640,6 +640,13 @@ function! s:AsyncRun_Job_Start(cmd)
 		if g:asyncrun_stop != ''
 			let l:options['stoponexit'] = g:asyncrun_stop
 		endif
+		if s:async_info.range > 0
+			let l:options['in_io'] = 'buffer'
+			let l:options['in_mode'] = 'nl'
+			let l:options['in_buf'] = s:async_info.range_buf
+			let l:options['in_top'] = s:async_info.range_top
+			let l:options['in_bot'] = s:async_info.range_bot
+		endif
 		let s:async_job = job_start(l:args, l:options)
 		let l:success = (job_status(s:async_job) != 'fail')? 1 : 0
 	else
@@ -649,6 +656,15 @@ function! s:AsyncRun_Job_Start(cmd)
 		let l:callbacks['on_exit'] = function('s:AsyncRun_Job_NeoVim')
 		let s:async_job = jobstart(l:args, l:callbacks)
 		let l:success = (s:async_job > 0)? 1 : 0
+		if l:success != 0
+			if s:async_info.range > 0
+				let l:top = s:async_info.range_top
+				let l:bot = s:async_info.range_bot
+				let l:lines = getline(l:top, l:bot)
+				call chansend(s:async_job, l:lines)
+			endif
+			call chanclose(s:async_job, 'stdin')
+		endif
 	endif
 	if l:success != 0
 		let s:async_state = or(s:async_state, 1)
@@ -998,6 +1014,10 @@ function! s:run(opts)
 		let s:async_info.autosave = opts.auto
 		let s:async_info.text = opts.text
 		let s:async_info.raw = opts.raw
+		let s:async_info.range = opts.range
+		let s:async_info.range_top = opts.range_top
+		let s:async_info.range_bot = opts.range_bot
+		let s:async_info.range_buf = opts.range_buf
 		if s:AsyncRun_Job_Start(l:command) != 0
 			call s:AutoCmd('Error')
 		endif
@@ -1156,6 +1176,19 @@ function! asyncrun#run(bang, opts, args, ...)
 	" update info (current running command text)
 	let g:asyncrun_info = a:args
 
+	" setup range
+	let l:opts.range = 0
+	let l:opts.range_top = 0
+	let l:opts.range_bot = 0
+	let l:opts.range_buf = 0
+
+	if a:0 >= 3 
+		let l:opts.range = a:1
+		let l:opts.range_top = a:2
+		let l:opts.range_bot = a:3
+		let l:opts.range_buf = bufnr('%')
+	endif
+
 	" check cwd
 	if l:opts.cwd != ''
 		for [l:key, l:val] in items(l:macros)
@@ -1234,15 +1267,15 @@ endfunc
 " asyncrun -version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '1.3.26'
+	return '1.3.27'
 endfunc
 
 
 "----------------------------------------------------------------------
 " Commands
 "----------------------------------------------------------------------
-command! -bang -nargs=+ -complete=file AsyncRun 
-	\ call asyncrun#run('<bang>', '', <q-args>)
+command! -bang -nargs=+ -range -complete=file AsyncRun 
+	\ call asyncrun#run('<bang>', '', <q-args>, <range>, <line1>, <line2>)
 
 command! -bang -nargs=0 AsyncStop call asyncrun#stop('<bang>')
 
