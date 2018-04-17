@@ -1204,7 +1204,7 @@ function! asyncrun#run(bang, opts, args, ...)
 
 	if a:0 >= 3
 		if a:1 > 0 && a:2 <= a:3
-			let l:opts.range = a:1
+			let l:opts.range = 2
 			let l:opts.range_top = a:2
 			let l:opts.range_bot = a:3
 			let l:opts.range_buf = bufnr('%')
