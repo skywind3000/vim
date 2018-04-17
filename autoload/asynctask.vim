@@ -72,12 +72,20 @@ function! s:init_cbs(task) abort
 	let a:task.__private.is_exited = 0
 	function! obj.out_cb(channel, text) abort
 		if has_key(self.task, 'cb')
-			call self.task.cb(self.task, 'stdout', a:text)
+			let text = a:text
+			if s:windows
+				let text = substitute(text, '\r$', '', 'g')
+			endif
+			call self.task.cb(self.task, 'stdout', text)
 		endif
 	endfunc
 	function! obj.err_cb(channel, text) abort
 		if has_key(self.task, 'cb')
-			call self.task.cb(self.task, 'stderr', a:text)
+			let text = a:text
+			if s:windows
+				let text = substitute(text, '\r$', '', 'g')
+			endif
+			call self.task.cb(self.task, 'stderr', text)
 		endif
 	endfunc
 	function! obj.close_cb(channel) abort
@@ -140,16 +148,28 @@ function! s:init_cbs(task) abort
 		if has_key(self.task, 'cb')
 			let task = self.task
 			let size = len(a:data)
+			let cache = ''
+			if a:event == 'stdout'
+				let cache = self.task.__private.nvim_stdout
+			else
+				let cache = self.task.__private.nvim_stderr
+			endif
 			for index in range(size)
-				let text = a:data[index]
-				if text == '' && index == size - 1
-					continue
+				let cache .= a:data[index]
+				if l:index + 1 < size
+					let text = cache
+					let cache = ''
+					if s:windows
+						let text = substitute(text, '\r$', '', 'g')
+					endif
+					call task.cb(task, a:event, text)
 				endif
-				if s:windows
-					let text = substitute(text, '\r$', '', 'g')
-				endif
-				call task.cb(task, a:event, text)
 			endfor
+			if a:event == 'stdout'
+				let self.task.__private.nvim_stdout = cache
+			else
+				let self.task.__private.nvim_stderr = cache
+			endif
 		endif
 	endfunc
 	function! obj.neovim_cb(job_id, data, event) abort
@@ -167,6 +187,16 @@ function! s:init_cbs(task) abort
 				endif
 			endif
 		elseif a:event == 'exit'
+			if has_key(self.task, 'cb')
+				let stdout = self.task.__private.nvim_stdout
+				let stderr = self.task.__private.nvim_stderr
+				if stdout != ''
+					call task.cb(task, 'stdout', stdout)
+				endif
+				if stderr != ''
+					call task.cb(task, 'stderr', stderr)
+				endif
+			endif
 			let self.task.__private.is_closed = 1
 			let self.task.__private.is_exited = 1
 			let self.task.__private.code = a:data
@@ -228,7 +258,7 @@ function! s:task_start(task, cmd, opts) abort
 			let opts = {}
 			let opts['out_io'] = 'pipe'
 			let opts['err_io'] = task.__private.err2out? 'out' : 'pipe'
-			let opts['in_io'] = task.__private.in_null? 'pipe' : 'null'
+			let opts['in_io'] = task.__private.in_null? 'null' : 'pipe'
 			let opts['in_mode'] = 'nl'
 			let opts['out_mode'] = 'nl'
 			let opts['err_mode'] = 'nl'
@@ -246,8 +276,19 @@ function! s:task_start(task, cmd, opts) abort
 			let opts['on_exit'] = opts.neovim_cb
 			let opts['task'] = task
 			" echo keys(opts.task)
+			let task.__private.nvim_stdout = ''
+			let task.__private.nvim_stderr = ''
 			let task.__private.job = jobstart(task.__private.args, opts)
 			let success = (task.__private.job > 0)? 1 : 0
+			if success
+				if task.__private.in_null
+					if exists('*chanclose')
+						call chanclose(task.__private.job, 'stdin')
+					elseif exists('*jobclose')
+						call jobclose(task.__private.job, 'stdin')
+					endif
+				endif
+			endif
 		endif
 		if success
 			let task.__private.state = or(task.__private.state, 1)
@@ -372,7 +413,7 @@ function! s:task.stop(how) abort
 			endif
 		else
 			if self.__private.job > 0
-				call jobstop(self.__private.job)
+				silent! call jobstop(self.__private.job)
 			endif
 		endif
 	else
@@ -411,23 +452,55 @@ function! s:task.send(data)
 			let job = self.__private.job
 			let channel = job_getchannel(job)
 			if type(a:data) == 1
-				call ch_sendraw(channel, a:data. '\n')
+				call ch_sendraw(channel, a:data. "\n")
 			else
 				for text in a:data
-					call ch_sendraw(channel, text. '\n')
+					call ch_sendraw(channel, text. "\n")
 				endfor
 			endif
 		else
 			if type(a:data) == 1
-				call jobsend(self.__private.job, [a:data, ''])
+				if exists('*chansend')
+					call chansend(self.__private.job, [a:data, ''])
+				elseif exists('*jobsend')
+					call jobsend(self.__private.job, [a:data, ''])
+				endif
 			else
-				call jobsend(self.__private.job, a:data + [''])
+				if exists('*chansend')
+					call chansend(self.__private.job, a:data + [''])
+				elseif exists('*jobsend')
+					call jobsend(self.__private.job, a:data + [''])
+				endif
 			endif
 		endif
 	else
 		return -2
 	endif
 	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" close stdin
+"----------------------------------------------------------------------
+function! s:task.close()
+	if s:support == 0
+		call s:errmsg('not support')
+		return -1
+	endif
+	if has_key(self.__private, 'job')
+		if s:nvim == 0
+			let job = self.__private.job
+			silent! call ch_close_in(job)
+		else
+			let job = self.__private.job
+			if exists('*chanclose')
+				silent! call chanclose(job, 'stdin')
+			elseif exists('*jobclose')
+				silent! call jobclose(job, 'stdin')
+			endif
+		endif
+	endif
 endfunc
 
 
@@ -472,8 +545,8 @@ if 0
 		endif
 		cbottom
 	endfunc
-	let t1 = asynctask#new(function('s:my_cb'), "test task 1")
-	let t2 = asynctask#new(function('s:my_cb'), "test task 2")
+	let t1 = asynctask#new(function('s:my_cb'), "test task A")
+	let t2 = asynctask#new(function('s:my_cb'), "test task B")
 	cexpr ""
 	" call t1.start('dir', {})
 	if s:windows == 0
@@ -481,7 +554,7 @@ if 0
 	else
 		call t1.start('python e:/lab/timer.py', {'err2out':0})
 	endif
-	" call t2.start('python e:/lab/timer.py', {})
+	call t2.start('python e:/lab/timer.py', {})
 endif
 
 

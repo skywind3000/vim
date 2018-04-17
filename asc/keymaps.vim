@@ -442,5 +442,3 @@ noremap <space>m3 :call quickmenu#toggle(3)<cr>
 "----------------------------------------------------------------------
 nnoremap <silent><space>at :MyCheatSheetAlign<cr>
 vnoremap <silent><space>at :MyCheatSheetAlign<cr>
-
-

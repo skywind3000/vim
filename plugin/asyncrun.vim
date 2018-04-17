@@ -511,22 +511,32 @@ function! s:AsyncRun_Job_NeoVim(job_id, data, event)
 	if a:event == 'stdout' || a:event == 'stderr'
 		let l:index = 0
 		let l:size = len(a:data)
+		let cache = (a:event == 'stdout')? s:neovim_stdout : s:neovim_stderr
 		while l:index < l:size
-			let s:text = a:data[l:index]
-			if s:text == '' && l:index == l:size - 1
-				let l:index += 1
-				continue
+			let cache .= a:data[l:index]
+			if l:index + 1 < l:size
+				let s:async_output[s:async_head] = cache
+				let s:async_head += 1
+				let cache = ''
 			endif
-			if s:asyncrun_windows != 0
-				let s:text = substitute(s:text, '\r$', '', 'g')
-			endif
-			let s:async_output[s:async_head] = s:text
-			let s:async_head += 1
 			let l:index += 1
 		endwhile
+		if a:event == 'stdout'
+			let s:neovim_stdout = cache
+		else
+			let s:neovim_stderr = cache
+		endif
 	elseif a:event == 'exit'
 		if type(a:data) == type(1)
 			let s:async_code = a:data
+		endif
+		if s:neovim_stdout != ''
+			let s:async_output[s:async_head] = s:neovim_stdout
+			let s:async_head += 1
+		endif
+		if s:neovim_stderr != ''
+			let s:async_output[s:async_head] = s:neovim_stderr
+			let s:async_head += 1
 		endif
 		let s:async_state = or(s:async_state, 6)
 	endif
@@ -654,6 +664,8 @@ function! s:AsyncRun_Job_Start(cmd)
 		let l:callbacks['on_stdout'] = function('s:AsyncRun_Job_NeoVim')
 		let l:callbacks['on_stderr'] = function('s:AsyncRun_Job_NeoVim')
 		let l:callbacks['on_exit'] = function('s:AsyncRun_Job_NeoVim')
+		let s:neovim_stdout = ''
+		let s:neovim_stderr = ''
 		let s:async_job = jobstart(l:args, l:callbacks)
 		let l:success = (s:async_job > 0)? 1 : 0
 		if l:success != 0
@@ -729,7 +741,7 @@ function! s:AsyncRun_Job_Stop(how)
 			endif
 		else
 			if s:async_job > 0
-				call jobstop(s:async_job)
+				silent! call jobstop(s:async_job)
 			endif
 		endif
 	else
