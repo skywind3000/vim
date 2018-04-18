@@ -350,6 +350,10 @@ if index(g:bundle_group, 'ale') >= 0
 endif
 
 
+if index(g:bundle_group, 'neomake') >= 0
+	Plug 'neomake/neomake'
+endif
+
 
 "----------------------------------------------------------------------
 " packages end

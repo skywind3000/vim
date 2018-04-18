@@ -81,7 +81,7 @@ function! s:language_setup()
 		setlocal commentstring=//\ %s
 	endif
 	let tags = expand("~/.vim/tags/") . &ft . '.tags'
-	let dict = expand("~/.vim/dict/") . &ft . '.dic'
+	let dict = expand("~/.vim/dict/") . &ft . '.dict'
 	exec "setlocal tags+=" . fnameescape(tags)
 	exec "setlocal dict+=" . fnameescape(dict)
 endfunc
