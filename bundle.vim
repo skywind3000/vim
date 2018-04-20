@@ -371,6 +371,19 @@ if index(g:bundle_group, 'neocomplete') >= 0
 	endfunction
 endif
 
+if index(g:bundle_group, 'omni')
+	Plug 'vim-scripts/OmniCppComplete', {'for':['cpp']}
+	Plug 'c9s/perlomni.vim', {'for':['perl']}
+	Plug 'shawncplus/phpcomplete.vim', {'for': ['php']}
+	" Plug 'artur-shaik/vim-javacomplete2'
+	Plug 'othree/html5.vim', {'for': ['html']}
+	Plug 'xolox/vim-lua-ftplugin', {'for': ['lua']}
+	let g:lua_complete_omni = 1
+	let g:lua_check_globals = 0
+	let g:lua_check_syntax = 0
+	let g:lua_define_completion_mappings = 0
+	autocmd FileType java setlocal omnifunc=javacomplete#Complete
+endif
 
 
 "----------------------------------------------------------------------
