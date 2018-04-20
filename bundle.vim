@@ -373,7 +373,7 @@ endif
 
 if index(g:bundle_group, 'omni')
 	Plug 'vim-scripts/OmniCppComplete', {'for':['cpp']}
-	Plug 'c9s/perlomni.vim', {'for':['perl']}
+	" Plug 'c9s/perlomni.vim', {'for':['perl']}
 	Plug 'shawncplus/phpcomplete.vim', {'for': ['php']}
 	" Plug 'artur-shaik/vim-javacomplete2'
 	Plug 'othree/html5.vim', {'for': ['html']}
