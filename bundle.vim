@@ -382,7 +382,7 @@ if index(g:bundle_group, 'omni')
 	let g:lua_check_globals = 0
 	let g:lua_check_syntax = 0
 	let g:lua_define_completion_mappings = 0
-	autocmd FileType java setlocal omnifunc=javacomplete#Complete
+	" autocmd FileType java setlocal omnifunc=javacomplete#Complete
 endif
 
 
