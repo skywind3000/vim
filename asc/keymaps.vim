@@ -210,13 +210,6 @@ noremap <silent><tab>; :call asclib#preview_goto('')<cr>
 noremap <silent><tab>: :call asclib#preview_goto('tab')<cr>
 
 if has('autocmd')
-	function! s:update_tags()
-		let names = []
-		let name = expand('~/.vim/tags/'. &filetype .'.tags')
-		if filereadable(name)
-			let &l:tags = &g:tags . ',' . name
-		endif
-	endfunc
 	function! s:quickfix_keymap()
 		if &buftype != 'quickfix'
 			return
@@ -233,7 +226,6 @@ if has('autocmd')
 	augroup AscQuickfix
 		autocmd!
 		autocmd FileType qf call s:quickfix_keymap()
-		autocmd FileType * call s:update_tags()
 		autocmd InsertLeave * call s:insert_leave()
 		" autocmd InsertLeave * set showmode
 	augroup END

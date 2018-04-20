@@ -15,6 +15,7 @@ set errorformat+=[%f:%l]\ ->\ %m,[%f:%l]:%m
 set vop=folds,cursor
 set fdm=indent
 set foldlevel=99
+set tags=./.tags;,.tags
 noremap <tab>/ :emenu <C-Z>
 
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
