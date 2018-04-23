@@ -229,6 +229,29 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" reposition window
+"----------------------------------------------------------------------
+function! asclib#window_up(color)
+	if has('folding')
+		silent! .foldopen!
+	endif
+	noautocmd exec "normal! zz"
+	if &previewwindow && a:color != 0
+		let xline = line('.')
+		match none
+		exec 'match previewWord "\%'. xline.'l"'
+	endif
+	let height = winheight('%') / 4
+	let winfo = winsaveview()
+	let avail = line('.') - winfo.topline - &scrolloff
+	let height = (height < avail)? height : avail
+	if height > 0
+		noautocmd exec "normal! ".height."\<c-e>"
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " preview window
 "----------------------------------------------------------------------
 if !exists('g:asclib#preview_position')
@@ -482,19 +505,12 @@ function! asclib#preview_tag(tagname)
 	elseif has_key(taginfo, 'line')
 		silent! exec "".taginfo.line
 	endif
-	if has("folding")
-		silent! .foldopen!
-	endif
-	normal! zz
-	let height = winheight('%') / 4
-	if height >= 2
-		silent! exec 'normal! '.height."\<c-e>"
-	endif
 	if 1
 		call search("$", "b")
 		call search(escape(a:tagname, '[\*~^'))
 		exe 'match previewWord "\%' . line(".") . 'l\%' . col(".") . 'c\k*"'
 	endif
+	call asclib#window_up(0)
 	call asclib#window_goto_uid(uid)
 	let text = taginfo.name
 	let text.= ' ('.(opt.index + 1).'/'.len(opt.taglist).') '
@@ -527,22 +543,7 @@ function! asclib#preview_edit(bufnr, filename, line, ...)
 	if cmd != ''
 		noautocmd exec cmd
 	endif
-	if has('folding')
-		silent! .foldopen!
-	endif
-	noautocmd exec "normal! zz"
-	match none
-	if &previewwindow && (a:line > 0 || cmd != '')
-		let xline = line('.')
-		exec 'match previewWord "\%'. xline.'l"'
-	endif
-	let height = winheight('%') / 4
-	let winfo = winsaveview()
-	let avail = line('.') - winfo.topline - &scrolloff
-	let height = (height < avail)? height : avail
-	if height >= 2
-		noautocmd exec "normal! ".height."\<c-e>"
-	endif
+	call asclib#window_up(a:line > 0 || cmd != '')
 	call asclib#window_goto_uid(uid)
 endfunc
 
@@ -582,11 +583,7 @@ function! asclib#preview_goto(mode)
 	endif
 	if winbufnr('%') == l:bufnr
 		silent exec ''.l:line
-		silent normal! zz
-		let height = winheight('%') / 4
-		if height >= 2
-			exec "normal! ".height."\<c-e>"
-		endif
+		call asclib#window_up(0)
 	endif
 endfunc
 
