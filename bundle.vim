@@ -210,7 +210,11 @@ if index(g:bundle_group, 'opt') >= 0
 	Plug 'tpope/vim-speeddating'
 	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
-	Plug 'ludovicchabant/vim-gutentags'
+	if s:uname != 'windows'
+		Plug 'ludovicchabant/vim-gutentags'
+	else
+		Plug 'skywind3000/vim-gutentags'
+	endif
 	" Plug 'itchyny/vim-cursorword'
 endif
 
@@ -229,7 +233,7 @@ if index(g:bundle_group, 'deoplete') >= 0
 		Plug 'roxma/vim-hug-neovim-rpc'
 	endif
 
-	Plug 'zchee/deoplete-clang'
+	" Plug 'zchee/deoplete-clang'
 	Plug 'zchee/deoplete-jedi'
 
 	let g:deoplete#enable_at_startup = 1
@@ -242,10 +246,13 @@ if index(g:bundle_group, 'deoplete') >= 0
 	inoremap <expr><BS> deoplete#smart_close_popup()."\<bs>"
 	inoremap <expr> <cr> pumvisible() ? "\<C-y>\<cr>" : "\<cr>"
 
-	let g:deoplete#sources = {}
-	let g:deoplete#sources._ = ['buffer', 'dictionary']
-	let g:deoplete#sources.cpp = ['clang']
-	let g:deoplete#sources.python = ['jedi']
+	if 0
+		let g:deoplete#sources = {}
+		let g:deoplete#sources._ = ['buffer', 'dictionary']
+		" let g:deoplete#sources.cpp = ['clang']
+		let g:deoplete#sources.python = ['jedi']
+		let g:deoplete#sources.cpp = ['omni']
+	endif
 
 	set shortmess+=c
 	let g:echodoc#enable_at_startup = 1
@@ -384,6 +391,24 @@ if index(g:bundle_group, 'omni')
 	let g:lua_define_completion_mappings = 0
 	" autocmd FileType java setlocal omnifunc=javacomplete#Complete
 endif
+
+
+if index(g:bundle_group, 'lsp') >= 0
+	Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next' }
+	let g:LanguageClient_loadSettings = 1
+	let g:LanguageClient_settingsPath = expand('~/.vim/languageclient.json')
+	let g:LanguageClient_selectionUI = 'location-list'
+	" let g:LanguageClient_loggingLevel = 'DEBUG'
+	if !exists('g:LanguageClient_serverCommands')
+		let g:LanguageClient_serverCommands = {}
+		let g:LanguageClient_serverCommands.c = ['cquery']
+		let g:LanguageClient_serverCommands.cpp = ['cquery']
+	endif
+	noremap <leader>rd :call LanguageClient#textDocument_definition()<cr>
+	noremap <leader>rr :call LanguageClient#textDocument_references()<cr>
+	noremap <leader>rc :call LanguageClient#textDocument_hover()<cr>
+endif
+
 
 
 "----------------------------------------------------------------------
