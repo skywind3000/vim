@@ -506,9 +506,10 @@ endfunc
 "----------------------------------------------------------------------
 " display preview file
 "----------------------------------------------------------------------
-function! asclib#preview_edit(bufnr, filename, line)
+function! asclib#preview_edit(bufnr, filename, line, ...)
 	let uid = asclib#window_uid('%', '%')
 	let pid = asclib#preview_open()
+	let cmd = (a:0 > 0)? a:1 : ""
 	let [l:tabnr, l:winnr] = asclib#window_find(pid)
 	call asclib#window_goto_tabwin(l:tabnr, l:winnr)
 	call asclib#window_saveview()
@@ -522,18 +523,25 @@ function! asclib#preview_edit(bufnr, filename, line)
 	call asclib#window_loadview()
 	if a:line > 0
 		noautocmd exec "".a:line
-		if has('folding')
-			silent! .foldopen!
-		endif
-		noautocmd exec "normal! zz"
-		let height = winheight('%') / 4
-		if height >= 2
-			noautocmd exec "normal! ".height."\<c-e>"
-		endif
-		if &previewwindow
-			match none
-			exec 'match previewWord "\%'. a:line.'l"'
-		endif
+	endif
+	if cmd != ''
+		noautocmd exec cmd
+	endif
+	if has('folding')
+		silent! .foldopen!
+	endif
+	noautocmd exec "normal! zz"
+	if &previewwindow && (a:line > 0 || cmd != '')
+		let xline = line('.')
+		match none
+		exec 'match previewWord "\%'. xline.'l"'
+	endif
+	let height = winheight('%') / 4
+	let winfo = winsaveview()
+	let avail = line('.') - winfo.topline - &scrolloff
+	let height = (height < avail)? height : avail
+	if height >= 2
+		noautocmd exec "normal! ".height."\<c-e>"
 	endif
 	call asclib#window_goto_uid(uid)
 endfunc

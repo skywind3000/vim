@@ -15,10 +15,9 @@
 
 function! menu#FindInProject()
 	let p = vimmake#get_root('%')
-	let t = expand('<cword>')
 	echohl Type
 	call inputsave()
-	let t = input('find word ('. p.'): ', t)
+	let t = input('find word ('. p.'): ')
 	call inputrestore()
 	echohl None
 	redraw | echo "" | redraw
