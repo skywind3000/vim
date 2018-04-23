@@ -531,9 +531,9 @@ function! asclib#preview_edit(bufnr, filename, line, ...)
 		silent! .foldopen!
 	endif
 	noautocmd exec "normal! zz"
+	match none
 	if &previewwindow && (a:line > 0 || cmd != '')
 		let xline = line('.')
-		match none
 		exec 'match previewWord "\%'. xline.'l"'
 	endif
 	let height = winheight('%') / 4
