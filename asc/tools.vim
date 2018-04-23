@@ -76,10 +76,15 @@ function! s:Show_Content(title, width, content)
 endfunc
 
 " Open file in new tab if it hasn't been open, or reuse the existant tab
-function! Tools_FileSwitch(how, filename)
+function! Tools_FileSwitch(how, ...)
+	if a:0 == 0 | return | endif
 	let l:tabcc = tabpagenr()
 	let l:wincc = winnr()
-	let l:filename = fnamemodify(a:filename, ':p')
+	let l:filename = fnamemodify(a:{a:0}, ':p')
+	let l:params = []
+	for i in range(a:0 - 1)
+		let l:params += [a:{i + 1}]
+	endfor
 	if has('win32') || has('win16') || has('win64') || has('win95')
 		let l:filename = tolower(l:filename)
 		let l:filename = substitute(l:filename, "\\", '/', 'g')
@@ -92,7 +97,7 @@ function! Tools_FileSwitch(how, filename)
 				continue
 			endif
 			let l:buftype = getbufvar(l:bufnr, '&buftype')
-			if l:buftype == 'quickfix'
+			if l:buftype == 'quickfix' || l:buftype == 'nofile'
 				continue
 			endif
 			let l:name = fnamemodify(bufname(l:bufnr), ':p')
@@ -103,28 +108,39 @@ function! Tools_FileSwitch(how, filename)
 			if l:filename == l:name
 				silent exec 'tabn '.(i + 1)
 				silent exec ''.(j + 1).'wincmd w'
+				for item in l:params
+					if strpart(item, 0, 2) == '+:'
+						silent exec strpart(item, 2)
+					endif
+				endfor
 				return
 			endif
 		endfor
 	endfor
-	" silent exec 'tabn '.l:tabcc
-	" silent exec ''.l:wincc.'wincmd w'
 	if (a:how == 'edit') || (a:how == 'e')
-		exec 'e '.fnameescape(a:filename)
+		exec 'e '.fnameescape(l:filename)
 	elseif (a:how == 'tabedit') || (a:how == 'tabe') || (a:how == 'tabnew')
-		exec 'tabe '.fnameescape(a:filename)
+		exec 'tabe '.fnameescape(l:filename)
 	elseif (a:how == 'split') || (a:how == 'sp')
-		exec 'split '.fnameescape(a:filename)
+		exec 'split '.fnameescape(l:filename)
 	elseif (a:how == 'vsplit') || (a:how == 'vs')
-		exec 'vsplit '.fnameescape(a:filename)
+		exec 'vsplit '.fnameescape(l:filename)
+	elseif (a:how == 'drop')
+		exec 'drop '.fnameescape(l:filename)
 	else
 		echohl ErrorMsg
 		echom "unknow command: ".a:how
 		echohl NONE
+		return
 	endif
+	for item in l:params
+		if strpart(item, 0, 2) == '+:'
+			silent exec strpart(item, 2)
+		endif
+	endfor
 endfunc
 
-command! -nargs=* FileSwitch call Tools_FileSwitch(<f-args>)
+command! -nargs=+ FileSwitch call Tools_FileSwitch(<f-args>)
 
 
 
@@ -950,7 +966,7 @@ command! -nargs=1 EnvPathRemove call s:Tools_RemovePath(<q-args>)
 "----------------------------------------------------------------------
 " Spell Highlighting
 "----------------------------------------------------------------------
-function Tools_SpellHighlight()
+function! Tools_SpellHighlight()
 	if has('gui_running')
 		hi! clear SpellBad
 		hi! clear SpellCap
