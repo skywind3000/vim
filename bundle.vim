@@ -396,8 +396,10 @@ endif
 if index(g:bundle_group, 'lsp') >= 0
 	Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next' }
 	let g:LanguageClient_loadSettings = 1
+	let g:LanguageClient_diagnosticsEnable = 0
 	let g:LanguageClient_settingsPath = expand('~/.vim/languageclient.json')
 	let g:LanguageClient_selectionUI = 'location-list'
+	let g:LanguageClient_diagnosticsList = v:null
 	" let g:LanguageClient_loggingLevel = 'DEBUG'
 	if !exists('g:LanguageClient_serverCommands')
 		let g:LanguageClient_serverCommands = {}
