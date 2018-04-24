@@ -405,6 +405,7 @@ if index(g:bundle_group, 'lsp') >= 0
 		let g:LanguageClient_serverCommands.cpp = ['cquery']
 	endif
 	noremap <leader>rd :call LanguageClient#textDocument_definition({'gotoCmd':'FileSwitch tabe'})<cr>
+	noremap <leader>re :call LanguageClient#textDocument_definition({'gotoCmd':'PreviewFile'})<cr>
 	noremap <leader>rr :call LanguageClient#textDocument_references()<cr>
 	noremap <leader>rc :call LanguageClient#textDocument_hover()<cr>
 endif

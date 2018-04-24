@@ -498,12 +498,12 @@ function! asclib#preview_tag(tagname)
 		match none
 	endif
 	normal! gg
-	if has_key(taginfo, 'cmd')
-		silent! exec "1"
-		silent! exec taginfo.cmd
-		silent! exec "nohl"
-	elseif has_key(taginfo, 'line')
+	if has_key(taginfo, 'line')
 		silent! exec "".taginfo.line
+	elseif has_key(taginfo, 'cmd')
+		silent! exec "1"
+		silent! exec escape(taginfo.cmd, '*')
+		silent! exec "nohl"
 	endif
 	if 1
 		call search("$", "b")
