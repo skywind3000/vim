@@ -930,14 +930,16 @@ function! preview#preview_scroll(offset)
 	if uid != pid
 		noautocmd wincmd P
 	endif
-	if a:offset == 1
-		exec "normal! \<c-d>"
-	elseif a:offset == -1
-		exec "normal! \<c-u>"
-	elseif a:offset >= 2
-		exec "normal! \<c-f>"
-	elseif a:offset <= -2
-		exec "normal! \<c-b>"
+	if &previewwindow != 0
+		if a:offset == 1
+			exec "normal! \<c-d>"
+		elseif a:offset == -1
+			exec "normal! \<c-u>"
+		elseif a:offset >= 2
+			exec "normal! \<c-f>"
+		elseif a:offset <= -2
+			exec "normal! \<c-b>"
+		endif
 	endif
 	if uid != pid
 		noautocmd wincmd p
