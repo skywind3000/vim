@@ -1788,6 +1788,8 @@ function! s:Cmd_VimScope(bang, what, name)
 			doautocmd User VimScope
 		endif
 	endif
+	redrawstatus!
+	redraw!
 endfunc
 
 command! -nargs=* -bang VimScope call s:Cmd_VimScope("<bang>", <f-args>)
