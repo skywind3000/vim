@@ -1659,7 +1659,7 @@ command! -bang -nargs=* VimBuild call s:Cmd_VimBuild('<bang>', <f-args>)
 if !exists('g:vimmake_grep_exts')
 	let g:vimmake_grep_exts = ['c', 'cpp', 'cc', 'h', 'hpp', 'hh', 'as']
 	let g:vimmake_grep_exts += ['m', 'mm', 'py', 'js', 'php', 'java', 'vim']
-	let g:vimmake_grep_exts += ['asm', 's', 'pyw', 'lua', 'go']
+	let g:vimmake_grep_exts += ['asm', 's', 'pyw', 'lua', 'go', 'rs']
 endif
 
 function! vimmake#grep(text, cwd)
@@ -1760,6 +1760,8 @@ function! s:Cmd_VimScope(bang, what, name)
 	elseif a:what == '9' || a:what == 'a'
 		let l:text = 'assigned "'.a:name.'"'
 	endif
+	let ncol = col('.')
+	let nrow = line('.')
 	silent cexpr "[cscope ".a:what.": ".l:text."]"
 	let success = 1
 	try
@@ -1785,6 +1787,7 @@ function! s:Cmd_VimScope(bang, what, name)
 			doautocmd User VimScope
 		endif
 	endif
+	call cursor(nrow, ncol)
 endfunc
 
 command! -nargs=* -bang VimScope call s:Cmd_VimScope("<bang>", <f-args>)
@@ -1836,15 +1839,15 @@ function! vimmake#keymap()
 
 	" set keymap to cscope
 	if has("cscope")
-		noremap <leader>cs :VimScope s <C-R>=expand("<cword>")<CR><CR>
-		noremap <leader>cg :VimScope g <C-R>=expand("<cword>")<CR><CR>
-		noremap <leader>cc :VimScope c <C-R>=expand("<cword>")<CR><CR>
-		noremap <leader>ct :VimScope t <C-R>=expand("<cword>")<CR><CR>
-		noremap <leader>ce :VimScope e <C-R>=expand("<cword>")<CR><CR>
-		noremap <leader>cd :VimScope d <C-R>=expand("<cword>")<CR><CR>
-		noremap <leader>ca :VimScope a <C-R>=expand("<cword>")<CR><CR>
-		noremap <leader>cf :VimScope f <C-R>=expand("<cfile>")<CR><CR>
-		noremap <leader>ci :VimScope i <C-R>=expand("<cfile>")<CR><CR>
+		noremap <silent> <leader>cs :VimScope s <C-R><C-W><CR>
+		noremap <silent> <leader>cg :VimScope g <C-R><C-W><CR>
+		noremap <silent> <leader>cc :VimScope c <C-R><C-W><CR>
+		noremap <silent> <leader>ct :VimScope t <C-R><C-W><CR>
+		noremap <silent> <leader>ce :VimScope e <C-R><C-W><CR>
+		noremap <silent> <leader>cd :VimScope d <C-R><C-W><CR>
+		noremap <silent> <leader>ca :VimScope a <C-R><C-W><CR>
+		noremap <silent> <leader>cf :VimScope f <C-R><C-W><CR>
+		noremap <silent> <leader>ci :VimScope i <C-R><C-W><CR>
 		if v:version >= 800 || has('patch-7.4.2038')
 			set cscopequickfix=s+,c+,d+,i+,t+,e+,g+,f+,a+
 		else

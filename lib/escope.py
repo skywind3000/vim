@@ -41,7 +41,7 @@ def execute(args, shell = False, capture = False):
 			args = shlex.split(cmd)
 	for n in args:
 		if sys.platform[:3] != 'win':
-			replace = { ' ':'\\ ', '\\':'\\\\', '\"':'\\\"', '\t':'\\t', \
+			replace = { ' ':'\\ ', '\\':'\\\\', '\"':'\\\"', '\t':'\\t', 
 				'\n':'\\n', '\r':'\\r' }
 			text = ''.join([ replace.get(ch, ch) for ch in n ])
 			parameters.append(text)
