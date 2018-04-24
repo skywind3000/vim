@@ -511,6 +511,9 @@ function! preview#preview_tag(tagname)
 	let text = taginfo.name
 	let text.= ' ('.(opt.index + 1).'/'.len(opt.taglist).') '
 	let text.= filename
+	if has_key(taginfo, 'line')
+		let text .= ':'.taginfo.line
+	endif
 	call preview#cmdmsg(text, 1)
 endfunc
 

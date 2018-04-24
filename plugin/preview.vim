@@ -81,3 +81,11 @@ command! -nargs=1 -bang PreviewScroll call s:PreviewScroll(<bang>0, <f-args>)
 
 
 
+"----------------------------------------------------------------------
+" goto the preview window
+"----------------------------------------------------------------------
+command! -nargs=1 PreviewGoto call preview#preview_goto(<f-args>)
+
+
+
+
