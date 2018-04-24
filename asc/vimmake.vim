@@ -1782,12 +1782,12 @@ function! s:Cmd_VimScope(bang, what, name)
 		echohl NONE
 		let success = 0
 	endtry
+	call cursor(nrow, ncol)
 	if success != 0 && a:bang != '!'
 		if has('autocmd')
 			doautocmd User VimScope
 		endif
 	endif
-	call cursor(nrow, ncol)
 endfunc
 
 command! -nargs=* -bang VimScope call s:Cmd_VimScope("<bang>", <f-args>)
