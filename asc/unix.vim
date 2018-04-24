@@ -80,6 +80,8 @@ augroup END
 function! s:language_setup()
 	if &ft == 'cpp' || &ft == 'c'
 		setlocal commentstring=//\ %s
+	elseif &ft == 'markdown'
+		setlocal wrap
 	endif
 	let tags = expand("~/.vim/tags/") . &ft . '.tags'
 	let dict = expand("~/.vim/dict/") . &ft . '.dict'
