@@ -304,7 +304,7 @@ function! asclib#preview_edit(bufnr, filename, line, ...)
 	if cmd != ''
 		noautocmd exec cmd
 	endif
-	call asclib#window#up(a:line > 0 || cmd != '')
+	call asclib#window#up((a:line > 0 || cmd != '')? 'previewWord' : '')
 	call asclib#window#goto_uid(uid)
 endfunc
 

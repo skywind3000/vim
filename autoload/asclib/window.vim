@@ -235,10 +235,10 @@ function! asclib#window#up(color)
 		silent! .foldopen!
 	endif
 	noautocmd exec "normal! zz"
-	if &previewwindow && a:color != 0
+	if &previewwindow && a:color != ''
 		let xline = line('.')
 		match none
-		exec 'match previewWord "\%'. xline.'l"'
+		exec 'match '.a:color.' "\%'. xline.'l"'
 	endif
 	let height = winheight('%') / 4
 	let winfo = winsaveview()
