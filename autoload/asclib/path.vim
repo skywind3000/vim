@@ -163,6 +163,11 @@ function! asclib#path#which(name)
 	else
 		let sep = ':'
 	endif
+	if asclib#path#isabs(a:name)
+		if filereadable(a:name)
+			return asclib#path#abspath(a:name)
+		endif
+	endif
 	for path in split($PATH, sep)
 		let filename = asclib#path#join(path, a:name)
 		if filereadable(filename)
@@ -178,7 +183,7 @@ endfunc
 "----------------------------------------------------------------------
 function! asclib#path#executable(name)
 	if s:windows != 0
-		for n in ['', '.exe', '.cmd', '.bat', '.vbs']
+		for n in ['.exe', '.cmd', '.bat', '.vbs']
 			let nname = a:name . n
 			let npath = asclib#path#which(nname)
 			if npath != ''
