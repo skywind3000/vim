@@ -169,3 +169,48 @@ function! asclib#utils#script_menu()
 endfunc
 
 
+"----------------------------------------------------------------------
+" search gtags config
+"----------------------------------------------------------------------
+function! asclib#utils#gtags_search_conf()
+	let rc = get(g:, 'gutentags_plus_rc', '')
+	if rc != ''
+		if filereadable(rc)
+			return asclib#path#abspath(rc)
+		endif
+	endif
+	let rc = asclib#path#abspath(expand('~/.globalrc'))
+	if filereadable(rc)
+		return rc
+	endif
+	let rc = asclib#path#abspath(expand('~/.gtags'))
+	if filereadable(rc)
+		return rc
+	endif
+	if g:asclib#common#unix != 0
+		rc = '/etc/gtags.conf'
+		if filereadable(rc)
+			return rc
+		endif
+		rc = '/usr/local/etc/gtags.conf'
+		if filereadable(rc)
+			return rc
+		endif
+	endif
+	let gtags = get(g:, 'gutentags_gtags_executable', 'gtags')
+	let gtags = asclib#path#executable(gtags)
+	if gtags == ''
+		return ''
+	endif
+	let ghome = asclib#path#dirname(gtags)
+	let rc = asclib#path#join(ghome, '../share/gtags/gtags.conf')
+	let rc = asclib#path#abspath(rc)
+	if filereadable(rc)
+		return rc
+	endif
+	return ''
+endfunc
+
+
+
+
