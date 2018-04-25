@@ -11,28 +11,7 @@ let s:scriptname = expand('<sfile>:p')
 let s:scripthome = fnamemodify(s:scriptname, ':h:h')
 let s:windows = has('win32') || has('win64') || has('win16') || has('win95')
 
-
-"----------------------------------------------------------------------
-" join two path
-"----------------------------------------------------------------------
-function! asclib#path#join(home, name)
-    let l:size = strlen(a:home)
-    if l:size == 0 | return a:name | endif
-    let l:last = strpart(a:home, l:size - 1, 1)
-    if has("win32") || has("win64") || has("win16") || has('win95')
-        if l:last == "/" || l:last == "\\"
-            return a:home . a:name
-        else
-            return a:home . '/' . a:name
-        endif
-    else
-        if l:last == "/"
-            return a:home . a:name
-        else
-            return a:home . '/' . a:name
-        endif
-    endif
-endfunc
+let asclib#path#windows = s:windows
 
 
 "----------------------------------------------------------------------
@@ -63,6 +42,58 @@ function! asclib#path#abspath(path)
 		endif
 	endif
 	return f
+endfunc
+
+
+"----------------------------------------------------------------------
+" check absolute path name
+"----------------------------------------------------------------------
+function! asclib#path#isabs(path)
+	let path = a:path
+	if strpart(path, 0, 1) == '~'
+		return 1
+	endif
+	if s:windows != 0
+		let head = strpart(path, 1, 2)
+		if head == ':/' || head == ":\\"
+			return 1
+		endif
+		let head = strpart(path, 0, 1)
+		if head == "\\"
+			return 1
+		endif
+	endif
+	let head = strpart(path, 0, 1)
+	if head == '/'
+		return 1
+	endif
+	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" join two path
+"----------------------------------------------------------------------
+function! asclib#path#join(home, name)
+    let l:size = strlen(a:home)
+    if l:size == 0 | return a:name | endif
+	if asclib#path#isabs(a:name)
+		return a:name
+	endif
+    let l:last = strpart(a:home, l:size - 1, 1)
+    if has("win32") || has("win64") || has("win16") || has('win95')
+        if l:last == "/" || l:last == "\\"
+            return a:home . a:name
+        else
+            return a:home . '/' . a:name
+        endif
+    else
+        if l:last == "/"
+            return a:home . a:name
+        else
+            return a:home . '/' . a:name
+        endif
+    endif
 endfunc
 
 
@@ -144,5 +175,17 @@ function! asclib#path#get_root(path, ...)
 	return l:hr
 endfunc
 
+
+"----------------------------------------------------------------------
+" exists
+"----------------------------------------------------------------------
+function! asclib#path#exists(path)
+	if isdirectory(a:path)
+		return 1
+	elseif filereadable(a:path)
+		return 1
+	endif
+	return 0
+endfunc
 
 

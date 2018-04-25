@@ -1,6 +1,11 @@
 let s:windows = has('win32') || has('win16') || has('win95') || has('win64')
+let asclib#common#windows = s:windows
+let asclib#common#unix = (s:windows == 0)? 1 : 0
 
 
+"----------------------------------------------------------------------
+" list script
+"----------------------------------------------------------------------
 function! s:list_script()
 	let path = get(g:, 'vimmake_path', expand('~/.vim/script'))
 	let names = []

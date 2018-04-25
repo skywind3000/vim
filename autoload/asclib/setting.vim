@@ -17,6 +17,9 @@ endif
 
 let s:scriptname = expand('<sfile>:p')
 let s:scripthome = fnamemodify(s:scriptname, ':h')
+let s:windows = has('win32') || has('win64') || has('win95') || has('win16')
+
+let asclib#setting#windows = s:windows
 
 function! asclib#setting#get(key, default)
 	return get(g:asclib#setting#config, a:key, a:default)
@@ -37,7 +40,7 @@ function! asclib#setting#script_home()
 endfunc
 
 function! asclib#setting#has_windows()
-	return has('win32') || has('win64') || has('win95') || has('win16')
+	return s:windows
 endfunc
 
 
