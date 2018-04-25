@@ -215,7 +215,7 @@ if index(g:bundle_group, 'opt') >= 0
 	if executable('ctags')
 		let g:gutentags_modules += ['ctags']
 	endif
-	if executable('gtags_cscope') && executable('gtags')
+	if executable('gtags-cscope') && executable('gtags')
 		let g:gutentags_modules += ['gtags_cscope']
 	endif
 	if len(g:gutentags_modules) > 0
