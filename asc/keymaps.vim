@@ -204,18 +204,17 @@ noremap <silent><space>tf :FuzzyFileSearch<cr>
 "inoremap <silent><C-F10> <c-\><c-o>:call Toggle_Taglist()<cr>
 noremap <silent><S-F10> :call quickmenu#toggle(0)<cr>
 inoremap <silent><S-F10> <ESC>:call quickmenu#toggle(0)<cr>
-noremap <silent><M-;> :call asclib#preview_tag(expand("<cword>"))<cr>
-noremap <silent><M-:> :call asclib#preview_close()<cr>
-noremap <silent><tab>; :call asclib#preview_goto('')<cr>
-noremap <silent><tab>: :call asclib#preview_goto('tab')<cr>
+noremap <silent><M-;> :PreviewTag<cr>
+noremap <silent><M-:> :PreviewClose<cr>
+noremap <silent><tab>; :PreviewGoto edit<cr>
+noremap <silent><tab>: :PreviewGoto tabe<cr>
 
 if has('autocmd')
 	function! s:quickfix_keymap()
 		if &buftype != 'quickfix'
 			return
 		endif
-		nnoremap <silent><buffer> p :call asclib#preview_quickfix(0)<cr>
-		nnoremap <silent><buffer> u :call asclib#quickfix_switch(0, 'bottom')<cr>
+		nnoremap <silent><buffer> p :PreviewQuickfix<cr>
 		setlocal nonumber
 	endfunc
 	function! s:insert_leave()
@@ -231,10 +230,8 @@ if has('autocmd')
 	augroup END
 endif
 
-nnoremap <silent><m-a> :call asclib#function_echo(0)<cr>
-inoremap <silent><m-a> <c-\><c-o>:call asclib#function_echo(1)<cr>
-"inoremap <silent><c-^> <c-\><c-o>:call asclib#function_echo(1)<cr>
-"nnoremap <silent><m-/> :call asclib#function_echo()<cr>
+nnoremap <silent><m-a> :PreviewSignature<cr>
+inoremap <silent><m-a> <c-\><c-o>:PreviewSignature<cr>
 
 
 "----------------------------------------------------------------------
@@ -337,10 +334,10 @@ nnoremap <space>gG :setlocal ts=4 sts=4 sw=4 noet<cr>
 nnoremap <silent><space>gf :call Tools_QuickfixCursor(3)<cr>
 nnoremap <silent><space>gb :call Tools_QuickfixCursor(2)<cr>
 
-noremap <silent><space>g; :call asclib#preview_tag(expand("<cword>"))<cr>
-noremap <silent><space>g: :call asclib#preview_close()<cr>
-noremap <silent><space>g' :call asclib#preview_goto('')<cr>
-noremap <silent><space>g" :call asclib#preview_goto('tab')<cr>
+noremap <silent><space>g; :PreviewTag<cr>
+noremap <silent><space>g: :PreviewClose<cr>
+noremap <silent><space>g' :PreviewGoto edit<cr>
+noremap <silent><space>g" :PreviewGoto tabe<cr>
 
 if has('win32') || has('win64')
 	noremap <space>gc :silent !start cmd.exe<cr>
@@ -416,7 +413,7 @@ nnoremap <silent>g1 :GrepCode <C-R>=expand("<cword>")<cr><cr>
 nnoremap <silent>g2 :GrepCode! <C-R>=expand("<cword>")<cr><cr>
 nnoremap <silent>g3 :VimScope g <C-R>=expand("<cword>")<cr><cr>
 nnoremap <silent>g4 :VimScope s <C-R>=expand("<cword>")<cr><cr>
-nnoremap <silent>g5 :call asclib#preview_tag(expand("<cword>"))<cr>
+nnoremap <silent>g5 :PreviewTag<cr>
 nnoremap <silent>g6 :call vimmake#update_tags('!', 'cs', '.cscope')<cr>
 nnoremap <silent>g7 :call vimmake#update_tags('!', 'py', '.cscopy')<cr>
 nnoremap <silent>g9 :call vimmake#update_tags('!', 'ctags', '.tags')<cr>
