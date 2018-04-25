@@ -98,7 +98,19 @@ endfunc
 function! menu#Escope(what)
 	let p = expand('%')
 	let t = expand('<cword>')
-	let m = {'g': 'definition', 'c': 'reference', 's': 'symbol'}
+	let m = {}
+	let m["s"] = "string symbol"
+	let m['g'] = 'definition'
+	let m['d'] = 'functions called by this'
+	let m['c'] = 'functions calling this'
+	let m['t'] = 'string'
+	let m['e'] = 'egrep pattern'
+	let m['f'] = 'file'
+	let m['i'] = 'files #including this file'
+	let m['a'] = 'places where this symbol is assigned'
+	if a:what == 'f' || a:what == 'i'
+		let t = expand('<cfile>')
+	endif
 	echohl Type
 	call inputsave()
 	let t = input('find '.m[a:what].' of ('. p.'): ', t)
@@ -108,7 +120,7 @@ function! menu#Escope(what)
 	if t == ''
 		return 0
 	endif
-	exec 'Es! find gtags '. a:what. ' ' . fnameescape(t) . ' %'
+	exec 'GscopeFind '. a:what. ' ' . fnameescape(t)
 endfunc
 
 
@@ -248,12 +260,17 @@ endif
 call quickmenu#current(1)
 call quickmenu#reset()
 
-call quickmenu#append('# GNU Global', '')
-call quickmenu#append('Find definition', 'call menu#Escope("g")')
-call quickmenu#append('Find reference', 'call menu#Escope("c")')
-call quickmenu#append('Find symbol', 'call menu#Escope("s")')
-call quickmenu#append('Index update', 'Es! update gtags %')
-call quickmenu#append('Reindex', 'Es! build gtags %')
+call quickmenu#append('# GTAGS Find', '')
+call quickmenu#append('Definition', 'call menu#Escope("g")')
+call quickmenu#append('Symbol', 'call menu#Escope("s")')
+call quickmenu#append('Functions called by', 'call menu#Escope("d")')
+call quickmenu#append('Functions calling', 'call menu#Escope("c")')
+call quickmenu#append('Text string', 'call menu#Escope("t")')
+call quickmenu#append('Egrep pattern', 'call menu#Escope("e")')
+call quickmenu#append('Find file', 'call menu#Escope("f")')
+call quickmenu#append('Files including', 'call menu#Escope("i")')
+call quickmenu#append('Reset database', 'GscopeKill')
+" call quickmenu#append('Reindex', 'Es! build gtags %')
 
 
 if has('win32') || has('win64') || has('win16') || has('win95')
