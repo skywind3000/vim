@@ -303,19 +303,17 @@ let g:indentLine_enabled = 1
 let g:gutentags_project_root = ['.root']
 let g:gutentags_ctags_tagfile = '.tags'
 
-let s:vim_tags = expand('~/.cache/tags')
-let g:gutentags_cache_dir = s:vim_tags
+let g:gutentags_modules = ['ctags', 'gtags_cscope']
+let g:gutentags_cache_dir = expand('~/.cache/tags')
 let g:gutentags_ctags_extra_args = []
 let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']
 let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
 let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
 
+let g:gutentags_define_advanced_commands = 1
+
 if has('win32') || has('win16') || has('win64') || has('win95')
 	let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
-endif
-
-if !isdirectory(s:vim_tags)
-	silent! call mkdir(s:vim_tags, 'p')
 endif
 
 
