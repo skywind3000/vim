@@ -463,66 +463,6 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" string & config
-"----------------------------------------------------------------------
-
-function! asclib#string_strip(text)
-	return substitute(a:text, '^\s*\(.\{-}\)\s*$', '\1', '')
-endfunc
-
-function! asclib#decode_cfg(string) abort
-	let item = {}
-	if type(a:string) == type('')
-		let data = split(a:string, "\n")
-	else
-		let data = a:string
-	endif
-	for curline in data
-		let pos = stridx(curline, ':')
-		if pos <= 0
-			continue
-		endif
-		let name = asclib#string_strip(strpart(curline, 0, pos))
-		let data = asclib#string_strip(strpart(curline, pos + 1))
-		if name == ''
-			continue
-		endif
-		let item[name] = data
-	endfor
-	return item
-endfunc
-
-function! asclib#encode_cfg(item) 
-	let output = []
-	for name in keys(a:item)
-		let data = a:item[name]
-		let name = substitute(name, '[\n\r]', '', 'g')
-		let data = substitute(data, '[\n\r]', '', 'g')
-		let output += [name . ': ' . data]
-	endfor
-	return join(output, "\n")
-endfunc
-
-function! asclib#read_cfg(filename)
-	let filename = a:filename
-	if stridx(filename, '~') >= 0
-		let filename = expand(filename)
-	endif
-	let data = readfile(filename)
-	return asclib#decode_cfg(data)
-endfunc
-
-function! asclib#write_cfg(filename, item) abort
-	let filename = a:filename
-	if stridx(filename, '~') >= 0
-		let filename = expand(filename)
-	endif
-	let data = asclib#encode_cfg(a:item)
-	call writefile(split(data, "\n"), filename)
-endfunc
-
-
-"----------------------------------------------------------------------
 " snips
 "----------------------------------------------------------------------
 
