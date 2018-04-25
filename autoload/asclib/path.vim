@@ -98,6 +98,52 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" dirname
+"----------------------------------------------------------------------
+function! asclib#path#dirname(path)
+	return fnamemodify(a:path, ':h')
+endfunc
+
+
+"----------------------------------------------------------------------
+" normalize
+"----------------------------------------------------------------------
+function! asclib#path#normalize(path, ...)
+	let lower = (a:0 > 0)? a:1 : 0
+	let path = a:path
+	if s:windows
+		let data = split(path, "\\", 1)
+		let path = join(data, '/')
+	endif
+	if lower && (s:windows || has('win32unix'))
+		let path = tolower(path)
+	endif
+	let size = len(path)
+	if path[size - 1] == '/'
+		let path = strpart(path, 0, size - 1)
+	endif
+	return path
+endfunc
+
+
+"----------------------------------------------------------------------
+" returns 1 for equal, 0 for not equal
+"----------------------------------------------------------------------
+function! asclib#path#equal(path1, path2)
+	let p1 = asclib#path#abspath(a:path1)
+	let p2 = asclib#path#abspath(a:path2)
+	if s:windows || has('win32unix')
+		let p1 = tolower(p1)
+		let p2 = tolower(p2)
+	endif
+	if p1 == p2
+		return 1
+	endif
+	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
 " path asc home
 "----------------------------------------------------------------------
 function! asclib#path#runtime(path)
@@ -105,6 +151,44 @@ function! asclib#path#runtime(path)
 	let pathname = asclib#path#join(pathname, a:path)
 	let pathname = fnamemodify(pathname, ':p')
 	return substitute(pathname, '\\', '/', 'g')
+endfunc
+
+
+"----------------------------------------------------------------------
+" find files in path
+"----------------------------------------------------------------------
+function! asclib#path#which(name)
+	if has('win32') || has('win64') || has('win16') || has('win95')
+		let sep = ';'
+	else
+		let sep = ':'
+	endif
+	for path in split($PATH, sep)
+		let filename = asclib#path#join(path, a:name)
+		if filereadable(filename)
+			return asclib#path#abspath(filename)
+		endif
+	endfor
+	return ''
+endfunc
+
+
+"----------------------------------------------------------------------
+" find executable
+"----------------------------------------------------------------------
+function! asclib#path#executable(name)
+	if s:windows != 0
+		for n in ['', '.exe', '.cmd', '.bat', '.vbs']
+			let nname = a:name . n
+			let npath = asclib#path#which(nname)
+			if npath != ''
+				return npath
+			endif
+		endfor
+	else
+		return asclib#path#which(a:name)
+	endif
+	return ''
 endfunc
 
 
