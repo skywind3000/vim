@@ -278,3 +278,31 @@ function! asclib#path#exists(path)
 endfunc
 
 
+"----------------------------------------------------------------------
+" strip ending slash
+"----------------------------------------------------------------------
+function! asclib#path#stripslash(path)
+	return fnamemodify(a:path, ':s?[/\\]$??')
+endfunc
+
+
+"----------------------------------------------------------------------
+" path to name
+"----------------------------------------------------------------------
+function! asclib#path#cachedir(cache_dir, root_dir, filename)
+    if asclib#path#isabs(a:filename)
+        return a:filename
+    endif
+    let l:file_path = asclib#path#stripslash(a:root_dir) . '/' . a:filename
+	let cache_dir = a:cache_dir
+    if cache_dir != ""
+        " Put the tag file in the cache dir instead of inside the
+        " project root.
+        let l:file_path = cache_dir . '/' . tr(l:file_path, '\/: ', '---_')
+        let l:file_path = substitute(l:file_path, '/\-', '/', '')
+    endif
+    let l:file_path = asclib#path#normalize(l:file_path)
+    return l:file_path
+endfunc
+
+
