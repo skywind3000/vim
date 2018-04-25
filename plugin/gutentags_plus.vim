@@ -1,6 +1,6 @@
 "======================================================================
 "
-" gutentags_plus.vim - config gtags
+" gutentags_plus.vim - connecting gtags_cscope db on demand
 "
 " Created by skywind on 2018/04/25
 " Last Modified: 2018/04/25 15:40:46
@@ -101,7 +101,6 @@ function! s:list_cscope_dbs()
 		let item.path = s:string_strip(db_path)
 		let records += [item]
 	endfor
-	silent! redraw!
 	return records
 endfunc
 
@@ -125,7 +124,7 @@ endfunc
 "----------------------------------------------------------------------
 " add to cscope database if not connected
 "----------------------------------------------------------------------
-function! s:GscopeAdd()
+function! s:GscopeAdd() abort
 	let dbname = s:get_gtags_file()
 	if dbname == ''
 		return 0
@@ -159,18 +158,11 @@ function! s:GscopeFind(bang, what, ...)
 		call s:ErrorMsg('not find gtags database for this file')
 		return 0
 	endif
-	if a:0 == 0
-		if index(['i', '8', 'f', '7'], a:what) < 0
-			let keyword = expand('<cword>')
-		else
-			let keyword = expand('<cfile>')
-			if a:what == 'i' || a:what == '8'
-				let keyword = '^'.keyword.'$'
-			endif
-		endif
-	endif
-	if keyword == ''
-		call s:ErrorMsg('E560: Usage: GscopeFind a|c|d|e|f|g|i|s|t name')
+	if a:0 == 0 || keyword == ''
+		redraw! | echo '' | redraw!
+		echohl ErrorMsg
+		echom 'E560: Usage: GscopeFind a|c|d|e|f|g|i|s|t name'
+		echohl NONE
 		return 0
 	endif
 	call s:GscopeAdd()
@@ -201,17 +193,21 @@ function! s:GscopeFind(bang, what, ...)
 	let success = 1
 	try
 		exec 'cs find '.a:what.' '.fnameescape(keyword)
+		redrawstatus
 	catch /^Vim\%((\a\+)\)\=:E259/
+		redrawstatus
 		echohl ErrorMsg
 		echo "E259: not find '".keyword."'"
 		echohl NONE
 		let success = 0
 	catch /^Vim\%((\a\+)\)\=:E567/
+		redrawstatus
 		echohl ErrorMsg
 		echo "E567: no cscope connections"
 		echohl NONE
 		let success = 0
 	catch /^Vim\%((\a\+)\)\=:E/
+		redrawstatus
 		echohl ErrorMsg
 		echo "ERROR: cscope error"
 		echohl NONE
@@ -220,14 +216,44 @@ function! s:GscopeFind(bang, what, ...)
 	if winbufnr('%') == nbuf
 		call cursor(nrow, ncol)
 	endif
-	if success != 0 && a:bang != '!'
-		if has('autocmd')
-			doautocmd User VimScope
-		endif
+	if success != 0 && a:bang == 0
+		let height = get(g:, 'gutentags_plus_height', 6)
+		exec 'botright copen '.height
+		exec 'wincmd p'
 	endif
 endfunc
 
 
 command! -nargs=+ -bang GscopeFind call s:GscopeFind(<bang>0, <f-args>)
+
+
+"----------------------------------------------------------------------
+" Kill all connections
+"----------------------------------------------------------------------
+function! s:GscopeKill()
+	silent cs kill -1
+	echo "All cscope connections have been closed."
+endfunc
+
+command! -nargs=0 GscopeKill call s:GscopeKill()
+
+
+
+"----------------------------------------------------------------------
+" setup keymaps
+"----------------------------------------------------------------------
+if get(g:, 'gutentags_plus_nomap', 0) == 0
+	noremap <silent> <leader>cs :GscopeFind s <C-R><C-W><cr>
+	noremap <silent> <leader>cg :GscopeFind g <C-R><C-W><cr>
+	noremap <silent> <leader>cc :GscopeFind c <C-R><C-W><cr>
+	noremap <silent> <leader>ct :GscopeFind t <C-R><C-W><cr>
+	noremap <silent> <leader>ce :GscopeFind e <C-R><C-W><cr>
+	noremap <silent> <leader>cf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+	noremap <silent> <leader>ci :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+	noremap <silent> <leader>cd :GscopeFind d <C-R><C-W><cr>
+	noremap <silent> <leader>ca :GscopeFind a <C-R><C-W><cr>
+	noremap <silent> <leader>ck :GscopeKill<cr>
+endif
+
 
 
