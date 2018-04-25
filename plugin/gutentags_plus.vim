@@ -68,11 +68,11 @@ endfunc
 " list cscope dbs
 "----------------------------------------------------------------------
 function! s:list_cscope_dbs()
-	redir => x
-	silent! cs show
+	redir => cs_list
+	noautocmd silent cs show
 	redir END
 	let records = []
-	for text in split(x, "\n")
+	for text in split(cs_list, "\n")
 		let text = s:string_strip(text)
 		if text == ''
 			continue
@@ -101,8 +101,11 @@ function! s:list_cscope_dbs()
 		let item.path = s:string_strip(db_path)
 		let records += [item]
 	endfor
+	silent! redraw!
 	return records
 endfunc
+
+" noautocmd echo s:list_cscope_dbs()
 
 
 "----------------------------------------------------------------------
@@ -156,7 +159,24 @@ function! s:GscopeFind(bang, what, ...)
 		call s:ErrorMsg('not find gtags database for this file')
 		return 0
 	endif
+	if a:0 == 0
+		if index(['i', '8', 'f', '7'], a:what) < 0
+			let keyword = expand('<cword>')
+		else
+			let keyword = expand('<cfile>')
+			if a:what == 'i' || a:what == '8'
+				let keyword = '^'.keyword.'$'
+			endif
+		endif
+	endif
+	if keyword == ''
+		call s:ErrorMsg('E560: Usage: GscopeFind a|c|d|e|f|g|i|s|t name')
+		return 0
+	endif
 	call s:GscopeAdd()
+	let ncol = col('.')
+	let nrow = line('.')
+	let nbuf = winbufnr('%')
 	let text = ''
 	if a:what == '0' || a:what == 's'
 		let text = 'symbol "'.keyword.'"'
@@ -177,9 +197,6 @@ function! s:GscopeFind(bang, what, ...)
 	elseif a:what == '9' || a:what == 'a'
 		let text = 'assigned "'.keyword.'"'
 	endif
-	let ncol = col('.')
-	let nrow = line('.')
-	let nbuf = winbufnr('%')
 	silent cexpr "[cscope ".a:what.": ".l:text."]"
 	let success = 1
 	try
