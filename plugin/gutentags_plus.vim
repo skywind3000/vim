@@ -145,7 +145,7 @@ command! -nargs=0 GscopeAdd call s:GscopeAdd()
 "----------------------------------------------------------------------
 " Find search
 "----------------------------------------------------------------------
-function! s:GscopeFind(bang, query, ...)
+function! s:GscopeFind(bang, what, ...)
 	let keyword = (a:0 > 0)? a:1 : ''
 	let dbname = s:get_gtags_file()
 	if dbname == ''
@@ -156,7 +156,61 @@ function! s:GscopeFind(bang, query, ...)
 		call s:ErrorMsg('not find gtags database for this file')
 		return 0
 	endif
-	call s:GscopeAdd(dbname)
+	call s:GscopeAdd()
+	let text = ''
+	if a:what == '0' || a:what == 's'
+		let text = 'symbol "'.keyword.'"'
+	elseif a:what == '1' || a:what == 'g'
+		let text = 'definition of "'.keyword.'"'
+	elseif a:what == '2' || a:what == 'd'
+		let text = 'functions called by "'.keyword.'"'
+	elseif a:what == '3' || a:what == 'c'
+		let text = 'functions calling "'.keyword.'"'
+	elseif a:what == '4' || a:what == 't'
+		let text = 'string "'.keyword.'"'
+	elseif a:what == '6' || a:what == 'e'
+		let text = 'egrep "'.keyword.'"'
+	elseif a:what == '7' || a:what == 'f'
+		let text = 'file "'.keyword.'"'
+	elseif a:what == '8' || a:what == 'i'
+		let text = 'files including "'.keyword.'"'
+	elseif a:what == '9' || a:what == 'a'
+		let text = 'assigned "'.keyword.'"'
+	endif
+	let ncol = col('.')
+	let nrow = line('.')
+	let nbuf = winbufnr('%')
+	silent cexpr "[cscope ".a:what.": ".l:text."]"
+	let success = 1
+	try
+		exec 'cs find '.a:what.' '.fnameescape(keyword)
+	catch /^Vim\%((\a\+)\)\=:E259/
+		echohl ErrorMsg
+		echo "E259: not find '".keyword."'"
+		echohl NONE
+		let success = 0
+	catch /^Vim\%((\a\+)\)\=:E567/
+		echohl ErrorMsg
+		echo "E567: no cscope connections"
+		echohl NONE
+		let success = 0
+	catch /^Vim\%((\a\+)\)\=:E/
+		echohl ErrorMsg
+		echo "ERROR: cscope error"
+		echohl NONE
+		let success = 0
+	endtry
+	if winbufnr('%') == nbuf
+		call cursor(nrow, ncol)
+	endif
+	if success != 0 && a:bang != '!'
+		if has('autocmd')
+			doautocmd User VimScope
+		endif
+	endif
 endfunc
+
+
+command! -nargs=+ -bang GscopeFind call s:GscopeFind(<bang>0, <f-args>)
 
 
