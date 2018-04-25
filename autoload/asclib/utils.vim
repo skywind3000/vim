@@ -188,11 +188,11 @@ function! asclib#utils#gtags_search_conf()
 		return rc
 	endif
 	if g:asclib#common#unix != 0
-		rc = '/etc/gtags.conf'
+		let rc = '/etc/gtags.conf'
 		if filereadable(rc)
 			return rc
 		endif
-		rc = '/usr/local/etc/gtags.conf'
+		let rc = '/usr/local/etc/gtags.conf'
 		if filereadable(rc)
 			return rc
 		endif
