@@ -210,12 +210,21 @@ if index(g:bundle_group, 'opt') >= 0
 	Plug 'tpope/vim-speeddating'
 	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
-	if s:uname != 'windows'
-		Plug 'ludovicchabant/vim-gutentags'
-	else
-		Plug 'skywind3000/vim-gutentags'
-	endif
 	" Plug 'itchyny/vim-cursorword'
+	let g:gutentags_modules = []
+	if executable('ctags')
+		let g:gutentags_modules += ['ctags']
+	endif
+	if executable('gtags_cscope') && executable('gtags')
+		let g:gutentags_modules += ['gtags_cscope']
+	endif
+	if len(g:gutentags_modules) > 0
+		if s:uname != 'windows'
+			Plug 'ludovicchabant/vim-gutentags'
+		else
+			Plug 'skywind3000/vim-gutentags'
+		endif
+	endif
 endif
 
 
