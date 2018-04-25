@@ -52,69 +52,7 @@ endfunc
 "----------------------------------------------------------------------
 " path basic
 "----------------------------------------------------------------------
-let s:scriptname = expand('<sfile>:p')
-let s:scripthome = fnamemodify(s:scriptname, ':h')
 let s:windows = (has('win95') || has('win32') || has('win64') || has('win16'))
-
-" join path
-function! asclib#path_join(home, name)
-    let l:size = strlen(a:home)
-    if l:size == 0 | return a:name | endif
-    let l:last = strpart(a:home, l:size - 1, 1)
-    if has("win32") || has("win64") || has("win16") || has('win95')
-        if l:last == "/" || l:last == "\\"
-            return a:home . a:name
-        else
-            return a:home . '/' . a:name
-        endif
-    else
-        if l:last == "/"
-            return a:home . a:name
-        else
-            return a:home . '/' . a:name
-        endif
-    endif
-endfunc
-
-" path asc home
-function! asclib#path_runtime(path)
-	let pathname = fnamemodify(s:scripthome, ':h')
-	let pathname = asclib#path_join(pathname, a:path)
-	let pathname = fnamemodify(pathname, ':p')
-	return substitute(pathname, '\\', '/', 'g')
-endfunc
-
-" find files in path
-function! asclib#path_which(name)
-	if has('win32') || has('win64') || has('win16') || has('win95')
-		let sep = ';'
-	else
-		let sep = ':'
-	endif
-	for path in split($PATH, sep)
-		let filename = asclib#path_join(path, a:name)
-		if filereadable(filename)
-			return vimmake#fullname(filename)
-		endif
-	endfor
-	return ''
-endfunc
-
-" find executable
-function! asclib#path_executable(name)
-	if s:windows != 0
-		for n in ['', '.exe', '.cmd', '.bat', '.vbs']
-			let nname = a:name . n
-			let npath = asclib#path_which(nname)
-			if npath != ''
-				return npath
-			endif
-		endfor
-	else
-		return asclib#path_which(a:name)
-	endif
-	return ''
-endfunc
 
 
 "----------------------------------------------------------------------
@@ -211,7 +149,7 @@ endfunc
 " python - pylint
 function! asclib#lint_pylint(filename)
 	let filename = (a:filename == '')? expand('%') : a:filename
-	let rc = asclib#path_runtime('tools/conf/pylint.conf') 
+	let rc = asclib#path#runtime('tools/conf/pylint.conf') 
 	let cmd = 'pylint --rcfile='.shellescape(rc).' --disable=W'
 	let cmd = cmd .' '.shellescape(filename)
 	let opt = {'auto': "make"}
@@ -221,7 +159,7 @@ endfunc
 " python - flake8
 function! asclib#lint_flake8(filename)
 	let filename = (a:filename == '')? expand('%') : a:filename
-	let rc = asclib#path_runtime('tools/conf/flake8.conf') 
+	let rc = asclib#path#runtime('tools/conf/flake8.conf') 
 	let cmd = 'flake8 --config='.shellescape(rc).' '.shellescape(filename)
 	let opt = {'auto': "make"}
 	call vimmake#run('', opt, cmd)
@@ -245,7 +183,7 @@ endfunc
 " c - splint
 function! asclib#lint_splint(filename)
 	let filename = (a:filename == '')? expand('%') : a:filename
-	let rc = asclib#path_runtime('tools/conf/splint.conf') 
+	let rc = asclib#path#runtime('tools/conf/splint.conf') 
 	let cmd = 'splint -f '.shellescape(rc).' '.shellescape(filename)
 	let opt = {'auto': "make"}
 	call vimmake#run('', opt, cmd)
@@ -263,7 +201,7 @@ function! asclib#open_win32_help(hlp, keyword)
 		call asclib#errmsg('can not open: '.a:hlp)
 		return 1
 	endif
-	if asclib#path_which('winhlp32.exe') == ''
+	if asclib#path#which('winhlp32.exe') == ''
 		call asclib#errmsg('can not find WinHlp32.exe, please install it')
 		return 2
 	endif
@@ -298,7 +236,7 @@ function! asclib#open_win32_chm(chm, keyword)
 		silent exec 'VimMake -mode=5 '.shellescape(a:chm)
 		return 0
 	else
-		if asclib#path_which('KeyHH.exe') == ''
+		if asclib#path#which('KeyHH.exe') == ''
 			call asclib#errmsg('can not find KeyHH.exe, please install it')
 			return 2
 		endif
@@ -349,7 +287,7 @@ endfunc
 function! asclib#open_gprof(image, profile)
 	let l:image = a:image
 	let l:profile = a:profile
-	if asclib#path_executable('gprof') == ''
+	if asclib#path#executable('gprof') == ''
 		call s:errmsg('cannot find gprof')
 		return
 	endif
@@ -537,7 +475,7 @@ endif
 function! asclib#owncloud_call(command)
 	let cmd = g:asclib#owncloudcmd
 	if cmd == ''
-		let cmd = asclib#path_executable('owncloudcmd')
+		let cmd = asclib#path#executable('owncloudcmd')
 	endif
 	if cmd == '' && s:windows != 0
 		if filereadable('C:/Program Files (x86)/ownCloud/owncloudcmd.exe')
