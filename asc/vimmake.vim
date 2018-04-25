@@ -1671,14 +1671,18 @@ function! vimmake#grep(text, cwd)
 	if mode == 'grep'
 		let l:inc = ''
 		for l:item in g:vimmake_grep_exts
-			let l:inc .= " --include=*." . l:item
+			if s:vimmake_windows == 0
+				let l:inc .= " --include='*." . l:item . "'"
+			else
+				let l:inc .= " --include=*." . l:item
+			endif
 		endfor
-        if a:cwd == '.' || a:cwd == ''
-            let l:inc .= ' *'
-        else
-            let l:full = vimmake#fullname(a:cwd)
-            let l:inc .= ' '.shellescape(l:full)
-        endif
+		if a:cwd == '.' || a:cwd == ''
+			let l:inc .= ' *'
+		else
+			let l:full = vimmake#fullname(a:cwd)
+			let l:inc .= ' '.shellescape(l:full)
+		endif
 		let cmd = 'grep -n -s -R ' . (fixed? '-F ' : '')
 		let cmd .= shellescape(a:text). l:inc .' /dev/null'
 		call vimmake#run('', {}, cmd)
