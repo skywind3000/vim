@@ -1762,6 +1762,7 @@ function! s:Cmd_VimScope(bang, what, name)
 	endif
 	let ncol = col('.')
 	let nrow = line('.')
+	let nbuf = winbufnr('%')
 	silent cexpr "[cscope ".a:what.": ".l:text."]"
 	let success = 1
 	try
@@ -1782,7 +1783,9 @@ function! s:Cmd_VimScope(bang, what, name)
 		echohl NONE
 		let success = 0
 	endtry
-	call cursor(nrow, ncol)
+	if winbufnr('%') == nbuf
+		call cursor(nrow, ncol)
+	endif
 	if success != 0 && a:bang != '!'
 		if has('autocmd')
 			doautocmd User VimScope
