@@ -181,7 +181,8 @@ endfunc
 function! s:GscopeFind(bang, what, ...)
 	let keyword = (a:0 > 0)? a:1 : ''
 	let dbname = s:get_gtags_file()
-	if dbname == ''
+	let root = get(b:, 'gutentags_root', '')
+	if dbname == '' || root == ''
 		call s:ErrorMsg("no gtags database for this file, setup gutentags")
 		return 0
 	endif
