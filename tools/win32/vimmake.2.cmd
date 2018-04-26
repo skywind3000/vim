@@ -16,12 +16,12 @@ if "%VIM_FILEEXT%" == ".txt" GOTO COMPILE_TXT
 
 :COMPILE_C
 REM CD /D "%VIM_FILEDIR%"
-d:\dev\mingw32\bin\gcc -Wall -O3 -finline-functions "%VIM_FILEPATH%" -o "%VIM_FILEDIR%/%VIM_FILENOEXT%" -lwinmm -lstdc++ -lgdi32 -lws2_32 -mavx -static
+d:\dev\mingw32\bin\gcc -Wall -O3 -finline-functions -g "%VIM_FILEPATH%" -o "%VIM_FILEDIR%/%VIM_FILENOEXT%" -lwinmm -lstdc++ -lgdi32 -lws2_32 -mavx -static
 GOTO END
 
 :COMPILE_CPP
 REM CD /D "%VIM_FILEDIR%"
-d:\dev\mingw32\bin\gcc -Wall -O3 -finline-functions -std=c++11 "%VIM_FILEPATH%" -o "%VIM_FILEDIR%/%VIM_FILENOEXT%" -lwinmm -lstdc++ -lgdi32 -lws2_32 -mavx -static
+d:\dev\mingw32\bin\gcc -Wall -O3 -finline-functions -g -std=c++11 "%VIM_FILEPATH%" -o "%VIM_FILEDIR%/%VIM_FILENOEXT%" -lwinmm -lstdc++ -lgdi32 -lws2_32 -mavx -static
 GOTO END
 
 :COMPILE_ERLANG

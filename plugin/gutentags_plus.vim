@@ -187,7 +187,7 @@ function! s:GscopeFind(bang, what, ...)
 		return 0
 	endif
 	if !filereadable(dbname)
-		call s:ErrorMsg('not find gtags database for this file')
+		call s:ErrorMsg('gtags database is not ready yet')
 		return 0
 	endif
 	if a:0 == 0 || keyword == ''
