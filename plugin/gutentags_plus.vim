@@ -183,7 +183,7 @@ function! s:GscopeFind(bang, what, ...)
 	let dbname = s:get_gtags_file()
 	let root = get(b:, 'gutentags_root', '')
 	if dbname == '' || root == ''
-		call s:ErrorMsg("no gtags database for this file, setup gutentags")
+		call s:ErrorMsg("no gtags database for this file, setup gutentags with gtags_cscope config")
 		return 0
 	endif
 	if !filereadable(dbname)
