@@ -147,7 +147,7 @@ command! -nargs=0 GscopeAdd call s:GscopeAdd()
 "----------------------------------------------------------------------
 " open quickfix
 "----------------------------------------------------------------------
-function! s:quickfix_open(height)
+function! s:quickfix_open(size)
 	function! s:WindowCheck(mode)
 		if &buftype == 'quickfix'
 			let s:quickfix_open = 1
@@ -169,7 +169,7 @@ function! s:quickfix_open(height)
 	if s:quickfix_open != 0
 		return
 	endif
-	exec 'botright copen '. ((a.size > 0)? a:size : '')
+	exec 'botright copen '. ((a:size > 0)? a:size : '')
 	noautocmd windo call s:WindowCheck(1)
 	noautocmd silent! exec ''.l:winnr.'wincmd w'
 endfunc
