@@ -19,23 +19,6 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" compare two path names 
-"----------------------------------------------------------------------
-function! s:path_equal(path1, path2)
-	let p1 = fnamemodify(a:path1, ':p')
-	let p2 = fnamemodify(a:path2, ':p')
-	if s:windows || has('win32unix')
-		let p1 = tolower(p1)
-		let p2 = tolower(p2)
-	endif
-	if p1 == p2
-		return 1
-	endif
-	return 0
-endfunc
-
-
-"----------------------------------------------------------------------
 " display error message
 "----------------------------------------------------------------------
 function! s:ErrorMsg(msg)
@@ -113,7 +96,18 @@ endfunc
 function! s:db_connected(dbname)
 	let record = s:list_cscope_dbs()
 	for item in record
-		if s:path_equal(item.path, a:dbname)
+		let p1 = fnamemodify(item.path, ':p')
+		let p2 = fnamemodify(a:dbname, ':p')
+		let equal = 0
+		if s:windows || has('win32unix')
+			let p1 = tolower(p1)
+			let p2 = tolower(p2)
+		endif
+		if s:windows
+			let p1 = tr(p1, "\\", "/")
+			let p2 = tr(p2, "\\", "/")
+		endif
+		if p1 == p2
 			return 1
 		endif
 	endfor
@@ -126,14 +120,20 @@ endfunc
 "----------------------------------------------------------------------
 function! s:GscopeAdd() abort
 	let dbname = s:get_gtags_file()
-	if dbname == ''
+	let root = get(b:, 'gutentags_root', '')
+	if dbname == '' || root == ''
 		return 0
 	endif
 	if s:db_connected(dbname)
 		return 1
 	endif
 	let value = &cscopeverbose
+	let $GTAGSDBPATH = fnamemodify(dbname, ':p:h')
+	let $GTAGSROOT = root
+	let prg = get(g:, 'gutentags_gtags_cscope_executable', 'gtags-cscope')
+	execute 'set cscopeprg=' . fnameescape(prg)
 	set nocscopeverbose
+	silent exec 'cs kill -1'
 	exec 'cs add '. fnameescape(dbname)
 	if value != 0
 		set cscopeverbose
@@ -142,6 +142,37 @@ function! s:GscopeAdd() abort
 endfunc
 
 command! -nargs=0 GscopeAdd call s:GscopeAdd()
+
+
+"----------------------------------------------------------------------
+" open quickfix
+"----------------------------------------------------------------------
+function! s:quickfix_open(height)
+	function! s:WindowCheck(mode)
+		if &buftype == 'quickfix'
+			let s:quickfix_open = 1
+			return
+		endif
+		if a:mode == 0
+			let w:quickfix_save = winsaveview()
+		else
+			if exists('w:quickfix_save')
+				call winrestview(w:quickfix_save)
+				unlet w:quickfix_save
+			endif
+		endif
+	endfunc
+	let s:quickfix_open = 0
+	let l:winnr = winnr()			
+	noautocmd windo call s:WindowCheck(0)
+	noautocmd silent! exec ''.l:winnr.'wincmd w'
+	if s:quickfix_open != 0
+		return
+	endif
+	exec 'botright copen '. ((a.size > 0)? a:size : '')
+	noautocmd windo call s:WindowCheck(1)
+	noautocmd silent! exec ''.l:winnr.'wincmd w'
+endfunc
 
 
 "----------------------------------------------------------------------
@@ -218,8 +249,7 @@ function! s:GscopeFind(bang, what, ...)
 	endif
 	if success != 0 && a:bang == 0
 		let height = get(g:, 'gutentags_plus_height', 6)
-		exec 'botright copen '.height
-		exec 'wincmd p'
+		call s:quickfix_open(height)
 	endif
 endfunc
 

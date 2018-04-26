@@ -112,8 +112,7 @@ function! asclib#path#normalize(path, ...)
 	let lower = (a:0 > 0)? a:1 : 0
 	let path = a:path
 	if s:windows
-		let data = split(path, "\\", 1)
-		let path = join(data, '/')
+		let path = tr(path, "\\", '/')
 	endif
 	if lower && (s:windows || has('win32unix'))
 		let path = tolower(path)
