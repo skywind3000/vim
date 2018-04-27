@@ -310,7 +310,7 @@ let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']
 let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
 let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
 
-let g:gutentags_define_advanced_commands = 1
+" let g:gutentags_define_advanced_commands = 1
 
 if has('win32') || has('win16') || has('win64') || has('win95')
 	let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
