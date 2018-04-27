@@ -1,5 +1,27 @@
 
 "----------------------------------------------------------------------
+" write log
+"----------------------------------------------------------------------
+function! asclib#utils#log(text, ...) abort
+	let text = a:text . ' '. join(a:000, ' ')
+	let time = strftime('%Y-%m-%d %H:%M:%S')
+	let name = 'm'. strpart(time, 0, 10) . '.log'
+	let name = substitute(name, '-', '', 'g')
+	let home = expand('~/.vim/logs')
+	let text = '['.time.'] ' . text
+	let name = home .'/'. name
+	if !exists('*writefile')
+		return 0
+	endif
+	if !isdirectory(home)
+		silent! call mkdir(home, 'p')
+	endif
+	call writefile([text . "\n"], name, 'a')
+	return 1
+endfunc
+
+
+"----------------------------------------------------------------------
 " call terminal.py
 "----------------------------------------------------------------------
 function! asclib#utils#terminal(mode, cmd, wait, ...) abort
