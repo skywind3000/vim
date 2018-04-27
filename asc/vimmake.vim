@@ -1,7 +1,7 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
-" Last Modified: 2018/04/17 18:13
+" Last Modified: 2018/04/27 14:55
 "
 " Execute customize tools: ~/.vim/vimmake.{name} directly:
 "     :VimTool {name}
@@ -270,6 +270,16 @@ function! s:AutoCmd(name)
 	if has('autocmd') && ((g:vimmake_build_skip / 2) % 2) == 0
 		exec 'silent doautocmd User VimMake'.a:name
 	endif
+endfunc
+
+" change directory with right command
+function! s:chdir(path)
+	if has('nvim')
+		let cmd = haslocaldir()? 'lcd' : (haslocaldir(-1, 0)? 'tcd' : 'cd')
+	else
+		let cmd = haslocaldir()? 'lcd' : 'cd'
+	endif
+	silent execute cmd . ' '. fnameescape(a:path)
 endfunc
 
 
@@ -1159,7 +1169,6 @@ function! vimmake#run(bang, opts, args, ...)
 	let l:macros['VIM_ROOT'] = vimmake#get_root('%')
 	let l:macros['<cwd>'] = getcwd()
 	let l:macros['<root>'] = l:macros['VIM_ROOT']
-	let cd = haslocaldir()? 'lcd ' : 'cd '
 	let l:retval = ''
 
 	" extract options
@@ -1203,7 +1212,7 @@ function! vimmake#run(bang, opts, args, ...)
 			let l:opts.cwd = s:StringReplace(l:opts.cwd, l:replace, l:val)
 		endfor
 		let l:opts.savecwd = getcwd()
-		silent! exec cd . fnameescape(l:opts.cwd)
+		silent! call s:chdir(l:opts.cwd)
 		let l:macros['VIM_CWD'] = getcwd()
 		let l:macros['VIM_RELDIR'] = expand("%:h:.")
 		let l:macros['VIM_RELNAME'] = expand("%:p:.")
@@ -1241,7 +1250,7 @@ function! vimmake#run(bang, opts, args, ...)
 
 	" restore cwd
 	if l:opts.cwd != ''
-		silent! exec cd fnameescape(l:opts.savecwd)
+		silent! call s:chdir(l:opts.savecwd)
 	endif
 
 	return l:retval
@@ -1422,7 +1431,6 @@ endfunc
 "- Execute current file by mode or filetype
 "----------------------------------------------------------------------
 function! s:Cmd_VimExecute(bang, ...)
-	let cd = haslocaldir()? 'lcd ' : 'cd '
 	let l:mode = (a:0 < 1)? '' : a:1
 	let l:cwd = g:vimmake_cwd
 	if a:0 >= 2
@@ -1440,7 +1448,7 @@ function! s:Cmd_VimExecute(bang, ...)
 		else
 			let l:dest = vimmake#get_root('%')
 		endif
-		silent! exec cd . fnameescape(l:dest)
+		silent! call s:chdir(l:dest)
 	endif
 	if index(['', '0', 'file', 'filename'], l:mode) >= 0
 		call s:ExecuteMe(0)
@@ -1526,7 +1534,7 @@ function! s:Cmd_VimExecute(bang, ...)
 		endif
 	endif
 	if l:cwd > 0
-		silent! exec cd . fnameescape(l:savecwd)
+		call s:chdir(l:savecwd)
 	endif
 endfunc
 

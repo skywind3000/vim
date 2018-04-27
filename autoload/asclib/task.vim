@@ -31,14 +31,14 @@ elseif has('nvim')
 	let s:support = 1
 endif
 
-" let s:support = 0
-
+" display error message
 function! s:errmsg(text)
 	echohl ErrorMsg
 	echom a:text
 	echohl None
 endfunc
 
+" allocate free task id
 function! s:allocate()
 	while 1
 		if !has_key(s:tasks, s:task_id)
@@ -49,6 +49,16 @@ function! s:allocate()
 			let s:task_id = 1
 		endif
 	endwhile
+endfunc
+
+" change directory with right command
+function! s:chdir(path)
+	if has('nvim')
+		let cmd = haslocaldir()? 'lcd' : (haslocaldir(-1, 0)? 'tcd' : 'cd')
+	else
+		let cmd = haslocaldir()? 'lcd' : 'cd'
+	endif
+	silent execute cmd . ' '. fnameescape(a:path)
 endfunc
 
 
@@ -353,13 +363,14 @@ function! s:task.start(command, opts) abort
 	let macros['VIM_COLUMNS'] = ''.&columns
 	let macros['VIM_LINES'] = ''.&lines
 	let macros['VIM_GUI'] = has('gui_running')? 1 : 0
-	let cd = haslocaldir()? 'lcd ' : 'cd '
 	let ss = getcwd()
 	let sn = get(a:opts, 'cwd', ss)
 	for [l:key, l:val] in items(macros)
 		exec 'let $'.l:key.' = l:val'
 	endfor
-	silent! exec cd . sn
+	if sn != ''
+		silent! call s:chdir(sn)
+	endif
 	let self.__private.cwd = getcwd()
 	let self.cwd = self.__private.cwd
 	let $VIM_CWD = self.__private.cwd
@@ -367,7 +378,9 @@ function! s:task.start(command, opts) abort
 	let $VIM_RELNAME = expand("%:p:.")
 	let $VIM_CFILE = expand("<cfile>")
 	let hr = s:task_start(self, a:command, a:opts)
-	silent! exec cd . ss
+	if sn != ''
+		silent! call s:chdir(ss)
+	endif
 	let self.state = self.__private.state
 	let self.id = self.__private.id
 	if hr == -1

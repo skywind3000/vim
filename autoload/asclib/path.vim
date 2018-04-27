@@ -15,6 +15,19 @@ let asclib#path#windows = s:windows
 
 
 "----------------------------------------------------------------------
+" change directory in proper way
+"----------------------------------------------------------------------
+function! asclib#path#chdir(path)
+	if has('nvim')
+		let cmd = haslocaldir()? 'lcd' : (haslocaldir(-1, 0)? 'tcd' : 'cd')
+	else
+		let cmd = haslocaldir()? 'lcd' : 'cd'
+	endif
+	silent execute cmd . ' '. fnameescape(a:path)
+endfunc
+
+
+"----------------------------------------------------------------------
 " absolute path
 "----------------------------------------------------------------------
 function! asclib#path#abspath(path)
