@@ -122,6 +122,11 @@ function! s:GscopeAdd() abort
 	let dbname = s:get_gtags_file()
 	let root = get(b:, 'gutentags_root', '')
 	if dbname == '' || root == ''
+		call s:ErrorMsg("no gtags database for this project, check gutentags's documents")
+		return 0
+	endif
+	if !filereadable(dbname)
+		call s:ErrorMsg('gtags database is not ready yet')
 		return 0
 	endif
 	if s:db_connected(dbname)
