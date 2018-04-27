@@ -2292,8 +2292,13 @@ function! s:Tlist_Parse_Tagline(tag_line)
 endfunction
 
 function! s:Tlist_PythonSystem(command)
+	if has('reltimefloat')
+		let starts = reltimefloat(reltime())
+	else
+		let starts = localtime()
+	endif
 	if !has('python')
-		return system(command)
+		let hr = system(command)
 	else
 		python import subprocess, vim
 		python x = vim.eval('a:command')
@@ -2304,11 +2309,24 @@ function! s:Tlist_PythonSystem(command)
 		python t = p.stdout.read()
 		python p.stdout.close()
 		python p.wait()
-		python t = t.replace('\\', '\\\\').replace('"', '\\"')
-		python t = t.replace('\n', '\\n').replace('\r', '\\r')
-		python vim.command('let l:text = "%s"'%t)
-		return l:text
+		if exists('*pyeval') != 0
+			let l:text = pyeval('t')
+		else
+			python t = t.replace('\\', '\\\\').replace('"', '\\"')
+			python t = t.replace('\n', '\\n').replace('\r', '\\r')
+			python vim.command('let l:text = "%s"'%t)
+		endif
+		let hr = l:text
 	endif
+	if has('reltimefloat')
+		let starts = reltimefloat(reltime()) - starts
+	else
+		let starts = localtime() - starts
+	endif
+	if exists('*asclib#utils#log') != 0
+		call asclib#utils#log('[taglist]', 'generated:', a:command, starts, 'seconds')
+	endif
+	return hr
 endfunction
 
 
