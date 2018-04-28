@@ -1,7 +1,7 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
-" Last Modified: 2018/04/27 14:55
+" Last Modified: 2018/04/29 05:20
 "
 " Execute customize tools: ~/.vim/vimmake.{name} directly:
 "     :VimTool {name}
@@ -77,6 +77,11 @@ endif
 " tool modes
 if !exists("g:vimmake_mode")
 	let g:vimmake_mode = {}
+endif
+
+" save file
+if !exists("g:vimmake_save")
+	let g:vimmake_save = 0
 endif
 
 " using timer to update quickfix
@@ -1238,6 +1243,10 @@ function! vimmake#run(bang, opts, args, ...)
 
 	" check if need to save
 	let l:save = get(l:opts, 'save', '')
+
+	if l:save == ''
+		let l:save = ''. g:vimmake_save
+	endif
 
 	if l:save == '1'
 		silent! update
