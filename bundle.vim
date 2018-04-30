@@ -92,7 +92,7 @@ if index(g:bundle_group, 'basic') >= 0
 		let g:Lf_ShortcutF = '<c-p>'
 		let g:Lf_ShortcutB = '<m-n>'
 		noremap <c-n> :LeaderfMru<cr>
-		noremap <m-p> :LeaderfFunction<cr>
+		noremap <m-p> :LeaderfFunction!<cr>
 		noremap <m-n> :LeaderfBuffer<cr>
 		noremap <m-m> :LeaderfTag<cr>
 		let g:Lf_MruMaxFiles = 2048
@@ -210,6 +210,7 @@ if index(g:bundle_group, 'opt') >= 0
 	Plug 'tpope/vim-speeddating'
 	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
+	" Plug 'soft-aesthetic/soft-era-vim'
 	" Plug 'itchyny/vim-cursorword'
 	let g:gutentags_modules = []
 	if executable('ctags')
@@ -362,6 +363,8 @@ if index(g:bundle_group, 'ale') >= 0
 	let g:ale_cpp_gcc_options = '-Wall -O2 -std=c++14'
 	let g:ale_c_cppcheck_options = ''
 	let g:ale_cpp_cppcheck_options = ''
+
+	let g:ale_linters.text = ['textlint', 'write-good']
 
 	if executable('gcc') == 0 && executable('clang')
 		let g:ale_linters.c += ['clang']
