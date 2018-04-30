@@ -211,6 +211,7 @@ let g:Lf_StlColorscheme = 'powerline'
 let g:Lf_ShortcutF = '<c-p>'
 let g:Lf_ShortcutB = '<m-n>'
 let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
+let g:Lf_PreviewResult = {'Function':0}
 
 let g:Lf_NormalMap = {
 	\ "File":   [["<ESC>", ':exec g:Lf_py "fileExplManager.quit()"<CR>']],
