@@ -66,8 +66,8 @@ augroup AscUnixGroup
 	au FileType * call s:language_setup()
 	au User AsyncRunStart call asyncrun#quickfix_toggle(6, 1)
 	au User VimScope,VimMakeStart call vimmake#toggle_quickfix(6, 1)
-	au User AsyncRunStart,VimMakeStart call asclib#path#chdir('.')
-	au BufAdd * call asclib#path#chdir('.')
+	" au User AsyncRunStart,VimMakeStart call asclib#path#chdir('.')
+	" au BufAdd * call asclib#path#chdir('.')
 	au BufNewFile,BufRead *.as setlocal filetype=actionscript
 	au BufNewFile,BufRead *.pro setlocal filetype=prolog
 	au BufNewFile,BufRead *.es setlocal filetype=erlang

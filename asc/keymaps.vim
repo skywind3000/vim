@@ -3,7 +3,7 @@
 " keymaps.vim - keymaps start with using <space>
 "
 " Created by skywind on 2016/10/12
-" Last Modified: 2018/03/10 23:44
+" Last Modified: 2018/05/02 13:05
 "
 "======================================================================
 
