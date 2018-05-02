@@ -25,11 +25,11 @@ function! Tools_SaveRetry()
 	let windows = has('win32') || has('win64') || has('win95') 
 	let windows = windows || has('win32unix') || has('win16')
 	if windows == 0 
-		exec 'w'
+		unsilent! exec 'w'
 		return
 	endif
 	if &readonly != 0
-		exec 'w'
+		unsilent! exec 'w'
 		return
 	endif
 	let retry = 30
@@ -46,6 +46,10 @@ function! Tools_SaveRetry()
 			echom "E45: 'readonly' option is set"
 			return
 		catch
+			redraw! | echo | redraw!
+			echohl ErrorMsg
+			echom v:errmsg
+			echohl None
 			break
 		endtry
 	endwhile
@@ -53,6 +57,8 @@ function! Tools_SaveRetry()
 		silent exec "w!"
 	endif
 endfunc
+
+command! -nargs=0 WriteFileGuard call Tools_SaveRetry()
 
 
 " open quickfix
