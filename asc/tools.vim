@@ -24,12 +24,21 @@ set wcm=<C-Z>
 function! Tools_SaveRetry() 
 	let windows = has('win32') || has('win64') || has('win95') 
 	let windows = windows || has('win32unix') || has('win16')
-	if windows == 0 
-		unsilent! exec 'w'
+	let v:errmsg = ''
+	if bufname('%') == ''
+		echohl ErrorMsg
+		echom "E32: No file name"
+		echohl None
 		return
 	endif
-	if &readonly != 0
-		unsilent! exec 'w'
+	if windows == 0 || &readonly != 0
+		try
+			exec 'w'
+		catch /.*/
+			echohl ErrorMsg
+			echom v:exception
+			echohl None
+		endtry
 		return
 	endif
 	let retry = 30
@@ -42,11 +51,7 @@ function! Tools_SaveRetry()
 		catch /^Vim\%((\a\+)\)\=:E505/
 			sleep 25m
 			" echom "retry"
-		catch /^Vim\%((\a\+)\)\=:E45/
-			echom "E45: 'readonly' option is set"
-			return
 		catch
-			redraw! | echo | redraw!
 			echohl ErrorMsg
 			echom v:errmsg
 			echohl None
