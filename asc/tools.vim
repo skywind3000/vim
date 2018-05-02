@@ -32,19 +32,26 @@ function! Tools_SaveRetry()
 		exec 'w'
 		return
 	endif
-	let retry = 20
+	let retry = 30
 	while retry > 0
 		let retry -= 1
 		try
 			silent exec 'w'
-			echom "saved: ". bufname('%')
+			echom "'". bufname('%'). "' written"
 			break
+		catch /^Vim\%((\a\+)\)\=:E505/
+			sleep 25m
+			" echom "retry"
 		catch /^Vim\%((\a\+)\)\=:E45/
-			sleep 50m
+			echom "E45: 'readonly' option is set"
+			return
 		catch
 			break
 		endtry
 	endwhile
+	if retry <= 0
+		silent exec "w!"
+	endif
 endfunc
 
 

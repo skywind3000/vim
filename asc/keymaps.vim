@@ -234,6 +234,9 @@ endif
 nnoremap <silent><m-a> :PreviewSignature<cr>
 inoremap <silent><m-a> <c-\><c-o>:PreviewSignature<cr>
 
+noremap <silent><m-s> :call Tools_SaveRetry()<cr>
+inoremap <silent><m-s> <ESC>:call Tools_SaveRetry()<cr>
+
 
 "----------------------------------------------------------------------
 " GUI/Terminal
