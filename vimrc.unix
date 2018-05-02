@@ -21,7 +21,7 @@ if exists('g:vim_startup')
 		if g:vim_startup == 'nvim'
 			let g:bundle_group += ['basic']
 		elseif g:vim_startup == 'mvim'
-			let g:bundle_group += ['basic', 'inter', 'high']
+			let g:bundle_group += ['basic', 'inter', 'high', 'opt', 'ale']
 			set signcolumn=yes
 		endif
 	endif
