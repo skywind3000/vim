@@ -20,6 +20,34 @@ set wcm=<C-Z>
 "set splitbelow
 
 
+" retry saving on windows
+function! Tools_SaveRetry() 
+	let windows = has('win32') || has('win64') || has('win95') 
+	let windows = windows || has('win32unix') || has('win16')
+	if windows == 0 
+		exec 'w'
+		return
+	endif
+	if &readonly != 0
+		exec 'w'
+		return
+	endif
+	let retry = 20
+	while retry > 0
+		let retry -= 1
+		try
+			silent exec 'w'
+			echom "saved: ". bufname('%')
+			break
+		catch /^Vim\%((\a\+)\)\=:E45/
+			sleep 50m
+		catch
+			break
+		endtry
+	endwhile
+endfunc
+
+
 " open quickfix
 function! Toggle_QuickFix(size)
 	function! s:WindowCheck(mode)
