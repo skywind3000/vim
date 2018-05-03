@@ -426,6 +426,7 @@ endif
 
 if index(g:bundle_group, 'keysound') >= 0
 	Plug 'skywind3000/vim-keysound'
+
 	let g:keysound_theme = 'default'
 	let g:keysound_enable = 1
 endif
