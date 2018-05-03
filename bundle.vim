@@ -424,6 +424,11 @@ if index(g:bundle_group, 'lsp') >= 0
 	noremap <leader>rc :call LanguageClient#textDocument_hover()<cr>
 endif
 
+if index(g:bundle_group, 'keysound') >= 0
+	Plug 'skywind3000/vim-keysound'
+	let g:keysound_theme = 'default'
+	let g:keysound_enable = 1
+endif
 
 
 "----------------------------------------------------------------------
