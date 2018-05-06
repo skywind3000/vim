@@ -56,6 +56,7 @@ endif
 let g:asclib#python#py_ver = s:py_version
 let g:asclib#python#py_cmd = s:py_cmd
 let g:asclib#python#py_eval = s:py_eval
+let g:asclib#python#shell_error = 0
 
 
 "----------------------------------------------------------------------
@@ -79,4 +80,29 @@ function! asclib#python#eval(script) abort
 		return py3eval(a:script)
 	endif
 endfunc
+
+function! asclib#python#system(command)
+	if g:asclib#common#windows == 0
+		let text = system(a:command)
+		let g:asclib#python#shell_error = v:shell_error
+		return text
+	elseif s:py_version == 0
+		call asclib#common#errmsg('vim does not support python')
+		return ''
+	else
+		exec s:py_cmd 'import subprocess, vim'
+		exec s:py_cmd 'argv = {"args": vim.eval("a:command")}'
+		exec s:py_cmd 'argv["shell"] = True'
+		exec s:py_cmd 'argv["stdout"] = subprocess.PIPE'
+		exec s:py_cmd 'argv["stderr"] = subprocess.STDOUT'
+		exec s:py_cmd 'p = subprocess.Popen(**argv)'
+		exec s:py_cmd 'text = p.stdout.read()'
+		exec s:py_cmd 'code = p.wait()'
+		let g:asclib#python#shell_error = asclib#python#eval('code')
+		return asclib#python#eval('text')
+	endif
+endfunc
+
+
+
 

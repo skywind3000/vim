@@ -20,10 +20,18 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" python detection 
+" write script
 "----------------------------------------------------------------------
-if !exists('g:asclib#common#py_version')
-	let g:asclib#common#py_version = 0
-endif
+function! asclib#common#writefile(lines, name)
+	if v:version >= 700
+		call writefile(a:lines, a:name)
+	else
+		exe 'redir ! > '.fnameescape(a:name)
+		for index in range(len(a:line))
+			silent echo a:line[index]
+		endfor
+		redir END
+	endif
+endfunc
 
 
