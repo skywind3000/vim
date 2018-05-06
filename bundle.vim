@@ -93,6 +93,7 @@ if index(g:bundle_group, 'basic') >= 0
 		let g:Lf_ShortcutB = '<m-n>'
 		noremap <c-n> :LeaderfMru<cr>
 		noremap <m-p> :LeaderfFunction!<cr>
+		noremap <m-P> :LeaderfBufTag!<cr>
 		noremap <m-n> :LeaderfBuffer<cr>
 		noremap <m-m> :LeaderfTag<cr>
 		let g:Lf_MruMaxFiles = 2048
@@ -364,7 +365,7 @@ if index(g:bundle_group, 'ale') >= 0
 	let g:ale_c_cppcheck_options = ''
 	let g:ale_cpp_cppcheck_options = ''
 
-	let g:ale_linters.text = ['textlint', 'write-good']
+	" let g:ale_linters.text = ['textlint', 'write-good']
 
 	if executable('gcc') == 0 && executable('clang')
 		let g:ale_linters.c += ['clang']
