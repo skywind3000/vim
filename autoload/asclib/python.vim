@@ -82,13 +82,10 @@ function! asclib#python#eval(script) abort
 endfunc
 
 function! asclib#python#system(command)
-	if g:asclib#common#windows == 0
+	if g:asclib#common#windows == 0 || s:py_version == 0
 		let text = system(a:command)
 		let g:asclib#python#shell_error = v:shell_error
 		return text
-	elseif s:py_version == 0
-		call asclib#common#errmsg('vim does not support python')
-		return ''
 	else
 		exec s:py_cmd 'import subprocess, vim'
 		exec s:py_cmd 'argv = {"args": vim.eval("a:command")}'
