@@ -365,7 +365,7 @@ if index(g:bundle_group, 'ale') >= 0
 	let g:ale_c_cppcheck_options = ''
 	let g:ale_cpp_cppcheck_options = ''
 
-	" let g:ale_linters.text = ['textlint', 'write-good']
+	let g:ale_linters.text = ['textlint', 'write-good', 'languagetool']
 
 	if executable('gcc') == 0 && executable('clang')
 		let g:ale_linters.c += ['clang']
