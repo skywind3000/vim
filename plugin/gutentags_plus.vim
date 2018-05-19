@@ -15,6 +15,8 @@ else
 	set cscopequickfix=s+,c+,d+,i+,t+,e+,g+,f+
 endif
 
+let g:gutentags_auto_add_gtags_cscope = 0
+
 
 "----------------------------------------------------------------------
 " strip heading and ending spaces 
