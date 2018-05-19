@@ -238,6 +238,8 @@ function! s:GscopeFind(bang, what, ...)
 		call setqflist([], ' ', {'title':title})
 	elseif has('nvim') && has('nvim-0.2.2')
 		call setqflist([], ' ', {'title':title})
+	elseif has('nvim')
+		call setqflist([], ' ', title)
 	else
 		call setqflist([], ' ')
 	endif
