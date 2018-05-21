@@ -216,6 +216,7 @@ if has('autocmd')
 		endif
 		nnoremap <silent><buffer> p :PreviewQuickfix<cr>
 		nnoremap <silent><buffer> P :PreviewClose<cr>
+		nnoremap <silent><buffer> q :close<cr>
 		setlocal nonumber
 	endfunc
 	function! s:insert_leave()

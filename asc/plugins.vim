@@ -233,6 +233,18 @@ let g:snips_author = 'skywind'
 
 
 "----------------------------------------------------------------------
+" Signify
+"----------------------------------------------------------------------
+let g:signify_vcs_list = ['git', 'svn']
+let g:signify_difftool = 'diff'
+let g:signify_sign_add               = '+'
+let g:signify_sign_delete            = '-'
+let g:signify_sign_delete_first_line = '‾'
+let g:signify_sign_change            = '~'
+let g:signify_sign_changedelete      = g:signify_sign_change
+
+
+"----------------------------------------------------------------------
 "- Misc
 "----------------------------------------------------------------------
 let g:calendar_navi = 'top'
@@ -240,8 +252,6 @@ let g:EchoFuncTrimSize = 1
 let g:EchoFuncBallonOnly = 1
 let g:startify_disable_at_vimenter = 1
 let g:startify_session_dir = '~/.vim/session'
-let g:signify_vcs_list = ['git', 'svn']
-let g:signify_difftool = 'diff'
 
 
 "----------------------------------------------------------------------
