@@ -236,16 +236,17 @@ function! s:GscopeFind(bang, what, ...)
 	endif
 	let text = "[cscope ".a:what.": ".text."]"
 	let title = "GscopeFind ".a:what.' "'.keyword.'"'
+	exec 'cexpr text'
 	if has('nvim') == 0 && (v:version >= 800 || has('patch-7.4.2210'))
-		call setqflist([], ' ', {'title':title})
+		call setqflist([], 'a', {'title':title})
 	elseif has('nvim') && has('nvim-0.2.2')
-		call setqflist([], ' ', {'title':title})
+		call setqflist([], 'a', {'title':title})
 	elseif has('nvim')
-		call setqflist([], ' ', title)
+		call setqflist([], 'a', title)
 	else
-		call setqflist([], ' ')
+		call setqflist([], 'a')
 	endif
-	call setqflist([{'text':text}], 'a')
+	" call setqflist([{'text':text}], 'a')
 	let success = 1
 	try
 		exec 'cs find '.a:what.' '.fnameescape(keyword)
