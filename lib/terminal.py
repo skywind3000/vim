@@ -817,7 +817,7 @@ class Terminal (object):
 		if sys.platform[:3] == 'win':
 			if script == None:
 				names = ['cmd (default)', 'cygwin', 'mintty', 'cygwinx']
-				names += ['wsl (windows subsystem for linux)', 'wslx']
+				names += ['wsl', 'wslx']
 				return names
 			if not profile:
 				profile = None
@@ -1102,8 +1102,8 @@ if __name__ == '__main__':
 		cfg.win32_cygwin_now(['echo 1234', 'ls -la'], True)
 		return 0
 	
-	test4()
-	# main()
+	# test4()
+	main()
 
 
 
