@@ -1091,7 +1091,7 @@ if __name__ == '__main__':
 		profile = None
 		profile = 'debian'
 		# profile = 'ubuntu1804'
-		print cfg.win32_wsl_locate(profile)
+		# print cfg.win32_wsl_locate(profile)
 		# cfg.win32_wsl_now('', ['echo 1234', 'ls -la', 'cat /etc/debian_version'], profile)
 		cfg.win32_wsl_open_bash('', ['echo 1234', 'ls -la', 'sleep 3'], profile)
 		# cfg.win32_shell_execute('open', cfg.win32_wsl_locate(), '--login -i -c "sleep 5"')
