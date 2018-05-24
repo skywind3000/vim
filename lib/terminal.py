@@ -47,7 +47,7 @@ class configure (object):
 				stdin = subprocess.PIPE,
 				stdout = subprocess.PIPE, 
 				stderr = subprocess.PIPE)
-		if stdin != None:
+		if stdin is None:
 			p.stdin.write(stdin)
 			p.stdin.flush()
 		p.stdin.close()
@@ -78,7 +78,7 @@ class configure (object):
 		for line in script:
 			#print line
 			pass
-		if type(script) == type([]):
+		if isinstance(script, list):
 			script = '\n'.join(script)
 		p = subprocess.Popen(['/usr/bin/osascript'], shell = False,
 				stdin = subprocess.PIPE, stdout = subprocess.PIPE,
@@ -125,7 +125,7 @@ class configure (object):
 		osascript.append('  end if')
 		x = '  set current settings of selected tab of '
 		x += 'window 1 to settings set "%s"'
-		if profile != None:
+		if profile is not None:
 			osascript.append(x%profile)
 		osascript.append('  activate')
 		osascript.append('end tell')
@@ -167,7 +167,7 @@ class configure (object):
 		return argument.replace(' ', '\\ ')
 
 	def win32_escape (self, argument, force = False):
-		if force == False and argument:
+		if force is False and argument:
 			clear = True
 			for n in ' \n\r\t\v\"':
 				if n in argument:
@@ -244,7 +244,7 @@ class configure (object):
 				import ctypes
 				self.GetFullPathName = self.kernel32.GetFullPathNameA
 				args = [ ctypes.c_char_p, ctypes.c_int32, ctypes.c_char_p ]
-				self.GetFullPathName.argtypes = arg + [ctypes.c_char_p]
+				self.GetFullPathName.argtypes = args + [ctypes.c_char_p]
 				self.GetFullPathName.restype = ctypes.c_uint32
 			except: pass
 		if not self.GetFullPathName:
@@ -268,7 +268,7 @@ class configure (object):
 				import ctypes
 				self.GetLongPathName = self.kernel32.GetLongPathNameA
 				args = [ ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int32 ]
-				self.GetLongPathName.argtypes = arg
+				self.GetLongPathName.argtypes = args
 				self.GetLongPathName.restype = ctypes.c_uint32
 			except: pass
 		if not self.GetLongPathName:
@@ -291,7 +291,7 @@ class configure (object):
 				self.shell32 = ctypes.windll.LoadLibrary('shell32.dll')
 				self.ShellExecute = self.shell32.ShellExecuteA
 				args = [ ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p ]
-				args+= [ ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int32 ]
+				args += [ ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int32 ]
 				self.ShellExecute.argtypes = args
 				self.ShellExecute.restype = ctypes.wintypes.HINSTANCE
 			except: pass
@@ -326,8 +326,15 @@ class configure (object):
 		return 0
 
 	# search bash for windows available ?
-	def win32_wsl_locate (self):
+	def win32_wsl_locate (self, profile = None):
 		if not self.win32_detect_win10():
+			return None
+		if profile:
+			name = profile + '.exe'
+			for path in os.environ.get('PATH', '').split(';'):
+				fn = os.path.join(path, name)
+				if os.path.exists(fn):
+					return name
 			return None
 		root = os.environ.get('SystemRoot', None)
 		if not root:
@@ -479,7 +486,7 @@ class configure (object):
 		command = ['cygstart']
 		command += [self.cyg2win('/bin/mintty')]
 		# if  title:
-			# command += ['-t', title]
+		#	command += ['-t', title]
 		if os.path.exists('/Cygwin-Terminal.ico'):
 			command += ['-i', '/Cygwin-Terminal.ico']
 		command += ['-e', 'bash']
@@ -571,9 +578,6 @@ class configure (object):
 		command = [bash]
 		if login:
 			command.append('--login')
-		if sys.stdout.isatty() and (not self.filter):
-			if not self.encoding:
-				command.extend(['-i'])
 		command.extend(['/tmp/' + filename])
 		if (not self.filter) and (not self.encoding):
 			subprocess.call(command, shell = False)
@@ -664,7 +668,7 @@ class configure (object):
 
 	# open bash for windows (needs windows 10) and execute script
 	def win32_wsl_now (self, title, script, profile = None):
-		bash = self.win32_wsl_locate()
+		bash = self.win32_wsl_locate(profile)
 		if not bash:
 			return -1, None
 		from tempfile import NamedTemporaryFile as OpenTmp
@@ -676,34 +680,12 @@ class configure (object):
 				t.write('%s\n'%line)
 			t.close()
 			tmpname = t.name
-			if sys.stdout.isatty() and (not self.filter):
-				command = '%s '%bash
-				command += '--login -i "' + self.win2wsl(t.name) + '"'
-				os.system(command)
+			command = '%s '%bash
+			if not profile:
+				command += ' "' + self.win2wsl(t.name) + '"'
 			else:
-				args = [bash, '--login', self.win2wsl(t.name)]
-				p = subprocess.Popen(
-						args,
-						shell = False, 
-						stdin = subprocess.PIPE,
-						stderr = subprocess.STDOUT,
-						stdout = subprocess.PIPE)
-				stdout = p.stdout
-				p.stdin.close()
-				self.filter_mode = 'wsl'
-				while True:
-					text = stdout.readline()
-					if text == '':
-						break
-					if self.encoding:
-						text = text.decode(self.encoding, 'ignore')
-					if self.filter:
-						text = self.filter(text)
-					if not text:
-						continue
-					text = text.rstrip('\n\r')
-					sys.stdout.write(text + '\n')
-					sys.stdout.flush()
+				command += 'run bash "' + self.win2wsl(t.name) + '"'
+			os.system(command)
 			try:
 				os.remove(t.name)
 			except:
@@ -712,7 +694,7 @@ class configure (object):
 
 	# open bash for windows in a new terminal window
 	def win32_wsl_open_bash (self, title, script, profile = None):
-		bash = self.win32_wsl_locate()
+		bash = self.win32_wsl_locate(profile)
 		if not bash:
 			return -1, None
 		fp = open(self.temp, 'wb')
@@ -722,7 +704,10 @@ class configure (object):
 		for line in script:
 			fp.write('%s\n'%line)
 		fp.close()
-		command = '--login -i "' + self.win2wsl(self.temp) + '"'
+		if not profile:
+			command = '--login -i "' + self.win2wsl(self.temp) + '"'
+		else:
+			command = 'run bash "' + self.win2wsl(self.temp) + '"'
 		self.win32_shell_execute('open', bash, command, os.getcwd())
 		return 0
 
@@ -768,12 +753,13 @@ class Terminal (object):
 				self.config.win32_cygwin_now(script, False)
 			else:
 				self.config.win32_cygwin_open_mintty(title, script, profile)
-		elif terminal in ('wsl', 'wslx', 'ubuntu', 'ubuntux'):
+		elif terminal in ('wsl', 'wslx'):
 			if not self.config.win32_detect_win10():
 				die('only supported on windows 10')
 				return -1
-			if not self.config.win32_wsl_locate():
-				die('can not find bash.exe, please install WSL')
+			if not self.config.win32_wsl_locate(profile):
+				name = profile and profile or 'bash'
+				die('can not find %s, please install WSL'%name)
 				return -2
 			if terminal in ('wsl', 'ubuntu'):
 				self.config.win32_wsl_open_bash(title, script, profile)
@@ -833,6 +819,8 @@ class Terminal (object):
 				names = ['cmd (default)', 'cygwin', 'mintty', 'cygwinx']
 				names += ['wsl (windows subsystem for linux)', 'wslx']
 				return names
+			if not profile:
+				profile = None
 			return self.__win32_open_terminal(terminal, title, script, profile)
 		elif sys.platform == 'cygwin':
 			if script == None:
@@ -1100,11 +1088,21 @@ if __name__ == '__main__':
 
 	def test4():
 		cfg = configure()
-		# cfg.win32_wsl_now('', ['echo 1234', 'ls -la'])
-		cfg.win32_wsl_open_bash('', ['echo 1234', 'ls -la', 'sleep 3'])
+		profile = None
+		profile = 'debian'
+		# profile = 'ubuntu1804'
+		print cfg.win32_wsl_locate(profile)
+		# cfg.win32_wsl_now('', ['echo 1234', 'ls -la', 'cat /etc/debian_version'], profile)
+		cfg.win32_wsl_open_bash('', ['echo 1234', 'ls -la', 'sleep 3'], profile)
 		# cfg.win32_shell_execute('open', cfg.win32_wsl_locate(), '--login -i -c "sleep 5"')
+
+	def test5():
+		cfg = configure()
+		cfg.cygwin = 'd:/linux'
+		cfg.win32_cygwin_now(['echo 1234', 'ls -la'], True)
+		return 0
 	
-	# test4()
+	# test5()
 	main()
 
 

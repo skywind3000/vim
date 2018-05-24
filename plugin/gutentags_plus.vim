@@ -3,7 +3,7 @@
 " gutentags_plus.vim - connecting gtags_cscope db on demand
 "
 " Created by skywind on 2018/04/25
-" Last Modified: 2018/05/19 21:48
+" Last Modified: 2018/05/22 15:54
 "
 "======================================================================
 
