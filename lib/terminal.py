@@ -707,7 +707,7 @@ class configure (object):
 		if not profile:
 			command = '--login -i "' + self.win2wsl(self.temp) + '"'
 		else:
-			command = 'run bash "' + self.win2wsl(self.temp) + '"'
+			command = 'run bash --login -i "' + self.win2wsl(self.temp) + '"'
 		self.win32_shell_execute('open', bash, command, os.getcwd())
 		return 0
 
@@ -1102,8 +1102,8 @@ if __name__ == '__main__':
 		cfg.win32_cygwin_now(['echo 1234', 'ls -la'], True)
 		return 0
 	
-	# test5()
-	main()
+	test4()
+	# main()
 
 
 
