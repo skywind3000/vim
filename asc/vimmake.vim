@@ -1,7 +1,7 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
-" Last Modified: 2018/04/29 05:23
+" Last Modified: 2018/05/26 23:05
 "
 " Execute customize tools: ~/.vim/vimmake.{name} directly:
 "     :VimTool {name}
@@ -1751,6 +1751,14 @@ function! s:Cmd_GrepCode(bang, what, ...)
         let l:cwd = vimmake#fullname(l:cwd)
     endif
     call vimmake#grep(a:what, l:cwd)
+	let title = 'GrepCode' . a:bang . ' '. a:what
+	if has('nvim') == 0 && (v:version >= 800 || has('patch-7.4.2210'))
+		call setqflist([], 'a', {'title':title})
+	elseif has('nvim') && has('nvim-0.2.2')
+		call setqflist([], 'a', {'title':title})
+	elseif has('nvim')
+		call setqflist([], 'a', title)
+	endif
 endfunc
 
 command! -bang -nargs=+ GrepCode call s:Cmd_GrepCode('<bang>', <f-args>)
