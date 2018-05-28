@@ -483,14 +483,24 @@ function q-cheat() {
 
 
 #----------------------------------------------------------------------
+# homebrew
+#----------------------------------------------------------------------
+function brew_disable() {
+	export PATH=${PATH##*"/.linuxbrew/bin:"}
+	export PATH=${PATH##*"/.linuxbrew/sbin:"}
+}
+
+function brew_enable() {
+	BREW='/home/linuxbrew/.linuxbrew'
+	brew_disable
+	export PATH="$BREW/bin:$BREW/sbin:$PATH"
+}
+
+#----------------------------------------------------------------------
 # additional alias
 #----------------------------------------------------------------------
 alias ccat=_colorize_via_pygmentize
 PYGMENTS_STYLE="monokai"
-export LINUXBREW='/home/linuxbrew/.linuxbrew'
-
-alias brew_enable='export PATH=$LINUXBREW/bin:$LINEBREW/sbin:${PATH##*"/.linuxbrew/bin:"}'
-alias brew_disable='export PATH=${PATH##*"/.linuxbrew/bin:"}'
 
 
 #----------------------------------------------------------------------
