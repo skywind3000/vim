@@ -488,12 +488,16 @@ function q-cheat() {
 function brew_disable() {
 	export PATH=${PATH##*"/.linuxbrew/bin:"}
 	export PATH=${PATH##*"/.linuxbrew/sbin:"}
+	export MANPATH=${MANPATH##*"/.linuxbrew/share/man:"}
+	export INFOPATH=${INFOPATH##*"/.linuxbrew/share/info:"}
 }
 
 function brew_enable() {
 	BREW='/home/linuxbrew/.linuxbrew'
 	brew_disable
 	export PATH="$BREW/bin:$BREW/sbin:$PATH"
+	export MANPATH="$BREW/share/man:$MANPATH"
+	export INFOPATH="$BREW/share/info:$INFOPATH"
 }
 
 #----------------------------------------------------------------------
