@@ -487,9 +487,9 @@ function q-cheat() {
 #----------------------------------------------------------------------
 alias ccat=_colorize_via_pygmentize
 PYGMENTS_STYLE="monokai"
-export LINUXBREW='/home/linuxbrew/.linuxbrew/bin'
+export LINUXBREW='/home/linuxbrew/.linuxbrew'
 
-alias brew_enable='export PATH=/home/linuxbrew/.linuxbrew/bin:${PATH##*"/.linuxbrew/bin:"}'
+alias brew_enable='export PATH=$LINUXBREW/bin:$LINEBREW/sbin:${PATH##*"/.linuxbrew/bin:"}'
 alias brew_disable='export PATH=${PATH##*"/.linuxbrew/bin:"}'
 
 
