@@ -10,19 +10,58 @@ https://www.zhihu.com/question/20833248/answer/186085007
 
 ## Install
 
-默认安装:
+
+### Linux:
+
+- 新建 `~/.vim` 目录，把项目克隆到 `~/.vim/vim` 下面：
 
 ```bash
-cd ~/github
+cd ~/.vim
 git clone https://github.com/skywind3000/vim.git
-echo "source '~/github/vim/asc.vim'" >> ~/.vimrc
 ```
 
-额外可选:
+- 编辑 `~/.vimrc` 文件，里面加一行：
 
-```bash
-echo "source '~/github/vim/skywind.vim'" >> ~/.vimrc
+```VimL
+so ~/.vim/vim/asc.vim
+so ~/.vim/vim/skywind.vim
 ```
+
+### Windows:
+
+- 新建 `D:\github` 目录，把项目克隆到 `D:\github\vim` 下面：
+
+```batch
+d:
+cd \github
+git clone https://github.com/skywind3000/vim.git
+```
+
+- 新建 `C:\Users\YourName\.vim` 目录：
+
+```batch
+C:\
+CD \Users\YourName
+mkdir .vim
+```
+
+- 编辑 `C:\Users\YourName\_vimrc` 文件，里面加一行：
+
+```VimL
+so d:/github/vim/asc.vim
+so d:/github/vim/skywind.vim
+```
+
+### 包管理：
+
+在你的 `.vimrc` 文件中加入相关包配置：
+
+```VimL
+let g:bundle_group = ['simple', 'basic', 'inter', 'opt', 'ale', 'echodoc']
+so ~/.vim/vim/bundle.vim
+```
+
+Windows 下修改对应目录。
 
 本配置依个人习惯，将 tabsize shiftwidth 等设置成了 4个字节宽度，并且关闭了 expandtab，不喜欢的话可以在 source 了两个文件以后覆盖该设置。
 
