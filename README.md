@@ -159,19 +159,3 @@ Windows 下修改对应目录。
 使用 `+` 返回当前文件所在目录时，如果文件被修改过未保存，且 Vim 没有设置 hidden，则会在该文件窗口上面打开目录浏览，不会把文件关掉。 
 
 当文件浏览器打开以后，按 `~` 键，返回用户目录（$HOME）；按 `反引号`（1左边那个键），返回项目根目录，详细见：[Vinegar](https://github.com/skywind3000/vim/wiki/Vim-Vinegar-and-Oil)。
-
-### Cscope / Pycscope / Ctags
-
-虽然大多数环境下用 Grep比较方便，无需使用 ctags/cscope，但项目大了，经常同一个关键字 Grep 出一堆乱七八糟的不相关内容来。
-
-| 按键 | 说明 |
-|:----:|------|
-|  g3  | 使用 cscope 查找函数的定义，需要生成 cscope 文件 |
-|  g4  | 使用 cscope 查找函数的引用，需要生成 cscope 文件 |
-|  g5  | 在预览窗口内查看光标下符号的定义，再按一次显示下一个，需要生成 ctags |
-|  g6  | 调用 cscope 在当前 **项目目录** 扫描 C/C++ 代码，生成 cscope文件 .cscope |
-|  g7  | 调用 pycscope 在当前 **项目目录** 扫描 Python 代码，生成 pycscope文件 .cscopy |
-|  g9  | 调用 ctags 在当前 **项目目录** 扫描代码，生成 ctags文件 .tags |
-
-
-
