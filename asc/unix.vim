@@ -86,6 +86,8 @@ function! s:language_setup()
 		setlocal commentstring=//\ %s
 	elseif &ft == 'markdown'
 		setlocal wrap
+	elseif &ft == 'qf'
+		setlocal nonumber
 	endif
 	let tags = expand("~/.vim/tags/") . &ft . '.tags'
 	let dict = expand("~/.vim/dict/") . &ft . '.dict'
@@ -111,6 +113,23 @@ endfunc
 
 command! -nargs=1 PersistFoldEnable call s:fold_restore(<q-args>)
 
+
+" turn off number and signcolumn for terminal
+if has('terminal') && exists(':terminal') == 2
+	if exists('##TerminalOpen')
+		augroup VimUnixTerminalGroup
+			au! 
+			au TerminalOpen * setlocal nonumber signcolumn=no
+		augroup END
+	endif
+endif
+
+
+"----------------------------------------------------------------------
+" highlighting tune
+"----------------------------------------------------------------------
+function! VimTuneHighlight(mode)
+endfunc
 
 
 

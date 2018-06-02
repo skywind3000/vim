@@ -27,9 +27,6 @@ let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 let s:tool_name = (g:asc_uname == 'windows')? 'win32': g:asc_uname
 let g:vimmake_path = expand(s:home . '/tools/' . s:tool_name)
 
-if exists('g:vimmake_grep_exts')
-	let g:vimmake_grep_exts += ['rs']
-endif
 
 RefreshToolMode!
 
@@ -37,8 +34,6 @@ RefreshToolMode!
 "----------------------------------------------------------------------
 "- Global Settings
 "----------------------------------------------------------------------
-highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE 
-	\ gui=NONE guifg=DarkGrey guibg=NONE
 
 let g:ycm_goto_buffer_command = 'new-or-existing-tab'
 

@@ -93,24 +93,46 @@ noremap <silent><space>en :call Tools_SwitchNumber()<cr>
 "----------------------------------------------------------------------
 noremap <M-h> b
 noremap <M-l> w
-noremap <M-H> B
-noremap <M-L> W
-noremap <M-j> 10j
-noremap <M-k> 10k
-noremap <M-J> gj
-noremap <M-K> gk
+noremap <M-j> gj
+noremap <M-k> gk
 noremap <M-y> d$
 inoremap <M-h> <c-left>
 inoremap <M-l> <c-right>
-inoremap <M-j> <c-\><c-o>10j
-inoremap <M-k> <c-\><c-o>10k
-inoremap <M-J> <c-\><c-o>gj
-inoremap <M-K> <c-\><c-o>gk
+inoremap <M-j> <c-\><c-o>gj
+inoremap <M-k> <c-\><c-o>gk
 inoremap <M-y> <c-\><c-o>d$
 cnoremap <M-h> <c-left>
 cnoremap <M-l> <c-right>
 cnoremap <M-b> <c-left>
 cnoremap <M-f> <c-right>
+
+
+"----------------------------------------------------------------------
+" fast window switching: ALT+SHIFT+HJKL
+"----------------------------------------------------------------------
+noremap <m-H> <c-w>h
+noremap <m-L> <c-w>l
+noremap <m-J> <c-w>j
+noremap <m-K> <c-w>k
+inoremap <m-H> <esc><c-w>h
+inoremap <m-L> <esc><c-w>l
+inoremap <m-J> <esc><c-w>j
+inoremap <m-K> <esc><c-w>k
+
+if has('terminal') && exists(':terminal') == 2
+	tnoremap <m-H> <c-w>h
+	tnoremap <m-L> <c-w>l
+	tnoremap <m-J> <c-w>j
+	tnoremap <m-K> <c-w>k
+	tnoremap <m-q> <c-\><c-n>
+elseif has('nvim')
+	tnoremap <m-H> <c-\><c-n><c-w>h
+	tnoremap <m-L> <c-\><c-n><c-w>l
+	tnoremap <m-J> <c-\><c-n><c-w>j
+	tnoremap <m-K> <c-\><c-n><c-w>k
+	tnoremap <m-q> <c-\><c-n>
+endif
+
 
 
 "----------------------------------------------------------------------
