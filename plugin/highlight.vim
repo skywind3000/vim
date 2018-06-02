@@ -30,6 +30,6 @@ highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE
 	\ gui=NONE guifg=DarkGrey guibg=NONE
 
 " tune completion popup menu
-hi! Pmenu guibg=gray guifg=black
-hi! PmenuSel guibg=brown guifg=gray
+" hi! Pmenu guibg=gray guifg=black
+" hi! PmenuSel guibg=brown guifg=gray
 
