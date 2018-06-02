@@ -27,7 +27,7 @@ endif
 
 " tune line numbers
 highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE 
-	\ gui=NONE guifg=DarkGrey guibg=NONE
+	\ gui=NONE guifg=#585858 guibg=NONE
 
 " tune completion popup menu
 hi! Pmenu guibg=gray guifg=black ctermbg=gray ctermfg=black
