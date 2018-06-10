@@ -230,7 +230,8 @@ if index(g:bundle_group, 'opt') >= 0
 		if s:uname != 'windows'
 			Plug 'ludovicchabant/vim-gutentags'
 		else
-			Plug 'skywind3000/vim-gutentags'
+			Plug 'ludovicchabant/vim-gutentags'
+			" Plug 'skywind3000/vim-gutentags'
 		endif
 	endif
 endif

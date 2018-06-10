@@ -120,10 +120,11 @@ inoremap <m-J> <esc><c-w>j
 inoremap <m-K> <esc><c-w>k
 
 if has('terminal') && exists(':terminal') == 2
-	tnoremap <m-H> <c-w>h
-	tnoremap <m-L> <c-w>l
-	tnoremap <m-J> <c-w>j
-	tnoremap <m-K> <c-w>k
+	set termwinkey=<c-_>
+	tnoremap <m-H> <c-_>h
+	tnoremap <m-L> <c-_>l
+	tnoremap <m-J> <c-_>j
+	tnoremap <m-K> <c-_>k
 	tnoremap <m-q> <c-\><c-n>
 elseif has('nvim')
 	tnoremap <m-H> <c-\><c-n><c-w>h
