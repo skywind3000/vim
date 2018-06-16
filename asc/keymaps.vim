@@ -119,7 +119,7 @@ inoremap <m-L> <esc><c-w>l
 inoremap <m-J> <esc><c-w>j
 inoremap <m-K> <esc><c-w>k
 
-if has('terminal') && exists(':terminal') == 2
+if has('terminal') && exists(':terminal') == 2 && has('patch-8.1.1')
 	set termwinkey=<c-_>
 	tnoremap <m-H> <c-_>h
 	tnoremap <m-L> <c-_>l
