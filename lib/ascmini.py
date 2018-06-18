@@ -8,7 +8,6 @@
 # Last change: 2017/03/24 19:42:40
 #
 #======================================================================
-from __future__ import print_function
 import sys
 import time
 import os
@@ -593,7 +592,10 @@ class ConfigReader (object):
 		self.ininame = ininame
 		self.config = {}
 		self.sections = []
-		content = open(ininame, 'rb').read()
+		try:
+			content = open(ininame, 'rb').read()
+		except IOError:
+			content = b''
 		if content[:3] == b'\xef\xbb\xbf':
 			text = content[3:].decode('utf-8')
 		elif codec is not None:
