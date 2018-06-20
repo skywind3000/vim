@@ -96,7 +96,7 @@ let s:plug_src = 'https://github.com/junegunn/vim-plug.git'
 let s:plug_tab = get(s:, 'plug_tab', -1)
 let s:plug_buf = get(s:, 'plug_buf', -1)
 let s:mac_gui = has('gui_macvim') && has('gui_running')
-let s:is_win = has('win32') || has('win64')
+let s:is_win = has('win32')
 let s:nvim = has('nvim-0.2') || (has('nvim') && exists('*jobwait') && !s:is_win)
 let s:vim8 = has('patch-8.0.0039') && exists('*job_start')
 let s:me = resolve(expand('<sfile>:p'))
@@ -2426,8 +2426,13 @@ function! s:diff()
         \ . (cnts[1] ? printf(' %d plugin(s) have pending updates.', cnts[1]) : ''))
 
   if cnts[0] || cnts[1]
-    nnoremap <silent> <buffer> <cr> :silent! call <SID>preview_commit()<cr>
-    nnoremap <silent> <buffer> o    :silent! call <SID>preview_commit()<cr>
+    nnoremap <silent> <buffer> <plug>(plug-preview) :silent! call <SID>preview_commit()<cr>
+    if empty(maparg("\<cr>", 'n'))
+      nmap <buffer> <cr> <plug>(plug-preview)
+    endif
+    if empty(maparg('o', 'n'))
+      nmap <buffer> o <plug>(plug-preview)
+    endif
   endif
   if cnts[0]
     nnoremap <silent> <buffer> X :call <SID>revert()<cr>
