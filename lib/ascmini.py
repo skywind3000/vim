@@ -992,6 +992,78 @@ class ShellUtilita (object):
 utils = ShellUtilita()
 
 
+#----------------------------------------------------------------------
+# TraceOut 
+#----------------------------------------------------------------------
+class TraceOut (object):
+
+	def __init__ (self, prefix = ''):
+		self._prefix = prefix
+		import threading
+		self._lock = threading.Lock()
+		self._logtime = None
+		self._logfile = None
+		self._channels = {'info':True, 'debug':True, 'error':True}
+		self._channels['warn'] = True
+		self._encoding = 'utf-8'
+		self._stdout = True
+		self._stderr = False
+
+	def _writelog (self, *args):
+		now = time.strftime('%Y-%m-%d %H:%M:%S')
+		date = now.split(None, 1)[0].replace('-', '')
+		self._lock.acquire()
+		if date != self._logtime:
+			self._logtime = date
+			if self._logfile is not None:
+				try:
+					self._logfile.close()
+				except:
+					pass
+				self._logfile = None
+		if self._logfile is None:
+			import codecs
+			logname = '%s%s.log'%(self._prefix, date)
+			self._logfile = codecs.open(logname, 'a', self._encoding)
+		part = []
+		for text in args:
+			if isinstance(text, unicode) or isinstance(text, str):
+				if not isinstance(text, unicode):
+					text = text.decode(self._encoding)
+			else:
+				text = unicode(text)
+			part.append(text)
+		text = u' '.join(part)
+		self._logfile.write('[%s] %s\r\n'%(now, text))
+		self._logfile.flush()
+		self._lock.release()
+		if self._stdout:
+			sys.stdout.write('[%s] %s\n'%(now, text))
+			sys.stdout.flush()
+		if self._stderr:
+			sys.stderr.write('[%s] %s\n'%(now, text))
+			sys.stderr.flush()
+		return True
+
+	def out (self, channel, *args):
+		if not self._channels.get(channel, False):
+			return False
+		self._writelog('[%s]'%channel, *args)
+		return True
+
+	def info (self, *args):
+		self.out('info', *args)
+
+	def warn (self, *args):
+		self.out('warn', *args)
+
+	def error (self, *args):
+		self.out('error', *args)
+
+	def debug (self, *args):
+		self.out('debug', *args)
+
+
 
 #----------------------------------------------------------------------
 # testing case
@@ -1007,7 +1079,11 @@ if __name__ == '__main__':
 		config = ConfigReader('e:/lab/casuald/conf/echoserver.ini')
 		print(config.option('transmod', 'portu'))
 		return 0
-	test2()
+	def test3():
+		trace = TraceOut('m')
+		trace.info('haha', 'mama')
+		return 0
+	test1()
 
 
 
