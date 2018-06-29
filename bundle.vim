@@ -218,6 +218,7 @@ if index(g:bundle_group, 'opt') >= 0
 	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
 	Plug 'soft-aesthetic/soft-era-vim'
+	Plug 'dyng/ctrlsf.vim'
 	" Plug 'itchyny/vim-cursorword'
 	let g:gutentags_modules = []
 	if executable('ctags')
