@@ -8,6 +8,7 @@
 # Last change: 2017/03/24 19:42:40
 #
 #======================================================================
+from __future__ import print_function
 import sys
 import time
 import os
