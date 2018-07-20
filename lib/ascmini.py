@@ -1009,6 +1009,7 @@ class TraceOut (object):
 		self._encoding = 'utf-8'
 		self._stdout = True
 		self._stderr = False
+		self._makedir = False
 
 	def _writelog (self, *args):
 		now = time.strftime('%Y-%m-%d %H:%M:%S')
@@ -1025,6 +1026,11 @@ class TraceOut (object):
 		if self._logfile is None:
 			import codecs
 			logname = '%s%s.log'%(self._prefix, date)
+			dirname = os.path.dirname(logname)
+			if self._makedir:
+				if not os.path.exists(dirname):
+					try: os.makedirs(dirname)
+					except: pass
 			self._logfile = codecs.open(logname, 'a', self._encoding)
 		part = []
 		for text in args:
