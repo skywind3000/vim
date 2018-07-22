@@ -1007,7 +1007,7 @@ class TraceOut (object):
 		self._channels = {'info':True, 'debug':True, 'error':True}
 		self._channels['warn'] = True
 		self._encoding = 'utf-8'
-		self._stdout = True
+		self._stdout = sys.stdout
 		self._stderr = False
 		self._makedir = False
 
@@ -1045,11 +1045,11 @@ class TraceOut (object):
 		self._logfile.flush()
 		self._lock.release()
 		if self._stdout:
-			sys.stdout.write('[%s] %s\n'%(now, text))
-			sys.stdout.flush()
+			self._stdout.write('[%s] %s\n'%(now, text))
+			self._stdout.flush()
 		if self._stderr:
-			sys.stderr.write('[%s] %s\n'%(now, text))
-			sys.stderr.flush()
+			self._stderr.write('[%s] %s\n'%(now, text))
+			self._stderr.flush()
 		return True
 
 	def out (self, channel, *args):
@@ -1069,6 +1069,30 @@ class TraceOut (object):
 
 	def debug (self, *args):
 		self.out('debug', *args)
+
+
+#----------------------------------------------------------------------
+# OutputHandler
+#----------------------------------------------------------------------
+class OutputHandler (object):
+	default_stdout = sys.stdout
+	default_stderr = sys.stderr
+	def __init__(self, writer):
+		self.writer = writer
+		self.content = ''
+		self.encoding = self.default_stdout.encoding
+	def flush(self):
+		pass
+	def write(self, s):
+		if isinstance(s, unicode):
+			s = s.encode("utf-8")
+		self.content += s
+		pos = self.content.find('\n')
+		if pos < 0: return
+		self.writer(self.content[:pos])
+		self.content = self.content[pos + 1:]
+	def writelines(self, l):
+		map(self.write, l)
 
 
 #----------------------------------------------------------------------
