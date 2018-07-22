@@ -221,7 +221,7 @@ class OBJECT (object):
 
 
 #----------------------------------------------------------------------
-# 取得调用栈
+# call stack
 #----------------------------------------------------------------------
 def callstack ():
 	import traceback
@@ -229,8 +229,8 @@ def callstack ():
 		import cStringIO
 		sio = cStringIO.StringIO()
 	else:
-		import StringIO
-		sio = StringIO.StringIO()
+		import io
+		sio = io.StringIO()
 	traceback.print_exc(file = sio)
 	return sio.getvalue()
 
@@ -1071,6 +1071,38 @@ class TraceOut (object):
 		self.out('debug', *args)
 
 
+#----------------------------------------------------------------------
+# run until mainfunc returns false 
+#----------------------------------------------------------------------
+def safe_loop (mainfunc, trace = None, sleep = 2.0):
+	while True:
+		try:
+			hr = mainfunc()
+			if not hr:
+				break
+		except KeyboardInterrupt:
+			tb = callstack().split('\n')
+			if trace:
+				for line in tb:
+					trace.error(line)
+			else:
+				for line in tb:
+					sys.stderr.write(line + '\n')
+			break
+		except:
+			tb = callstack().split('\n')
+			if trace:
+				for line in tb:
+					trace.error(line)
+				trace.error('ready to restart')
+				trace.error('')
+			else:
+				for line in tb:
+					sys.stderr.write(line + '\n')
+				sys.stderr.write('\nready to restart\n')
+			time.sleep(sleep)
+	return True
+
 
 #----------------------------------------------------------------------
 # testing case
@@ -1089,6 +1121,14 @@ if __name__ == '__main__':
 	def test3():
 		trace = TraceOut('m')
 		trace.info('haha', 'mama')
+		return 0
+	def test4():
+		log = TraceOut('m')
+		def loop():
+			time.sleep(2)
+			log.info('loop')
+			return False
+		safe_loop(loop, log)
 		return 0
 	test1()
 
