@@ -6,7 +6,7 @@
 # ascmini.py - mini library
 #
 # Created by skywind on 2017/03/24
-# Last change: 2017/03/24 19:42:40
+# Last Modified: 2018/08/10 19:04
 #
 #======================================================================
 from __future__ import print_function
@@ -1127,6 +1127,64 @@ def safe_loop (mainfunc, trace = None, sleep = 2.0):
 				sys.stderr.write('\nready to restart\n')
 			time.sleep(sleep)
 	return True
+
+
+#----------------------------------------------------------------------
+# tabulify: style = 0, 1, 2
+#----------------------------------------------------------------------
+def tabulify (rows, style = 0):
+	colsize = {}
+	maxcol = 0
+	output = []
+	if not rows:
+		return ''
+	for row in rows:
+		maxcol = max(len(row), maxcol)
+		for col, text in enumerate(row):
+			text = str(text)
+			size = len(text)
+			if col not in colsize:
+				colsize[col] = size
+			else:
+				colsize[col] = max(size, colsize[col])
+	if maxcol <= 0:
+		return ''
+	def gettext(row, col):
+		csize = colsize[col]
+		if row >= len(rows):
+			return ' ' * (csize + 2)
+		row = rows[row]
+		if col >= len(row):
+			return ' ' * (csize + 2)
+		text = str(row[col])
+		padding = 2 + csize - len(text)
+		pad1 = 1
+		pad2 = padding - pad1
+		return (' ' * pad1) + text + (' ' * pad2)
+	if style == 0:
+		for y, row in enumerate(rows):
+			line = ''.join([ gettext(y, x) for x in xrange(maxcol) ])
+			output.append(line)
+	elif style == 1:
+		if rows:
+			newrows = rows[:1]
+			head = [ '-' * colsize[i] for i in xrange(maxcol) ]
+			newrows.append(head)
+			newrows.extend(rows[1:])
+			rows = newrows
+		for y, row in enumerate(rows):
+			line = ''.join([ gettext(y, x) for x in xrange(maxcol) ])
+			output.append(line)
+	elif style == 2:
+		sep = '+'.join([ '-' * (colsize[x] + 2) for x in xrange(maxcol) ])
+		sep = '+' + sep + '+'
+		for y, row in enumerate(rows):
+			output.append(sep)
+			line = '|'.join([ gettext(y, x) for x in xrange(maxcol) ])
+			output.append('|' + line + '|')
+		output.append(sep)
+	return '\n'.join(output)
+
 
 
 #----------------------------------------------------------------------
