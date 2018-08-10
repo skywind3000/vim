@@ -5,7 +5,7 @@
 # googauth.py - Google Authenticator
 #
 # Created by skywind on 2018/08/10
-# Last Modified: 2018/08/10 15:39:19
+# Last Modified: 2018/08/10 21:50
 #
 #======================================================================
 from __future__ import print_function
