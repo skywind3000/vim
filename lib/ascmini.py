@@ -1186,6 +1186,56 @@ def tabulify (rows, style = 0):
 	return '\n'.join(output)
 
 
+#----------------------------------------------------------------------
+# compact dict: k1:v1,k2:v2,...,kn:vn
+#----------------------------------------------------------------------
+def compact_dumps(data):
+	output = []
+	for k, v in data.iteritems():
+		k = k.strip().replace(',', '').replace(':', '')
+		v = v.strip().replace(',', '').replace(':', '')
+		output.append(k + ':' + v)
+	return ','.join(output)
+
+def compact_loads(text):
+	data = {}
+	for pp in text.strip().split(','):
+		pp = pp.strip()
+		if not pp:
+			continue
+		ps = pp.split(':')
+		if len(ps) < 2:
+			continue
+		k = ps[0].strip()
+		v = ps[1].strip()
+		if k:
+			data[k] = v
+	return data
+
+
+#----------------------------------------------------------------------
+# Simple Timer
+#----------------------------------------------------------------------
+class SimpleTimer (object):
+
+	def __init__ (self, period):
+		self.__current = None
+		self.__timeslap = None
+		self.__period = period
+	
+	def run (self):
+		raise NotImplementedError('Method not implemented')
+
+	def update (self, now):
+		self.__current = now
+		if self.__timeslap is None:
+			self.__timeslap = self.__current + self.__period
+		elif self.__current >= self.__timeslap:
+			self.__timeslap = self.__current + self.__period
+			self.run()	
+		return True
+
+
 
 #----------------------------------------------------------------------
 # testing case
