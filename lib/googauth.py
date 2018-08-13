@@ -257,7 +257,7 @@ def list_code(table, cont):
 		except KeyboardInterrupt:
 			print()
 			break
-		print()
+		# print()
 	return 0
 
 
