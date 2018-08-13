@@ -248,7 +248,7 @@ def list_code(table, cont):
 			code = generate_code(secret, epoch)
 			rows.append([ user, domain, code, '  %d (s)'%life ])
 		print(tabulify(rows, 2))
-		print()
+		# print()
 		if not cont:
 			break
 		print('press Ctrl+C to break ...')
@@ -257,7 +257,7 @@ def list_code(table, cont):
 		except KeyboardInterrupt:
 			print()
 			break
-		# print()
+		print()
 	return 0
 
 
