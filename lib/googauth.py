@@ -247,7 +247,8 @@ def list_code(table, cont):
 			domain = record[2]
 			code = generate_code(secret, epoch)
 			rows.append([ user, domain, code, '  %d (s)'%life ])
-		print(tabulify(rows, 2))
+		style = os.environ.get('GOOGAUTH_STYLE', 2)
+		print(tabulify(rows, int(style)))
 		# print()
 		if not cont:
 			break
