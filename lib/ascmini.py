@@ -1,11 +1,12 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+# vim: set ts=4 sw=4 tw=0 noet :
 #======================================================================
 #
 # ascmini.py - mini library
 #
 # Created by skywind on 2017/03/24
-# Last change: 2017/03/24 19:42:40
+# Last Modified: 2018/08/10 19:04
 #
 #======================================================================
 from __future__ import print_function
@@ -221,7 +222,7 @@ class OBJECT (object):
 
 
 #----------------------------------------------------------------------
-# 取得调用栈
+# call stack
 #----------------------------------------------------------------------
 def callstack ():
 	import traceback
@@ -229,8 +230,8 @@ def callstack ():
 		import cStringIO
 		sio = cStringIO.StringIO()
 	else:
-		import StringIO
-		sio = StringIO.StringIO()
+		import io
+		sio = io.StringIO()
 	traceback.print_exc(file = sio)
 	return sio.getvalue()
 
@@ -1007,8 +1008,9 @@ class TraceOut (object):
 		self._channels = {'info':True, 'debug':True, 'error':True}
 		self._channels['warn'] = True
 		self._encoding = 'utf-8'
-		self._stdout = True
+		self._stdout = sys.stdout
 		self._stderr = False
+		self._makedir = False
 
 	def _writelog (self, *args):
 		now = time.strftime('%Y-%m-%d %H:%M:%S')
@@ -1025,6 +1027,11 @@ class TraceOut (object):
 		if self._logfile is None:
 			import codecs
 			logname = '%s%s.log'%(self._prefix, date)
+			dirname = os.path.dirname(logname)
+			if self._makedir:
+				if not os.path.exists(dirname):
+					try: os.makedirs(dirname)
+					except: pass
 			self._logfile = codecs.open(logname, 'a', self._encoding)
 		part = []
 		for text in args:
@@ -1039,11 +1046,11 @@ class TraceOut (object):
 		self._logfile.flush()
 		self._lock.release()
 		if self._stdout:
-			sys.stdout.write('[%s] %s\n'%(now, text))
-			sys.stdout.flush()
+			self._stdout.write('[%s] %s\n'%(now, text))
+			self._stdout.flush()
 		if self._stderr:
-			sys.stderr.write('[%s] %s\n'%(now, text))
-			sys.stderr.flush()
+			self._stderr.write('[%s] %s\n'%(now, text))
+			self._stderr.flush()
 		return True
 
 	def out (self, channel, *args):
@@ -1065,6 +1072,170 @@ class TraceOut (object):
 		self.out('debug', *args)
 
 
+#----------------------------------------------------------------------
+# OutputHandler
+#----------------------------------------------------------------------
+class OutputHandler (object):
+	default_stdout = sys.stdout
+	default_stderr = sys.stderr
+	def __init__(self, writer):
+		self.writer = writer
+		self.content = ''
+		self.encoding = self.default_stdout.encoding
+	def flush(self):
+		pass
+	def write(self, s):
+		if isinstance(s, unicode):
+			s = s.encode("utf-8")
+		self.content += s
+		pos = self.content.find('\n')
+		if pos < 0: return
+		self.writer(self.content[:pos])
+		self.content = self.content[pos + 1:]
+	def writelines(self, l):
+		map(self.write, l)
+
+
+#----------------------------------------------------------------------
+# run until mainfunc returns false 
+#----------------------------------------------------------------------
+def safe_loop (mainfunc, trace = None, sleep = 2.0):
+	while True:
+		try:
+			hr = mainfunc()
+			if not hr:
+				break
+		except KeyboardInterrupt:
+			tb = callstack().split('\n')
+			if trace:
+				for line in tb:
+					trace.error(line)
+			else:
+				for line in tb:
+					sys.stderr.write(line + '\n')
+			break
+		except:
+			tb = callstack().split('\n')
+			if trace:
+				for line in tb:
+					trace.error(line)
+				trace.error('ready to restart')
+				trace.error('')
+			else:
+				for line in tb:
+					sys.stderr.write(line + '\n')
+				sys.stderr.write('\nready to restart\n')
+			time.sleep(sleep)
+	return True
+
+
+#----------------------------------------------------------------------
+# tabulify: style = 0, 1, 2
+#----------------------------------------------------------------------
+def tabulify (rows, style = 0):
+	colsize = {}
+	maxcol = 0
+	output = []
+	if not rows:
+		return ''
+	for row in rows:
+		maxcol = max(len(row), maxcol)
+		for col, text in enumerate(row):
+			text = str(text)
+			size = len(text)
+			if col not in colsize:
+				colsize[col] = size
+			else:
+				colsize[col] = max(size, colsize[col])
+	if maxcol <= 0:
+		return ''
+	def gettext(row, col):
+		csize = colsize[col]
+		if row >= len(rows):
+			return ' ' * (csize + 2)
+		row = rows[row]
+		if col >= len(row):
+			return ' ' * (csize + 2)
+		text = str(row[col])
+		padding = 2 + csize - len(text)
+		pad1 = 1
+		pad2 = padding - pad1
+		return (' ' * pad1) + text + (' ' * pad2)
+	if style == 0:
+		for y, row in enumerate(rows):
+			line = ''.join([ gettext(y, x) for x in xrange(maxcol) ])
+			output.append(line)
+	elif style == 1:
+		if rows:
+			newrows = rows[:1]
+			head = [ '-' * colsize[i] for i in xrange(maxcol) ]
+			newrows.append(head)
+			newrows.extend(rows[1:])
+			rows = newrows
+		for y, row in enumerate(rows):
+			line = ''.join([ gettext(y, x) for x in xrange(maxcol) ])
+			output.append(line)
+	elif style == 2:
+		sep = '+'.join([ '-' * (colsize[x] + 2) for x in xrange(maxcol) ])
+		sep = '+' + sep + '+'
+		for y, row in enumerate(rows):
+			output.append(sep)
+			line = '|'.join([ gettext(y, x) for x in xrange(maxcol) ])
+			output.append('|' + line + '|')
+		output.append(sep)
+	return '\n'.join(output)
+
+
+#----------------------------------------------------------------------
+# compact dict: k1:v1,k2:v2,...,kn:vn
+#----------------------------------------------------------------------
+def compact_dumps(data):
+	output = []
+	for k, v in data.iteritems():
+		k = k.strip().replace(',', '').replace(':', '')
+		v = v.strip().replace(',', '').replace(':', '')
+		output.append(k + ':' + v)
+	return ','.join(output)
+
+def compact_loads(text):
+	data = {}
+	for pp in text.strip().split(','):
+		pp = pp.strip()
+		if not pp:
+			continue
+		ps = pp.split(':')
+		if len(ps) < 2:
+			continue
+		k = ps[0].strip()
+		v = ps[1].strip()
+		if k:
+			data[k] = v
+	return data
+
+
+#----------------------------------------------------------------------
+# Simple Timer
+#----------------------------------------------------------------------
+class SimpleTimer (object):
+
+	def __init__ (self, period):
+		self.__current = None
+		self.__timeslap = None
+		self.__period = period
+	
+	def run (self):
+		raise NotImplementedError('Method not implemented')
+
+	def update (self, now):
+		self.__current = now
+		if self.__timeslap is None:
+			self.__timeslap = self.__current + self.__period
+		elif self.__current >= self.__timeslap:
+			self.__timeslap = self.__current + self.__period
+			self.run()	
+		return True
+
+
 
 #----------------------------------------------------------------------
 # testing case
@@ -1083,6 +1254,14 @@ if __name__ == '__main__':
 	def test3():
 		trace = TraceOut('m')
 		trace.info('haha', 'mama')
+		return 0
+	def test4():
+		log = TraceOut('m')
+		def loop():
+			time.sleep(2)
+			log.info('loop')
+			return False
+		safe_loop(loop, log)
 		return 0
 	test1()
 
