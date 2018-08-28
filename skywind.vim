@@ -109,7 +109,12 @@ let g:vimmake_ftrun['make'] = 'make -f'
 let g:vimmake_ftrun['zsh'] = 'zsh'
 let g:vimmake_ftrun['erlang'] = 'escript'
 let g:vimmake_ftmake = {}
-let g:vimmake_ftmake['go'] = 'go build -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT).exe" "$(VIM_FILEPATH)" '
+
+if has('win32') || has('win16') || has('win64') || has('win95')
+	let g:vimmake_ftmake['go'] = 'go build -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT).exe" "$(VIM_FILEPATH)" '
+else
+	let g:vimmake_ftmake['go'] = 'go build -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" "$(VIM_FILEPATH)" '
+endif
 
 let g:vimmake_extrun = {'hs': 'runghc', 'lisp': 'sbcl --script'}
 
