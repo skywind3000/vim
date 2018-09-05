@@ -462,61 +462,61 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" owncloud
+" nextcloud
 "----------------------------------------------------------------------
-if !exists('g:asclib#owncloud')
-	let g:asclib#owncloud = ['', '', '']
+if !exists('g:asclib#nextcloud')
+	let g:asclib#nextcloud = ['', '', '']
 endif
 
-if !exists('g:asclib#owncloudcmd')
-	let g:asclib#owncloudcmd = ''
+if !exists('g:asclib#nextcloudcmd')
+	let g:asclib#nextcloudcmd = ''
 endif
 
 
-function! asclib#owncloud_call(command)
-	let cmd = g:asclib#owncloudcmd
+function! asclib#nextcloud_call(command)
+	let cmd = g:asclib#nextcloudcmd
 	if cmd == ''
-		let cmd = asclib#path#executable('owncloudcmd')
+		let cmd = asclib#path#executable('nextcloudcmd')
 	endif
 	if cmd == '' && s:windows != 0
-		if filereadable('C:/Program Files (x86)/ownCloud/owncloudcmd.exe')
-			let cmd = 'C:/Program Files (x86)/ownCloud/owncloudcmd.exe'
-		elseif filereadable('C:/Program Files/ownCloud/owncloudcmd.exe')
-			let cmd = 'C:/Program Files/ownCloud/owncloudcmd.exe'
+		if filereadable('C:/Program Files (x86)/nextcloud/nextcloudcmd.exe')
+			let cmd = 'C:/Program Files (x86)/nextcloud/nextcloudcmd.exe'
+		elseif filereadable('C:/Program Files/nextcloud/nextcloudcmd.exe')
+			let cmd = 'C:/Program Files/nextcloud/nextcloudcmd.exe'
 		endif
 	endif
 	if cmd == ''
-		call asclib#errmsg("cannot find owncloudcmd")		
+		call asclib#errmsg("cannot find nextcloudcmd")		
 		return
 	endif
 	call vimmake#run('', {}, shellescape(cmd) . ' ' . a:command)
 endfunc
 
 
-function! asclib#owncloud_sync()
+function! asclib#nextcloud_sync()
 	let cloud = expand('~/.vim/cloud')
 	try
 		silent call mkdir(cloud, "p", 0755)
 	catch /^Vim\%((\a\+)\)\=:E/
 	finally
 	endtry
-	if type(g:asclib#owncloud) != type([])
-		call asclib#errmsg("bad g:asclib#owncloud config")
+	if type(g:asclib#nextcloud) != type([])
+		call asclib#errmsg("bad g:asclib#nextcloud config")
 		return
 	endif
-	if len(g:asclib#owncloud) != 3
-		call asclib#errmsg("bad g:asclib#owncloud config")
+	if len(g:asclib#nextcloud) != 3
+		call asclib#errmsg("bad g:asclib#nextcloud config")
 		return
 	endif
-	let url = g:asclib#owncloud[0]
-	let cloud_user = g:asclib#owncloud[1]
-	let cloud_pass = g:asclib#owncloud[2]
+	let url = g:asclib#nextcloud[0]
+	let cloud_user = g:asclib#nextcloud[1]
+	let cloud_pass = g:asclib#nextcloud[2]
 	if strpart(url, 0, 5) != 'http:' && strpart(url, 0, 6) != 'https:'
-		call asclib#errmsg("bad g:asclib#owncloud[0] config")
+		call asclib#errmsg("bad g:asclib#nextcloud[0] config")
 		return
 	endif
 	if cloud_user == ''
-		call asclib#errmsg("bad g:asclib#owncloud[1] config")
+		call asclib#errmsg("bad g:asclib#nextcloud[1] config")
 		return
 	endif
 	let cmd = '-u ' .shellescape(cloud_user) . ' '
@@ -526,7 +526,7 @@ function! asclib#owncloud_sync()
 	let cmd .= '--trust --non-interactive '
 	let cmd .= (s:windows == 0)? '--exclude /dev/null ' : ''
 	let cmd .= shellescape(cloud) . ' ' . shellescape(url)
-	call asclib#owncloud_call(cmd)
+	call asclib#nextcloud_call(cmd)
 endfunc
 
 
