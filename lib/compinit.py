@@ -11,6 +11,7 @@
 
 def __completion_init():
 	try:
+		# for windows: pip install pyreadline
 		import readline
 		import rlcompleter
 		import atexit

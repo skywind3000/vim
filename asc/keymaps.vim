@@ -407,8 +407,8 @@ noremap <silent><space>lt :call asclib#html_prettify()<cr>
 " more personal in gvim
 "----------------------------------------------------------------------
 if has('gui_running') && (has('win32') || has('win64'))
-	noremap <S-F11> :VimMake -mode=4 -cwd=$(VIM_FILEDIR) -save=1 d:\\dev\\python36\\python.exe "$(VIM_FILENAME)"<cr>
-	inoremap <S-F11> <ESC>:VimMake -mode=4 -cwd=$(VIM_FILEDIR) d:\\dev\\python36\\python.exe "$(VIM_FILENAME)"<cr>
+	noremap <S-F11> :VimMake -mode=4 -cwd=$(VIM_FILEDIR) -save=1 d:\\software\\anaconda3\\python.exe "$(VIM_FILENAME)"<cr>
+	inoremap <S-F11> <ESC>:VimMake -mode=4 -cwd=$(VIM_FILEDIR) d:\\software\\anaconda3\\python.exe "$(VIM_FILENAME)"<cr>
 	noremap <S-F12> :VimMake -mode=4 -save=1 -cwd=$(VIM_FILEDIR) d:\\dev\\python64\\python.exe "$(VIM_FILENAME)"<cr>
 endif
 
