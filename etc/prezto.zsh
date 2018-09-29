@@ -177,8 +177,6 @@ bindkey '\ev' deer
 bindkey -s '\eu' 'ranger_cd\n'
 bindkey -s '\eOS' 'vim '
 
-alias ll='ls -lh'
-
 
 # source function.sh if it exists
 [ -f "$HOME/.local/etc/function.sh" ] && . "$HOME/.local/etc/function.sh"
