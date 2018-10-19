@@ -179,7 +179,7 @@ function! svnhelp#svn_add(filename)
 	elseif mode == 1
 		exec 'VimMake! -raw svn add '.name
 	else
-		exec 'VimMake! -raw -cwd='.home'.' git add '.name
+		exec 'VimMake! -raw -cwd='.home.' git add '.name
 	endif
 endfunc
 
