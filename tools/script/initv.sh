@@ -42,9 +42,11 @@ _term() {
 service() {
 	start
 	trap _term TERM INT
-	sleep infinity &
-	wait $!
-	_term
+	while : 
+	do
+		sleep infinity &
+		wait $!
+	done
 }
 
 INITD=/home/skywind/tmp/init.d
