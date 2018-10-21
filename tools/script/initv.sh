@@ -2,6 +2,7 @@
 
 CMD="$1"
 INITD="$2"
+SLEEP=""
 
 start() {
 	if [ -d "$INITD" ]; then
@@ -34,8 +35,10 @@ restart() {
 }
 
 _term() {
-	# trap "" TERM INT
+	trap "" TERM INT
 	stop
+	[ -n "$SLEEP" ] && kill $SLEEP
+	SLEEP=""
 	exit 0
 }
 
@@ -45,6 +48,7 @@ service() {
 	while : 
 	do
 		sleep infinity &
+		SLEEP=$!
 		wait $!
 	done
 }
