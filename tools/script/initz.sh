@@ -80,7 +80,7 @@ keep() {
 	trap _term TERM INT TSTP QUIT EXIT
 	while : 
 	do
-		/bin/sleep infinity &
+		/bin/sleep 3600 &
 		SLEEP=$!
 		wait $!
 	done
