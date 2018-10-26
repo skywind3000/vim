@@ -19,6 +19,7 @@ SLEEP=""
 # start service
 #----------------------------------------------------------------------
 start() {
+	trap "" INT QUIT TSTP EXIT
 	if [ -d "$INITD" ]; then
 		echo "Launching initialization scripts"
 		for f in $INITD/I*; do
@@ -38,6 +39,7 @@ start() {
 # stop service
 #----------------------------------------------------------------------
 stop() {
+	trap "" INT QUIT TSTP EXIT
 	if [ -d "$INITD" ]; then
 		echo "Launching termination scripts"
 		for f in $INITD/K*; do
@@ -75,7 +77,7 @@ _term() {
 
 keep() {
 	start
-	trap _term TERM INT
+	trap _term TERM INT TSTP QUIT EXIT
 	while : 
 	do
 		/bin/sleep infinity &
