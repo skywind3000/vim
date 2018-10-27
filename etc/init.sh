@@ -49,10 +49,25 @@ export PATH
 # check if bash or zsh
 if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
 
-	# run script for interactive shell of bash/zsh
+	# run script for interactive mode of bash/zsh
 	if [[ $- == *i* ]] && [ -z "$_INIT_SH_NOFUN" ]; then
 		if [ -f "$HOME/.local/etc/function.sh" ]; then
 			. "$HOME/.local/etc/function.sh"
+		fi
+	fi
+fi
+
+# check if login shell
+if [ -n "$BASH_VERSION" ]; then
+	if shopt -q login_shell; then
+		if [ -f "$HOME/.local/etc/login.sh" ] && [ -z "$_INIT_SH_NOLOG" ]; then
+			. "$HOME/.local/etc/login.sh"
+		fi
+	fi
+elif [ -n "$ZSH_VERSION" ]; then
+	if [[ -o login ]]; then
+		if [ -f "$HOME/.local/etc/login.sh" ] && [ -z "$_INIT_SH_NOLOG" ]; then
+			. "$HOME/.local/etc/login.sh"
 		fi
 	fi
 fi
