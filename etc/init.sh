@@ -4,7 +4,7 @@
 if [ -z $_INIT_SH_LOADED ]; then
 	_INIT_SH_LOADED=1
 
-	# skip if in non-interactive mode 
+	# skip if in non-interactive mode
 	case $- in
 		*i*) ;;
 		*) return
