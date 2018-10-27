@@ -9,7 +9,7 @@ else
 fi
 
 # skip if in non-interactive mode
-case $- in
+case "$-" in
 	*i*) ;;
 	*) return
 esac
