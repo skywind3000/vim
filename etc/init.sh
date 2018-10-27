@@ -6,12 +6,8 @@ if [ -z $_INIT_SH_LOADED ]; then
 
 	# skip if in non-interactive mode
 	case $- in
-		*i*) 
-			echo "interactive"
-			;;
-		*) 
-			echo "non-interactive"
-			return
+		*i*) ;;
+		*) return
 	esac
 
 	# set PATH so it includes user's private bin if it exists
