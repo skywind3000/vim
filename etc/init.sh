@@ -4,6 +4,12 @@
 if [ -z $_INIT_SH_LOADED ]; then
 	_INIT_SH_LOADED=1
 
+	# skip if in non-interactive mode
+	case $- in
+		*i*) ;;
+		*) return
+	esac
+
 	# set PATH so it includes user's private bin if it exists
 	if [ -d "$HOME/.local/bin" ]; then
 		export PATH="$HOME/.local/bin:$PATH"
