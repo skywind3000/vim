@@ -58,12 +58,12 @@ endfunc
 command! -nargs=* HighLink call s:hllink(<f-args>)
 
 
-HighLink	QuickmenuBracket		Delimiter	StartifyBracket
-HighLink	QuickmenuSection		Statement	StartifySection
-HighLink	QuickmenuSelect			Title		StartifySelect
-HighLink	QuickmenuNumber			Number		StartifyNumber
-HighLink	QuickmenuSpecial		Comment		StartifySpecial
-HighLink	QuickmenuHeader			Title		StartifyHeader
-HighLink	QuickmenuOption			Identifier  StartifyFile
-HighLink	QuickmenuHelp			Comment 	StartifySpecial	
+HighLink	QuickmenuBracket		Delimiter	StartifyBracket2
+HighLink	QuickmenuSection		Statement	StartifySection2
+HighLink	QuickmenuSelect			Title		StartifySelect2
+HighLink	QuickmenuNumber			Number		StartifyNumber2
+HighLink	QuickmenuSpecial		Comment		StartifySpecial2
+HighLink	QuickmenuHeader			Title		StartifyHeader2
+HighLink	QuickmenuOption			Identifier  StartifyFile2
+HighLink	QuickmenuHelp			Comment 	StartifySpecial2
 
