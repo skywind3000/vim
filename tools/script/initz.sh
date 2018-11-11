@@ -70,7 +70,7 @@ restart() {
 _term() {
 	trap "" TERM INT
 	stop
-	[ -n "$SLEEP" ] && kill $SLEEP
+	[ -n "$SLEEP" ] && kill $SLEEP 2> /dev/null
 	SLEEP=""
 	exit 0
 }
