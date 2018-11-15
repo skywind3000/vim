@@ -1,4 +1,4 @@
-# init script for both login and non-login shell
+# init script for interactive shells
 # vim: set ft=sh :
 
 # prevent loading twice
