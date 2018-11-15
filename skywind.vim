@@ -55,7 +55,7 @@ augroup END
 "----------------------------------------------------------------------
 let s:settings = {  
 	\ 'cygwin': 'd:/linux',
-	\ 'zeal': 'D:\Program Files\zeal-portable-0.5.0-windows-x86\zeal.exe',
+	\ 'zeal': 'D:\Program Files\zeal-portable-0.6.1-windows-x86\zeal.exe',
 	\ }
 
 let s:settings_win = {

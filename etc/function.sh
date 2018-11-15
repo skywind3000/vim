@@ -512,7 +512,8 @@ PYGMENTS_STYLE="monokai"
 # advance keymap
 #----------------------------------------------------------------------
 
-# default bash key binding
+# default bash key binding: 
+# M-u: ranger_cd, F4: vim, F5 fzf
 if [ -n "$BASH_VERSION" ]; then
 	bind '"\eu":"ranger_cd\n"'
 	bind '"\eOS":"vim "'
@@ -522,6 +523,7 @@ elif [ -n "$ZSH_VERSION" ]; then
 	bindkey -s '\eu' 'ranger_cd\n'
 	bindkey '\e[15~' fzf-cd-widget
 fi
+
 
 #----------------------------------------------------------------------
 # Logout
