@@ -498,6 +498,7 @@ function brew_enable() {
 	export PATH="$BREW/bin:$BREW/sbin:$PATH"
 	export MANPATH="$BREW/share/man:$MANPATH"
 	export INFOPATH="$BREW/share/info:$INFOPATH"
+	export HOMEBREW_NO_AUTO_UPDATE=1
 }
 
 #----------------------------------------------------------------------
