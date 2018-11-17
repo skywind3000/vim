@@ -1,6 +1,6 @@
 " unimpaired.vim - Pairs of handy bracket mappings
 " Maintainer:   Tim Pope <http://tpo.pe/>
-" Version:      1.2
+" Version:      2.0
 " GetLatestVimScripts: 1590 1 :AutoInstall: unimpaired.vim
 
 if exists("g:loaded_unimpaired") || &cp || v:version < 700
@@ -10,7 +10,7 @@ let g:loaded_unimpaired = 1
 
 let s:maps = []
 function! s:map(...) abort
-  call add(s:maps, a:000)
+  call add(s:maps, copy(a:000))
 endfunction
 
 function! s:maps() abort
@@ -291,9 +291,11 @@ endfunction
 
 if empty(maparg('co', 'n'))
   nmap <silent><expr> co <SID>legacy_option_map(nr2char(getchar()))
+  nnoremap cop <Nop>
 endif
 if empty(maparg('=o', 'n'))
   nmap <silent><expr> =o <SID>legacy_option_map(nr2char(getchar()))
+  nnoremap =op <Nop>
 endif
 
 function! s:setup_paste() abort
@@ -316,8 +318,6 @@ endfunction
 
 nnoremap <silent> <Plug>unimpairedPaste :call <SID>setup_paste()<CR>
 
-call s:map('n', 'yo', ':<C-U>echoerr "Use ]op"<CR>', '<silent>')
-call s:map('n', 'yO', ':<C-U>echoerr "Use [op"<CR>', '<silent>')
 call s:map('n', '[op', ':call <SID>setup_paste()<CR>O', '<silent>')
 call s:map('n', ']op', ':call <SID>setup_paste()<CR>o', '<silent>')
 call s:map('n', 'yop', ':call <SID>setup_paste()<CR>0C', '<silent>')
@@ -521,13 +521,6 @@ call UnimpairedMapTransform('xml_decode',']x')
 
 " Section: Activation
 
-augroup unimpaired
-  autocmd!
-  autocmd VimEnter * call s:maps()
-augroup END
-
-if !has('vim_starting')
-  call s:maps()
-endif
+call s:maps()
 
 " vim:set sw=2 sts=2:

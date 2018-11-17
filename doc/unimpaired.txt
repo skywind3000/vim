@@ -39,6 +39,8 @@ is "args" and for the "q" commands is "quickfix".
 *]t*     |:tnext|
 *[T*     |:tfirst|
 *]T*     |:tlast|
+*[<C-T>* |:ptprevious|
+*]<C-T>* |:ptnext|
 
                                                 *[f*
 [f                      Go to the file preceding the current one
@@ -73,19 +75,21 @@ LINE OPERATIONS                                 *unimpaired-lines*
 OPTION TOGGLING                                 *unimpaired-toggling*
 
 On	Off	Toggle	Option
-*[ob*	*]ob*	*=ob*	'background' (dark is off, light is on)
-*[oc*	*]oc*	*=oc*	'cursorline'
-*[od*	*]od*	*=od*	'diff' (actually |:diffthis| / |:diffoff|)
-*[oh*	*]oh*	*=oh*	'hlsearch'
-*[oi*	*]oi*	*=oi*	'ignorecase'
-*[ol*	*]ol*	*=ol*	'list'
-*[on*	*]on*	*=on*	'number'
-*[or*	*]or*	*=or*	'relativenumber'
-*[os*	*]os*	*=os*	'spell'
-*[ou*	*]ou*	*=ou*	'cursorcolumn'
-*[ov*	*]ov*	*=ov*	'virtualedit'
-*[ow*	*]ow*	*=ow*	'wrap'
-*[ox*	*]ox*	*=ox*	'cursorline' 'cursorcolumn' (x as in crosshairs)
+*[ob*	*]ob*	*yob*	'background' (dark is off, light is on)
+*[oc*	*]oc*	*yoc*	'cursorline'
+*[od*	*]od*	*yod*	'diff' (actually |:diffthis| / |:diffoff|)
+*[oh*	*]oh*	*yoh*	'hlsearch'
+*[oi*	*]oi*	*yoi*	'ignorecase'
+*[ol*	*]ol*	*yol*	'list'
+*[on*	*]on*	*yon*	'number'
+*[or*	*]or*	*yor*	'relativenumber'
+*[os*	*]os*	*yos*	'spell'
+*[ou*	*]ou*	*you*	'cursorcolumn'
+*[ov*	*]ov*	*yov*	'virtualedit'
+*[ow*	*]ow*	*yow*	'wrap'
+*[ox*	*]ox*	*yox*	'cursorline' 'cursorcolumn' (x as in crosshairs)
+
+The mnemonic for y is that if you tilt it a bit it looks like a switch.
 
 PASTING                                         *unimpaired-pasting*
 
@@ -98,14 +102,15 @@ These are experimental:
 *=p*    Paste after linewise, reindenting.
 *=P*    Paste before linewise, reindenting.
 
-|]p| and |[p| have also been remapped to force linewise pasting, while
-preserving their usual indent matching behavior.
+|]p|, |[p|, |[P|, and |]P| have also been remapped to force linewise pasting,
+while preserving their usual indent matching behavior.
 
-                                                *yo* *yO*
+                                                *[op* *]op* *yop*
 A toggle has not been provided for 'paste' because the typical use case of
-wrapping of a solitary insertion is so wasteful:  You toggle twice, but
-you only paste once (YOPO).  Instead, press yo or yO to invoke |o| or |O| with
-'paste' already set.  Leaving insert mode sets 'nopaste' automatically.
+wrapping of a solitary insertion is inefficient:  You toggle twice, but
+you only paste once (YOPO).  Instead, press [op, ]op, or yop to invoke |o|,
+|O|, or |0||C| with 'paste' already set.  Leaving insert mode sets 'nopaste'
+automatically.
 
 ENCODING AND DECODING                           *unimpaired-encoding*
 
@@ -144,9 +149,5 @@ Mnemonic: encoding always comes before decoding; "[" always comes before "]".
 ]y{motion}              C String decode.
 ]yy
 {Visual}]y
-
-TODO                                            *unimpaired-todo*
-
-Avoid munging null characters when encoding and decoding.
 
  vim:tw=78:et:ft=help:norl:
