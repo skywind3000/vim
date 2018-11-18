@@ -4,28 +4,28 @@
 #----------------------------------------------------------------------
 # parameters
 #----------------------------------------------------------------------
-INITD="$1"
-CMD="$2"
-[ -n "$3" ] && WAIT="$3" || WAIT=1
+INITZ_HOME="$1"
+INITZ_CMD="$2"
+[ -n "$3" ] && INITZ_WAIT="$3" || INITZ_WAIT=1
 
 
 #----------------------------------------------------------------------
 # internal variable
 #----------------------------------------------------------------------
-SLEEP=""
+INITZ_SLEEP=""
 
 
 #----------------------------------------------------------------------
-# start service
+# initz_start service
 #----------------------------------------------------------------------
-start() {
+initz_start() {
 	trap "" INT QUIT TSTP EXIT
-	if [ -d "$INITD" ]; then
+	if [ -d "$INITZ_HOME" ]; then
 		echo "Launching initialization scripts"
-		for f in $INITD/I*; do
+		for f in $INITZ_HOME/I*; do
 			[ -e "$f" ] && . "$f"
 		done
-		for f in $INITD/S*; do
+		for f in $INITZ_HOME/S*; do
 			[ -x "$f" ] && "$f" start
 		done
 	else
@@ -36,21 +36,21 @@ start() {
 
 
 #----------------------------------------------------------------------
-# stop service
+# initz_stop service
 #----------------------------------------------------------------------
-stop() {
+initz_stop() {
 	trap "" INT QUIT TSTP EXIT
-	if [ -d "$INITD" ]; then
+	if [ -d "$INITZ_HOME" ]; then
 		echo "Launching termination scripts"
-		for f in $INITD/K*; do
+		for f in $INITZ_HOME/K*; do
 			[ -x "$f" ] && "$f" stop
 		done
 	else
 		echo "error: %s directory not found" 1>&2
 		exit 1
 	fi
-	if [ -n "$WAIT" ]; then
-		/bin/sleep "$WAIT"
+	if [ -n "$INITZ_WAIT" ]; then
+		/bin/sleep "$INITZ_WAIT"
 	fi
 }
 
@@ -58,14 +58,14 @@ stop() {
 #----------------------------------------------------------------------
 # execute scripts
 #----------------------------------------------------------------------
-execute() {
-	if [ -d "$INITD" ]; then
+initz_execute() {
+	if [ -d "$INITZ_HOME" ]; then
 		echo "Executing initialization scripts"
-		for f in $INITD/I*; do
+		for f in $INITZ_HOME/I*; do
 			[ -e "$f" ] && . "$f"
 		done
-		for f in $INITD/E*; do
-			[ -x "$f" ] && "$f" start
+		for f in $INITZ_HOME/E*; do
+			[ -x "$f" ] && "$f"
 		done
 	else
 		echo "error: %s directory not found" 1>&2
@@ -75,32 +75,31 @@ execute() {
 
 
 #----------------------------------------------------------------------
-# restart service
+# reinitz_start service
 #----------------------------------------------------------------------
-restart() {
-	stop 
-	start
+initz_restart() {
+	initz_stop 
+	initz_start
 }
 
 
 #----------------------------------------------------------------------
 # keep service
 #----------------------------------------------------------------------
-_term() {
-	trap "" TERM INT
-	stop
-	[ -n "$SLEEP" ] && kill $SLEEP 2> /dev/null
-	SLEEP=""
+initz_term() {
+	initz_stop
+	[ -n "$INITZ_SLEEP" ] && kill $INITZ_SLEEP 2> /dev/null
+	INITZ_SLEEP=""
 	exit 0
 }
 
-keep() {
-	start
-	trap _term TERM INT TSTP QUIT EXIT
+initz_keep() {
+	initz_start
+	trap initz_term TERM INT TSTP QUIT EXIT
 	while : 
 	do
 		/bin/sleep 3600 &
-		SLEEP=$!
+		INITZ_SLEEP=$!
 		wait $!
 	done
 }
@@ -109,34 +108,34 @@ keep() {
 #----------------------------------------------------------------------
 # main routine
 #----------------------------------------------------------------------
-_help() {
-	echo "usage: $0 TARGET {start|stop|restart|keep}"
+initz_help() {
+	echo "usage: $0 TARGET {start|stop|restart|keep|execute}"
 	exit 0
 }
 
-if [ -z "$CMD" ] || [ -z "$INITD" ]; then
-	_help
+if [ -z "$INITZ_CMD" ] || [ -z "$INITZ_HOME" ]; then
+	initz_help
 	exit 0
 fi
 
-case "$CMD" in
+case "$INITZ_CMD" in
 	start)
-		start
+		initz_start
 		;;
 	stop)
-		stop
+		initz_stop
 		;;
 	restart)
-		restart
+		initz_restart
 		;;
 	keep)
-		keep
+		initz_keep
 		;;
 	execute)
-		execute
+		initz_execute
 		;;
 	*)
-		_help
+		initz_help
 		exit 0
 esac
 
