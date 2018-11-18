@@ -59,7 +59,6 @@ stop() {
 # execute scripts
 #----------------------------------------------------------------------
 execute() {
-	trap "" INT QUIT TSTP EXIT
 	if [ -d "$INITD" ]; then
 		echo "Executing initialization scripts"
 		for f in $INITD/I*; do
@@ -72,7 +71,6 @@ execute() {
 		echo "error: %s directory not found" 1>&2
 		exit 1
 	fi
-	trap - INT QUIT TSTP EXIT
 }
 
 
