@@ -405,8 +405,8 @@ if index(g:bundle_group, 'omni')
 	Plug 'shawncplus/phpcomplete.vim', {'for': ['php']}
 	" Plug 'artur-shaik/vim-javacomplete2'
 	Plug 'othree/html5.vim', {'for': ['html']}
-	Plug 'xolox/vim-lua-ftplugin', {'for': ['lua']}
-	let g:lua_complete_omni = 1
+	" Plug 'xolox/vim-lua-ftplugin', {'for': ['lua']}
+	let g:lua_complete_omni = 0
 	let g:lua_check_globals = 0
 	let g:lua_check_syntax = 0
 	let g:lua_define_completion_mappings = 0

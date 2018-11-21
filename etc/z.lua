@@ -8,7 +8,8 @@
 --
 -- * 10x times faster than fasd and autojump
 -- * 3x times faster than rupa/z
--- * supports: Bash, Zsh and Windows Cmd
+-- * compatible with posix shells: bash, zsh, sh, ash, dash, busybox
+-- * supports windows
 --
 -- USE:
 --     * z foo     # cd to most frecent dir matching foo
@@ -17,6 +18,7 @@
 --     * z -t foo  # cd to most recently accessed dir matching foo
 --     * z -l foo  # list matches instead of cd
 --     * z -c foo  # restrict matches to subdirs of $PWD
+--     * z -e foo  # echo the best match, don't cd
 --
 -- Bash Install: 
 --     * put something like this in your .bashrc:
@@ -29,6 +31,10 @@
 -- Zsh Install:
 --     * put something like this in your .zshrc:
 --         eval "$(lua /path/to/z.lua --init zsh)"
+-- 
+-- Posix Shell Install:
+--     * put something like this in your .profile:
+--         eval "$(lua /path/to/z.lua --init posix)"
 --
 -- Windows Install (with Clink):
 --     * copy z.lua and z.cmd to clink's home directory
@@ -380,6 +386,22 @@ end
 
 
 -----------------------------------------------------------------------
+-- check single name element
+-----------------------------------------------------------------------
+function os.path.single(path)
+	if string.match(path, '/') then
+		return false
+	end
+	if windows then
+		if string.match(path, '\\') then
+			return false
+		end
+	end
+	return true
+end
+
+
+-----------------------------------------------------------------------
 -- expand user home
 -----------------------------------------------------------------------
 function os.path.expand(pathname)
@@ -415,8 +437,12 @@ function os.interpreter()
 		return nil
 	end
 	local lua = arg[-1]	
-	if lua == 'lua' then
-		return os.path.which('lua')
+	if os.path.single(lua) then
+		local path = os.path.which(lua)
+		if not os.path.isabs(path) then
+			return os.path.abspath(path)
+		end
+		return path
 	end
 	return os.path.abspath(lua)
 end
@@ -487,6 +513,7 @@ function math.random_init()
 	if rnd ~= nil then
 		seed = seed .. rnd
 	end
+	seed = seed .. os.tmpname()
 	local number = 0
 	for i = 1, seed:len() do
 		local k = string.byte(seed:sub(i, i))
@@ -580,12 +607,12 @@ function data_save(filename, M)
 		fp = io.open(filename, 'w')
 	else
 		math.random_init()
-		tmpname = filename .. '.' .. math.random_string(8)
-		tmpname = tmpname .. tostring(os.time())
+		tmpname = filename .. '.' .. math.random_string(6)
+		local sub = (os.tmpname()):sub(-6, -1):gsub('[\\/:~]', '')
+		tmpname = tmpname .. sub .. tostring(os.time())
 		local rnd = os.getenv('_ZL_RANDOM')
-		if rnd ~= nil then
-			tmpname = tmpname .. '' ..rnd
-		end
+		tmpname = tmpname .. '' .. (rnd and rnd or '')
+		-- print('tmpname: '..tmpname)
 		fp = io.open(tmpname, 'w')
 	end
 	if fp == nil then
@@ -1078,7 +1105,7 @@ end
 -- shell scripts
 -----------------------------------------------------------------------
 local script_zlua = [[
-function _zlua() {
+_zlua() {
 	local arg_list=""
 	local arg_type=""
 	local arg_subdir=""
@@ -1112,8 +1139,9 @@ function _zlua() {
 	else
 		local dest=$("$ZLUA_LUAEXE" "$ZLUA_SCRIPT" --cd $arg_type $arg_subdir "$@")
 		if [ "$dest" ] && [ -d "$dest" ]; then
-			[ -n "$arg_echo" ] && echo "$dest"
-			if [ -z "$_ZL_NOBUILTIN" ]; then
+			if [ -n "$arg_echo" ]; then
+				echo "$dest"
+			elif [ -z "$_ZL_NOBUILTIN" ]; then
 				builtin cd "$dest"
 			else
 				cd "$dest"
@@ -1139,6 +1167,13 @@ case "$PROMPT_COMMAND" in
 esac
 ]]
 
+local script_init_posix = [[
+case "$PS1" in
+	*_zlua?--add*) ;;
+	*) PS1="\$(_zlua --add \"\$(command pwd 2>/dev/null)\" &)$PS1"
+esac
+]]
+
 local script_init_zsh = [[
 _zlua_precmd() {
 	(_zlua --add "${PWD:a}" &)
@@ -1149,7 +1184,9 @@ _zlua_precmd() {
 ]]
 
 local script_complete_bash = [[
-complete -o filenames -C '_zlua --complete "$COMP_LINE"' ${_ZL_CMD:-z}
+if [ -n "$BASH_VERSION" ]; then
+	complete -o filenames -C '_zlua --complete "$COMP_LINE"' ${_ZL_CMD:-z}
+fi
 ]]
 
 local script_complete_zsh = [[
@@ -1172,8 +1209,10 @@ function z_shell_init(opts)
 	print('')
 	print(script_zlua)
 
+	local prompt_hook = (os.getenv("_ZL_NO_PROMPT_COMMAND") == nil)
+
 	if opts.bash ~= nil then
-		if os.getenv("_ZL_NO_PROMPT_COMMAND") == nil then
+		if prompt_hook then
 			if opts.fast == nil then
 				print(script_init_bash)
 			else
@@ -1182,10 +1221,32 @@ function z_shell_init(opts)
 		end
 		print(script_complete_bash)
 	elseif opts.zsh ~= nil then
-		if os.getenv("_ZL_NO_PROMPT_COMMAND") == nil then
+		if prompt_hook then
 			print(script_init_zsh)
 		end
 		print(script_complete_zsh)
+	elseif opts.posix ~= nil then
+		if prompt_hook then
+			print(script_init_posix)
+		end
+		print('_ZL_NOBUILTIN=1')
+	else
+		print('if [ -n "$BASH_VERSION" ]; then')
+		if prompt_hook then
+			print(script_init_bash)
+		end
+		print(script_complete_bash)
+		print('elif [ -n "$ZSH_VERSION" ]; then')
+		if prompt_hook then
+			print(script_init_zsh)
+		end
+		-- print(script_complete_zsh)
+		print('else')
+		if prompt_hook then
+			print(script_init_posix)
+		end
+		print('_ZL_NOBUILTIN=1')
+		print('fi')
 	end
 end
 
@@ -1245,11 +1306,12 @@ if /i "%ListOnly%"=="-n" (
 		if exist !NewPath!\nul (
 			if /i "%EchoPath%"=="-e" (
 				echo !NewPath!
+			)	else (
+				pushd !NewPath!
+				pushd !NewPath!
+				endlocal
+				popd
 			)
-			pushd !NewPath!
-			pushd !NewPath!
-			endlocal
-			popd
 		)
 	)
 )	else (
@@ -1303,5 +1365,4 @@ if not pcall(debug.getlocal, 4, 1) then
 		main()
 	end
 end
-
 
