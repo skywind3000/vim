@@ -287,5 +287,6 @@ if [ -n "$BASH_VERSION" ]; then
   complete -o filenames -F _commacd_backward_forward_completion ,,,
 fi
 
+
 # vim: set ts=2 sw=2 tw=0 et ::
 
