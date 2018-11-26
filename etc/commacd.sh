@@ -175,14 +175,31 @@ _commacd_backward_vcs_root() {
 # search backward for the directory whose name begins with $1 (`,, $1`)
 _commacd_backward_by_prefix() {
   local prev_dir dir="${PWD%/*}" matches match IFS=$'\n'
+  local imatch=""
+  case "$(uname -a)" in
+    *CYGWIN*|*cygwin*|*MSYS*|*MINGW*) local imatch=1 ;;
+    *Microsoft*|*WSL*) local imatch=1 ;;
+  esac
   while [[ -n "$dir" ]]; do
     prev_dir="$dir"
     dir="${dir%/*}"
     matches=($(_commacd_expand "$dir/${1}*/"))
     for match in "${matches[@]}"; do
-        if [[ "$match" == "$prev_dir/" ]]; then
+        if [ "$match" = "${prev_dir}/" ]; then
           echo -n "$prev_dir"
           return
+        elif [ -n "$imatch" ]; then
+          if [ -n "$BASH_VERSION" ]; then
+            if [ "${match,,}" = "${prev_dir,,}/" ]; then
+              echo -n "$prev_dir"
+              return
+            fi
+          else
+            if [ "${match:u}" = "${prev_dir:u}/" ]; then
+              echo -n "$prev_dir"
+              return
+            fi
+          fi
         fi
     done
   done
