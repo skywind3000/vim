@@ -58,10 +58,12 @@ _commacd_choose_match() {
   local length=${#matches}
   for ((i=0;i<length;i++)); do
     if [ -n "$BASH_VERSION" ]; then
-      printf "%s\t%s\n" "$((i+${COMMACD_SEQSTART:-0}))" "${matches[$i]}" >&2
+      local value="${matches[$i]}"
     else
-      printf "%s\t%s\n" "$((i+${COMMACD_SEQSTART:-0}))" "${matches[$(($i+1))]}" >&2
+      local value="${matches[$(($i+1))]}"
     fi
+    [ -z "$value" ] && break
+    printf "%s\t%s\n" "$((i+${COMMACD_SEQSTART:-0}))" "$value" >&2
   done
   local selection;
   local threshold=$((11-${COMMACD_SEQSTART:-0}))
