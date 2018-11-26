@@ -147,7 +147,7 @@ _commacd_forward() {
 # search backward for the vcs root (`,,`)
 _commacd_backward_vcs_root() {
   local dir="${PWD%/*}"
-  local rootmarker=${COMMACD_ROOTMARKER:-.git,.root,.hg,.root}
+  local rootmarker=${COMMACD_ROOTMARKER:-.git,.svn,.hg,.root}
   if [ -n "$BASH_VERSION" ]; then
     local IFS=","
     local markers=($rootmarker)
