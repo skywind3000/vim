@@ -162,7 +162,7 @@ _commacd_backward_vcs_root() {
         break
       fi
     done
-    [ -n "match" ] && break
+    [ -n "$match" ] && break
     dir="${dir%/*}"
     if [[ -z "$dir" ]]; then
       echo -n "$PWD"
