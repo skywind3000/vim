@@ -39,7 +39,7 @@ _commacd_expand() {
     printf "%s\n" "${ex[@]}";
   else
     setopt local_options no_case_glob extended_glob null_glob
-    print -rl - ${~1}
+    print -rl - "${~1}"
   fi
 }
 
@@ -60,7 +60,7 @@ _commacd_choose_match() {
     if [ -n "$BASH_VERSION" ]; then
       local value="${matches[$i]}"
     else
-      local value="${matches[$(($i+1))]}"
+      local value="${matches[$((i+1))]}"
     fi
     [ -z "$value" ] && break
     printf "%s\t%s\n" "$((i+${COMMACD_SEQSTART:-0}))" "$value" >&2
