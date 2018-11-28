@@ -27,7 +27,7 @@ fi
 
 _commacd_split() {
   # shellcheck disable=SC2001
-  echo "$1" | command sed $'s|/|\\\n/|g'
+  echo "$1" | sed $'s|/|\\\n/|g'
 }
 _commacd_join() { local IFS="$1"; shift; echo "$*"; }
 
