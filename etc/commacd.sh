@@ -39,7 +39,7 @@ _commacd_expand() {
     printf "%s\n" "${ex[@]}";
   else
     setopt local_options no_case_glob extended_glob null_glob
-    print -rl - "${~1}"
+    print -rl - ${~1}
   fi
 }
 
