@@ -21,7 +21,7 @@ if [ -n "$BASH_VERSION" ]; then
 elif [ -n "$ZSH_VERSION" ]; then
   setopt no_case_glob
 else
-  echo "commacd.sh supports only bash/zsh" >&2
+  echo "Sorry, commacd.sh is only available for bash and zsh" >&2
   return
 fi
 
@@ -38,6 +38,7 @@ _commacd_expand() {
     local ex=($1);
     printf "%s\n" "${ex[@]}";
   else
+    # shellcheck disable=SC2086
     setopt local_options no_case_glob extended_glob null_glob
     print -rl - ${~1}
   fi
