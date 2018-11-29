@@ -47,10 +47,11 @@ _commacd_expand() {
 _command_cd() {
   local dir=$1 IFS=$' \t\n'
   if [[ -z "$COMMACD_CD" ]]; then
-    builtin cd "$dir" && pwd
+    builtin cd "$dir"
   else
-    $COMMACD_CD "$dir" && pwd
+    $COMMACD_CD "$dir"
   fi
+  [ -z "$COMMACD_SILENT" ] && pwd
 }
 
 # show match selection menu
