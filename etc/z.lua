@@ -1190,11 +1190,12 @@ _zlua() {
 	else
 		local dest=$("$ZLUA_LUAEXE" "$ZLUA_SCRIPT" --cd $arg_type $arg_subdir "$@")
 		if [ -n "$dest" ] && [ -d "$dest" ]; then
-			if [ -z "$_ZL_NO_BUILTIN_CD" ]; then
+			if [ -z "$_ZL_CD" ]; then
 				builtin cd "$dest"
 			else
-				cd "$dest"
+				$_ZL_CD "$dest"
 			fi
+			[ -n "$_ZL_ECHO" ] && pwd
 		fi
 	fi
 }
@@ -1394,6 +1395,9 @@ if /i "%RunMode%"=="-n" (
 	for /f "delims=" %%i in ('call "%LuaExe%" "%LuaScript%" --cd %MatchType% %StrictSub% %*') do set "NewPath=%%i"
 	if not "!NewPath!"=="" (
 		if exist !NewPath!\nul (
+			if /i not "%_ZL_ECHO%"=="" (
+				echo !NewPath!
+			)
 			pushd !NewPath!
 			pushd !NewPath!
 			endlocal
