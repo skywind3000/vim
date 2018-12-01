@@ -137,9 +137,14 @@ function! s:GscopeAdd() abort
 		call s:ErrorMsg('gtags database is not ready yet')
 		return 0
 	endif
+	let pwd = getcwd()
+	let s:previous_pwd = get(s:, 'previous_pwd', '')
 	if s:db_connected(dbname)
-		return 1
+		if s:previous_pwd == pwd
+			return 1
+		endif
 	endif
+	let s:previous_pwd = pwd
 	let value = &cscopeverbose
 	let $GTAGSDBPATH = fnamemodify(dbname, ':p:h')
 	let $GTAGSROOT = root
