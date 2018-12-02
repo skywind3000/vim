@@ -91,7 +91,7 @@ if index(g:bundle_group, 'basic') >= 0
 		Plug 'Yggdroot/LeaderF'
 		let g:Lf_ShortcutF = '<c-p>'
 		let g:Lf_ShortcutB = '<m-n>'
-		noremap <c-n> :Leaderf mru --regex<cr>
+		noremap <c-n> :Leaderf mru --regexMode<cr>
 		noremap <m-p> :LeaderfFunction!<cr>
 		noremap <m-P> :LeaderfBufTag!<cr>
 		noremap <m-n> :LeaderfBuffer<cr>
