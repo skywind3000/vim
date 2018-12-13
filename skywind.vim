@@ -151,9 +151,9 @@ else
 endif
 
 if has('win32') || has('win64') || has('win16') || has('win95')
-	let g:vimmake_cflags = ['-O3', '-lwinmm', '-lstdc++', '-lgdi32', '-lws2_32', '-msse3']
+	let g:vimmake_cflags = ['-O2', '-lwinmm', '-lstdc++', '-lgdi32', '-lws2_32', '-msse3']
 else
-	let g:vimmake_cflags = ['-O3', '-lstdc++']
+	let g:vimmake_cflags = ['-O2', '-lstdc++']
 	runtime ftplugin/man.vim
 	nnoremap K :Man <cword><CR>
 	let g:ft_man_open_mode = 'vert'
