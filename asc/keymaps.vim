@@ -418,10 +418,9 @@ noremap <C-F10> :VimBuild gcc -pg<cr>
 "----------------------------------------------------------------------
 " g command
 "----------------------------------------------------------------------
-nnoremap gb :YcmCompleter GoToDeclaration
-nnoremap gl :YcmCompleter GoToDefinition
-nnoremap gx :YcmCompleter GoToDefinitionElseDeclaration
-nnoremap gy :YcmCompleter GoToReferences
+nnoremap gl :YcmCompleter GoToDeclaration<cr>
+nnoremap gx :YcmCompleter GoToDefinitionElseDeclaration<cr>
+nnoremap gy :YcmCompleter GoToReferences<cr>
 
 
 "----------------------------------------------------------------------

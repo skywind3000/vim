@@ -54,18 +54,18 @@ if index(g:bundle_group, 'simple') >= 0
 	Plug 'tpope/vim-unimpaired'
 	Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
 
-	nnoremap <space>a= :Tabularize /=<CR>
-	vnoremap <space>a= :Tabularize /=<CR>
-	nnoremap <space>a/ :Tabularize /\/\//l2c1l0<CR>
-	vnoremap <space>a/ :Tabularize /\/\//l2c1l0<CR>
-	nnoremap <space>a, :Tabularize /,/l0r1<CR>
-	vnoremap <space>a, :Tabularize /,/l0r1<CR>
-	nnoremap <space>al :Tabularize /\|<cr>
-	vnoremap <space>al :Tabularize /\|<cr>
-	nnoremap <space>a<bar> :Tabularize /\|<cr>
-	vnoremap <space>a<bar> :Tabularize /\|<cr>
-	nnoremap <space>ar :Tabularize /\|/r0<cr>
-	vnoremap <space>ar :Tabularize /\|/r0<cr>
+	nnoremap gb= :Tabularize /=<CR>
+	vnoremap gb= :Tabularize /=<CR>
+	nnoremap gb/ :Tabularize /\/\//l2c1l0<CR>
+	vnoremap gb/ :Tabularize /\/\//l2c1l0<CR>
+	nnoremap gb, :Tabularize /,/l0r1<CR>
+	vnoremap gb, :Tabularize /,/l0r1<CR>
+	nnoremap gbl :Tabularize /\|<cr>
+	vnoremap gbl :Tabularize /\|<cr>
+	nnoremap gb<bar> :Tabularize /\|<cr>
+	vnoremap gb<bar> :Tabularize /\|<cr>
+	nnoremap gbr :Tabularize /\|/r0<cr>
+	vnoremap gbr :Tabularize /\|/r0<cr>
 	map gz <Plug>Sneak_s
 	map gZ <Plug>Sneak_S
 endif
