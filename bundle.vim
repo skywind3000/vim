@@ -54,6 +54,7 @@ if index(g:bundle_group, 'simple') >= 0
 	Plug 'tpope/vim-unimpaired'
 	Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
 	Plug 'bootleq/vim-cycle'
+	Plug 'tpope/vim-surround'
 
 	nnoremap gb= :Tabularize /=<CR>
 	vnoremap gb= :Tabularize /=<CR>
