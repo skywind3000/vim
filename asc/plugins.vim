@@ -373,18 +373,6 @@ let g:cycle_default_groups = [
 			\   [['without', 'with']],
 			\   [["exclude", "include"]],
 			\   [["asc", "desc"]],
-			\   [['是', '否']],
-			\   [['{:}', '[:]', '(:)'], 'sub_pairs'],
-			\   [['（:）', '「:」', '『:』'], 'sub_pairs'],
-			\   [['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-			\     'Friday', 'Saturday'], 'hard_case', {'name': 'Days'}],
-			\   [['January', 'February', 'March', 'April', 'May', 'June', 
-			\     'July', 'August', 'September', 'October', 'November', 
-			\     'December'], 'hard_case', {'name': 'Months'}],
-			\ ]
-
-" customize
-let g:cycle_default_groups += [
 			\   [["begin", "end"]],
 			\   [["first", "last"]],
 			\   [["slow", "fast"]],
@@ -393,7 +381,17 @@ let g:cycle_default_groups += [
 			\   [["before", "after"]],
 			\   [["new", "delete"]],
 			\   [["while", "until"]],
+			\   [["up", "down"]],
+			\   [["top", "bottom"]],
 			\   [["one", "two", "three", "four", "five", "six"]],
+			\   [['是', '否']],
+			\   [['{:}', '[:]', '(:)'], 'sub_pairs'],
+			\   [['（:）', '「:」', '『:』'], 'sub_pairs'],
+			\   [['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday',
+			\     'Friday', 'Saturday'], 'hard_case', {'name': 'Days'}],
+			\   [['January', 'February', 'March', 'April', 'May', 'June', 
+			\     'July', 'August', 'September', 'October', 'November', 
+			\     'December'], 'hard_case', {'name': 'Months'}],
 			\ ]
 
 
