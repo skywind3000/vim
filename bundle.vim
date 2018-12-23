@@ -53,6 +53,7 @@ if index(g:bundle_group, 'simple') >= 0
 	Plug 'justinmk/vim-sneak'
 	Plug 'tpope/vim-unimpaired'
 	Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
+	Plug 'bootleq/vim-cycle'
 
 	nnoremap gb= :Tabularize /=<CR>
 	vnoremap gb= :Tabularize /=<CR>
@@ -69,6 +70,13 @@ if index(g:bundle_group, 'simple') >= 0
 	vnoremap gbr :Tabularize /\|/r0<cr>
 	map gz <Plug>Sneak_s
 	map gZ <Plug>Sneak_S
+
+	noremap <silent> <Plug>CycleFallbackNext <C-A>
+	noremap <silent> <Plug>CycleFallbackPrev <C-X>
+	nmap <silent> <c-a> <Plug>CycleNext
+	vmap <silent> <c-a> <Plug>CycleNext
+	nmap <silent> <c-x> <Plug>CyclePrev
+	vmap <silent> <c-x> <Plug>CyclePrev
 endif
 
 
@@ -356,7 +364,7 @@ if index(g:bundle_group, 'ale') >= 0
 				\ 'javascript': ['eslint'], 
 				\ }
 
-	function s:lintcfg(name)
+	function! s:lintcfg(name)
 		let conf = s:path('tools/conf/')
 		let path1 = conf . a:name
 		let path2 = expand('~/.vim/linter/'. a:name)
@@ -374,7 +382,7 @@ if index(g:bundle_group, 'ale') >= 0
 	let g:ale_c_cppcheck_options = ''
 	let g:ale_cpp_cppcheck_options = ''
 
-	let g:ale_linters.text = ['textlint', 'write-good', 'languagetool']
+	" let g:ale_linters.text = ['textlint', 'write-good', 'languagetool']
 
 	if executable('gcc') == 0 && executable('clang')
 		let g:ale_linters.c += ['clang']
