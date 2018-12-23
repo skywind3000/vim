@@ -382,6 +382,7 @@ let g:cycle_default_groups = [
 			\   [["new", "delete"]],
 			\   [["while", "until"]],
 			\   [["up", "down"]],
+			\   [["left", "right"]],
 			\   [["top", "bottom"]],
 			\   [["one", "two", "three", "four", "five", "six", "seven",
 			\     "eight", "nine", "ten"]],
