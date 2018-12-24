@@ -96,6 +96,7 @@ if index(g:bundle_group, 'basic') >= 0
 	Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['c', 'cpp'] }
 	Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
 	Plug 'vim-python/python-syntax', { 'for': ['python'] }
+	Plug 'tpope/vim-eunuch'
 	
 	if has('python') || has('python3')
 		Plug 'Yggdroot/LeaderF'
@@ -224,11 +225,11 @@ if index(g:bundle_group, 'opt') >= 0
 	Plug 'junegunn/fzf'
 	Plug 'mhartington/oceanic-next'
 	Plug 'asins/vim-dict'
-	Plug 'tpope/vim-speeddating'
-	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
 	Plug 'soft-aesthetic/soft-era-vim'
 	Plug 'dyng/ctrlsf.vim'
+	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
+	" Plug 'tpope/vim-speeddating'
 	" Plug 'itchyny/vim-cursorword'
 	let g:gutentags_modules = []
 	if executable('ctags')
