@@ -54,7 +54,7 @@ inoremap <C-k> <up>
 inoremap <C-l> <right>
 
 
-" use hotkey to change buffer
+" use hotkey for buffer
 noremap <silent>\bn :bn<cr>
 noremap <silent>\bp :bp<cr>
 noremap <silent>\bm :bm<cr>
@@ -64,16 +64,12 @@ noremap <silent>\bl :ls<cr>
 noremap <silent>\bb :ls<cr>:b
 noremap <silent>\nh :nohl<cr>
 
-" use hotkey to operate tab
-noremap <silent><tab> <nop>
-noremap <silent><tab>m :tabnew<cr>
-noremap <silent><tab>e :tabclose<cr>
-noremap <silent><tab>n :tabn<cr>
-noremap <silent><tab>p :tabp<cr>
-noremap <silent><tab>f <c-i>
-noremap <silent><tab>b <c-o>
-noremap <silent>\t :tabnew<cr>
-noremap <silent>\g :tabclose<cr>
+" use hotkey for tab
+noremap <silent>\tc :tabnew<cr>
+noremap <silent>\tq :tabclose<cr>
+noremap <silent>\tn :tabnext<cr>
+noremap <silent>\tp :tabprev<cr>
+noremap <silent>\to :tabonly<cr>
 noremap <silent>\1 :tabn 1<cr>
 noremap <silent>\2 :tabn 2<cr>
 noremap <silent>\3 :tabn 3<cr>
@@ -176,6 +172,11 @@ noremap <tab>w <c-w>w
 " ctrl-enter to insert a empty line below, shift-enter to insert above
 noremap <tab>o o<ESC>
 noremap <tab>O O<ESC>
+
+" tab enhancement
+noremap <silent><tab> <nop>
+noremap <silent><tab>f <c-i>
+noremap <silent><tab>b <c-o>
 
 " insert mode as emacs
 inoremap <c-a> <home>
