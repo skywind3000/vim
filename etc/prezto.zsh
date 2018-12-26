@@ -58,6 +58,7 @@ DISABLE_CORRECTION="true"
 # Enable 256 color to make auto-suggestions look nice
 export TERM="xterm-256color"
 
+ZSH_AUTOSUGGEST_USE_ASYNC=1
 
 # Declare modules
 zstyle ':prezto:*:*' color 'yes'
@@ -76,10 +77,10 @@ zstyle ':prezto:load' pmodule \
 	'utility' \
 	'completion' \
 	'history-substring-search' \
-	'syntax-highlighting' \
 	'autosuggestions' \
 	'prompt' \
 
+	# 'autosuggestions' \
 
 # Initialize prezto
 antigen use prezto
@@ -88,6 +89,7 @@ antigen use prezto
 # default bundles
 antigen bundle rupa/z z.sh
 antigen bundle Vifon/deer
+antigen bundle zdharma/fast-syntax-highlighting
 # antigen bundle zsh-users/zsh-autosuggestions
 
 antigen bundle willghatch/zsh-cdr
@@ -137,6 +139,7 @@ antigen apply
 
 # options
 unsetopt correct_all
+unsetopt share_history
 setopt prompt_subst
 
 setopt BANG_HIST                 # Treat the '!' character specially during expansion.
