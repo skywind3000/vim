@@ -1,4 +1,5 @@
 #! /bin/sh
+# https://github.com/skywind3000/vim/raw/master/tools/script/bootstrap.sh
 
 set -e
 set -x
