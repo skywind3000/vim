@@ -86,7 +86,7 @@ fi
 #----------------------------------------------------------------------
 
 # default bash key binding
-if [ -n "$BASH_VERSION" ]; then
+if [[ -n "$BASH_VERSION" ]]; then
 	bind '"\eh":"\C-b"'
 	bind '"\el":"\C-f"'
 	bind '"\ej":"\C-n"'
@@ -96,7 +96,7 @@ if [ -n "$BASH_VERSION" ]; then
 	bind '"\eJ":"\C-a"'
 	bind '"\eK":"\C-e"'
 	bind '"\e;":"ll\n"'
-elif [ -n "$ZSH_VERSION" ]; then
+elif [[ -n "$ZSH_VERSION" ]]; then
 	bindkey -s '\e;' 'll\n'
 	bindkey -s '\eu' 'ranger_cd\n'
 fi
@@ -105,18 +105,18 @@ fi
 #----------------------------------------------------------------------
 # https://github.com/rupa/z
 #----------------------------------------------------------------------
-if [ -z "$DISABLE_Z_PLUGIN" ]; then
-	if [ -x "$INIT_LUA" ] && [ -f "$HOME/.local/etc/z.lua" ]; then
-		if [ -n "$BASH_VERSION" ]; then
+if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
+	if [[ -x "$INIT_LUA" ]] && [[ -f "$HOME/.local/etc/z.lua" ]]; then
+		if [[ -n "$BASH_VERSION" ]]; then
 			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init bash once)"
-		elif [ -n "$ZSH_VERSION" ]; then
+		elif [[ -n "$ZSH_VERSION" ]]; then
 			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init zsh once)"
 		else
 			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init auto once)"
 		fi
 		alias zz='z -i'
 	else
-		[ -f "$HOME/.local/etc/z.sh" ] && . "$HOME/.local/etc/z.sh"
+		[[ -f "$HOME/.local/etc/z.sh" ]] && . "$HOME/.local/etc/z.sh"
 		alias zz='z'
 	fi
 fi
@@ -130,7 +130,7 @@ alias zzc='zz -c'
 # commacd.sh
 #----------------------------------------------------------------------
 COMMACD_CD="cd"
-[ -e "$HOME/.local/etc/commacd.sh" ] && . "$HOME/.local/etc/commacd.sh"
+[[ -e "$HOME/.local/etc/commacd.sh" ]] && . "$HOME/.local/etc/commacd.sh"
 
 
 #----------------------------------------------------------------------
