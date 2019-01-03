@@ -31,6 +31,7 @@ fi
 # Load local bash/zsh compatible settings
 _INIT_SH_NOFUN=1
 _INIT_SH_NOLOG=1
+DISABLE_Z_PLUGIN=1
 [ -f "$HOME/.local/etc/init.sh" ] && source "$HOME/.local/etc/init.sh"
 
 # exit for non-interactive shell

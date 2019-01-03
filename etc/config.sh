@@ -105,10 +105,41 @@ fi
 #----------------------------------------------------------------------
 # https://github.com/rupa/z
 #----------------------------------------------------------------------
-if [ -n "$BASH_VERSION" ]; then
-	if [ -z "$(type -t _z)" ]; then
-		[ -f "$HOME/.local/etc/z.sh" ] && . "$HOME/.local/etc/z.sh"
+if [ -z "$DISABLE_Z_PLUGIN" ]; then
+	if [ -z "$LUA_EXEC" ]; then
+		if [ -x "/usr/bin/lua" ]; then
+			LUA_EXEC="/usr/bin/lua"
+		elif [ -x "/usr/bin/lua5.3" ]; then
+			LUA_EXEC="/usr/bin/lua5.3"
+		elif [ -x "/usr/local/bin/lua" ]; then
+			LUA_EXEC="/usr/local/bin/lua"
+		elif [ -x "/opt/bin/lua" ]; then
+			LUA_EXEC="/opt/bin/lua"
+		elif [ -x "/opt/bin/lua5.3" ]; then
+			LUA_EXEC="/opt/bin/lua5.3"
+		elif [ -x "/opt/local/bin/lua" ]; then
+			LUA_EXEC="/opt/local/bin/lua"
+		elif [ -x "/opt/local/bin/lua5.3" ]; then
+			LUA_EXEC="/opt/local/bin/lua5.3"
+		fi
 	fi
+	if [ -x "$LUA_EXEC" ] && [ -f "$HOME/.local/etc/z.lua" ]; then
+		if [ -n "$BASH_VERSION" ]; then
+			eval "$($LUA_EXEC $HOME/.local/etc/z.lua --init bash once)"
+		elif [ -n "$ZSH_VERSION" ]; then
+			eval "$($LUA_EXEC $HOME/.local/etc/z.lua --init zsh once)"
+		else
+			eval "$($LUA_EXEC $HOME/.local/etc/z.lua --init auto once)"
+		fi
+		alias zz='z -i'
+	elif [ -f "$HOME/.local/etc/z.sh" ]; then
+		if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
+			source . "$HOME/.local/etc/z.sh"
+		fi
+		alias zz='z'
+	fi
+	alias zc='z -c'
+	alias zf='cd "$(z -l -s | fzf --reverse --height 35%)"'
 fi
 
 
