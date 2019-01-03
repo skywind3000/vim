@@ -115,7 +115,6 @@ if [ -z "$DISABLE_Z_PLUGIN" ]; then
 			eval "$($INIT_LUA ~/.local/etc/z.lua --init auto once)"
 		fi
 		alias zz='z -i'
-		alias zzc='z -i -c'
 	elif [ -f "~/.local/etc/z.sh" ]; then
 		if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
 			. "~/.local/etc/z.sh"
@@ -126,6 +125,7 @@ fi
 
 alias zc='z -c'
 alias zf='cd "$(z -l -s | fzf --reverse --height 35%)"'
+alias zzc='zz -c'
 
 
 #----------------------------------------------------------------------
