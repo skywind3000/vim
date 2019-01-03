@@ -123,24 +123,25 @@ if [ -z "$DISABLE_Z_PLUGIN" ]; then
 			LUA_EXEC="/opt/local/bin/lua5.3"
 		fi
 	fi
-	if [ -x "$LUA_EXEC" ] && [ -f "$HOME/.local/etc/z.lua" ]; then
+	if [ -x "$LUA_EXEC" ] && [ -f "~/.local/etc/z.lua" ]; then
 		if [ -n "$BASH_VERSION" ]; then
-			eval "$($LUA_EXEC $HOME/.local/etc/z.lua --init bash once)"
+			eval "$($LUA_EXEC ~/.local/etc/z.lua --init bash once)"
 		elif [ -n "$ZSH_VERSION" ]; then
-			eval "$($LUA_EXEC $HOME/.local/etc/z.lua --init zsh once)"
+			eval "$($LUA_EXEC ~/.local/etc/z.lua --init zsh once)"
 		else
-			eval "$($LUA_EXEC $HOME/.local/etc/z.lua --init auto once)"
+			eval "$($LUA_EXEC ~/.local/etc/z.lua --init auto once)"
 		fi
 		alias zz='z -i'
-	elif [ -f "$HOME/.local/etc/z.sh" ]; then
+	elif [ -f "~/.local/etc/z.sh" ]; then
 		if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
-			. "$HOME/.local/etc/z.sh"
+			. "~/.local/etc/z.sh"
 		fi
 		alias zz='z'
 	fi
-	alias zc='z -c'
-	alias zf='cd "$(z -l -s | fzf --reverse --height 35%)"'
 fi
+
+alias zc='z -c'
+alias zf='cd "$(z -l -s | fzf --reverse --height 35%)"'
 
 
 #----------------------------------------------------------------------
