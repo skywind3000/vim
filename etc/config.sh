@@ -106,17 +106,17 @@ fi
 # https://github.com/rupa/z
 #----------------------------------------------------------------------
 if [ -z "$DISABLE_Z_PLUGIN" ]; then
-	if [ -x "$INIT_LUA" ] && [ -f "~/.local/etc/z.lua" ]; then
+	if [ -x "$INIT_LUA" ] && [ -f "$HOME/.local/etc/z.lua" ]; then
 		if [ -n "$BASH_VERSION" ]; then
-			eval "$($INIT_LUA ~/.local/etc/z.lua --init bash once)"
+			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init bash once)"
 		elif [ -n "$ZSH_VERSION" ]; then
-			eval "$($INIT_LUA ~/.local/etc/z.lua --init zsh once)"
+			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init zsh once)"
 		else
-			eval "$($INIT_LUA ~/.local/etc/z.lua --init auto once)"
+			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init auto once)"
 		fi
 		alias zz='z -i'
-	elif [ -f "~/.local/etc/z.sh" ]; then
-		. "~/.local/etc/z.sh"
+	else
+		[ -f "$HOME/.local/etc/z.sh" ] && . "$HOME/.local/etc/z.sh"
 		alias zz='z'
 	fi
 fi
