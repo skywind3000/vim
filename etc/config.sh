@@ -134,7 +134,7 @@ if [ -z "$DISABLE_Z_PLUGIN" ]; then
 		alias zz='z -i'
 	elif [ -f "$HOME/.local/etc/z.sh" ]; then
 		if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
-			source . "$HOME/.local/etc/z.sh"
+			. "$HOME/.local/etc/z.sh"
 		fi
 		alias zz='z'
 	fi
