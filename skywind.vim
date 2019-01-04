@@ -214,13 +214,9 @@ hi! default link AtHint Identifier
 "----------------------------------------------------------------------
 " Enable vim-diff-enhanced (Christian Brabandt)
 "----------------------------------------------------------------------
-function! EnableEnhancedDiff()
-	if has('patch-8.1.0388')
-		set diffopt+=internal,algorithm:patience
-		set diffopt+=indent-heuristic
-	else
-		let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
-	endif
+if has('patch-8.1.0388')
+	set diffopt+=internal,algorithm:patience
+	set diffopt+=indent-heuristic
 endfunc
 
 if executable('git')
