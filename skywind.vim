@@ -217,11 +217,8 @@ hi! default link AtHint Identifier
 if has('patch-8.1.0388')
 	set diffopt+=internal,algorithm:patience
 	set diffopt+=indent-heuristic
-endfunc
-
-if executable('git')
-	call EnableEnhancedDiff()
 endif
+
 
 
 "----------------------------------------------------------------------
