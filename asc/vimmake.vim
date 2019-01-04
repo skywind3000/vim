@@ -1160,6 +1160,7 @@ function! vimmake#run(bang, opts, args, ...)
 	let l:macros['VIM_FILENAME'] = expand("%:t")
 	let l:macros['VIM_FILEDIR'] = expand("%:p:h")
 	let l:macros['VIM_FILENOEXT'] = expand("%:t:r")
+	let l:macros['VIM_PATHNOEXT'] = expand("%:r")
 	let l:macros['VIM_FILEEXT'] = "." . expand("%:e")
 	let l:macros['VIM_CWD'] = getcwd()
 	let l:macros['VIM_RELDIR'] = expand("%:h:.")
@@ -1172,6 +1173,7 @@ function! vimmake#run(bang, opts, args, ...)
 	let l:macros['VIM_LINES'] = ''.&lines
 	let l:macros['VIM_GUI'] = has('gui_running')? 1 : 0
 	let l:macros['VIM_ROOT'] = vimmake#get_root('%')
+    let l:macros['VIM_HOME'] = expand(split(&rtp, ',')[0])
 	let l:macros['<cwd>'] = getcwd()
 	let l:macros['<root>'] = l:macros['VIM_ROOT']
 	let l:retval = ''
