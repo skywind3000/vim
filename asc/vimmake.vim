@@ -1606,9 +1606,9 @@ function! s:Cmd_VimBuild(bang, ...)
 	elseif index(['2', 'emake'], l:what) >= 0
 		let l:source = shellescape(expand("%"))
 		if l:conf == ''
-			exec vimmake .'@ emake "$(VIM_FILEPATH)"'
+			exec vimmake .'@ emake --abs=1 "$(VIM_FILEPATH)"'
 		else
-			exec vimmake .'@ emake --ini='.shellescape(l:conf).' '.l:source
+			exec vimmake .'@ emake --abs=1 --ini='.shellescape(l:conf).' '.l:source
 		endif
 	elseif index(['3', 'gnumake'], l:what) >= 0
 		let l:makeprg = get(g:, 'vimmake_mp_make', '')
