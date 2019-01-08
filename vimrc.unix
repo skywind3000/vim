@@ -39,9 +39,5 @@ hi LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=Dark
 hi SignColumn ctermbg=0
 
 
-if v:version >= 704
-	call EnableEnhancedDiff()
-endif
-
 
 
