@@ -22,7 +22,7 @@ let s:windows = has('win32') || has('win64') || has('win16') || has('win95')
 
 " hot key to back to directory
 if !exists('g:vinegar_key')
-	let g:vinegar_key = '+'
+	let g:vinegar_key = '-'
 endif
 
 if !exists('g:vinegar_nerdtree_as_netrw')
@@ -176,7 +176,7 @@ function! s:setup_vinegar()
 			nnoremap <silent><buffer> <cr> :call <SID>nerdtree_enter()<cr>
 		endif
 	elseif &ft == 'dirvish'
-        exec 'nnoremap <buffer><silent> ' . key. ' :VinegarOpen edit<cr>'
+        exec 'nmap <buffer><silent> ' . key. ' <Plug>(dirvish_up)'
 		nnoremap <silent><buffer> r :Dirvish %<cr>
 	endif
 endfunc
