@@ -415,12 +415,13 @@ endif
 noremap <C-F10> :VimBuild gcc -pg<cr>
 
 
+
 "----------------------------------------------------------------------
 " g command
 "----------------------------------------------------------------------
-nnoremap gl :YcmCompleter GoToDeclaration<cr>
-nnoremap gx :YcmCompleter GoToDefinitionElseDeclaration<cr>
-nnoremap gy :YcmCompleter GoToReferences<cr>
+nnoremap gyd :YcmCompleter GoToDefinitionElseDeclaration<cr>
+nnoremap gyr :YcmCompleter GoToReferences<cr>
+nnoremap gyh :YcmCompleter GetDoc<cr>
 
 
 "----------------------------------------------------------------------
