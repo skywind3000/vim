@@ -1846,16 +1846,6 @@ function! vimmake#keymap()
 	inoremap <silent><F9> <ESC>:VimBuild gcc<cr>
 	inoremap <silent><F10> <ESC>:call vimmake#toggle_quickfix(6)<cr>
 
-	noremap <silent><F11> :cp<cr>
-	noremap <silent><F12> :cn<cr>
-	inoremap <silent><F11> <ESC>:cp<cr>
-	inoremap <silent><F12> <ESC>:cn<cr>
-
-	noremap <silent><leader>cp :cp<cr>
-	noremap <silent><leader>cn :cn<cr>
-	noremap <silent><leader>co :copen 6<cr>
-	noremap <silent><leader>cl :cclose<cr>
-
 	" VimTool startup
 	for l:index in range(10)
 		exec 'noremap <leader>c'.l:index.' :VimTool ' . l:index . '<cr>'
