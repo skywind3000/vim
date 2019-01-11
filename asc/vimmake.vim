@@ -1889,9 +1889,6 @@ function! vimmake#keymap()
 		else
 			set cscopequickfix=s+,c+,d+,i+,t+,e+,g+,f+
 		endif
-		set csto=0
-		set cst
-		set csverb
 	endif
 
 	" cscope update
