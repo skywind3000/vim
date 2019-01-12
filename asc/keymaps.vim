@@ -71,7 +71,6 @@ noremap <silent><tab>9 :VinegarOpen tabedit<cr>
 noremap <silent><tab>0 :exe "NERDTree ".fnameescape(expand("%:p:h"))<cr>
 noremap <silent><tab>y :exe "NERDTree ".fnameescape(vimmake#get_root("%"))<cr>
 noremap <silent><tab>g <c-w>p
-noremap <silent>+ :VinegarOpen edit<cr>
 
 noremap <silent><space>ha :GuiSignRemove
 			\ errormarker_error errormarker_warning<cr>
@@ -154,8 +153,6 @@ if has('gui_running') || (has('nvim') && (has('win32') || has('win64')))
 	inoremap <M-r> <ESC>:VimExecute run<cr>
 	noremap <M-b> :VimBuild emake<cr>
 	inoremap <M-b> <ESC>:VimBuild emake<cr>
-	noremap <M-a> ggVG
-	inoremap <M-a> <ESC>ggVG
 	noremap <m-_> :call Change_Transparency(-2)<cr>
 	noremap <m-+> :call Change_Transparency(+2)<cr>
 	if has('gui_macvim')
