@@ -131,6 +131,8 @@ if has('win32') || has('win64') || has('win16') || has('win95')
 	let g:vimmake_extrun['pl'] = "start d:\\dev\\swipl\\bin\\swipl-win.exe -s"
 	let g:vimmake_build_encoding = 'gbk'
 	let g:asyncrun_encs = 'gbk'
+	let g:asyncrun_stdin = 1
+	let g:vimmake_stdin = 1
 	let cp = "d:/dev/scala/scala-2.11.6/lib/scala-actors-2.11.0.jar;"
 	let cp.= "d:/dev/scala/scala-2.11.6/lib/akka-actor_2.11-2.3.4.jar"
 	let g:vimmake_extrun['scala'] = 'scala'
