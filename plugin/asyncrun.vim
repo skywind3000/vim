@@ -1326,7 +1326,7 @@ endfunc
 " asyncrun -version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.0.3'
+	return '2.0.4'
 endfunc
 
 
