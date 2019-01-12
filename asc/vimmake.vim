@@ -1,7 +1,7 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
-" Last Modified: 2018/05/26 23:05
+" Last Modified: 2019/01/13 05:19
 "
 " Execute customize tools: ~/.vim/vimmake.{name} directly:
 "     :VimTool {name}
@@ -698,8 +698,14 @@ function! s:Vimmake_Build_Start(cmd)
 			let l:options['in_top'] = s:build_info.range_top
 			let l:options['in_bot'] = s:build_info.range_bot
 		endif
+		if get(g:, 'vimmake_stdin', 0)
+			let l:options['in_io'] = 'pipe'
+		endif
 		let s:build_job = job_start(l:args, l:options)
 		let l:success = (job_status(s:build_job) != 'fail')? 1 : 0
+		if l:success && l:options['in_io'] == 'pipe'
+			silent! call ch_close_in(job_getchannel(s:async_job))	
+		endif
 	else
 		let l:callbacks = {'shell': 'VimMake'}
 		let l:callbacks['on_stdout'] = function('s:Vimmake_Build_NeoVim')
