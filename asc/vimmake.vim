@@ -171,7 +171,7 @@ endif
 
 " enable stdin
 if !exists('g:vimmake_stdin')
-	let g:vimmake_stdin = 1
+	let g:vimmake_stdin = (has('win32') || has('win64'))
 endif
 
 " build info

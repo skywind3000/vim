@@ -183,7 +183,7 @@ if !exists('g:asyncrun_save')
 endif
 
 if !exists('g:asyncrun_stdin')
-	let g:asyncrun_stdin = 1
+	let g:asyncrun_stdin = (has('win32') || has('win64'))
 endif
 
 
