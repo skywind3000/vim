@@ -387,6 +387,7 @@ let g:cycle_default_groups = [
 			\   [["one", "two", "three", "four", "five", "six", "seven",
 			\     "eight", "nine", "ten"]],
 			\   [['是', '否']],
+			\   [['void', 'int', 'char']],
 			\   [['{:}', '[:]', '(:)'], 'sub_pairs'],
 			\   [['（:）', '「:」', '『:』'], 'sub_pairs'],
 			\   [['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday',
