@@ -543,6 +543,7 @@ function _exit() {
 #----------------------------------------------------------------------
 function zlua_enable() {
 	[[ -z "$1" ]] && LUA_EXEC="$(command -v lua)" || LUA_EXEC="$1"
+	export _ZL_MATCH_MODE=1
 	if [[ -x "$LUA_EXEC" ]]; then
 		if [[ -n "$BASH_VERSION" ]]; then
 			PROMPT_COMMAND="${PROMPT_COMMAND//\(_z --add *\);/}"
