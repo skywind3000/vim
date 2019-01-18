@@ -107,6 +107,7 @@ fi
 if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
 	if [[ -x "$INIT_LUA" ]] && [[ -f "$HOME/.local/etc/z.lua" ]]; then
 		export _ZL_MATCH_MODE=1
+		export _ZL_CD="cd"
 		if [[ -n "$BASH_VERSION" ]]; then
 			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init bash once)"
 		elif [[ -n "$ZSH_VERSION" ]]; then
