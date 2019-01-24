@@ -97,6 +97,7 @@ if index(g:bundle_group, 'basic') >= 0
 	Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
 	Plug 'vim-python/python-syntax', { 'for': ['python'] }
 	Plug 'tpope/vim-eunuch'
+	Plug 'dag/vim-fish'
 	
 	if has('python') || has('python3')
 		Plug 'Yggdroot/LeaderF'

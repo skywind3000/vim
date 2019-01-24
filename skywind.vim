@@ -179,7 +179,7 @@ command! -bang -nargs=* -complete=file Make VimMake -program=make @ <args>
 " VimImport site/echofunc.vim
 VimImport site/argtextobj.vim
 VimImport site/indent-object.vim
-VimImport site/calendar.vim
+" VimImport site/calendar.vim
 "VimImport site/hilinks.vim
 
 if has('gui_running')
