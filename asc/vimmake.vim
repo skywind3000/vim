@@ -1,7 +1,7 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
-" Last Modified: 2019/01/13 13:32
+" Last Modified: 2019/01/26 01:58
 "
 " Execute customize tools: ~/.vim/vimmake.{name} directly:
 "     :VimTool {name}
@@ -167,11 +167,6 @@ endif
 " last command
 if !exists('g:vimmake_build_info')
 	let g:vimmake_build_info = ''
-endif
-
-" enable stdin
-if !exists('g:vimmake_stdin')
-	let g:vimmake_stdin = (has('win32') || has('win64'))
 endif
 
 " build info
@@ -702,14 +697,13 @@ function! s:Vimmake_Build_Start(cmd)
 			let l:options['in_buf'] = s:build_info.range_buf
 			let l:options['in_top'] = s:build_info.range_top
 			let l:options['in_bot'] = s:build_info.range_bot
-		endif
-		if g:vimmake_stdin
+		elseif exists('*ch_close_in')
 			let l:options['in_io'] = 'pipe'
 		endif
 		let s:build_job = job_start(l:args, l:options)
 		let l:success = (job_status(s:build_job) != 'fail')? 1 : 0
-		if l:success && g:vimmake_stdin
-			silent! call ch_close_in(job_getchannel(s:async_job))	
+		if l:success && l:options['in_io'] == 'pipe'
+			silent! call ch_close_in(job_getchannel(s:build_job))
 		endif
 	else
 		let l:callbacks = {'shell': 'VimMake'}
@@ -849,6 +843,8 @@ function! s:ExtractOpt(command)
 	let opts.text = get(opts, 'text', '')
 	let opts.auto = get(opts, 'auto', '')
 	let opts.raw = get(opts, 'raw', '')
+	let opts.strip = get(opts, 'strip', '')
+	let opts.append = get(opts, 'append', '')
 	if 0
 		echom 'cwd:'. opts.cwd
 		echom 'mode:'. opts.mode
