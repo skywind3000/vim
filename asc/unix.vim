@@ -125,6 +125,12 @@ if has('terminal') && exists(':terminal') == 2
 endif
 
 
+" setup shell 
+if &shell =~# 'fish'
+	set shell=sh
+endif
+
+
 "----------------------------------------------------------------------
 " highlighting tune
 "----------------------------------------------------------------------
