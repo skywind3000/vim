@@ -169,6 +169,11 @@ if !exists('g:vimmake_build_info')
 	let g:vimmake_build_info = ''
 endif
 
+" use stdin
+if !exists('g:vimmake_build_stdin')
+	let g:vimmake_build_stdin = has('win32') || has('win64') || has('win95')
+endif
+
 " build info
 if !exists('g:vimmake_text')
 	let g:vimmake_text = ''
@@ -698,7 +703,9 @@ function! s:Vimmake_Build_Start(cmd)
 			let l:options['in_top'] = s:build_info.range_top
 			let l:options['in_bot'] = s:build_info.range_bot
 		elseif exists('*ch_close_in')
-			let l:options['in_io'] = 'pipe'
+			if g:vimmake_build_stdin != 0
+				let l:options['in_io'] = 'pipe'
+			endif
 		endif
 		let s:build_job = job_start(l:args, l:options)
 		let l:success = (job_status(s:build_job) != 'fail')? 1 : 0
