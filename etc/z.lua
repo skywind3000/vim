@@ -4,7 +4,7 @@
 -- z.lua - z.sh implementation in lua, by skywind 2018, 2019
 -- Licensed under MIT license.
 --
--- Version 39, Last Modified: 2019/01/28 17:37
+-- Version 41, Last Modified: 2019/01/28 20:32
 --
 -- * 10x times faster than fasd and autojump
 -- * 3x times faster than rupa/z
@@ -1094,10 +1094,14 @@ function main(argv)
 		return false
 	end
 	if false then
-		print("options: ")
-		printT(options)
-		print("args: ")
-		printT(args)
+		if options['--init'] == nil and options['--cd'] == null then
+			if options['--complete'] == nil then
+				print("options: ")
+				printT(options)
+				print("args: ")
+				printT(args)
+			end
+		end
 	end
 	if options['-c'] then
 		Z_SUBDIR = true
@@ -1312,9 +1316,7 @@ _zlua() {
 			else
 				$_ZL_CD "$dest"
 			fi
-			if [ -n "$_ZL_ECHO" ]; then
-				pwd
-			fi
+			if [ -n "$_ZL_ECHO" ]; then pwd; fi
 		fi
 	fi
 }
@@ -1463,6 +1465,7 @@ function z_shell_init(opts)
 	end
 end
 
+
 -----------------------------------------------------------------------
 -- Fish shell init
 -----------------------------------------------------------------------
@@ -1473,14 +1476,15 @@ function _zlua
 	set -l arg_subdir ""
 	set -l arg_inter ""
 	set -l arg_strip ""
+	function _zlua_call; eval (string escape -- $argv); end
 	if test "$argv[1]" = "--add"
 		set -e argv[1]
 		set -x _ZL_RANDOM (random)
-		eval "$ZLUA_LUAEXE" "$ZLUA_SCRIPT" --add $argv
+		_zlua_call "$ZLUA_LUAEXE" "$ZLUA_SCRIPT" --add $argv
 		return
 	else if test "$argv[1]" = "--complete"
 		set -e argv[1]
-		eval "$ZLUA_LUAEXE" "$ZLUA_SCRIPT" --complete $argv
+		_zlua_call "$ZLUA_LUAEXE" "$ZLUA_SCRIPT" --complete $argv
 		return
 	end
 	while true
@@ -1500,18 +1504,18 @@ function _zlua
 		set -e argv[1]
 	end
 	if test "$arg_mode" = "-h"
-		eval "$ZLUA_LUAEXE" "$ZLUA_SCRIPT" -h
+		_zlua_call "$ZLUA_LUAEXE" "$ZLUA_SCRIPT" -h
 	else if test "$arg_mode" = "-l" -o (count $argv) -eq 0;
-		eval "$ZLUA_LUAEXE" "$ZLUA_SCRIPT" -l $arg_subdir $arg_type $arg_strip $argv
+		_zlua_call "$ZLUA_LUAEXE" "$ZLUA_SCRIPT" -l $arg_subdir $arg_type $arg_strip $argv
 	else if test -n "$arg_mode"
-		eval "$ZLUA_LUAEXE" "$ZLUA_SCRIPT" $arg_mode $arg_subdir $arg_type $arg_inter $argv
+		_zlua_call "$ZLUA_LUAEXE" "$ZLUA_SCRIPT" $arg_mode $arg_subdir $arg_type $arg_inter $argv
 	else
-		set -l dest (eval "$ZLUA_LUAEXE" "$ZLUA_SCRIPT" --cd $arg_type $arg_subdir $arg_inter $argv)
+		set -l dest (_zlua_call "$ZLUA_LUAEXE" "$ZLUA_SCRIPT" --cd $arg_type $arg_subdir $arg_inter $argv)
 		if test -n "$dest" -a -d "$dest"
 			if test -z "$_ZL_CD"
 				builtin cd "$dest"
 			else
-				eval "$_ZL_CD" "$dest"
+				_zlua_call "$_ZL_CD" "$dest"
 			end
 		end
 		if test -n "$_ZL_ECHO"; pwd; end
