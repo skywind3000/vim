@@ -123,6 +123,7 @@ let g:vimmake_extrun['es'] = 'escript'
 let g:vimmake_extrun['erl'] = 'escript'
 let g:vimmake_extrun['clj'] = 'clojure'
 let g:vimmake_extrun['hs'] = 'runghc'
+let g:vimmake_extrun['fish'] = 'fish'
 
 if has('win32') || has('win64') || has('win16') || has('win95')
 	let g:vimmake_extrun['scm'] = "d:\\linux\\bin\\guile.exe"
