@@ -767,25 +767,23 @@ function! preview#function_signature(funname, fn_only, filetype)
 				let file_line .= ':'. i.line
 			elseif i.cmd > 0
 				let file_line .= ':'. i.cmd
+				if i.cmd =~ '^\s*\d\+\s*$'
+					let i.line = str2nr(i.cmd)
+				endif
 			endif
 		endif
 		let i.file_line = file_line
-		let key = name . ':' . file_line
-		if !has_key(check, key)
-			let check[key] = 1
-			let res += [i]
-		endif
+		let res += [i]
 	endfor
-	let result = []
 	let index = 1
 	for i in res
 		let name = i.func_prototype
 		let file_line = i.file_line
 		let desc = name. ' ('.index.'/'.len(res).') '.file_line
-		let result += [desc]
+		let i.func_desc = desc
 		let index += 1
 	endfor
-	return result
+	return res
 endfunc
 
 
@@ -833,11 +831,19 @@ function! preview#function_prototype(funcname, filetype)
 	let proto = w:preview_prototype_cache
 	if proto.name != a:funcname || proto.ft != ft
 		let res = preview#function_signature(a:funcname, 0, ft)
-		let proto.data = res
+		let proto.data = []
 		let proto.index = 0
 		let proto.name = a:funcname
 		let proto.ft = ft
 		let w:preview_prototype_cache = proto
+		let check = {}
+		for item in res
+			let sign = item.func_prototype . ':' . item.file_line
+			if !has_key(check, sign)
+				let proto.data += [item.func_desc]
+				let check[sign] = 1
+			endif
+		endfor
 	endif
 	if len(proto.data) == 0
 		unlet w:preview_prototype_cache
@@ -851,6 +857,27 @@ function! preview#function_prototype(funcname, filetype)
 		unlet w:preview_prototype_cache
 	endif
 	return text
+endfunc
+
+
+"----------------------------------------------------------------------
+" list tags in quickfix window 
+"----------------------------------------------------------------------
+function! preview#quickfix_list(name, fn_only, filetype)
+	let res = preview#function_signature(a:name, a:fn_only, a:filetype)
+	if len(res) == 0
+		call preview#errmsg('E426: tag not found: '. a:name)
+		return 0
+	endif
+	cexpr ""
+	let output = []
+	for item in res
+		let text = item.filename . ':' . item.line . ': '
+		let text .= item.func_prototype
+		let output += [text]
+	endfor
+	caddexpr output
+	return len(res)
 endfunc
 
 
