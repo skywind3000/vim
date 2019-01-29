@@ -873,7 +873,7 @@ function! preview#quickfix_list(name, fn_only, filetype)
 	let output = []
 	for item in res
 		let text = item.filename . ':' . item.line . ': '
-		let text .= item.func_prototype
+		let text .= '<<' . a:name . '>> ' . item.func_prototype
 		let output += [text]
 	endfor
 	caddexpr output

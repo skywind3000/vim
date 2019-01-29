@@ -67,6 +67,21 @@ command! -nargs=? -bang PreviewSignature call s:PreviewSignature(<bang>0, <f-arg
 
 
 "----------------------------------------------------------------------
+" preview tags in quickfix 
+"----------------------------------------------------------------------
+function! s:PreviewList(bang, ...)
+	let name = (a:0 > 0)? a:1 : expand('<cword>')
+	let size = preview#quickfix_list(name, a:bang, &filetype)
+	if size > 0
+		redraw | echo "" | redraw
+		echo "PreviewList: ". size . " tags listed."
+	endif
+endfunc
+
+command! -nargs=? -bang PreviewList call s:PreviewList(<bang>0, <f-args>)
+
+
+"----------------------------------------------------------------------
 " preview scroll
 "----------------------------------------------------------------------
 function! s:PreviewScroll(bang, offset)
