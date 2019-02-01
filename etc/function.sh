@@ -81,6 +81,7 @@ cd_func ()
 if [ -n "$BASH_VERSION" ]; then
 	alias cd=cd_func
 	alias d='cd_func --'
+	export _ZL_CD='cd_func'
 fi
 
 
@@ -544,7 +545,6 @@ function _exit() {
 function zlua_enable() {
 	[[ -z "$1" ]] && LUA_EXEC="$(command -v lua)" || LUA_EXEC="$1"
 	export _ZL_MATCH_MODE=1
-	export _ZL_CD="cd"
 	if [[ -x "$LUA_EXEC" ]]; then
 		if [[ -n "$BASH_VERSION" ]]; then
 			PROMPT_COMMAND="${PROMPT_COMMAND//\(_z --add *\);/}"

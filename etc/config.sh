@@ -123,8 +123,11 @@ if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
 fi
 
 alias zc='z -c'
-alias zf='cd "$(z -l -s | fzf --reverse --height 35%)"'
 alias zzc='zz -c'
+
+zf() {
+	cd "$(z -l "$@" 2>&1 | fzf --height 40% --nth 2.. --reverse --inline-info +s --tac | sed 's/^[0-9,.]* *//')" 
+}
 
 
 #----------------------------------------------------------------------
