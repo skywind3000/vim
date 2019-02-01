@@ -446,12 +446,12 @@ end
 -----------------------------------------------------------------------
 function os.interpreter()
 	if os.argv == nil then
-		io.stderr:write("cannot get arguments (arg), recompiled you lua\n")
+		io.stderr:write("cannot get arguments (arg), recompiled your lua\n")
 		return nil
 	end
 	local lua = os.argv[-1]	
 	if lua == nil then
-		io.stderr:write("cannot get executable name, recompiled you lua\n")
+		io.stderr:write("cannot get executable name, recompiled your lua\n")
 	end
 	if os.path.single(lua) then
 		local path = os.path.which(lua)
@@ -469,12 +469,12 @@ end
 -----------------------------------------------------------------------
 function os.scriptname()
 	if os.argv == nil then
-		io.stderr:write("cannot get arguments (arg), recompiled you lua\n")
+		io.stderr:write("cannot get arguments (arg), recompiled your lua\n")
 		return nil
 	end
 	local script = os.argv[0]
 	if script == nil then
-		io.stderr:write("cannot get script name, recompiled you lua\n")
+		io.stderr:write("cannot get script name, recompiled your lua\n")
 	end
 	return os.path.abspath(script)
 end
