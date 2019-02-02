@@ -309,7 +309,7 @@ function os.path.abspath(path)
 	else
 		if os.path.isdir(path) then
 			if os.path.exists('/bin/sh') then
-				local cmd = "/bin/sh -c 'cd \" ..path .."\"; pwd'"
+				local cmd = "/bin/sh -c 'cd \"" ..path .."\"; pwd'"
 				return os.call(cmd)
 			end
 		end
