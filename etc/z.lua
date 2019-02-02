@@ -1142,17 +1142,21 @@ function z_cd(patterns)
 		retval = M[index].name
 	elseif Z_INTERACTIVE == 2 then
 		local fzf = os.getenv('_ZL_FZF')
-		local tmpname = os.tmpname()
-		local cmd = '--height 35% --nth 2.. --reverse --inline-info +s --tac'
+		local tmpname = '/tmp/zlua.txt'
+		local cmd = '--nth 2.. --reverse --inline-info +s --tac'
 		local cmd = ((not fzf) and 'fzf' or fzf)  .. ' ' .. cmd
-		PRINT_MODE = tmpname
-		z_print(M, true, false)
 		if not windows then
-			cmd = 'cat "' .. tmpname .. '" | ' .. cmd
+			tmpname = os.tmpname()
+			cmd = 'cat "' .. tmpname .. '" | --height 35% ' .. cmd
 		else
+			tmpname = os.tmpname():gsub('\\', ''):gsub('%.', '')
+			tmpname = os.getenv('TMP') .. '\\zlua_' .. tmpname .. '.txt'
 			cmd = 'type "' .. tmpname .. '" | ' .. cmd
 		end
+		PRINT_MODE = tmpname
+		z_print(M, true, false)
 		retval = os.call(cmd)
+		-- io.stderr:write('<'..cmd..'>\n')
 		os.remove(tmpname)
 		if retval == '' or retval == nil then
 			return nil
