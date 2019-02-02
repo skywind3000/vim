@@ -309,7 +309,7 @@ function os.path.abspath(path)
 	else
 		local test = os.path.which('realpath')
 		if test ~= nil and test ~= '' then
-			return os.call('realpath \'' .. path .. '\'')
+			return os.call('realpath -s \'' .. path .. '\' 2> /dev/null')
 		end
 		local test = os.path.which('perl')
 		if test ~= nil and test ~= '' then
