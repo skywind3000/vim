@@ -81,7 +81,7 @@ cd_func ()
 if [ -n "$BASH_VERSION" ]; then
 	alias cd=cd_func
 	alias d='cd_func --'
-	export _ZL_CD='cd_func'
+	_ZL_CD='cd_func'
 fi
 
 
