@@ -307,6 +307,12 @@ function os.path.abspath(path)
 		local output = os.call(script)
 		return output:gsub('%s$', '')
 	else
+		if os.path.isdir(path) then
+			if os.path.exists('/bin/sh') then
+				local cmd = "/bin/sh -c 'cd \" ..path .."\"; pwd'"
+				return os.call(cmd)
+			end
+		end
 		local test = os.path.which('realpath')
 		if test ~= nil and test ~= '' then
 			return os.call('realpath -s \'' .. path .. '\' 2> /dev/null')
