@@ -1728,12 +1728,12 @@ if /i "%1"=="-x" (
 	shift /1
 	goto parse
 )
-if /i "%1"=="-i" (
+if "%1"=="-i" (
 	set "InterMode=-i"
 	shift /1
 	goto parse
 )
-if /i "%1"=="-I" (
+if "%1"=="-I" (
 	set "InterMode=-I"
 	shift /1
 	goto parse
