@@ -87,6 +87,7 @@ local in_module = pcall(debug.getlocal, 4, 1) and true or false
 local utils = {}
 os.path = {}
 os.argv = arg ~= nil and arg or {}
+os.path.sep = windows and '\\' or '/'
 
 
 -----------------------------------------------------------------------
@@ -405,7 +406,7 @@ end
 -----------------------------------------------------------------------
 -- is absolute path
 -----------------------------------------------------------------------
-function os.path.isabs(pathname)
+function os.path.isabs(path)
 	if path == nil or path == '' then 
 		return false
 	elseif path:sub(1, 1) == '/' then
@@ -434,6 +435,37 @@ function os.path.norm(pathname)
 		pathname = pathname:gsub('/', '\\')
 	end
 	return pathname
+end
+
+
+-----------------------------------------------------------------------
+-- join two path
+-----------------------------------------------------------------------
+function os.path.join(path1, path2)
+	if path2 == nil or path2 == '' then
+		return path1
+	elseif os.path.isabs(path2) then
+		return path2
+	elseif path1 == nil or path1 == '' then
+		return path2
+	end
+	local postsep = true
+	local len1 = path1:len()
+	local len2 = path2:len()
+	if path1:sub(-1, -1) == '/' then
+		postsep = false
+	elseif windows then
+		if path1:sub(-1, -1) == '\\' then
+			postsep = false
+		elseif len1 == 2 and path1:sub(2, 2) == ':' then
+			postsep = false
+		end
+	end
+	if postsep then
+		return path1 .. os.path.sep .. path2
+	else
+		return path1 .. path2
+	end
 end
 
 
