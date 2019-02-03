@@ -110,7 +110,7 @@ os.LOG_NAME = os.getenv('_ZL_LOG_NAME')
 
 
 -----------------------------------------------------------------------
--- split string
+-- string lib
 -----------------------------------------------------------------------
 function string:split(sSeparator, nMax, bRegexp)
 	assert(sSeparator ~= '')
@@ -120,29 +120,55 @@ function string:split(sSeparator, nMax, bRegexp)
 		local bPlain = not bRegexp
 		nMax = nMax or -1
 		local nField, nStart = 1, 1
-		local nFirst,nLast = self:find(sSeparator, nStart, bPlain)
+		local nFirst, nLast = self:find(sSeparator, nStart, bPlain)
 		while nFirst and nMax ~= 0 do
-			aRecord[nField] = self:sub(nStart, nFirst-1)
-			nField = nField+1
-			nStart = nLast+1
-			nFirst,nLast = self:find(sSeparator, nStart, bPlain)
-			nMax = nMax-1
+			aRecord[nField] = self:sub(nStart, nFirst - 1)
+			nField = nField + 1
+			nStart = nLast + 1
+			nFirst, nLast = self:find(sSeparator, nStart, bPlain)
+			nMax = nMax - 1
 		end
 		aRecord[nField] = self:sub(nStart)
+	else
+		aRecord[1] = ''
 	end
 	return aRecord
 end
 
-
------------------------------------------------------------------------
--- string starts with
------------------------------------------------------------------------
 function string:startswith(text)
 	local size = text:len()
 	if self:sub(1, size) == text then
 		return true
 	end
 	return false
+end
+
+function string:lstrip()
+	if self == nil then return nil end
+	local s = self:gsub('^%s+', '')
+	return s
+end
+
+function string:rstrip()
+	if self == nil then return nil end
+	local s = self:gsub('%s+$', '')
+	return s
+end
+
+function string:strip()
+	return self:lstrip():rstrip()
+end
+
+function string:rfind(key)
+	if keyword == '' then
+		return self:len(), 0
+	end
+	local length = self:len()
+	local start, ends = self:reverse():find(key:reverse())
+	if start == nil then
+		return nil
+	end
+	return (length - ends + 1), (length - start + 1)
 end
 
 
@@ -380,18 +406,18 @@ end
 -- is absolute path
 -----------------------------------------------------------------------
 function os.path.isabs(pathname)
-	local h1 = pathname:sub(1, 1)
-	if windows then
-		local h2 = pathname:sub(2, 2)
-		local h3 = pathname:sub(3, 3)
-		if h1 == '/' or h1 == '\\' then
-			return true
-		end
-		if h2 == ':' and (h3 == '/' or h3 == '\\') then
-			return true
-		end
-	elseif h1 == '/' then
+	if path == nil or path == '' then 
+		return false
+	elseif path:sub(1, 1) == '/' then
 		return true
+	end
+	if windows then
+		local head = path:sub(1, 1)
+		if head == '\\' then
+			return true
+		elseif path:match('^%a:[/\\]') ~= nil then
+			return true
+		end
 	end
 	return false
 end
