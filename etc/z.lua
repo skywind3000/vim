@@ -172,6 +172,24 @@ function string:rfind(key)
 	return (length - ends + 1), (length - start + 1)
 end
 
+function string:join(parts)
+	if parts == nil or #parts == 0 then
+		return ''
+	end
+	local size = #parts
+	local text = ''
+	local index = 1
+	while index <= size do
+		if index == 1 then
+			text = text .. parts[index]
+		else
+			text = text .. self .. parts[index]
+		end
+		index = index + 1
+	end
+	return text
+end
+
 
 -----------------------------------------------------------------------
 -- table size
