@@ -342,15 +342,28 @@ end
 
 
 -----------------------------------------------------------------------
+-- absolute path (simulated)
+-----------------------------------------------------------------------
+function os.path.absolute(path)
+	local pwd = os.pwd()
+	return os.path.normpath(os.path.join(pwd, path))
+end
+
+
+-----------------------------------------------------------------------
 -- get absolute path
 -----------------------------------------------------------------------
 function os.path.abspath(path)
+	if path == '' then path = '.' end
 	if windows then
 		local script = 'FOR /f "delims=" %%i IN ("%s") DO @echo %%~fi'
 		local script = string.format(script, path)
 		local script = 'cmd.exe /C ' .. script .. ' 2> nul'
 		local output = os.call(script)
-		return output:gsub('%s$', '')
+		local test = output:gsub('%s$', '')
+		if test ~= nil and test ~= '' then
+			return test
+		end
 	else
 		local test = os.path.which('realpath')
 		if test ~= nil and test ~= '' then
@@ -387,6 +400,7 @@ function os.path.abspath(path)
 			end
 		end
 	end
+	return os.path.absolute(path)
 end
 
 
@@ -510,6 +524,8 @@ function os.path.join(path1, path2)
 	elseif os.path.isabs(path2) then
 		return path2
 	elseif path1 == nil or path1 == '' then
+		return path2
+	elseif windows and path2:match('^%a:') then
 		return path2
 	end
 	local postsep = true
