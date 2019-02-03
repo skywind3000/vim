@@ -1201,12 +1201,10 @@ function z_remove(path)
 		if not insensitive then
 			if not remove[item.name] then
 				table.insert(X, item)
-				-- print('include:'..item.name)
 			end
 		else
 			if not remove[item.name:lower()] then
 				table.insert(X, item)
-				-- print('include:'..item.name)
 			end
 		end
 	end
