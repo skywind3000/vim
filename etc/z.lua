@@ -4,7 +4,7 @@
 -- z.lua - z.sh implementation in lua, by skywind 2018, 2019
 -- Licensed under MIT license.
 --
--- Version 1.1.0, Last Modified: 2019/02/02 14:51
+-- Version 1.2.0, Last Modified: 2019/02/03 17:46
 --
 -- * 10x times faster than fasd and autojump
 -- * 3x times faster than rupa/z
@@ -453,6 +453,51 @@ function os.path.norm(pathname)
 		pathname = pathname:gsub('/', '\\')
 	end
 	return pathname
+end
+
+
+-----------------------------------------------------------------------
+-- normalize . and ..
+-----------------------------------------------------------------------
+function os.path.normpath(path)
+	if os.path.sep ~= '/' then
+		path = path:gsub('\\', '/')
+	end
+	path = path:gsub('/+', '/')
+	local srcpath = path
+	local basedir = ''
+	local isabs = false
+	if windows and path:sub(2, 2) == ':' then
+		basedir = path:sub(1, 2)
+		path = path:sub(3, -1)
+	end
+	if path:sub(1, 1) == '/' then
+		basedir = basedir .. '/'
+		isabs = true
+		path = path:sub(2, -1)
+	end
+	local parts = path:split('/')
+	local output = {}
+	for _, path in ipairs(parts) do
+		if path == '.' or path == '' then
+		elseif path == '..' then
+			local size = #output
+			if size == 0 then
+				if not isabs then
+					table.insert(output, '..')
+				end
+			elseif output[size] == '..' then
+				table.insert(output, '..')
+			else
+				table.remove(output, size)
+			end
+		else
+			table.insert(output, path)
+		end
+	end
+	path = basedir .. string.join('/', output)
+	if windows then path = path:gsub('/', '\\') end
+	return path == '' and '.' or path
 end
 
 
