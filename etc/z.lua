@@ -1405,9 +1405,70 @@ end
 
 
 -----------------------------------------------------------------------
--- cd to parent directories which contains keyword
+-- find_vcs_root
 -----------------------------------------------------------------------
-function cd_backward(args, options)
+function find_vcs_root(path)
+	local markers = os.getenv('_ZL_ROOT_MARKERS')
+	local markers = markers and markers or '.git,.svn,.hg,.root'
+	local markers = string.split(markers, ',')
+	path = os.path.absolute(path)
+	while true do
+		for _, marker in ipairs(markers) do
+			local test = os.path.join(path, marker)
+			if os.path.exists(test) then
+				return path
+			end
+		end
+		local parent, _ = os.path.split(path)
+		if path == parent then break end
+		path = parent
+	end
+	return nil
+end
+
+
+-----------------------------------------------------------------------
+-- cd to parent directories which contains keyword
+-- #args == 0   -> returns to vcs root
+-- #args == 1   -> returns to parent dir starts with args[1]
+-- #args == 2   -> returns string.replace($PWD, args[1], args[2])
+-----------------------------------------------------------------------
+function cd_backward(args, options, pwd)
+	local nargs = #args
+	local pwd = (pwd ~= nil) and pwd or os.pwd()
+	if nargs == 0 then
+		return find_vcs_root(pwd)
+	elseif nargs == 1 then
+		local test = windows and pwd:gsub('\\', '/') or pwd
+		local key = '/' .. args[1]
+		if not key:match('%u') then
+			test = test:lower()
+		end
+		local pos, _ = test:rfind(key)
+		if not pos then
+			return nil
+		end
+		local ends = test:find('/', pos + key:len())
+		if not ends then
+			ends = test:len()
+		end
+		local path = pwd:sub(1, (not ends) and test:len() or ends)
+		return os.path.normpath(path)
+	else
+		local test = windows and pwd:gsub('\\', '/') or pwd
+		local src = args[1]
+		local dst = args[2]
+		if not src:match('%u') then
+			test = test:lower()
+		end
+		local start, ends = test:rfind(src)
+		if not start then
+			return pwd
+		end
+		local lhs = pwd:sub(1, start - 1)
+		local rhs = pwd:sub(ends + 1)
+		return lhs .. dst .. rhs
+	end
 end
 
 
