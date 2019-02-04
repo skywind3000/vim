@@ -4,7 +4,7 @@
 -- z.lua - z.sh implementation in lua, by skywind 2018, 2019
 -- Licensed under MIT license.
 --
--- Version 1.4.1, Last Modified: 2019/02/04 14:40
+-- Version 1.4.0, Last Modified: 2019/02/04 00:06
 --
 -- * 10x times faster than fasd and autojump
 -- * 3x times faster than rupa/z
@@ -1996,6 +1996,7 @@ complete -c $_ZL_CMD -s 't' -d 'cd to most recently accessed dir matching'
 complete -c $_ZL_CMD -s 'l' -d 'list matches instead of cd'
 complete -c $_ZL_CMD -s 'c' -d 'restrict matches to subdirs of $PWD'
 complete -c $_ZL_CMD -s 'e' -d 'echo the best match, don''t cd'
+complete -c $_ZL_CMD -s 'b' -d 'jump backwards to given dir or to project root'
 complete -c $_ZL_CMD -s 'x' -x -d 'remove path from history' -a '(_z_complete)'
 ]]
 
