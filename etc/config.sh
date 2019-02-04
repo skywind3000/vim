@@ -106,15 +106,16 @@ fi
 #----------------------------------------------------------------------
 if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
 	if [[ -x "$INIT_LUA" ]] && [[ -f "$HOME/.local/etc/z.lua" ]]; then
-		export _ZL_MATCH_MODE=1
 		if [[ -n "$BASH_VERSION" ]]; then
-			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init bash once)"
+			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init bash once enhanced)"
 		elif [[ -n "$ZSH_VERSION" ]]; then
-			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init zsh once)"
+			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init zsh once enhanced)"
 		else
-			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init auto once)"
+			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init auto once enhanced)"
 		fi
 		alias zz='z -i'
+		alias zb='z -b'
+		alias zf='z -I'
 	else
 		[[ -f "$HOME/.local/etc/z.sh" ]] && . "$HOME/.local/etc/z.sh"
 		alias zz='z'
