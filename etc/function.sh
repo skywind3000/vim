@@ -553,6 +553,7 @@ function zlua_enable() {
 			precmd_functions[$precmd_functions[(i)_z_precmd]]=()
 			eval "$($LUA_EXEC $HOME/.local/etc/z.lua --init zsh once enhanced)"
 		fi
+		_ZL_ECHO=1
 		alias zz='z -i'
 		alias zb='z -b'
 		alias zf='z -I'

@@ -116,6 +116,7 @@ if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
 		alias zz='z -i'
 		alias zb='z -b'
 		alias zf='z -I'
+		_ZL_ECHO=1
 	else
 		[[ -f "$HOME/.local/etc/z.sh" ]] && . "$HOME/.local/etc/z.sh"
 		alias zz='z'
@@ -124,10 +125,6 @@ fi
 
 alias zc='z -c'
 alias zzc='zz -c'
-
-zf() {
-	cd "$(z -l "$@" 2>&1 | fzf --height 40% --nth 2.. --reverse --inline-info +s --tac | sed 's/^[0-9,.]* *//')" 
-}
 
 
 #----------------------------------------------------------------------
