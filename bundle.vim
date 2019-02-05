@@ -384,6 +384,7 @@ if index(g:bundle_group, 'ale') >= 0
 	let g:ale_cpp_gcc_options = '-Wall -O2 -std=c++14'
 	let g:ale_c_cppcheck_options = ''
 	let g:ale_cpp_cppcheck_options = ''
+	let g:ale_lua_luacheck_options = '-d'
 
 	" let g:ale_linters.text = ['textlint', 'write-good', 'languagetool']
 
