@@ -324,6 +324,9 @@ end
 -----------------------------------------------------------------------
 function os.path.which(exename)
 	local path = os.getenv('PATH')
+	if exename == nil or exename == '' then
+		return nil
+	end
 	if windows then
 		paths = ('.;' .. path):split(';')
 	else
@@ -704,8 +707,7 @@ function os.path.expand(pathname)
 end
 
 
------------------------------------------------------------------------
--- search executable
+----------------------------------------------------------------------- -- search executable
 -----------------------------------------------------------------------
 function os.path.search(name)
 end
@@ -720,7 +722,7 @@ function os.interpreter()
 		return nil
 	end
 	local lua = os.argv[-1]
-	if lua == nil then
+	if lua == nil or lua == '' then
 		io.stderr:write("cannot get executable name, recompiled your lua\n")
 	end
 	if os.path.single(lua) then
