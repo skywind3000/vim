@@ -387,7 +387,6 @@ if index(g:bundle_group, 'ale') >= 0
 	let g:ale_lua_luacheck_options = '-d'
 
 	" let g:ale_linters.text = ['textlint', 'write-good', 'languagetool']
-
 	" let g:ale_linters.lua += ['luacheck']
 	
 	if executable('gcc') == 0 && executable('clang')
