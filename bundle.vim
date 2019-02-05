@@ -361,7 +361,7 @@ if index(g:bundle_group, 'ale') >= 0
 				\ 'c': ['gcc', 'cppcheck'], 
 				\ 'cpp': ['gcc', 'cppcheck'], 
 				\ 'python': ['flake8', 'pylint'], 
-				\ 'lua': ['luac'], 
+				\ 'lua': ['luac', 'luacheck'], 
 				\ 'go': ['go build', 'gofmt'],
 				\ 'java': ['javac'],
 				\ 'javascript': ['eslint'], 
