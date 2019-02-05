@@ -361,7 +361,7 @@ if index(g:bundle_group, 'ale') >= 0
 				\ 'c': ['gcc', 'cppcheck'], 
 				\ 'cpp': ['gcc', 'cppcheck'], 
 				\ 'python': ['flake8', 'pylint'], 
-				\ 'lua': ['luac', 'luacheck'], 
+				\ 'lua': ['luac'], 
 				\ 'go': ['go build', 'gofmt'],
 				\ 'java': ['javac'],
 				\ 'javascript': ['eslint'], 
@@ -388,6 +388,8 @@ if index(g:bundle_group, 'ale') >= 0
 
 	" let g:ale_linters.text = ['textlint', 'write-good', 'languagetool']
 
+	" let g:ale_linters.lua += ['luacheck']
+	
 	if executable('gcc') == 0 && executable('clang')
 		let g:ale_linters.c += ['clang']
 		let g:ale_linters.cpp += ['clang']
