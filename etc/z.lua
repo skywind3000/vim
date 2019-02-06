@@ -73,6 +73,7 @@
 --   set $_ZL_ECHO to 1 to display new directory name after cd.
 --   set $_ZL_MAXAGE to define a aging threshold (default is 5000).
 --   set $_ZL_MATCH_MODE to 1 to enable enhanced matching mode.
+--   set $_ZL_NO_CHECK to 1 to disable path validation. z --purge to clear.
 --
 --=====================================================================
 
