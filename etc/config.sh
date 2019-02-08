@@ -106,7 +106,7 @@ fi
 #----------------------------------------------------------------------
 if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
 	if [[ ! -d "$HOME/.local/share/zlua" ]]; then
-		mkdir -p -m 700 "$HOME/.local/share/zlua"
+		mkdir -p -m 700 "$HOME/.local/share/zlua" 2> /dev/null
 	fi
 	export _ZL_DATA="$HOME/.local/share/zlua/zlua.txt"
 	export _Z_DATA="$HOME/.local/share/zlua/z.txt"

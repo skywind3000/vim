@@ -545,7 +545,7 @@ function _exit() {
 #----------------------------------------------------------------------
 function zlua_enable() {
 	if [[ ! -d "$HOME/.local/share/zlua" ]]; then
-		mkdir -p -m 700 "$HOME/.local/share/zlua"
+		mkdir -p -m 700 "$HOME/.local/share/zlua" 2> /dev/null
 	fi
 	export _ZL_DATA="$HOME/.local/share/zlua/zlua.txt"
 	[[ -z "$1" ]] && LUA_EXEC="$(command -v lua)" || LUA_EXEC="$1"
