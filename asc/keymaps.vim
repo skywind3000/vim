@@ -29,6 +29,7 @@ inoremap <F3> <ESC>:VimTool 3<cr>
 inoremap <F4> <ESC>:VimTool 4<cr>
 
 
+
 " keymap for VimTool
 if (has('gui_running') || has('nvim')) && (has('win32') || has('win64'))
 	let s:keys = [')', '!', '@', '#', '$', '%', '^', '&', '*', '(']

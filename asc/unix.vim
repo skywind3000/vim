@@ -18,6 +18,7 @@ set foldlevel=99
 set tags=./.tags;,.tags
 set formatoptions+=m
 set formatoptions+=B
+set history=2000
 set showcmd
 
 noremap <tab>/ :emenu <C-Z>
