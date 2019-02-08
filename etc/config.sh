@@ -105,7 +105,7 @@ fi
 # https://github.com/rupa/z
 #----------------------------------------------------------------------
 if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
-	if [[ -! -d "$HOME/.local/share/zlua" ]]; then
+	if [[ ! -d "$HOME/.local/share/zlua" ]]; then
 		mkdir -p -m 700 "$HOME/.local/share/zlua"
 	fi
 	export _ZL_DATA="$HOME/.local/share/zlua/zlua.txt"
