@@ -544,6 +544,10 @@ function _exit() {
 # enable zlua 
 #----------------------------------------------------------------------
 function zlua_enable() {
+	if [[ -! -d "$HOME/.local/share/zlua" ]]; then
+		mkdir -p -m 700 "$HOME/.local/share/zlua"
+	fi
+	export _ZL_DATA="$HOME/.local/share/zlua/zlua.txt"
 	[[ -z "$1" ]] && LUA_EXEC="$(command -v lua)" || LUA_EXEC="$1"
 	if [[ -x "$LUA_EXEC" ]]; then
 		if [[ -n "$BASH_VERSION" ]]; then

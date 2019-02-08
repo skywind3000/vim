@@ -105,6 +105,11 @@ fi
 # https://github.com/rupa/z
 #----------------------------------------------------------------------
 if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
+	if [[ -! -d "$HOME/.local/share/zlua" ]]; then
+		mkdir -p -m 700 "$HOME/.local/share/zlua"
+	fi
+	export _ZL_DATA="$HOME/.local/share/zlua/zlua.txt"
+	export _Z_DATA="$HOME/.local/share/zlua/z.txt"
 	if [[ -x "$INIT_LUA" ]] && [[ -f "$HOME/.local/etc/z.lua" ]]; then
 		if [[ -n "$BASH_VERSION" ]]; then
 			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init bash once enhanced)"
