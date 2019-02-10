@@ -1919,7 +1919,7 @@ function z_shell_init(opts)
 	if not opts.posix then
 		print(script_zlua)
 	else
-		if opts.modern then
+		if opts.new or opts.modern then
 			print(script_zlua)
 		else
 			local script = script_zlua:gsub('local ', '')
