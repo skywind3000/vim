@@ -1955,7 +1955,7 @@ function z_shell_init(opts)
 			local script = script_init_posix
 			if once then script = script_init_posix_once end
 			if opts.legacy then
-				script = script:gsub('&)', ')')
+				script = script:gsub('%&%)', ')')
 			end
 			print(script)
 		end
