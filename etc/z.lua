@@ -1913,7 +1913,7 @@ function z_shell_init(opts)
 	if not opts.posix then
 		print(script_zlua)
 	elseif not opts.legacy then
-		local script = script_lua:gsub('builtin ', '')
+		local script = script_zlua:gsub('builtin ', '')
 		print(script)
 	else
 		local script = script_zlua:gsub('local ', ''):gsub('builtin ', '')
