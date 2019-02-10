@@ -552,7 +552,7 @@ function zlua_enable() {
 	if [[ -x "$LUA_EXEC" ]]; then
 		if [[ -n "$BASH_VERSION" ]]; then
 			PROMPT_COMMAND="${PROMPT_COMMAND//\(_z --add *\);/}"
-			eval "$($LUA_EXEC $HOME/.local/etc/z.lua --init bash once enhanced)"
+			eval "$($LUA_EXEC $HOME/.local/etc/z.lua --init bash once enhanced fzf)"
 		elif [[ -n "$ZSH_VERSION" ]]; then
 			precmd_functions[$precmd_functions[(i)_z_precmd]]=()
 			eval "$($LUA_EXEC $HOME/.local/etc/z.lua --init zsh once enhanced)"

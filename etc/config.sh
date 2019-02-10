@@ -112,7 +112,7 @@ if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
 	export _Z_DATA="$HOME/.local/share/zlua/z.txt"
 	if [[ -x "$INIT_LUA" ]] && [[ -f "$HOME/.local/etc/z.lua" ]]; then
 		if [[ -n "$BASH_VERSION" ]]; then
-			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init bash once enhanced)"
+			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init bash once enhanced fzf)"
 		elif [[ -n "$ZSH_VERSION" ]]; then
 			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init zsh once enhanced)"
 		else
