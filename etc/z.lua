@@ -180,7 +180,7 @@ function string:rfind(key)
 		return self:len(), 0
 	end
 	local length = self:len()
-	local start, ends = self:reverse():find(key:reverse())
+	local start, ends = self:reverse():find(key:reverse(), 1, true)
 	if start == nil then
 		return nil
 	end
@@ -1499,7 +1499,7 @@ function cd_backward(args, options, pwd)
 			return os.path.normpath(path)
 		else
 			local test = windows and pwd:gsub('\\', '/') or pwd
-			local key = '/' .. args[1]
+			local key = windows and args[1]:lower() or args[1]
 			if not key:match('%u') then
 				test = test:lower()
 			end
@@ -1507,7 +1507,12 @@ function cd_backward(args, options, pwd)
 			if not pos then
 				return nil
 			end
-			local ends = test:find('/', pos + key:len())
+			if pos > 1 then
+				if test:sub(pos - 1, pos - 1) ~= '/' then
+					return nil
+				end
+			end
+			local ends = test:find('/', pos + key:len(), 0, true)
 			if not ends then
 				ends = test:len()
 			end
