@@ -1880,18 +1880,14 @@ local script_fzf_complete_bash = [[
 if [ "$TERM" != "dumb" ] && command -v fzf >/dev/null 2>&1; then
 	# To redraw line after fzf closes (printf '\e[5n')
 	bind '"\e[0n": redraw-current-line'
-
 	_zlua_fzf_complete() {
-		local query="${COMP_WORDS[COMP_CWORD]}"
-		local selected=$(_zlua | sed "s|$HOME|\~|" | $zlua_fzf --query "$query" | sed 's/^[0-9,.]* *//')
-
+		local args=("${COMP_WORDS[@]:1}")
+		local selected=$(_zlua -l "${args[@]}" | sed "s|$HOME|\~|" | $zlua_fzf | sed 's/^[0-9,.]* *//')
 		if [ -n "$selected" ]; then
 			COMPREPLY=( "$selected" )
 		fi
-
 		printf '\e[5n'
 	}
-
 	complete -o bashdefault -o nospace -F _zlua_fzf_complete ${_ZL_CMD:-z}
 fi
 ]]
@@ -1906,6 +1902,7 @@ _zlua_zsh_tab_completion() {
 }
 compctl -U -K _zlua_zsh_tab_completion _zlua
 ]]
+
 
 
 -----------------------------------------------------------------------
