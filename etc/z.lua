@@ -651,6 +651,45 @@ end
 
 
 -----------------------------------------------------------------------
+-- path tear
+-----------------------------------------------------------------------
+function os.path.tear(path)
+	local parts = {}
+	if path == nil then return nil end
+	while true do
+		local head, tail = os.path.split(path)
+		if head == path then break end
+		if tail ~= nil and tail ~= '' then
+			table.insert(parts, tail)
+		end
+		path = head
+	end
+	if path ~= nil and path ~= '' then
+		table.insert(parts, path)
+	end
+	local i, j = 1, #parts
+	while i < j do
+		parts[i], parts[j] = parts[j], parts[i]
+		i, j = i + 1, j - 1
+	end
+	return parts
+end
+
+
+-----------------------------------------------------------------------
+-- concat
+-----------------------------------------------------------------------
+function os.path.concat(elements)
+	if elements == nil then return nil end
+	local path = ''
+	for _, name in ipairs(elements) do
+		path = os.path.join(path, name)
+	end
+	return os.path.norm(path)
+end
+
+
+-----------------------------------------------------------------------
 -- check subdir
 -----------------------------------------------------------------------
 function os.path.subdir(basename, subname)
@@ -788,25 +827,13 @@ end
 -----------------------------------------------------------------------
 function os.path.glob(path)
 	local result = {}
-	local parts = {}
 	local test = path
 	if path == nil or path == '' then return nil end
 	if path:startswith('~') then
 		path = os.path.expand(path)
 	end
-	while true do
-		local head, tail = os.path.split(test)
-		if head == test then break end
-		table.insert(parts, tail)
-		test = head
-	end
-	table.insert(parts, test)
+	local parts = os.path.tear(path)
 	local limit = #parts
-	local i, j = 1, limit
-	while i < j do
-		parts[i], parts[j] = parts[j], parts[i]
-		i, j = i + 1, j - 1
-	end
 	if limit < 1 then return nil end
 	function search(base, index)
 		local element = parts[index]
