@@ -826,8 +826,9 @@ function os.path.glob(path)
 					end
 				end
 			else
+				local test = os.path.join(base, element)
 				if os.path.isdir(test) then
-					search(os.path.join(base, element), index + 1)
+					search(test, index + 1)
 				end
 			end
 		end
