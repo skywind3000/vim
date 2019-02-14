@@ -742,7 +742,7 @@ function os.listdir(path, onlydir)
 			local name = line:sub(1, -2)
 			local mark = '*/=>@|'
 			if not mark:find(flag, 0, true) then
-				tail = ''
+				flag = ''
 				name = line
 			end
 			if name ~= '' and name ~= '.' and name ~= '..' then
