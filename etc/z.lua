@@ -239,6 +239,10 @@ end
 -----------------------------------------------------------------------
 function printT(table, level)
 	key = ""
+	if table == nil then
+		print('nil')
+		return
+	end
 	local func = function(table, level) end
 	func = function(table, level)
 		level = level or 1
@@ -251,7 +255,6 @@ function printT(table, level)
 		else
 			print(indent .. "{")
 		end
-
 		key = ""
 		for k, v in pairs(table) do
 			if type(v) == "table" then
@@ -716,6 +719,121 @@ end
 -- search executable
 -----------------------------------------------------------------------
 function os.path.search(name)
+end
+
+
+-----------------------------------------------------------------------
+-- list files in directory
+-----------------------------------------------------------------------
+function os.listdir(path, onlydir)
+	local record = {}
+	path = os.path.absolute(path)
+	if not os.path.isdir(path) then
+		if path ~= '.' then
+			return nil
+		end
+	end
+	if os.path.sep == '/' then
+		local cmd = 'command ls -1aF "' .. path .. '"'
+		local fp = io.popen(cmd .. ' 2> /dev/null')
+		if fp == nil then return nil end
+		for line in fp:lines() do
+			local flag = line:sub(-1, -1)
+			local name = line:sub(1, -2)
+			local mark = '*/=>@|'
+			if not mark:find(flag, 0, true) then
+				tail = ''
+				name = line
+			end
+			if name ~= '' and name ~= '.' and name ~= '..' then
+				if not onlydir then
+					table.insert(record, name)
+				elseif flag == '/' then
+					table.insert(record, name)
+				end
+			end
+		end
+		fp:close()
+	else
+		local cmd = 'dir /b "'..path..'" ' .. (onlydir and '/ad' or '/a')
+		local fp = io.popen(cmd .. ' 2> /dev/nul')
+		if fp == nil then return nil end
+		for line in fp:lines() do
+			if line == nil then break end
+			if line ~= '' then
+				table.insert(record, line)
+			end
+		end
+		fp:close()
+	end
+	return record
+end
+
+
+-----------------------------------------------------------------------
+-- translate wildcard
+-----------------------------------------------------------------------
+function os.path.wildcard_escape(wildcard)
+	local pat = wildcard:gsub('%.', '%%.'):gsub('%?', '.'):gsub('%*', '.*')
+	pat = '^' .. pat .. '$'
+	if os.path.sep == '/' and pat:find('%u') then
+		return pat
+	end
+	return case_insensitive_pattern(pat)
+end
+
+
+-----------------------------------------------------------------------
+-- expand glob
+-----------------------------------------------------------------------
+function os.path.glob(path)
+	local result = {}
+	local parts = {}
+	local test = path
+	if path == nil or path == '' then return nil end
+	while true do
+		local head, tail = os.path.split(test)
+		if head == test then break end
+		table.insert(parts, tail)
+		test = head
+	end
+	table.insert(parts, test)
+	local limit = #parts
+	local i, j = 1, limit
+	while i < j do
+		parts[i], parts[j] = parts[j], parts[i]
+		i, j = i + 1, j - 1
+	end
+	if limit < 1 then return nil end
+	function search(base, index)
+		local element = parts[index]
+		if index <= 1 then
+			search(element, index + 1)
+		elseif index > limit then
+			if os.path.isdir(base) then
+				table.insert(result, os.path.normpath(base))
+			end
+		else
+			if element:find('?', 0, true) or element:find('*', 0, true) then
+				local dirs = os.listdir(base, true)
+				local pat = os.path.wildcard_escape(element)
+				if dirs then
+					for _, name in ipairs(dirs) do
+						if element == '*' or name:find(pat) then
+							local test = os.path.join(base, name)
+							search(os.path.join(base, name), index + 1)
+						end
+					end
+				end
+			else
+				if os.path.isdir(test) then
+					search(os.path.join(base, element), index + 1)
+				end
+			end
+		end
+	end
+	search('', 1)
+	return result
 end
 
 
