@@ -4,7 +4,7 @@
 -- z.lua - a cd command that learns, by skywind 2018, 2019
 -- Licensed under MIT license.
 --
--- Version 1.4.8, Last Modified: 2019/02/14 10:19
+-- Version 2.0.1, Last Modified: 2019/02/14 10:19
 --
 -- * 10x faster than fasd and autojump, 3x faster than z.sh
 -- * available for posix shells: bash, zsh, sh, ash, dash, busybox
@@ -837,6 +837,69 @@ function os.path.glob(path)
 		end
 	end
 	search('', 1)
+	return result
+end
+
+
+-----------------------------------------------------------------------
+-- glob_fast
+-----------------------------------------------------------------------
+function os.path.glob_path(path, native)
+	if path == nil or path == '' then 
+		return nil
+	end
+	if path:find('~', 0, true) then
+		path = os.path.expand(path)
+	end
+	path = os.path.normpath(path)
+	if (not path:find('*', 0, true)) and (not path:find('?', 0, true)) then
+		local head, tail = os.path.split(path)
+		if head == path then
+			return {path}
+		elseif os.path.isdir(path) then
+			return {path}
+		end
+		return nil
+	end
+	if os.path.sep ~= '/' or native then
+		return os.path.glob(path)
+	end
+	local test = os.getenv('_ZL_NO_BASH')
+	if test ~= nil and test ~= '' and test ~= '0' and test ~= 'no' then
+		return os.path.glob(path)
+	end
+	local bash = os.path.which('bash')
+	if (not bash) or bash == '' then
+		return os.path.glob(path)
+	end
+	local tmpname = os.tmpname()
+	local fp = io.open(tmpname, 'w')
+	fp:write('function _expand_glob() {\n')
+	fp:write(' shopt -s nocaseglob extglob nullglob\n')
+	fp:write(' shopt -u failglob\n')
+	fp:write(' local ex=($1)\n')
+	fp:write(' printf "%s\\n" "${ex[@]}"\n}\n\n')
+	fp:write('_expand_glob "$*"\n\n')
+	fp:close()
+	local test = (path:sub(-1, -1) ~= '/') and (path .. '/') or path
+	local cmd = 'bash "'..tmpname..'" "'..test..'"'
+	local result = {}
+	fp = io.popen(cmd .. '', 'r')
+	if fp == nil then
+		return nil
+	end
+	for line in fp:lines() do
+		if line:sub(-1, -1) == '/' then
+			if line:len() > 1 then
+				line = line:sub(1, -2)
+			end
+			if line and os.path.isdir(line) then
+				table.insert(result, line)
+			end
+		end
+	end
+	fp:close()
+	os.remove(tmpname)
 	return result
 end
 
