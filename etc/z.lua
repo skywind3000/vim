@@ -791,6 +791,9 @@ function os.path.glob(path)
 	local parts = {}
 	local test = path
 	if path == nil or path == '' then return nil end
+	if path:startswith('~') then
+		path = os.path.expand(path)
+	end
 	while true do
 		local head, tail = os.path.split(test)
 		if head == test then break end
