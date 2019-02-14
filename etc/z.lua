@@ -4,7 +4,7 @@
 -- z.lua - a cd command that learns, by skywind 2018, 2019
 -- Licensed under MIT license.
 --
--- Version 2.0.0, Last Modified: 2019/02/15 00:12
+-- Version 1.5.0, Last Modified: 2019/02/14 22:57
 --
 -- * 10x faster than fasd and autojump, 3x faster than z.sh
 -- * available for posix shells: bash, zsh, sh, ash, dash, busybox
@@ -239,10 +239,6 @@ end
 -----------------------------------------------------------------------
 function printT(table, level)
 	key = ""
-	if table == nil then
-		print('nil')
-		return
-	end
 	local func = function(table, level) end
 	func = function(table, level)
 		level = level or 1
@@ -255,6 +251,7 @@ function printT(table, level)
 		else
 			print(indent .. "{")
 		end
+
 		key = ""
 		for k, v in pairs(table) do
 			if type(v) == "table" then
@@ -651,60 +648,6 @@ end
 
 
 -----------------------------------------------------------------------
--- path tear: split all elements
------------------------------------------------------------------------
-function os.path.tear(path)
-	local parts = {}
-	if path == nil then return nil end
-	while true do
-		local head, tail = os.path.split(path)
-		if head == path then break end
-		if tail ~= nil and tail ~= '' then
-			table.insert(parts, tail)
-		end
-		path = head
-	end
-	if path ~= nil and path ~= '' then
-		table.insert(parts, path)
-	end
-	local i, j = 1, #parts
-	while i < j do
-		parts[i], parts[j] = parts[j], parts[i]
-		i, j = i + 1, j - 1
-	end
-	return parts
-end
-
-
------------------------------------------------------------------------
--- concat: join all elements
------------------------------------------------------------------------
-function os.path.concat(elements)
-	if elements == nil then return nil end
-	local path = ''
-	for _, name in ipairs(elements) do
-		path = os.path.join(path, name)
-	end
-	return os.path.norm(path)
-end
-
-
------------------------------------------------------------------------
--- check is root
------------------------------------------------------------------------
-function os.path.isroot(path)
-	if path == nil or path == '' then 
-		return false
-	elseif path == '/' or path == '\\' or path == '~' then 
-		return true 
-	elseif path:match('^%a:[/\\]') then
-		return true
-	end
-	return false
-end
-
-
------------------------------------------------------------------------
 -- check subdir
 -----------------------------------------------------------------------
 function os.path.subdir(basename, subname)
@@ -777,176 +720,6 @@ end
 
 
 -----------------------------------------------------------------------
--- list files in directory
------------------------------------------------------------------------
-function os.listdir(path, onlydir)
-	local record = {}
-	path = os.path.absolute(path)
-	if not os.path.isdir(path) then
-		if path ~= '.' then
-			return nil
-		end
-	end
-	if os.path.sep == '/' then
-		local cmd = 'command ls -1aF "' .. path .. '"'
-		local fp = io.popen(cmd .. ' 2> /dev/null')
-		if fp == nil then return nil end
-		for line in fp:lines() do
-			local flag = line:sub(-1, -1)
-			local name = line:sub(1, -2)
-			local mark = '*/=>@|'
-			if not mark:find(flag, 0, true) then
-				flag = ''
-				name = line
-			end
-			if name ~= '' and name ~= '.' and name ~= '..' then
-				if not onlydir then
-					table.insert(record, name)
-				elseif flag == '/' then
-					table.insert(record, name)
-				end
-			end
-		end
-		fp:close()
-	else
-		local cmd = 'dir /b "'..path..'" ' .. (onlydir and '/ad' or '/a')
-		local fp = io.popen(cmd .. ' 2> /dev/nul')
-		if fp == nil then return nil end
-		for line in fp:lines() do
-			if line == nil then break end
-			if line ~= '' then
-				table.insert(record, line)
-			end
-		end
-		fp:close()
-	end
-	return record
-end
-
-
------------------------------------------------------------------------
--- translate wildcard
------------------------------------------------------------------------
-function os.path.wildcard_escape(wildcard)
-	local pat = wildcard:gsub('%.', '%%.'):gsub('%?', '.'):gsub('%*', '.*')
-	pat = '^' .. pat:gsub('%+', '%%+') .. '$'
-	if os.path.sep == '/' and pat:find('%u') then
-		return pat
-	end
-	return case_insensitive_pattern(pat)
-end
-
-
------------------------------------------------------------------------
--- expand glob
------------------------------------------------------------------------
-function os.path.glob(path)
-	local result = {}
-	local test = path
-	if path == nil or path == '' then return nil end
-	if path:startswith('~') then
-		path = os.path.expand(path)
-	end
-	local parts = os.path.tear(path)
-	local limit = #parts
-	if limit < 1 then return nil end
-	function search(base, index)
-		local element = parts[index]
-		if index <= 1 then
-			search(element, index + 1)
-		elseif index > limit then
-			if os.path.isdir(base) then
-				table.insert(result, os.path.normpath(base))
-			end
-		else
-			if element:find('?', 0, true) or element:find('*', 0, true) then
-				local dirs = os.listdir(base, true)
-				local pat = os.path.wildcard_escape(element)
-				if dirs then
-					for _, name in ipairs(dirs) do
-						if element == '*' or name:find(pat) then
-							local test = os.path.join(base, name)
-							search(os.path.join(base, name), index + 1)
-						end
-					end
-				end
-			else
-				local test = os.path.join(base, element)
-				if os.path.isdir(test) then
-					search(test, index + 1)
-				end
-			end
-		end
-	end
-	search('', 1)
-	return result
-end
-
-
------------------------------------------------------------------------
--- glob_fast
------------------------------------------------------------------------
-function os.path.glob_path(path, native)
-	if path == nil or path == '' then 
-		return nil
-	end
-	if path:find('~', 0, true) then
-		path = os.path.expand(path)
-	end
-	path = os.path.normpath(path)
-	if (not path:find('*', 0, true)) and (not path:find('?', 0, true)) then
-		local head, tail = os.path.split(path)
-		if head == path then
-			return {path}
-		elseif os.path.isdir(path) then
-			return {path}
-		end
-		return nil
-	end
-	if os.path.sep ~= '/' or native then
-		return os.path.glob(path)
-	end
-	local test = os.getenv('_ZL_NO_BASH')
-	if test ~= nil and test ~= '' and test ~= '0' and test ~= 'no' then
-		return os.path.glob(path)
-	end
-	local bash = os.path.which('bash')
-	if (not bash) or bash == '' then
-		return os.path.glob(path)
-	end
-	local tmpname = os.tmpname()
-	local fp = io.open(tmpname, 'w')
-	fp:write('function _expand_glob() {\n')
-	fp:write(' shopt -s nocaseglob extglob nullglob\n')
-	fp:write(' shopt -u failglob\n')
-	fp:write(' local ex=($1)\n')
-	fp:write(' printf "%s\\n" "${ex[@]}"\n}\n\n')
-	fp:write('_expand_glob "$*"\n\n')
-	fp:close()
-	local test = (path:sub(-1, -1) ~= '/') and (path .. '/') or path
-	local cmd = 'bash "'..tmpname..'" "'..test..'"'
-	local result = {}
-	fp = io.popen(cmd .. '', 'r')
-	if fp == nil then
-		return nil
-	end
-	for line in fp:lines() do
-		if line:sub(-1, -1) == '/' then
-			if line:len() > 1 then
-				line = line:sub(1, -2)
-			end
-			if line and os.path.isdir(line) then
-				table.insert(result, line)
-			end
-		end
-	end
-	fp:close()
-	os.remove(tmpname)
-	return result
-end
-
-
------------------------------------------------------------------------
 -- get lua executable
 -----------------------------------------------------------------------
 function os.interpreter()
@@ -1006,16 +779,8 @@ function os.getopt(argv)
 			if head ~= '-' then
 				break
 			end
-			if arg == '-' then
-				options['-'] = ''
-			elseif arg == '--' then
-				options['-'] = '-'
-			elseif arg:match('^-%d+$') then
-				options['-'] = arg:sub(2)
-			else
-				local part = arg:split('=')
-				options[part[1]] = part[2] ~= nil and part[2] or ''
-			end
+			local part = arg:split('=')
+			options[part[1]] = part[2] ~= nil and part[2] or ''
 		end
 		index = index + 1
 	end
@@ -1771,89 +1536,6 @@ function cd_backward(args, options, pwd)
 		local rhs = pwd:sub(ends + 1)
 		return lhs .. dst .. rhs
 	end
-end
-
-
------------------------------------------------------------------------
--- make glob path
------------------------------------------------------------------------
-function make_glob_path(args, prefix, pwd)
-	local pwd = (pwd ~= nil) and pwd or os.pwd()
-	local path = pwd
-	if args == nil then 
-		return nil 
-	end
-	if type(args) == 'string' then
-		args = {args}
-	end
-	for _, arg in ipairs(args) do
-		local parts = os.path.tear(arg)
-		for _, name in ipairs(parts) do
-			if os.path.isroot(name) then
-				if name:find('~', 0, true) then
-					name = os.path.expand(name)
-				end
-				path = name
-			elseif name == '.' or name == '..' then
-				path = os.path.join(path, name)
-			elseif name ~= '' then
-				if prefix then
-					path = os.path.join(path, name .. '*')
-				else
-					path = os.path.join(path, '*' .. name .. '*')
-				end
-			end
-		end
-	end
-	return os.path.normpath(path):gsub('\\', '/')
-end
-
-
------------------------------------------------------------------------
--- find glob path
------------------------------------------------------------------------
-function match_glob_paths(args, pwd, detour)
-	local pwd = (pwd ~= nil) and pwd or os.pwd()
-	local test = os.getenv('_ZL_NO_FUZZY') 
-	local fuzzy = (test == nil or test == '' or test == '0' or test == 'no')
-	if not detour then
-		test = make_glob_path(args, true, pwd)
-		if test then
-			local result = os.path.glob_path(test, false)
-			if result and #result ~= 0 then
-				return result
-			end
-		end
-		test = make_glob_path(args, false, pwd)
-		if test and fuzzy then
-			local result = os.path.glob_path(test, false)
-			if result and #result ~= 0 then
-				return result
-			end
-		end
-	else
-		local path = pwd
-		while path ~= '' do
-			test = make_glob_path(args, true, path)
-			if test then
-				local result = os.path.glob_path(test, false)
-				if result and #result ~= 0 then
-					return result
-				end
-			end
-			test = make_glob_path(args, false, path)
-			if test and fuzzy then
-				local result = os.path.glob_path(test, false)
-				if result and #result ~= 0 then
-					return result
-				end
-			end
-			test = os.path.split(path)
-			if test == path then break end
-			path = test
-		end
-	end
-	return nil
 end
 
 
