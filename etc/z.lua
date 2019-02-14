@@ -775,7 +775,7 @@ end
 -----------------------------------------------------------------------
 function os.path.wildcard_escape(wildcard)
 	local pat = wildcard:gsub('%.', '%%.'):gsub('%?', '.'):gsub('%*', '.*')
-	pat = '^' .. pat .. '$'
+	pat = '^' .. pat:gsub('%+', '%%+') .. '$'
 	if os.path.sep == '/' and pat:find('%u') then
 		return pat
 	end
