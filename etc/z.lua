@@ -651,7 +651,7 @@ end
 
 
 -----------------------------------------------------------------------
--- path tear
+-- path tear: split all elements
 -----------------------------------------------------------------------
 function os.path.tear(path)
 	local parts = {}
@@ -677,7 +677,7 @@ end
 
 
 -----------------------------------------------------------------------
--- concat
+-- concat: join all elements
 -----------------------------------------------------------------------
 function os.path.concat(elements)
 	if elements == nil then return nil end
@@ -991,8 +991,16 @@ function os.getopt(argv)
 			if head ~= '-' then
 				break
 			end
-			local part = arg:split('=')
-			options[part[1]] = part[2] ~= nil and part[2] or ''
+			if arg == '-' then
+				options['-'] = ''
+			elseif arg == '--' then
+				options['-'] = '-'
+			elseif arg:match('^-%d+$') then
+				options['-'] = arg:sub(2)
+			else
+				local part = arg:split('=')
+				options[part[1]] = part[2] ~= nil and part[2] or ''
+			end
 		end
 		index = index + 1
 	end
