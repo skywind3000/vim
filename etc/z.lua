@@ -1775,11 +1775,17 @@ end
 
 
 -----------------------------------------------------------------------
--- find glob
+-- make glob path
 -----------------------------------------------------------------------
 function make_glob_path(args, prefix, pwd)
 	local pwd = (pwd ~= nil) and pwd or os.pwd()
 	local path = pwd
+	if args == nil then 
+		return nil 
+	end
+	if type(args) == 'string' then
+		args = {args}
+	end
 	for _, arg in ipairs(args) do
 		local parts = os.path.tear(arg)
 		for _, name in ipairs(parts) do
@@ -1790,8 +1796,7 @@ function make_glob_path(args, prefix, pwd)
 				path = name
 			elseif name == '.' or name == '..' then
 				path = os.path.join(path, name)
-			else
-				print('> '..name)
+			elseif name ~= '' then
 				if prefix then
 					path = os.path.join(path, name .. '*')
 				else
@@ -1800,7 +1805,55 @@ function make_glob_path(args, prefix, pwd)
 			end
 		end
 	end
-	return path
+	return os.path.normpath(path):gsub('\\', '/')
+end
+
+
+-----------------------------------------------------------------------
+-- find glob path
+-----------------------------------------------------------------------
+function match_glob_paths(args, pwd, detour)
+	local pwd = (pwd ~= nil) and pwd or os.pwd()
+	local test = os.getenv('_ZL_NO_FUZZY') 
+	local fuzzy = (test == nil or test == '' or test == '0' or test == 'no')
+	if not detour then
+		test = make_glob_path(args, true, pwd)
+		if test then
+			local result = os.path.glob_path(test, false)
+			if result and #result ~= 0 then
+				return result
+			end
+		end
+		test = make_glob_path(args, false, pwd)
+		if test and fuzzy then
+			local result = os.path.glob_path(test, false)
+			if result and #result ~= 0 then
+				return result
+			end
+		end
+	else
+		local path = pwd
+		while path ~= '' do
+			test = make_glob_path(args, true, path)
+			if test then
+				local result = os.path.glob_path(test, false)
+				if result and #result ~= 0 then
+					return result
+				end
+			end
+			test = make_glob_path(args, false, path)
+			if test and fuzzy then
+				local result = os.path.glob_path(test, false)
+				if result and #result ~= 0 then
+					return result
+				end
+			end
+			test = os.path.split(path)
+			if test == path then break end
+			path = test
+		end
+	end
+	return nil
 end
 
 
