@@ -628,7 +628,7 @@ function os.path.split(path)
 		return path:sub(1, 1), path:sub(2)
 	elseif windows then
 		local drive = path:match('^%a:') and path:sub(1, 2) or ''
-		if pos == 3 then
+		if pos == 3 and drive ~= '' then
 			return path:sub(1, 3), path:sub(4)
 		end
 	end
@@ -686,6 +686,21 @@ function os.path.concat(elements)
 		path = os.path.join(path, name)
 	end
 	return os.path.norm(path)
+end
+
+
+-----------------------------------------------------------------------
+-- check is root
+-----------------------------------------------------------------------
+function os.path.isroot(path)
+	if path == nil or path == '' then 
+		return false
+	elseif path == '/' or path == '\\' or path == '~' then 
+		return true 
+	elseif path:match('^%a:[/\\]') then
+		return true
+	end
+	return false
 end
 
 
@@ -1756,6 +1771,36 @@ function cd_backward(args, options, pwd)
 		local rhs = pwd:sub(ends + 1)
 		return lhs .. dst .. rhs
 	end
+end
+
+
+-----------------------------------------------------------------------
+-- find glob
+-----------------------------------------------------------------------
+function make_glob_path(args, prefix, pwd)
+	local pwd = (pwd ~= nil) and pwd or os.pwd()
+	local path = pwd
+	for _, arg in ipairs(args) do
+		local parts = os.path.tear(arg)
+		for _, name in ipairs(parts) do
+			if os.path.isroot(name) then
+				if name:find('~', 0, true) then
+					name = os.path.expand(name)
+				end
+				path = name
+			elseif name == '.' or name == '..' then
+				path = os.path.join(path, name)
+			else
+				print('> '..name)
+				if prefix then
+					path = os.path.join(path, name .. '*')
+				else
+					path = os.path.join(path, '*' .. name .. '*')
+				end
+			end
+		end
+	end
+	return path
 end
 
 
