@@ -56,7 +56,7 @@ command! -nargs=? PreviewTag call s:PreviewTag(<f-args>)
 " preview signature
 "----------------------------------------------------------------------
 function! s:PreviewSignature(bang, ...)
-	let funcname = (a:0 > 0)? a:1 : expand('<cword>')
+	let funcname = (a:0 > 0)? a:1 : ""
 	if a:bang 
 		let funcname = '<?>'
 	endif
