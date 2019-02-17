@@ -1977,7 +1977,7 @@ function z_shell_init(opts)
 
 	if opts.bash ~= nil then
 		if prompt_hook then
-			if opts.once then
+			if once then
 				print(script_init_bash_once)
 			elseif opts.fast then
 				print(script_init_bash_fast)
