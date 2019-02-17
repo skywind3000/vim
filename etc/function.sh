@@ -559,10 +559,10 @@ function zlua_enable() {
 		fi
 		_ZL_ECHO=1
 		export _ZL_FZF_FLAG="-e"
-		alias zz='z -i'
+		alias zi='z -i'
+		alias zz='z -c'
 		alias zb='z -b'
 		alias zf='z -I'
-		alias zc='z -c'
 		alias zh='z -I -t .'
 	fi
 }

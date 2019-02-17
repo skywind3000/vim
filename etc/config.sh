@@ -118,7 +118,7 @@ if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
 		else
 			eval "$($INIT_LUA $HOME/.local/etc/z.lua --init auto once enhanced)"
 		fi
-		alias zz='z -i'
+		alias zi='z -i'
 		alias zb='z -b'
 		alias zf='z -I'
 		alias zh='z -I -t .'
@@ -130,7 +130,7 @@ if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
 	fi
 fi
 
-alias zc='z -c'
+alias zz='z -c'
 alias zzc='zz -c'
 
 
