@@ -558,7 +558,6 @@ function zlua_enable() {
 			eval "$($LUA_EXEC $HOME/.local/etc/z.lua --init zsh once enhanced)"
 		fi
 		_ZL_ECHO=1
-		export _ZL_FZF_FLAG="-e"
 		alias zi='z -i'
 		alias zz='z -c'
 		alias zb='z -b'

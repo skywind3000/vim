@@ -123,7 +123,6 @@ if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
 		alias zf='z -I'
 		alias zh='z -I -t .'
 		_ZL_ECHO=1
-		export _ZL_FZF_FLAG="-e"
 	else
 		[[ -f "$HOME/.local/etc/z.sh" ]] && . "$HOME/.local/etc/z.sh"
 		alias zz='z'
