@@ -571,9 +571,11 @@ function zlua_enable() {
 # zlua_with_fz
 #----------------------------------------------------------------------
 function zlua_with_fz() {
-	_z() { _zlua "$@"; }
-	if [[ -e "$HOME/.local/etc/fz.sh" ]]; then
-		. "$HOME/.local/etc/fz.sh"
+	if command -v fzf > /dev/null 2>&1; then
+		_z() { _zlua "$@"; }
+		if [[ -e "$HOME/.local/etc/fz.sh" ]]; then
+			. "$HOME/.local/etc/fz.sh"
+		fi
 	fi
 }
 
