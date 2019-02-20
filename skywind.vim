@@ -43,8 +43,8 @@ let g:ycm_goto_buffer_command = 'new-or-existing-tab'
 "----------------------------------------------------------------------
 augroup SkywindGroup
 	au!
-	au FileType python setlocal shiftwidth=4 tabstop=4 noexpandtab omnifunc=pythoncomplete#Complete
-	" au FileType python setlocal shiftwidth=4 tabstop=4 omnifunc=pythoncomplete#Complete
+	" au FileType python setlocal shiftwidth=4 tabstop=4 noexpandtab omnifunc=pythoncomplete#Complete
+	au FileType python setlocal shiftwidth=4 tabstop=4 omnifunc=pythoncomplete#Complete
 	au FileType lisp setlocal ts=8 sts=2 sw=2 et
 	au FileType scala setlocal sts=4 sw=4 noet
 	au FileType haskell setlocal et
