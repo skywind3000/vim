@@ -1465,9 +1465,6 @@ function z_cd(patterns)
 		end
 		if os.environ('_ZL_FZF_SORT', false) then
 			table.sort(M, function (a, b) return a.name < b.name end)
-			for _, item in ipairs(M) do
-				item.score = '-'
-			end
 		end
 		PRINT_MODE = tmpname
 		z_print(M, true, false)
