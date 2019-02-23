@@ -572,7 +572,7 @@ function zlua_enable() {
 #----------------------------------------------------------------------
 function zlua_with_fz() {
 	if command -v fzf > /dev/null 2>&1; then
-		_z() { _zlua "$@"; }
+		FZ_HISTORY_CD_CMD="_zlua"
 		if [[ -e "$HOME/.local/etc/fz.sh" ]]; then
 			. "$HOME/.local/etc/fz.sh"
 		fi
