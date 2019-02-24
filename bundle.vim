@@ -8,7 +8,7 @@ elseif has('win32') || has('win64') || has('win95') || has('win16')
 elseif has('win32unix')
 	let s:uname = 'cygwin'
 elseif has('unix')
-	let s:uname = system("echo -n \"$(uname)\"")
+	let s:uname = substitute(system("uname"), '\s*\n$', '', 'g')
 	if !v:shell_error && s:uname == "Linux"
 		let s:uname = 'linux'
 	elseif v:shell_error == 0 && match(s:uname, 'Darwin') >= 0
