@@ -8,7 +8,7 @@ elseif has('win32unix')
 elseif has('unix') && (has('mac') || has('macunix'))
 	let g:asc_uname = 'darwin'
 elseif has('unix')
-	let s:uname = system("uname")
+	let s:uname = substitute(system("uname"), '\s*\n$', '', 'g')
 	if v:shell_error == 0 && match(s:uname, 'Linux') >= 0
 		let g:asc_uname = 'linux'
 	elseif v:shell_error == 0 && match(s:uname, 'FreeBSD') >= 0
