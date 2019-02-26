@@ -18,11 +18,11 @@ function cd_mark() {
 			;;
 		/*)            # m /bar  - search bookmarks matching "bar"
 			find "$MARKPATH" -type l -name "*${1:1}*" | \
-				awk -F "/" '{print $NF}' | MARKPATH="$MARKPATH" xargs -i \
+				awk -F "/" '{print $NF}' | MARKPATH="$MARKPATH" xargs -I'{}'\
 				sh -c 'echo "{} ->" $(readlink "$MARKPATH/{}")'
 			;;
 		"")            # m       - list all bookmarks
-			command ls -1 "$MARKPATH/" | MARKPATH="$MARKPATH" xargs -i \
+			command ls -1 "$MARKPATH/" | MARKPATH="$MARKPATH" xargs -I'{}' \
 				sh -c 'echo "{} ->" $(readlink "$MARKPATH/{}")'
 			;;
 		*)             # m foo   - cd to the bookmark directory
