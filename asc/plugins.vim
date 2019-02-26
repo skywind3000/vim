@@ -132,7 +132,11 @@ let g:ycm_min_num_identifier_candidate_chars = 2
 let g:ycm_collect_identifiers_from_comments_and_strings = 1
 let g:ycm_complete_in_strings=1
 let g:ycm_key_invoke_completion = '<c-z>'
-set completeopt=menu,menuone,noselect
+set completeopt=menu,menuone
+
+if has('patch-8.0.1000')
+	set completeopt=menu,menuone,noselect
+endif
 
 " noremap <c-z> <NOP>
 
