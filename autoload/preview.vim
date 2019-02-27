@@ -292,6 +292,9 @@ function! preview#preview_open()
 		if pid > 0
 			noautocmd call preview#window_goto_uid(pid)
 			set previewwindow
+			if get(g:, 'preview_nolist', 0)
+				setlocal nobuflisted
+			endif
 		endif
 		noautocmd call preview#window_goto_uid(uid)
 	endif
