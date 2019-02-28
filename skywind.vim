@@ -44,7 +44,7 @@ let g:ycm_goto_buffer_command = 'new-or-existing-tab'
 augroup SkywindGroup
 	au!
 	" au FileType python setlocal shiftwidth=4 tabstop=4 noexpandtab omnifunc=pythoncomplete#Complete
-	au FileType python setlocal shiftwidth=4 tabstop=4 omnifunc=pythoncomplete#Complete
+	au FileType python setlocal shiftwidth=4 tabstop=4 et omnifunc=pythoncomplete#Complete
 	au FileType lisp setlocal ts=8 sts=2 sw=2 et
 	au FileType scala setlocal sts=4 sw=4 noet
 	au FileType haskell setlocal et
@@ -109,6 +109,11 @@ let g:vimmake_ftrun = {}
 let g:vimmake_ftrun['make'] = 'make -f'
 let g:vimmake_ftrun['zsh'] = 'zsh'
 let g:vimmake_ftrun['erlang'] = 'escript'
+let g:vimmake_ftrun['csh'] = 'csh'
+let g:vimmake_ftrun['tcsh'] = 'tcsh'
+let g:vimmake_ftrun['fish'] = 'fish'
+let g:vimmake_ftrun['bash'] = 'bash'
+let g:vimmake_ftrun['ksh'] = 'ksh'
 let g:vimmake_ftmake = {}
 
 if has('win32') || has('win16') || has('win64') || has('win95')
@@ -117,40 +122,6 @@ else
 	let g:vimmake_ftmake['go'] = 'go build -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" "$(VIM_FILEPATH)" '
 endif
 
-let g:vimmake_extrun = {'hs': 'runghc', 'lisp': 'sbcl --script'}
-
-let g:vimmake_extrun['scala'] = 'scala'
-let g:vimmake_extrun['es'] = 'escript'
-let g:vimmake_extrun['erl'] = 'escript'
-let g:vimmake_extrun['clj'] = 'clojure'
-let g:vimmake_extrun['hs'] = 'runghc'
-let g:vimmake_extrun['fish'] = 'fish'
-
-if has('win32') || has('win64') || has('win16') || has('win95')
-	let g:vimmake_extrun['scm'] = "d:\\linux\\bin\\guile.exe"
-	let g:vimmake_extrun['io'] = "d:\\dev\\IoLanguage\\bin\\io.exe"
-	let g:vimmake_extrun['pro'] = "start d:\\dev\\swipl\\bin\\swipl-win.exe -s"
-	let g:vimmake_extrun['pl'] = "start d:\\dev\\swipl\\bin\\swipl-win.exe -s"
-	let g:vimmake_build_encoding = 'gbk'
-	let g:asyncrun_encs = 'gbk'
-	let cp = "d:/dev/scala/scala-2.11.6/lib/scala-actors-2.11.0.jar;"
-	let cp.= "d:/dev/scala/scala-2.11.6/lib/akka-actor_2.11-2.3.4.jar"
-	let g:vimmake_extrun['scala'] = 'scala'
-	"let g:vimmake_extrun['scala'].= ' -cp '.fnameescape(cp)
-	let g:vimmake_extrun['gv'] = 'd:/dev/tools/graphviz/bin/dotty.exe'
-	let g:vimmake_extrun['dot'] = 'd:/dev/tools/graphviz/bin/dotty.exe'
-	let g:vimmake_ftrun['dot'] = 'd:/dev/tools/graphviz/bin/dotty.exe'
-	let g:vimmake_ftrun['verilog'] = 'd:/dev/iverilog/bin/iverilog.exe'
-else
-	if executable('clisp')
-		let g:vimmake_extrun['lisp'] = 'clisp'
-	elseif executable('sbcl')
-		let g:vimmake_extrun['list'] = 'sbcl --script'
-	endif
-	if executable('swipl')
-		let g:vimmake_extrun['pro'] = 'swipl -s'
-	endif
-endif
 
 if has('win32') || has('win64') || has('win16') || has('win95')
 	let g:vimmake_cflags = ['-O2', '-lwinmm', '-lstdc++', '-lgdi32', '-lws2_32', '-msse3']
