@@ -8,6 +8,7 @@ alias grep='grep --color=tty'
 alias nvim='/usr/local/opt/bin/vim --cmd "let g:vim_startup=\"nvim\""'
 alias mvim='/usr/local/opt/bin/vim --cmd "let g:vim_startup=\"mvim\""'
 alias tmux='tmux -2'
+alias lld='lsd -l'
 
 # default editor
 export EDITOR=vim
