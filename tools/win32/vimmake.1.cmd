@@ -19,6 +19,7 @@ if "%VIM_FILEEXT%" == ".bat" GOTO RUN_CMD
 if "%VIM_FILEEXT%" == ".cmd" GOTO RUN_CMD
 
 if "%VIM_FILEEXT%" == ".js" GOTO RUN_NODE
+if "%VIM_FILEEXT%" == ".lua" GOTO RUN_LUA
 
 echo unsupported file type %VIM_FILEEXT%
 GOTO END
@@ -37,6 +38,10 @@ GOTO END
 
 :RUN_NODE
 node.exe "%VIM_FILENAME%"
+GOTO END
+
+:RUN_LUA
+d:\dev\lua\LuaJIT-2.0.5\luajit.exe "%VIM_FILENAME%"
 GOTO END
 
 :ERROR_NO_FILE

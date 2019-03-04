@@ -29,6 +29,7 @@ if "%VIM_FILEEXT%" == ".bxrc" GOTO RUN_BOCHS
 
 if "%VIM_FILEEXT%" == ".v" GOTO RUN_VERILOG
 if "%VIM_FILEEXT%" == ".vl" GOTO RUN_VERILOG
+if "%VIM_FILEEXT%" == ".lua" GOTO RUN_LUA
 
 echo unsupported file type %VIM_FILEEXT%
 GOTO END
@@ -81,7 +82,10 @@ GOTO END
 
 :RUN_VERILOG
 vvp "%VIM_FILEDIR%\%VIM_FILENOEXT%.vvp"
+GOTO END
 
+:RUN_LUA
+d:\dev\lua\LuaJIT-2.0.5\luajit.exe "%VIM_FILENAME%"
 GOTO END
 
 :ERROR_NO_FILE
