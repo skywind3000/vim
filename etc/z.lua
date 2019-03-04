@@ -538,7 +538,7 @@ function os.path.isdir(pathname)
 	end
 	local name = pathname
 	if (not name:endswith('/')) and (not name:endswith('\\')) then
-		name = name .. '/'
+		name = name .. os.path.sep
 	end
 	return os.path.exists(name)
 end
@@ -564,6 +564,8 @@ function os.path.exists(name)
 			if code == 16 or code == 13 or code == 22 then
 				return true
 			end
+		else
+			print('code: ' .. code .. ' error: ' .. err)
 		end
 		return false
 	end
