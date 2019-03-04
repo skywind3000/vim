@@ -564,8 +564,6 @@ function os.path.exists(name)
 			if code == 16 or code == 13 or code == 22 then
 				return true
 			end
-		else
-			print('code: ' .. code .. ' error: ' .. err)
 		end
 		return false
 	end
