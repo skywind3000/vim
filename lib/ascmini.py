@@ -592,8 +592,19 @@ class ConfigReader (object):
 
     def __init__ (self, ininame, codec = None):
         self.ininame = ininame
+        self.reset()
+        self.load(ininame, codec)
+
+    def reset (self):
         self.config = {}
         self.sections = []
+        return True
+
+    def load (self, ininame, codec = None):
+        if not ininame:
+            return None
+        elif not os.path.exists(ininame):
+            return None
         try:
             content = open(ininame, 'rb').read()
         except IOError:
@@ -623,14 +634,13 @@ class ConfigReader (object):
             import configparser
             cp = configparser.ConfigParser()
             cp.read_string(text)
-        config = {}
         for sect in cp.sections():
             for key, val in cp.items(sect):
                 lowsect, lowkey = sect.lower(), key.lower()
-                config.setdefault(lowsect, {})[lowkey] = val
-        if 'default' not in config:
-            config['default'] = {}
-        self.config = config
+                self.config.setdefault(lowsect, {})[lowkey] = val
+        if 'default' not in self.config:
+            self.config['default'] = {}
+        return True
 
     def option (self, section, item, default = None):
         sect = self.config.get(section, None)
