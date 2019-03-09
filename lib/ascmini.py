@@ -416,7 +416,6 @@ posix = PosixKit()
 # file content load/save
 #----------------------------------------------------------------------
 
-
 def load_config(path):
     import json
     try:
@@ -1240,6 +1239,16 @@ def replace_file (srcname, dstname):
         kernel32.ReplaceFileW.argtypes = [ wp, wp, wp, DWORD, vp, vp ]
         kernel32.ReplaceFileA.restype = BOOL
         kernel32.ReplaceFileW.restype = BOOL
+        kernel32.GetLastError.argtypes = []
+        kernel32.GetLastError.restype = DWORD
+        success = False
+        try:
+            os.rename(srcname, dstname)
+            success = True
+        except OSError:
+            pass
+        if success:
+            return True
         if sys.version_info[0] < 3 and isinstance(srcname, str):
             hr = kernel32.ReplaceFileA(dstname, srcname, None, 2, None, None)
         else:
@@ -1263,6 +1272,15 @@ def tmpname (filename, fill = 5):
         if not os.path.exists(test):
             return test
     return None
+
+
+#----------------------------------------------------------------------
+# save json atomic 
+#----------------------------------------------------------------------
+def save_config_atomic(filename, obj):
+    temp = tmpname(filename)
+    save_config(temp, obj)
+    return replace_file(temp, filename)
 
 
 #----------------------------------------------------------------------
