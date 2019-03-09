@@ -180,12 +180,12 @@ def redirect(args, reader, combine = True):
     stdin.close()
     while 1:
         text = stdout.readline()
-        if text == b'' or text == '':
+        if text in (b'', ''):
             break
         reader('stdout', text)
     while stderr is not None:
         text = stderr.readline()
-        if text == b'' or text == '':
+        if text in (b'', ''):
             break
         reader('stderr', text)
     stdout.close()
@@ -602,9 +602,9 @@ class ConfigReader (object):
 
     def load (self, ininame, codec = None):
         if not ininame:
-            return None
+            return False
         elif not os.path.exists(ininame):
-            return None
+            return False
         try:
             content = open(ininame, 'rb').read()
         except IOError:
