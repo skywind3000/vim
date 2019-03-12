@@ -372,9 +372,6 @@ if index(g:bundle_group, 'ale') >= 0
 		let conf = s:path('tools/conf/')
 		let path1 = conf . a:name
 		let path2 = expand('~/.vim/linter/'. a:name)
-		if filereadable(path2)
-			return path2
-		endif
 		return shellescape(filereadable(path2)? path2 : path1)
 	endfunc
 
