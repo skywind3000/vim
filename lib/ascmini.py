@@ -14,6 +14,7 @@ import sys
 import time
 import os
 import socket
+import collections
 
 
 #----------------------------------------------------------------------
@@ -1086,19 +1087,23 @@ class TraceOut (object):
 #----------------------------------------------------------------------
 class OutputHandler (object):
     def __init__(self, writer):
+        import threading
         self.writer = writer
         self.content = ''
+        self.lock = threading.Lock()
         self.encoding = sys.__stdout__.encoding
     def flush(self):
-        pass
+        return True
     def write(self, s):
+        self.lock.acquire()
         self.content += s
         while True:
             pos = self.content.find('\n')
-            if pos < 0: return
+            if pos < 0: break
             self.writer(self.content[:pos])
             self.content = self.content[pos + 1:]
-        return 
+        self.lock.release()
+        return True
     def writelines(self, l):
         map(self.write, l)
 
@@ -1306,6 +1311,60 @@ class SimpleTimer (object):
         return True
 
 
+#----------------------------------------------------------------------
+# Registry
+#----------------------------------------------------------------------
+class Registry (object):
+
+    def __init__ (self, filename = None):
+        self.registry = {}
+        if filename:
+            registry = load_config(filename)
+            if registry:
+                self.registry = registry
+        self.filename = filename
+
+    def save (self, filename = None):
+        filename = (filename) and filename or self.filename
+        if filename is None:
+            raise IOError('Filename must not be None')
+        names = list(self.registry.keys())
+        names.sort()
+        dump = collections.OrderedDict()
+        for name in names:
+            dump[name] = self.registry[name]
+        save_config_atomic(filename, dump)
+
+    def get (self, key, default = None):
+        return self.registry.get(key, default)
+
+    def set (self, key, value):
+        if not isinstance(key, str):
+            raise ValueError('key must be string')
+        if (not isinstance(value, str)) and (not isinstance(value, int)):
+            if not isinstance(value, float):
+                raise ValueError('value must be int/string/float')
+        self.registry[key] = value
+        return True
+
+    def __contains__ (self, key):
+        return (key in self.registry)
+
+    def __len__ (self):
+        return len(self.registry)
+
+    def __getitem__ (self, key):
+        return self.registry[key]
+
+    def __setitem__ (self, key, value):
+        self.set(key, value)
+
+    def __iter__ (self):
+        return self.registry.__iter__()
+
+    def keys (self):
+        return self.registry.keys()
+
 
 #----------------------------------------------------------------------
 # testing case
@@ -1332,6 +1391,16 @@ if __name__ == '__main__':
             log.info('loop')
             return False
         safe_loop(loop, log)
+        return 0
+    def test5():
+        reg = Registry('output.json')
+        import pprint
+        pprint.pprint(reg.registry)
+        reg.set('home.default', 1234)
+        reg.set('target.abc', 'asdfasdf')
+        reg.set('home.haha', 'hiahia')
+        reg.set('target.pi', 3.1415926)
+        # reg.save()
         return 0
     test1()
 
