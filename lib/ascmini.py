@@ -15,6 +15,7 @@ import time
 import os
 import socket
 import collections
+import json
 
 
 #----------------------------------------------------------------------
@@ -1339,11 +1340,12 @@ class Registry (object):
         return self.registry.get(key, default)
 
     def set (self, key, value):
-        if not isinstance(key, str):
-            raise ValueError('key must be string')
+        if (not isinstance(key, str)) and (not isinstance(key, int)):
+            raise ValueError('key must be int/string')
         if (not isinstance(value, str)) and (not isinstance(value, int)):
-            if not isinstance(value, float):
-                raise ValueError('value must be int/string/float')
+            if (not isinstance(value, float)) and (not isinstance(value, bool)):
+                if value is not None:
+                    raise ValueError('value must be int/string/float')
         self.registry[key] = value
         return True
 
@@ -1364,6 +1366,16 @@ class Registry (object):
 
     def keys (self):
         return self.registry.keys()
+
+
+#----------------------------------------------------------------------
+# json decode: safe for python 3.5
+#----------------------------------------------------------------------
+def json_loads(text):
+    if sys.version_info[0] == 3 and sys.version_info[1] < 7:
+        if isinstance(text, bytes):
+            text = text.decode('utf-8')
+    return json.loads(text)
 
 
 #----------------------------------------------------------------------
