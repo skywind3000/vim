@@ -587,6 +587,66 @@ def readts(ts, onlyday = False):
 
 
 #----------------------------------------------------------------------
+# parse text
+#----------------------------------------------------------------------
+def parse_conf_text(text, default = None):
+    if text is None:
+        return default
+    print('parse_conf_text:', type(default))
+    if isinstance(default, str):
+        return text
+    elif isinstance(default, bool):
+        text = text.lower()
+        if not text:
+            return default
+        text = text.lower()
+        if default:
+            if text in ('false', 'f', 'no', 'n', '0'):
+                return False
+        else:
+            if text in ('true', 'ok', 'yes', 't', 'y', '1'):
+                return True
+            if text.isdigit():
+                try:
+                    value = int(text)
+                    if value:
+                        return True
+                except:
+                    pass
+        return default
+    elif isinstance(default, float):
+        try:
+            value = float(text)
+            return value
+        except:
+            return default
+    elif isinstance(default, int) or isinstance(default, long):
+        multiply = 1
+        text = text.strip('\r\n\t ')
+        postfix1 = text[-1:].lower()
+        postfix2 = text[-2:].lower()
+        if postfix1 == 'k':
+            multiply = 1024
+            text = text[:-1]
+        elif postfix1 == 'm': 
+            multiply = 1024 * 1024
+            text = text[:-1]
+        elif postfix2 == 'kb':
+            multiply = 1024
+            text = text[:-2]
+        elif postfix2 == 'mb':
+            multiply = 1024 * 1024
+            text = text[:-2]
+        try: text = int(text.strip('\r\n\t '), 0)
+        except: text = default
+        if multiply > 1: 
+            text *= multiply
+        return text
+    return text
+
+
+
+#----------------------------------------------------------------------
 # ConfigReader
 #----------------------------------------------------------------------
 class ConfigReader (object):
@@ -650,28 +710,7 @@ class ConfigReader (object):
         text = sect.get(item, None)
         if text is None:
             return default
-        if isinstance(default, int) or isinstance(default, long):
-            multiply = 1
-            text = text.strip('\r\n\t ')
-            postfix1 = text[-1:].lower()
-            postfix2 = text[-2:].lower()
-            if postfix1 == 'k':
-                multiply = 1024
-                text = text[:-1]
-            elif postfix1 == 'm': 
-                multiply = 1024 * 1024
-                text = text[:-1]
-            elif postfix2 == 'kb':
-                multiply = 1024
-                text = text[:-2]
-            elif postfix2 == 'mb':
-                multiply = 1024 * 1024
-                text = text[:-2]
-            try: text = int(text.strip('\r\n\t '), 0)
-            except: text = default
-            if multiply > 1: 
-                text *= multiply
-        return text
+        return parse_conf_text(text, default)
 
 
 #----------------------------------------------------------------------
