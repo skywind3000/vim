@@ -592,7 +592,6 @@ def readts(ts, onlyday = False):
 def parse_conf_text(text, default = None):
     if text is None:
         return default
-    print('parse_conf_text:', type(default))
     if isinstance(default, str):
         return text
     elif isinstance(default, bool):
