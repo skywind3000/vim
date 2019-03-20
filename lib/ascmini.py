@@ -6,7 +6,7 @@
 # ascmini.py - mini library
 #
 # Created by skywind on 2017/03/24
-# Last Modified: 2018/08/10 19:04
+# Version: 5, Last Modified: 2019/03/20 17:19
 #
 #======================================================================
 from __future__ import print_function
@@ -215,7 +215,7 @@ class OBJECT (object):
     def __len__ (self):
         return self.__dict__.__len__()
     def __repr__ (self):
-        line = [ '%s=%s'%(k, repr(v)) for k, v in self.__dict__.iteritems() ]
+        line = [ '%s=%s'%(k, repr(v)) for k, v in self.__dict__.items() ]
         return 'OBJECT(' + ', '.join(line) + ')'
     def __str__ (self):
         return self.__repr__()
@@ -1242,7 +1242,7 @@ def tabulify (rows, style = 0):
 #----------------------------------------------------------------------
 def compact_dumps(data):
     output = []
-    for k, v in data.iteritems():
+    for k, v in data.items():
         k = k.strip().replace(',', '').replace(':', '')
         v = v.strip().replace(',', '').replace(':', '')
         output.append(k + ':' + v)
