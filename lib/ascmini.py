@@ -1150,7 +1150,7 @@ class OutputHandler (object):
 #----------------------------------------------------------------------
 # run until mainfunc returns false 
 #----------------------------------------------------------------------
-def safe_loop (mainfunc, trace = None, sleep = 2.0):
+def safe_loop (mainfunc, trace = None, sleep = 2.0, dtor = None):
     while True:
         try:
             hr = mainfunc()
@@ -1170,11 +1170,23 @@ def safe_loop (mainfunc, trace = None, sleep = 2.0):
             if trace:
                 for line in tb:
                     trace.error(line)
-                trace.error('ready to restart')
-                trace.error('')
             else:
                 for line in tb:
                     sys.stderr.write(line + '\n')
+            if dtor:
+                if trace:
+                    trace.error('clean up')
+                else:
+                    sys.stderr.write('clean up\n')
+                try:
+                    dtor()
+                except:
+                    pass
+            if trace:
+                trace.error('')
+                trace.error('restarting in %s seconds'%sleep)
+                trace.error('')
+            else:
                 sys.stderr.write('\nready to restart\n')
             time.sleep(sleep)
     return True
