@@ -1102,6 +1102,19 @@ class TraceOut (object):
             self._stderr.flush()
         return True
 
+    def change (self, prefix):
+        self._lock.acquire()
+        self._logtime = None
+        self._prefix = prefix
+        if self._logfile:
+            try:
+                self._logfile.close()
+            except:
+                pass
+        self._logfile = None
+        self._lock.release()
+        return True
+
     def out (self, channel, *args):
         if not self._channels.get(channel, False):
             return False
