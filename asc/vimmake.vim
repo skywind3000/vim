@@ -1,7 +1,7 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
-" Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
-" Last Modified: 2019/01/26 01:58
+" Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019
+" Last Modified: 2019/04/28 14:55
 "
 " Execute customize tools: ~/.vim/vimmake.{name} directly:
 "     :VimTool {name}
@@ -287,7 +287,7 @@ function! s:chdir(path)
 	if has('nvim')
 		let cmd = haslocaldir()? 'lcd' : (haslocaldir(-1, 0)? 'tcd' : 'cd')
 	else
-		let cmd = haslocaldir()? 'lcd' : 'cd'
+		let cmd = haslocaldir()? ((haslocaldir() == 1)? 'lcd' : 'tcd') : 'cd'
 	endif
 	silent execute cmd . ' '. fnameescape(a:path)
 endfunc
