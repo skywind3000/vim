@@ -9,15 +9,15 @@ if !has('gui_running') && &t_Co < 256
   finish
 endif
 
-if !exists('g:sublime_gui_italic')
-    let g:sublime_gui_italic = 0
+if !exists('g:sublimemonokai_gui_italic')
+    let g:sublimemonokai_gui_italic = 1
 endif
 
-if !exists('g:sublime_term_italic')
-    let g:sublime_term_italic = 0
+if !exists('g:sublimemonokai_term_italic')
+    let g:sublimemonokai_term_italic = 0
 endif
 
-let g:sublime_termcolors = 256 " does not support 16 color term right now.
+let g:sublimemonokai_termcolors = 256 " does not support 16 color term right now.
 
 set background=dark
 hi clear
@@ -26,7 +26,7 @@ if exists('syntax_on')
   syntax reset
 endif
 
-let colors_name = 'sublime'
+let colors_name = 'sublimemonokai'
 
 fun! s:h(group, style)
   let s:ctermformat = 'NONE'
@@ -35,17 +35,17 @@ fun! s:h(group, style)
     let s:ctermformat = a:style.format
     let s:guiformat = a:style.format
   endif
-  if g:sublime_term_italic == 0
+  if g:sublimemonokai_term_italic == 0
     let s:ctermformat = substitute(s:ctermformat, ',italic', '', '')
     let s:ctermformat = substitute(s:ctermformat, 'italic,', '', '')
     let s:ctermformat = substitute(s:ctermformat, 'italic', '', '')
   endif
-  if g:sublime_gui_italic == 0
+  if g:sublimemonokai_gui_italic == 0
     let s:guiformat = substitute(s:guiformat, ',italic', '', '')
     let s:guiformat = substitute(s:guiformat, 'italic,', '', '')
     let s:guiformat = substitute(s:guiformat, 'italic', '', '')
   endif
-  if g:sublime_termcolors == 16
+  if g:sublimemonokai_termcolors == 16
     let l:ctermfg = (has_key(a:style, 'fg') ? a:style.fg.cterm16 : 'NONE')
     let l:ctermbg = (has_key(a:style, 'bg') ? a:style.bg.cterm16 : 'NONE')
   else
@@ -73,7 +73,7 @@ endfun
 " namespaced global variable
 fun! s:create_palette_color(color_name, color_data)
 	exec 'let s:' . a:color_name . ' = a:color_data'
-	exec 'let g:sublime_' . a:color_name . ' = a:color_data'
+	exec 'let g:sublimemonokai_' . a:color_name . ' = a:color_data'
 endf
 
 call s:create_palette_color('brightwhite', { 'gui': '#FFFFFF', 'cterm': '231' })
@@ -195,7 +195,7 @@ hi! link PreProc        SublimeGreen
 hi! link Include        SublimeWhite
 hi! link Define         SublimePink
 hi! link Macro          SublimeGreen
-hi! link PreCondit      SublimePink
+hi! link PreCondit      SublimeWhite
 hi! link Special        SublimePurple
 hi! link SpecialChar    SublimePink
 hi! link Tag            SublimeGreen
@@ -260,21 +260,15 @@ hi! link dosbatchSwitch      Normal
 
 hi! link cAnsiFunction     SublimeFunctionCall
 hi! link cDefine           SublimeGreen
-hi! link cPreCondit        SublimePink
-hi! link cPreConditMatch   SublimePink
 hi! link cFormat           Special
 hi! link cInclude          SublimePink
 hi! link cLabel            SublimePink
 hi! link cSpecial          Special
 hi! link cSpecialCharacter Special
 hi! link cStatement        Keyword
-hi! link cDelimiter        SublimeWhite
-hi! link cOperator         SublimeWhite
 hi! link cStorageClass     SublimePink
 hi! link cStructure        SublimeType
 hi! link cType             SublimeType
-hi! link cBraces           SublimeWhite
-
 " XXX: Other known deficiencies:
 "
 " * There's no way to distinguish between function calls and
