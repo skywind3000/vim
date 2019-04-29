@@ -22,12 +22,12 @@ set statusline+=\ %0(%{&fileformat}\ [%{(&fenc==\"\"?&enc:&fenc).(&bomb?\",BOM\"
 "----------------------------------------------------------------------
 let g:lightline = {
 			\ 'active': {
-			\   'left': [ [ 'mode', 'paste' ],
-			\             [ 'absolutepath', 'status' ] ]
+			\   'left': [ [ 'mode', 'active' ],
+			\             [ 'fullname' ], [ 'status' ] ]
 			\ },
 			\ 'inactive': {
 			\   'left': [ [ 'mode' ],
-			\             [ 'absolutepath', 'status' ] ]
+			\             [ 'fullname' ], [ 'status' ] ]
 			\ },
 			\ 'component': {
 			\   'fullname': '%F',
