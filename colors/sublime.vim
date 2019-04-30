@@ -1,6 +1,6 @@
-" File:       monokai.vim
-" Maintainer: Erich Gubler (erichdongubler)
-" URL:        https://github.com/erichdongubler/vim-sublime-monokai
+" File:       sublime.vim
+" Maintainer: skywind3000
+" Originate:  https://github.com/erichdongubler/vim-sublime-monokai
 " License:    MIT
 
 " Initialisation
