@@ -637,7 +637,8 @@ hi! link pythonParam       SublimeContextParam
 " XXX: pythonStatement covers a bit too much...unfortunately, this means that
 " some keywords, like `def`, can't be highlighted like in Sublime yet.
 hi! link pythonStatement   Keyword
-hi! link pythonImport      SublimePink
+" hi! link pythonImport      SublimePink
+hi! link pythonInclude     SublimePink
 hi! link pythonSelf        SublimeContextParam
 hi! link pythonBuiltin     Type
 hi! link pythonConst       Number
