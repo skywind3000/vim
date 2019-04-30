@@ -638,6 +638,9 @@ hi! link pythonParam       SublimeContextParam
 " some keywords, like `def`, can't be highlighted like in Sublime yet.
 hi! link pythonStatement   Keyword
 hi! link pythonImport      SublimePink
+hi! link pythonSelf        SublimeContextParam
+hi! link pythonBuiltin     Type
+hi! link pythonConst       Number
 " XXX: Other known deficiencies:
 "
 " * Python special regexp sequences aren't highlighted. :\
