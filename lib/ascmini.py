@@ -68,12 +68,12 @@ def execute(args, shell = False, capture = False):
         shell = False
     if shell and (not capture):
         os.system(cmd)
-        return ''
+        return b''
     elif (not shell) and (not capture):
         import subprocess
         if 'call' in subprocess.__dict__:
             subprocess.call(args)
-            return ''
+            return b''
     import subprocess
     if 'Popen' in subprocess.__dict__:
         p = subprocess.Popen(args, shell = shell,
@@ -83,14 +83,14 @@ def execute(args, shell = False, capture = False):
     else:
         p = None
         stdin, stdouterr = os.popen4(cmd)
-    text = stdouterr.read()
     stdin.close()
+    text = stdouterr.read()
     stdouterr.close()
     if p: p.wait()
     if not capture:
         sys.stdout.write(text)
         sys.stdout.flush()
-        return ''
+        return b''
     return text
 
 
@@ -113,8 +113,20 @@ def call(args, input_data = None, combine = False):
                 parameters.append(n)
     cmd = ' '.join(parameters)
     import subprocess
+    bufsize = 0x100000
+    if input_data is not None:
+        if not isinstance(input_data, bytes):
+            if sys.stdin and sys.stdin.encoding:
+                input_data = input_data.encode(sys.stdin.encoding, 'ignore')
+            elif sys.stdout and sys.stdout.encoding:
+                input_data = input_data.encode(sys.stdout.encoding, 'ignore')
+            else:
+                input_data = input_data.encode('utf-8', 'ignore')
+        size = len(input_data) * 2 + 0x10000
+        if size > bufsize:
+            bufsize = size
     if 'Popen' in subprocess.__dict__:
-        p = subprocess.Popen(args, shell = False,
+        p = subprocess.Popen(args, shell = False, bufsize = bufsize,
             stdin = subprocess.PIPE, stdout = subprocess.PIPE,
             stderr = combine and subprocess.STDOUT or subprocess.PIPE)
         stdin, stdout, stderr = p.stdin, p.stdout, p.stderr
@@ -127,19 +139,12 @@ def call(args, input_data = None, combine = False):
             stdin, stdout = os.popen4(cmd)
             stderr = None
     if input_data is not None:
-        if not isinstance(input_data, bytes):
-            if sys.stdin and sys.stdin.encoding:
-                input_data = input_data.encode(sys.stdin.encoding, 'ignore')
-            elif sys.stdout and sys.stdout.encoding:
-                input_data = input_data.encode(sys.stdout.encoding, 'ignore')
-            else:
-                input_data = input_data.encode('utf-8', 'ignore')
         stdin.write(input_data)
         stdin.flush()
+    stdin.close()
     exeout = stdout.read()
     if stderr: exeerr = stderr.read()
     else: exeerr = None
-    stdin.close()
     stdout.close()
     if stderr: stderr.close()
     retcode = None
@@ -356,6 +361,10 @@ class PosixKit (object):
 
     # load content
     def load_file_content (self, filename, mode = 'r'):
+        if hasattr(filename, 'read'):
+            try: content = filename.read()
+            except: pass
+            return content
         try:
             fp = open(filename, mode)
             content = fp.read()
@@ -397,7 +406,16 @@ class PosixKit (object):
             guess = [sys.getdefaultencoding(), 'utf-8']
             if sys.stdout and sys.stdout.encoding:
                 guess.append(sys.stdout.encoding)
+            try:
+                import locale
+                guess.append(locale.getpreferredencoding())
+            except:
+                pass
+            visit = {}
             for name in guess + ['gbk', 'ascii', 'latin1']:
+                if name in visit:
+                    continue
+                visit[name] = 1
                 try:
                     text = content.decode(name)
                     break
@@ -843,7 +861,6 @@ class WebKit (object):
         import cgi
         return cgi.escape(s, True).replace('\n', "</br>\n")
 
-
     def html2text (self, html):
         part = []
         pos = 0
@@ -892,6 +909,43 @@ class WebKit (object):
             return None, position
         value = text[p1 + len(starts):p2]
         return value, p2 + len(ends)
+
+    def replace_range (self, text, start, size, newtext):
+        head = text[:start]
+        tail = text[start + size:]
+        return head + newtext + tail
+
+    def url_parse (self, url):
+        if sys.version_info[0] < 3:
+            import urlparse
+            return urlparse.urlparse(url)
+        import urllib.parse
+        return urllib.parse.urlparse(url)
+
+    def url_unquote (self, text, plus = False):
+        if sys.version_info[0] < 3:
+            import urlparse
+            if plus:
+                text = text.replace('+', ' ')
+            return urlparse.unquote(text)
+        import urllib.parse
+        if plus:
+            return urllib.parse.unquote_plus(text)
+        return urllib.parse.unquote(text)
+        
+    def url_parse_qs (self, text, keep_blank = 0):
+        if sys.version_info[0] < 3:
+            import urlparse
+            return urlparse.parse_qs(text, keep_blank)
+        import urllib.parse
+        return urllib.parse.parse_qs(text, keep_blank)
+
+    def url_parse_qsl (self, text, keep_blank = 0):
+        if sys.version_info[0] < 3:
+            import urlparse
+            return urlparse.parse_qsl(text, keep_blank)
+        import urllib.parse
+        return urllib.parse.parse_qsl(text, keep_blank)
 
 
 
@@ -1039,6 +1093,88 @@ class ShellUtils (object):
         zfp = None
         return 0
 
+    # find root
+    def find_root (self, path, markers = None, fallback = False):
+        if markers is None:
+            markers = ('.git', '.svn', '.hg', '.project', '.root')
+        if path is None:
+            path = os.getcwd()
+        path = os.path.abspath(path)
+        base = path
+        while True:
+            parent = os.path.normpath(os.path.join(base, '..'))
+            if parent == base:
+                break
+            for marker in markers:
+                test = os.path.join(base, marker)
+                if os.path.exists(test):
+                    return base
+            base = parent
+        if fallback:
+            return path
+        return None
+
+    # project root
+    def project_root (self, path, markers = None):
+        return self.find_root(path, markers, True)
+
+    # getopt: returns (options, args)
+    def getopt (self, argv):
+        args = []
+        options = {}
+        if argv is None:
+            argv = sys.argv[1:]
+        index = 0
+        count = len(argv)
+        while index < count:
+            arg = argv[index]
+            if arg != '':
+                head = arg[:1]
+                if head != '-':
+                    break
+                if arg == '-':
+                    break
+                name = arg.lstrip('-')
+                key, _, val = name.partition('=')
+                options[key.strip()] = val.strip()
+            index += 1
+        while index < count:
+            args.append(argv[index])
+            index += 1
+        return options, args
+
+    # hexdump
+    def hexdump (self, data, char = False):
+        content = ''
+        charset = ''
+        lines = []
+        if isinstance(data, str):
+            if sys.version_info[0] >= 3:
+                data = data.encode('utf-8', 'ignore')
+        if not isinstance(data, bytes):
+            raise ValueError('data must be bytes')
+        for i, _ in enumerate(data):
+            if sys.version_info[0] < 3:
+                ascii = ord(data[i])
+            else:
+                ascii = data[i]
+            if i % 16 == 0: content += '%08X  '%i
+            content += '%02X'%ascii
+            content += ((i & 15) == 7) and '-' or ' '
+            if (ascii >= 0x20) and (ascii < 0x7f): charset += chr(ascii)
+            else: charset += '.'
+            if (i % 16 == 15): 
+                lines.append(content + ' ' + charset)
+                content, charset = '', ''
+        if len(content) < 60: content += ' ' * (58 - len(content))
+        lines.append(content + ' ' + charset)
+        limit = char and 104 or 58
+        return '\n'.join([ n[:limit] for n in lines ])
+
+    def print_binary (self, data, char = False):
+        print(self.hexdump(data, char))
+        return True
+    
 
 utils = ShellUtils()
 
@@ -1477,7 +1613,22 @@ if __name__ == '__main__':
         reg.set('target.pi', 3.1415926)
         # reg.save()
         return 0
-    test1()
+    def test6():
+        print(utils.find_root(__file__))
+        print(utils.project_root('/'))
+        utils.print_binary('Hello, World !! Ni Hao !!', True)
+        print(utils.getopt(['-t', '--name=123', '--out', '-', 'abc', 'def', 'ghi']))
+        print(utils.getopt([]))
+        print(web.replace_range('Hello, World', 4, 2, 'fuck'))
+        url = 'socks5://test:pass@localhost/tt?123=45'
+        res = web.url_parse(url)
+        print(res)
+        print(res.hostname)
+        print(res.port)
+        print(res.username)
+        print(res.password)
+        return 0
+    test6()
 
 
 
