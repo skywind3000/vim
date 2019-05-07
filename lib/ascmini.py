@@ -353,11 +353,23 @@ class PosixKit (object):
         return None
 
     # search executable
-    def search_exe (self, exename):
-        path = self.which(exename)
+    def search_exe (self, exename, prefix = None, postfix = None):
+        path = self.which(exename, prefix, postfix)
         if path is None:
             return None
         return self.pathshort(path)
+
+    # executable 
+    def search_cmd (self, cmdname, prefix = None, postfix = None):
+        if sys.platform[:3] == 'win':
+            ext = os.path.splitext(cmdname)[-1].lower()
+            if ext:
+                return self.search_exe(cmdname, prefix, postfix)
+            for ext in ('.cmd', '.bat', '.exe', '.vbs'):
+                path = self.which(cmdname + ext, prefix, postfix)
+                if path:
+                    return self.pathshort(path)
+        return self.search_exe(cmdname)
 
     # load content
     def load_file_content (self, filename, mode = 'r'):
