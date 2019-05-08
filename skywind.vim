@@ -114,6 +114,7 @@ let g:vimmake_ftrun['tcsh'] = 'tcsh'
 let g:vimmake_ftrun['fish'] = 'fish'
 let g:vimmake_ftrun['bash'] = 'bash'
 let g:vimmake_ftrun['ksh'] = 'ksh'
+let g:vimmake_ftrun['markdown'] = 'markpress -u'
 let g:vimmake_ftmake = {}
 
 if has('win32') || has('win16') || has('win64') || has('win95')

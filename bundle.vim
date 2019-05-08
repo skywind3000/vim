@@ -90,7 +90,6 @@ if index(g:bundle_group, 'basic') >= 0
 	Plug 'flazz/vim-colorschemes'
 	Plug 'xolox/vim-misc'
 	Plug 'terryma/vim-expand-region'
-	Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
 	Plug 'pprovost/vim-ps1', { 'for': 'ps1' }
 	Plug 'tbastos/vim-lua', { 'for': 'lua' }
 	Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['c', 'cpp'] }
@@ -155,6 +154,8 @@ if index(g:bundle_group, 'inter') >= 0
 	Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 	Plug 'xolox/vim-notes', { 'on': ['Note', 'SearchNotes', 'DeleteNotes', 'RecentNotes'] }
 	Plug 'skywind3000/vimoutliner', { 'for': 'votl' }
+	Plug 'mattn/gist-vim'
+	" Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
 	" Plug 'Yggdroot/indentLine'
 
 	if has('python')
