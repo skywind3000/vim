@@ -21,6 +21,10 @@ set formatoptions+=B
 set history=2000
 set showcmd
 
+if has('patch-8.1.1300')
+	set shortmess-=S
+endif
+
 noremap <tab>/ :emenu <C-Z>
 
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')

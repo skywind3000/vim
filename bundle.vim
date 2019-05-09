@@ -154,8 +154,9 @@ if index(g:bundle_group, 'inter') >= 0
 	Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 	Plug 'xolox/vim-notes', { 'on': ['Note', 'SearchNotes', 'DeleteNotes', 'RecentNotes'] }
 	Plug 'skywind3000/vimoutliner', { 'for': 'votl' }
+	Plug 'mattn/webapi-vim'
 	Plug 'mattn/gist-vim'
-	" Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
+	Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
 	" Plug 'Yggdroot/indentLine'
 
 	if has('python')
