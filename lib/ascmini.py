@@ -6,7 +6,7 @@
 # ascmini.py - mini library
 #
 # Created by skywind on 2017/03/24
-# Version: 5, Last Modified: 2019/03/20 17:19
+# Version: 6, Last Modified: 2019/05/12 22:10
 #
 #======================================================================
 from __future__ import print_function
@@ -722,7 +722,7 @@ class ConfigReader (object):
             cp.readfp(sio)
         else:
             import configparser
-            cp = configparser.ConfigParser()
+            cp = configparser.ConfigParser(interpolation = None)
             cp.read_string(text)
         for sect in cp.sections():
             for key, val in cp.items(sect):
