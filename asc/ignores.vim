@@ -1,4 +1,4 @@
-set suffixes=.bak,~,.o,.h,.info,.swp,.obj,.pyc,.pyo,.egg-info,.class
+set suffixes=.bak,~,.o,.info,.swp,.obj,.pyc,.pyo,.egg-info,.class
 
 set wildignore=*.o,*.obj,*~,*.exe,*.a,*.pdb,*.lib "stuff to ignore when tab completing
 set wildignore+=*.so,*.dll,*.swp,*.egg,*.jar,*.class,*.pyc,*.pyo,*.bin,*.dex
