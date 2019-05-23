@@ -216,6 +216,10 @@ hi! link SublimeDocumentation SublimeGrey
 hi! link SublimeFunctionCall SublimeAqua
 hi! link SublimeUserAttribute SublimeGrey
 
+" Fix Search Highlighting conflict with Cursor
+hi! clear Search
+hi! Search term=reverse ctermfg=252 ctermbg=24 guifg=#D9D9D9 guibg=#007299
+
 " Bash/POSIX shell
 
 hi! link shConditional Conditional
