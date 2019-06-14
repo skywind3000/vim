@@ -94,6 +94,7 @@ class BasicTranslator(object):
         res['text'] = text
         res['translation'] = None
         res['success'] = False
+        res['info'] = None
         return res
 
     # 是否是英文
@@ -132,12 +133,46 @@ class GoogleTranslator (BasicTranslator):
     def translate (self, sl, tl, text):
         if (sl is None or sl == 'auto') and (tl is None or tl == 'auto'):
             sl, tl = self.guess_language(text)
+        self.text = text
         url = self.get_url(sl, tl, text)
         r = self.http_get(url)
         obj = r.json()
-        import pprint
-        pprint.pprint(obj)
-        return 0
+        res = {}
+        res['sl'] = obj[2] and obj[2] or sl
+        res['tl'] = obj[1] and obj[1] or tl
+        res['info'] = obj
+        result = self.get_result('', obj)
+        result = self.get_synonym(result, obj)
+        if len(obj) >= 13 and obj[12]:
+            result = self.get_definitions(result, obj)
+        res['translation'] = result
+        return res
+
+    def get_result (self, result, obj):
+        for x in obj[0]:
+            if x[0]:
+                result += x[0]
+        return result
+
+    def get_synonym (self, result, resp):
+        if resp[1]:
+            result += '\n=========\n'
+            result += '0_0: Translations of {}\n'.format(self.text)
+            for x in resp[1]:
+                result += '{}.\n'.format(x[0][0])
+                for i in x[2]:
+                    result += '{}: {}\n'.format(i[0], ", ".join(i[1]))
+        return result
+
+    def get_definitions (self, result, resp):
+        result += '\n=========\n'
+        result += '0_0: Definitions of {}\n'.format(self.text)
+        for x in resp[12]:
+            result += '{}.\n'.format(x[0])
+            for y in x[1]:
+                result += '  - {}\n'.format(y[0])
+                result += '    * {}\n'.format(y[2]) if len(y) >= 3 else ''
+        return result
 
 
 #----------------------------------------------------------------------
@@ -151,7 +186,12 @@ if __name__ == '__main__':
         return 0
     def test2():
         gt = GoogleTranslator()
-        print(gt.translate('auto', 'auto', 'Hello, World !!'))
+        # t = gt.translate('auto', 'auto', 'Hello, World !!')
+        # t = gt.translate('auto', 'auto', '你吃饭了没有?')
+        t = gt.translate('auto', 'auto', 'kiss')
+        # t = gt.translate('auto', 'auto', '亲吻')
+        import pprint
+        print(t['translation'])
         return 0
     test2()
 
