@@ -6,7 +6,7 @@
 # ascmini.py - mini library
 #
 # Created by skywind on 2017/03/24
-# Version: 6, Last Modified: 2019/05/12 22:10
+# Version: 6, Last Modified: 2019/06/14 16:41
 #
 #======================================================================
 from __future__ import print_function
@@ -934,16 +934,27 @@ class WebKit (object):
         import urllib.parse
         return urllib.parse.urlparse(url)
 
-    def url_unquote (self, text, plus = False):
+    def url_unquote (self, text, plus = True):
         if sys.version_info[0] < 3:
-            import urlparse
+            import urllib
             if plus:
-                text = text.replace('+', ' ')
-            return urlparse.unquote(text)
+                return urllib.unquote_plus(text)
+            return urllib.unquote(text)
         import urllib.parse
         if plus:
             return urllib.parse.unquote_plus(text)
         return urllib.parse.unquote(text)
+
+    def url_quote (self, text, plus = True):
+        if sys.version_info[0] < 3:
+            import urllib
+            if plus:
+                return urllib.quote_plus(text)
+            return urlparse.quote(text)
+        import urllib.parse
+        if plus:
+            return urllib.parse.quote_plus(text)
+        return urllib.parse.quote(text)
         
     def url_parse_qs (self, text, keep_blank = 0):
         if sys.version_info[0] < 3:
