@@ -5,7 +5,7 @@
 # translator.py - 命令行翻译（谷歌，必应，百度，有道，词霸）
 #
 # Created by skywind on 2019/06/14
-# Version: 1.0.1, Last Modified: 2019/06/14 21:16
+# Version: 1.0.2, Last Modified: 2019/06/18 18:40
 #
 #======================================================================
 from __future__ import print_function, unicode_literals
@@ -648,7 +648,7 @@ ENGINES = {
         'baidu': BaiduTranslator,
         'youdao': YoudaoTranslator,
         'bing': BingDict,
-        'ciba', CibaTranslator,
+        'ciba': CibaTranslator,
     }
 
 
