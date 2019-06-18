@@ -581,6 +581,37 @@ class BaiduTranslator (BasicTranslator):
 
 
 #----------------------------------------------------------------------
+# 词霸
+#----------------------------------------------------------------------
+class CibaTranslator (BasicTranslator):
+
+    def __init__ (self, **argv):
+        super(CibaTranslator, self).__init__('ciba', **argv)
+
+    def translate (self, sl, tl, text):
+        sl, tl = self.guess_language(sl, tl, text)
+        url = 'https://fy.iciba.com/ajax.php'
+        req = {}
+        req['a'] = 'fy'
+        req['f'] = sl
+        req['t'] = tl
+        req['w'] = text
+        r = self.http_get(url, req, None)
+        resp = r.json()
+        res = {}
+        res['text'] = text
+        res['sl'] = sl
+        res['tl'] = tl
+        res['translation'] = None
+        res['html'] = None
+        res['xterm'] = None
+        if 'content' in resp:
+            if 'out' in resp['content']:
+                res['translation'] = resp['content']['out']
+        return res
+
+
+#----------------------------------------------------------------------
 # 分析命令行参数
 #----------------------------------------------------------------------
 def getopt (argv):
@@ -617,6 +648,7 @@ ENGINES = {
         'baidu': BaiduTranslator,
         'youdao': YoudaoTranslator,
         'bing': BingDict,
+        'ciba', CibaTranslator,
     }
 
 
@@ -697,6 +729,12 @@ if __name__ == '__main__':
         pprint.pprint(r)
         print(r['translation'])
         return 0
+    def test6():
+        t = CibaTranslator()
+        r = t.translate('', '', '吃饭没有？')
+        # print(r['info'])
+        # print()
+        print(r['translation'])
     def test9():
         argv = ['', '正在测试翻译一段话']
         main(argv)
@@ -704,7 +742,7 @@ if __name__ == '__main__':
         argv = ['', '--engine=youdao', '正在测试翻译一段话']
         main(argv)
         return 0
-    # test5()
+    # test6()
     main()
 
 
