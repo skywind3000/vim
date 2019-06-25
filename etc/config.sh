@@ -25,6 +25,14 @@ if [ -d "$HOME/.local/go" ]; then
 	fi
 fi
 
+# setup for alternative go path
+if [ -d "$HOME/go" ]; then
+	export GOPATH="$HOME/go"
+	if [ -d "$HOME/go/bin" ]; then
+		export PATH="$HOME/go/bin:$PATH"
+	fi
+fi
+
 # setup for go if it exists
 if [ -d /usr/local/app/go ]; then
 	export GOROOT="/usr/local/app/go"
