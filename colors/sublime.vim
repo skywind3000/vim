@@ -556,6 +556,47 @@ hi! link jsThis           SublimeContextParam
 hi! link jsTry            Keyword
 hi! link jsUndefined      Constant
 
+hi! link javaScriptArgsObj        SublimeAqua
+hi! link javaScriptArrowFunction  SublimePink
+hi! link javaScriptBuiltins       SublimeFunctionCall
+hi! link javaScriptCatch          Keyword
+hi! link javaScriptConditional    Keyword
+call s:h('jsDocTags',       { 'fg': s:aqua, 'format': 'italic' })
+hi! link javaScriptException      Keyword
+" Variation: It's actually nice to get this italicized, to me
+hi! link javaScriptExceptions     Type
+hi! link javaScriptExport         Keyword
+hi! link javaScriptFinally        Keyword
+hi! link javaScriptFrom           Keyword
+call s:h('jsFuncArgRest',   { 'fg': s:purple, 'format': 'italic' })
+hi! link javaScriptFuncArgs       SublimeContextParam
+hi! link javaScriptFuncCall       SublimeFunctionCall
+hi! link javaScriptFuncName       Tag
+hi! link javaScriptFunction       SublimeType
+hi! link javaScriptFunctionKey    Tag
+" FIXME: FutureKeys includes a bit too much. It had some type names, which should be aqua, but most of the keywords that might actually get used would be pink (keywords like public, abstract).
+hi! link javaScriptFutureKeys     Keyword
+call s:h('jsGlobalObjects', { 'fg': s:aqua, 'format': 'italic' })
+hi! link javaScriptImport         Keyword
+hi! link javaScriptIdentifier     Keyword
+hi! link javaScriptModuleAs       Keyword
+hi! link javaScriptModuleAsterisk Keyword
+hi! link javaScriptNan            Constant
+hi! link javaScriptNull           Constant
+hi! link javaScriptObjectFuncName Tag
+hi! link javaScriptPrototype      SublimeAqua
+" Variation: Technically this is extra from Sublime, but it looks nice.
+hi! link javaScriptRepeat         Keyword
+hi! link javaScriptReturn         Keyword
+hi! link javaScriptStatement      Keyword
+hi! link javaScriptStatic         jsStorageClass
+hi! link javaScriptStorageClass   SublimeType
+hi! link javaScriptSuper          SublimeContextParam
+hi! link javaScriptThis           SublimeContextParam
+hi! link javaScriptTry            Keyword
+hi! link javaScriptUndefined      Constant
+
+
 " JSON
 
 hi! link jsonKeyword Identifier
