@@ -516,7 +516,7 @@ function brew_link() {
 	if [ -n "$1" ]; then
 		if [ -x "/home/linuxbrew/.linuxbrew/bin/$1" ]; then
 			NAME="$(readlink -f /home/linuxbrew/.linuxbrew/bin/$1)"
-			ln -s "$NAME" ~/bin/
+			ln -s "$NAME" ~/.local/bin/
 		else
 			echo "missing: /home/linuxbrew/.linuxbrew/bin/$1"
 		fi
@@ -527,10 +527,10 @@ function brew_link() {
 
 function brew_unlink() {
 	if [ -n "$1" ]; then
-		if [ -e "~/bin/$1" ]; then
-			rm -f "~/bin/$1"
+		if [ -e "~/.local/bin/$1" ]; then
+			rm -f "~/.local/bin/$1"
 		else
-			echo "missing: ~/bin/$1"
+			echo "missing: ~/.local/bin/$1"
 		fi
 	else
 		echo "usage: brew_unlink <name>"
