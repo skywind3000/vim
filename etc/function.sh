@@ -503,6 +503,41 @@ function brew_enable() {
 	export HOMEBREW_NO_AUTO_UPDATE=1
 }
 
+function brew_call() {
+	PATH="/home/linux/linuxbrew/.linuxbrew/bin:$PATH" "$@"
+}
+
+function brew_exe() {
+	PATH="/home/linux/linuxbrew/.linuxbrew/bin:$PATH" /home/linuxbrew/.linuxbrew/bin/brew "$@"
+}
+
+
+function brew_link() {
+	if [ -n "$1" ]; then
+		if [ -x "/home/linuxbrew/.linuxbrew/bin/$1" ]; then
+			NAME="$(readlink -f /home/linuxbrew/.linuxbrew/bin/$1)"
+			ln -s "$NAME" ~/bin/
+		else
+			echo "missing: /home/linuxbrew/.linuxbrew/bin/$1"
+		fi
+	else
+		echo "usage: brew_link <name>"
+	fi
+}
+
+function brew_unlink() {
+	if [ -n "$1" ]; then
+		if [ -e "~/bin/$1" ]; then
+			rm -f "~/bin/$1"
+		else
+			echo "missing: ~/bin/$1"
+		fi
+	else
+		echo "usage: brew_unlink <name>"
+	fi
+}
+
+
 #----------------------------------------------------------------------
 # additional alias
 #----------------------------------------------------------------------
