@@ -147,7 +147,7 @@ get_w3m_path() {
 
 get_mime_type() {
     # Get a file's mime_type.
-    mime_type=$(file "-${file_flags:-biL}" "$1")
+    mime_type=$(file "-${file_flags:-biL}" "$1" 2>/dev/null)
 }
 
 status_line() {
@@ -487,13 +487,18 @@ mark() {
 
     # Find the program to use.
     case "$2" in
-        y|Y) file_program=(cp -iR) ;;
-        m|M) file_program=(mv -i) ;;
-        s|S) file_program=(ln -s) ;;
+        ${FFF_KEY_YANK:=y}|${FFF_KEY_YANK_ALL:=Y}) file_program=(cp -iR) ;;
+        ${FFF_KEY_MOVE:=m}|${FFF_KEY_MOVE_ALL:=M}) file_program=(mv -i)  ;;
+        ${FFF_KEY_LINK:=s}|${FFF_KEY_LINK_ALL:=S}) file_program=(ln -s)  ;;
 
         # These are 'fff' functions.
-        d|D) file_program=(trash) ;;
-        b|B) file_program=(bulk_rename) ;;
+        ${FFF_KEY_TRASH:=d}|${FFF_KEY_TRASH_ALL:=D})
+            file_program=(trash)
+        ;;
+
+        ${FFF_KEY_BULK_RENAME:=b}|${FFF_KEY_BULK_RENAME_ALL:=B})
+            file_program=(bulk_rename)
+        ;;
     esac
 
     status_line
@@ -978,6 +983,19 @@ key() {
                 stat "${list[scroll]}"
                 read -ern 1
                 redraw
+            }
+        ;;
+
+        # Toggle executable flag.
+        ${FFF_KEY_EXECUTABLE:=X})
+            [[ -f ${list[scroll]} && -w ${list[scroll]} ]] && {
+                if [[ -x ${list[scroll]} ]]; then
+                    chmod -x "${list[scroll]}"
+                    status_line "Unset executable."
+                else
+                    chmod +x "${list[scroll]}"
+                    status_line "Set executable."
+                fi
             }
         ;;
 
