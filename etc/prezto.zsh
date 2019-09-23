@@ -138,6 +138,9 @@ ZSH_HIGHLIGHT_STYLES[assign]=none
 
 antigen apply
 
+# work around: fast syntax highlighting may crash zsh without this
+FAST_HIGHLIGHT[chroma-git]="chroma/-ogit.ch"
+
 # options
 unsetopt correct_all
 unsetopt share_history
