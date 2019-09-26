@@ -73,7 +73,7 @@ fi
 
 export VIM_CONFIG
 
-[ -d "$VIM_CONFIG/cheat" ] && export CHEAT_USER_DIR="$VIM_CONFIG/cheat"
+[ -d "$VIM_CONFIG/cheat" ] && export CHEAT_PATH="$VIM_CONFIG/cheat"
 
 export CHEAT_COLORS=true
 
