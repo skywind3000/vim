@@ -6,7 +6,7 @@
 # ascmini.py - mini library
 #
 # Created by skywind on 2017/03/24
-# Version: 6, Last Modified: 2019/06/14 16:41
+# Version: 7, Last Modified: 2019/09/27 07:56
 #
 #======================================================================
 from __future__ import print_function
@@ -505,7 +505,7 @@ def http_request(url, timeout = 10, data = None, post = False, head = None):
                 data = data.encode('utf-8', 'ignore')
             req = urllib.request.Request(url, data)
         if head:
-            for k, v in head:
+            for k, v in head.items():
                 req.add_header(k, v)
         try:
             res = urllib.request.urlopen(req, timeout = timeout)
@@ -543,7 +543,7 @@ def http_request(url, timeout = 10, data = None, post = False, head = None):
         else:
             req = urllib2.Request(url, data is not None and data or '')
         if head:
-            for k, v in head:
+            for k, v in head.items():
                 req.add_header(k, v)
         try:
             res = urllib2.urlopen(req, timeout = timeout)
