@@ -5,7 +5,7 @@
 # cheat.py - python cheat sheet
 #
 # Created by skywind on 2018/01/25
-# Last change: 2018/01/25 16:20:27
+# Last Modified: 2019/09/27 05:06
 #
 #======================================================================
 from __future__ import print_function
@@ -160,46 +160,46 @@ class CheatSheets (object):
 		self.site_sheets = utils.search_cheat()
 		self.cheats_dict = None
 	
-	def default_path (self):
+	def user_dir (self):
 
 		""" Returns the default cheatsheet path """
 
 		# determine the default cheatsheet dir
-		default_sheets_dir = os.environ.get('DEFAULT_CHEAT_DIR') or os.path.join('~', '.cheat')
+		default_sheets_dir = os.environ.get('CHEAT_USER_DIR') or os.path.join('~', '.cheat')
 		default_sheets_dir = os.path.expanduser(os.path.expandvars(default_sheets_dir))
 
-		# create the DEFAULT_CHEAT_DIR if it does not exist
+		# create the CHEAT_USER_DIR if it does not exist
 		if not os.path.isdir(default_sheets_dir):
 			try:
 				# @kludge: unclear on why this is necessary
-				os.umask(0000)
+				# os.umask(0000)
 				os.mkdir(default_sheets_dir)
 
 			except OSError:
-				die('Could not create DEFAULT_CHEAT_DIR')
+				die('Could not create CHEAT_USER_DIR')
 
-		# assert that the DEFAULT_CHEAT_DIR is readable and writable
+		# assert that the CHEAT_USER_DIR is readable and writable
 		if not os.access(default_sheets_dir, os.R_OK):
-			die('The DEFAULT_CHEAT_DIR (' + default_sheets_dir + ') is not readable.')
+			die('The CHEAT_USER_DIR (' + default_sheets_dir + ') is not readable.')
 		if not os.access(default_sheets_dir, os.W_OK):
-			die('The DEFAULT_CHEAT_DIR (' + default_sheets_dir + ') is not writable.')
+			die('The CHEAT_USER_DIR (' + default_sheets_dir + ') is not writable.')
 
 		# return the default dir
 		return default_sheets_dir
 
 	def paths (self):
 		""" Assembles a list of directories containing cheatsheets """
-		sheet_paths = [ self.default_path() ]
+		sheet_paths = [ self.user_dir() ]
 		sheet_paths.extend(self.site_sheets)
 
 		# merge the CHEATPATH paths into the sheet_paths
-		if 'CHEATPATH' in os.environ and os.environ['CHEATPATH']:
-			for path in os.environ['CHEATPATH'].split(os.pathsep):
+		if 'CHEAT_PATH' in os.environ and os.environ['CHEAT_PATH']:
+			for path in os.environ['CHEAT_PATH'].split(os.pathsep):
 				if os.path.isdir(path):
 					sheet_paths.append(path)
 
 		if not sheet_paths:
-			die('The DEFAULT_CHEAT_DIR dir does not exist or the CHEATPATH is not set.')
+			die('The CHEAT_USER_DIR dir does not exist or the CHEAT_PATH is not set.')
 
 		return sheet_paths
 
@@ -259,12 +259,12 @@ class CheatSheet (object):
 	def copy (self, current_sheet_path, new_sheet_path):
 		""" Copies a sheet to a new path """
 
-		# attempt to copy the sheet to DEFAULT_CHEAT_DIR
+		# attempt to copy the sheet to CHEAT_USER_DIR
 		try:
 			shutil.copy(current_sheet_path, new_sheet_path)
 
 		# fail gracefully if the cheatsheet cannot be copied. This can happen if
-		# DEFAULT_CHEAT_DIR does not exist
+		# CHEAT_USER_DIR does not exist
 		except IOError:
 			die('Could not copy cheatsheet for editing.')
 
@@ -275,10 +275,10 @@ class CheatSheet (object):
 		if not self.exists(sheet):
 			self.create(sheet)
 
-		# if the cheatsheet exists but not in the default_path, copy it to the
+		# if the cheatsheet exists but not in the user_dir, copy it to the
 		# default path before editing
-		elif self.exists(sheet) and not self.exists_in_default_path(sheet):
-			self.copy(self.path(sheet), os.path.join(cheatsheets.default_path(), sheet))
+		elif self.exists(sheet) and not self.exists_in_user_dir(sheet):
+			self.copy(self.path(sheet), os.path.join(cheatsheets.user_dir(), sheet))
 			self.edit(sheet)
 
 		# if it exists and is in the default path, then just open it
@@ -287,7 +287,7 @@ class CheatSheet (object):
 
 	def create (self, sheet):
 		""" Creates a cheatsheet """
-		new_sheet_path = os.path.join(cheatsheets.default_path(), sheet)
+		new_sheet_path = os.path.join(cheatsheets.user_dir(), sheet)
 		utils.open_with_editor(new_sheet_path)
 
 	def edit (self, sheet):
@@ -298,10 +298,10 @@ class CheatSheet (object):
 		""" Predicate that returns true if the sheet exists """
 		return sheet in cheatsheets.get() and os.access(self.path(sheet), os.R_OK)
 
-	def exists_in_default_path (self, sheet):
-		""" Predicate that returns true if the sheet exists in default_path"""
-		default_path_sheet = os.path.join(cheatsheets.default_path(), sheet)
-		return sheet in cheatsheets.get() and os.access(default_path_sheet, os.R_OK)
+	def exists_in_user_dir (self, sheet):
+		""" Predicate that returns true if the sheet exists in user_dir"""
+		user_dir_sheet = os.path.join(cheatsheets.user_dir(), sheet)
+		return sheet in cheatsheets.get() and os.access(user_dir_sheet, os.R_OK)
 
 	def is_writable (self, sheet):
 		""" Predicate that returns true if the sheet is writeable """
@@ -497,7 +497,7 @@ def main(args = None):
 #----------------------------------------------------------------------
 if __name__ == '__main__':
 
-	# os.environ['DEFAULT_CHEAT_DIR'] = 'd:/acm/github/vim/cheat'
+	# os.environ['CHEAT_USER_DIR'] = 'd:/acm/github/vim/cheat'
 
 	def test1():
 		print(utils.search_cheat())
@@ -505,7 +505,7 @@ if __name__ == '__main__':
 		return 0
 
 	def test2():
-		print(cheatsheets.default_path())
+		print(cheatsheets.user_dir())
 		import pprint
 		pprint.pprint(cheatsheets.get())
 		return 0	
