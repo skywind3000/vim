@@ -8,7 +8,7 @@
 # Last Modified: 2019/09/27 05:06
 #
 #======================================================================
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 import sys
 import os
 import subprocess
@@ -28,7 +28,7 @@ class CheatUtils (object):
         """ Colorizes cheatsheet content if so configured """
 
         # only colorize if so configured
-        if 'CHEATCOLORS' not in os.environ:
+        if 'CHEAT_COLORS' not in os.environ:
             return sheet_content
 
         try:
@@ -330,7 +330,7 @@ cheatsheet = CheatSheet()
 # display text
 #----------------------------------------------------------------------
 def display(text):
-    cheat_colors = os.environ.get('CHEATCOLORS', '')
+    cheat_colors = os.environ.get('CHEAT_COLORS', '')
     if cheat_colors and sys.stdout.isatty():
         if cheat_colors in ('0', 'no', 'disable', ''):
             print(text)
@@ -517,7 +517,7 @@ if __name__ == '__main__':
 
     def test4():
         os.environ['EDITOR'] = 'vim'
-        os.environ['CHEATCOLORS'] = 'true'
+        os.environ['CHEAT_COLORS'] = 'true'
         args = ['tar']
         args = ['-d']
         args = ['-e', 'tar']

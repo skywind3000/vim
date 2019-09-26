@@ -75,7 +75,7 @@ export VIM_CONFIG
 
 [ -d "$VIM_CONFIG/cheat" ] && export CHEAT_USER_DIR="$VIM_CONFIG/cheat"
 
-export CHEATCOLORS=true
+export CHEAT_COLORS=true
 
 if [ -f "$HOME/.local/lib/python/compinit.py" ]; then
 	export PYTHONSTARTUP="$HOME/.local/lib/python/compinit.py"
