@@ -180,21 +180,21 @@ function _prompt_init_theme {
 		if [[ "$1" == "" ]]; then
 			export PS1='\u@\h:\w\$ '
 		elif [[ "$1" == "linux" ]]; then
-			export PS1='\[\e[32m\]\u@\h\[\e[0m:\[\e[33m\]\w\[\e[0m\]\$ '
+			export PS1='\[\e[32m\]\u@\h\[\e[0m\]:\[\e[33m\]\w\[\e[0m\]\$ '
 		elif [[ "$1" == "debian" ]]; then
 			export PS1='\[\e[01;32m\]\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\]\$ '
 		elif [[ "$1" == "cygwin" ]]; then
-			export PS1='\n\[\e[32m\]\u@\h\[\e[0m \[\e[33m\]\w\[\e[0m\]\n\$ '
+			export PS1='\n\[\e[32m\]\u@\h\[\e[0m\] \[\e[33m\]\w\[\e[0m\]\n\$ '
 		elif [[ "$1" == "msys" ]]; then
-			export PS1='\n\[\e[32m\]\u@\h\[\e[0m \[\e[35m\]${MSYSTEM} \[\e[33m\]\w\[\e[0m\]\n\$ '
+			export PS1='\n\[\e[32m\]\u@\h\[\e[0m\] \[\e[35m\]${MSYSTEM} \[\e[33m\]\w\[\e[0m\]\n\$ '
 		elif [[ "$1" == "skwp" ]]; then
-			export PS1='\[\e[35m\]\u\[\e[0m\]@\[\e[33m\]\h\[\e[0m:\[\e[32m\]\w\[\e[0m\] \$ '
+			export PS1='\[\e[35m\]\u\[\e[0m\]@\[\e[33m\]\h\[\e[0m:\]\[\e[32m\]\w\[\e[0m\] \$ '
 		elif [[ "$1" == "skwp256" ]]; then
-			export PS1='\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m \[\e[38;5;118m\]\w\[\e[0m\] \$ '
+			export PS1='\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m\] \[\e[38;5;118m\]\w\[\e[0m\] \$ '
 		elif [[ "$1" == "skwp256-cygwin" ]]; then
-			export PS1='\n\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m \[\e[38;5;118m\]\w\[\e[0m\]\n\$ '
+			export PS1='\n\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m\] \[\e[38;5;118m\]\w\[\e[0m\]\n\$ '
 		elif [[ "$1" == "skwp256-msys" ]]; then
-			export PS1='\n\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m \[\e[35m\]${MSYSTEM} \[\e[38;5;118m\]\w\[\e[0m\]\n\$ '
+			export PS1='\n\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m\] \[\e[35m\]${MSYSTEM} \[\e[38;5;118m\]\w\[\e[0m\]\n\$ '
 		elif [[ "$1" == "fish" ]]; then
 			if [[ "$UID" -eq 0 ]]; then
 				export PS1='\u@\h \[\e[31m\]$(_fish_collapsed_pwd)\[\e[0m\]> '
@@ -203,9 +203,9 @@ function _prompt_init_theme {
 			fi
 		elif [[ "$1" == "fish-skwp" ]]; then
 			if [[ "$UID" -eq 0 ]]; then
-				export PS1='\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m \[\e[38;5;1m\]$(_fish_collapsed_pwd)\[\e[0m\]> '
+				export PS1='\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m\] \[\e[38;5;1m\]$(_fish_collapsed_pwd)\[\e[0m\]> '
 			else
-				export PS1='\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m \[\e[38;5;118m\]$(_fish_collapsed_pwd)\[\e[0m\]> '
+				export PS1='\[\e[38;5;135m\]\u\[\e[0m\]@\[\e[38;5;166m\]\h\[\e[0m\] \[\e[38;5;118m\]$(_fish_collapsed_pwd)\[\e[0m\]> '
 			fi
 		fi
 	else
