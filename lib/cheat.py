@@ -99,6 +99,17 @@ class CheatUtils (object):
             if not os.path.exists(path):
                 continue
             available.append(path)
+        tests = []
+        tests.append('~/.local/share/cheat/cheatsheets')
+        if sys.platform[:3] != 'win':
+            tests.append('/usr/share/cheat/cheatsheets')
+            tests.append('/usr/local/share/cheat/cheatsheets')
+        for test in tests:
+            if '~' in test:
+                test = os.path.expanduser(test)
+            test = os.path.abspath(test)
+            if os.path.isdir(test):
+                available.append(test)
         return available
 
     def set_color (self, color):
@@ -219,7 +230,7 @@ class CheatSheets (object):
     def list (self):
         """ Lists the available cheatsheets """
         sheet_list = ''
-        pad_length = max([len(x) for x in self.get()]) + 4
+        pad_length = max([len(x) for x in self.get()] + [0]) + 4
         for sheet in sorted(self.get().items()):
             sheet_list += sheet[0].ljust(pad_length) + sheet[1] + "\n"
         return sheet_list
@@ -382,6 +393,95 @@ def display(text):
 
 
 #----------------------------------------------------------------------
+# request http
+#----------------------------------------------------------------------
+def http_request(url, timeout = 10, data = None, post = False, head = None):
+    headers = []
+    import urllib
+    import ssl
+    if sys.version_info[0] >= 3:
+        import urllib.parse
+        import urllib.request
+        import urllib.error
+        if data is not None:
+            if isinstance(data, dict):
+                data = urllib.parse.urlencode(data)
+        if not post:
+            if data is None:
+                req = urllib.request.Request(url)
+            else:
+                mark = '?' in url and '&' or '?'
+                req = urllib.request.Request(url + mark + data)
+        else:
+            data = data is not None and data or ''
+            if not isinstance(data, bytes):
+                data = data.encode('utf-8', 'ignore')
+            req = urllib.request.Request(url, data)
+        if head:
+            for k, v in head.items():
+                req.add_header(k, v)
+        try:
+            res = urllib.request.urlopen(req, timeout = timeout)
+            headers = res.getheaders()
+        except urllib.error.HTTPError as e:
+            return e.code, str(e.message), None
+        except urllib.error.URLError as e:
+            return -1, str(e), None
+        except socket.timeout:
+            return -2, 'timeout', None
+        except ssl.SSLError:
+            return -2, 'timeout', None
+        content = res.read()
+    else:
+        import urllib2
+        if data is not None:
+            if isinstance(data, dict):
+                part = {}
+                for key in data:
+                    val = data[key]
+                    if isinstance(key, unicode):
+                        key = key.encode('utf-8')
+                    if isinstance(val, unicode):
+                        val = val.encode('utf-8')
+                    part[key] = val
+                data = urllib.urlencode(part)
+            if not isinstance(data, bytes):
+                data = data.encode('utf-8', 'ignore')
+        if not post:
+            if data is None:
+                req = urllib2.Request(url)
+            else:
+                mark = '?' in url and '&' or '?'
+                req = urllib2.Request(url + mark + data)
+        else:
+            req = urllib2.Request(url, data is not None and data or '')
+        if head:
+            for k, v in head.items():
+                req.add_header(k, v)
+        try:
+            res = urllib2.urlopen(req, timeout = timeout)
+            content = res.read()
+            if res.info().headers:
+                for line in res.info().headers:
+                    line = line.rstrip('\r\n\t')
+                    pos = line.find(':')
+                    if pos < 0:
+                        continue
+                    key = line[:pos].rstrip('\t ')
+                    val = line[pos + 1:].lstrip('\t ')
+                    headers.append((key, val))
+        except urllib2.HTTPError as e:
+            return e.code, str(e.message), None
+        except urllib2.URLError as e:
+            return -1, str(e), None
+        except socket.timeout:
+            return -2, 'timeout', None
+        except ssl.SSLError:
+            return -2, 'timeout', None
+    return 200, content, headers
+
+
+#----------------------------------------------------------------------
 # document
 #----------------------------------------------------------------------
 cheatdoc = """cheat
@@ -394,6 +494,7 @@ Usage:
   cheat -s <keyword>
   cheat -l
   cheat -d
+  cheat -q
   cheat -v
 
 Options:
@@ -401,6 +502,7 @@ Options:
   -e --edit         Edit cheatsheet
   -l --list         List cheatsheets
   -s --search       Search cheatsheets for <keyword>
+  -q --query        Query online in cheat.sh
   -v --version      Print the version number
 
 Examples:
@@ -425,6 +527,7 @@ def usage():
     print('  cheat -s <keyword>')
     print('  cheat -l')
     print('  cheat -d')
+    print('  cheat -q <query>')
     print('  cheat -v')
     return 0
 
@@ -437,7 +540,8 @@ def main(args = None):
     args = [ n for n in (args and args or sys.argv) ]
     
     keywords = ['-e', '--edit', '-s', '--search', '-l', '--list', 
-            '-d', '--directories', '-v', '--version', '-h', '--help']
+            '-d', '--directories', '-v', '--version', '-h', '--help',
+            '-q', '--query']
 
     if len(args) < 2:
         usage()
@@ -450,6 +554,7 @@ def main(args = None):
             options[arg] = 1
         else:
             argv.append(arg)
+            break
     
     word = argv and argv[0] or ''
 
@@ -481,6 +586,23 @@ def main(args = None):
             return 1
         text = cheatsheets.search(word)
         display(text)
+
+    elif '-q' in options or '--query' in options:
+        query = '+'.join(argv)
+        if not query:
+            print('usage: cheat -q <query> to search online in cheat.sh')
+            return 1
+        url = 'http://cheat.sh/' + query + '?'
+        if sys.platform[:3] == 'win':
+            url += 'T'
+        elif os.environ.get('CHEAT_NO_COLOR', ''):
+            url += 'T'
+        head = {'User-Agent': 'curl'}
+        code, content, headers = http_request(url, head = head)
+        if isinstance(content, bytes):
+            content = content.decode('utf-8', 'ignore')
+        sys.stdout.write(content)
+        sys.stdout.flush()
 
     else:
         if not word:
