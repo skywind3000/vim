@@ -533,61 +533,82 @@ def usage():
 
 
 #----------------------------------------------------------------------
+# getopt: returns (options, args)
+#----------------------------------------------------------------------
+def getopt (argv):
+    args = []
+    options = {}
+    if argv is None:
+        argv = sys.argv[1:]
+    index = 0
+    count = len(argv)
+    while index < count:
+        arg = argv[index]
+        if arg != '':
+            head = arg[:1]
+            if head != '-':
+                break
+            if arg == '-':
+                break
+            name = arg.lstrip('-')
+            key, _, val = name.partition('=')
+            options[key.strip()] = val.strip()
+        index += 1
+    while index < count:
+        args.append(argv[index])
+        index += 1
+    return options, args
+
+
+#----------------------------------------------------------------------
 # main
 #----------------------------------------------------------------------
 def main(args = None):
 
     args = [ n for n in (args and args or sys.argv) ]
     
-    keywords = ['-e', '--edit', '-s', '--search', '-l', '--list', 
-            '-d', '--directories', '-v', '--version', '-h', '--help',
-            '-q', '--query']
-
     if len(args) < 2:
         usage()
         return 0
 
-    argv, options = [], {}
+    options, argv = getopt(args[1:])
 
-    for arg in args[1:]:
-        if arg in keywords:
-            options[arg] = 1
-        else:
-            argv.append(arg)
-            break
-    
     word = argv and argv[0] or ''
 
-    if len(argv) > 1:
+    if len(argv) == 0 and (not options):
         usage()
         return 1
+
+    if word == '?':
+        options = {'q':1}
+        argv = argv[1:]
     
-    if '-d' in options or '--directories' in options:
+    if 'd' in options or 'directories' in options:
         print("\n".join(cheatsheets.paths()))
 
-    elif '-l' in options or '--list' in options:
+    elif 'l' in options or 'list' in options:
         print(cheatsheets.list())
 
-    elif '-e' in options or '--edit' in options:
+    elif 'e' in options or 'edit' in options:
         if not word:
             usage()
             return 1
         cheatsheet.create_or_edit(word)
 
-    elif '-h' in options or '--help' in options:
+    elif 'h' in options or 'help' in options:
         print(cheatdoc)
 
-    elif '-v' in options or '--version' in options:
+    elif 'v' in options or 'version' in options:
         print('cheat 2.2.3: by Chris Allen Lane and patched by skywind3000')
 
-    elif '-s' in options or '--search' in options:
+    elif 's' in options or 'search' in options:
         if not word:
             usage()
             return 1
         text = cheatsheets.search(word)
         display(text)
 
-    elif '-q' in options or '--query' in options:
+    elif 'q' in options or 'query' in options:
         query = '+'.join(argv)
         if not query:
             print('usage: cheat -q <query> to search online in cheat.sh')
@@ -597,6 +618,7 @@ def main(args = None):
             url += 'T'
         elif os.environ.get('CHEAT_NO_COLOR', ''):
             url += 'T'
+        # print(url)
         head = {'User-Agent': 'curl'}
         code, content, headers = http_request(url, head = head)
         if isinstance(content, bytes):
