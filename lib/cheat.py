@@ -100,10 +100,10 @@ class CheatUtils (object):
                 continue
             available.append(path)
         tests = []
-        tests.append('~/.local/share/cheat/cheatsheets')
+        tests.append('~/.local/share/cheat')
         if sys.platform[:3] != 'win':
-            tests.append('/usr/share/cheat/cheatsheets')
-            tests.append('/usr/local/share/cheat/cheatsheets')
+            tests.append('/usr/share/cheat')
+            tests.append('/usr/local/share/cheat')
         for test in tests:
             if '~' in test:
                 test = os.path.expanduser(test)
