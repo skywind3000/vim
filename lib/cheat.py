@@ -601,8 +601,7 @@ def main(args = None):
         code, content, headers = http_request(url, head = head)
         if isinstance(content, bytes):
             content = content.decode('utf-8', 'ignore')
-        sys.stdout.write(content)
-        sys.stdout.flush()
+        print(content)
 
     else:
         if not word:
