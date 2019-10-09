@@ -12,6 +12,7 @@ hi! clear SpellBad
 hi! clear SpellCap
 hi! clear SpellRare
 hi! clear SpellLocal
+
 if has('gui_running')
 	hi! SpellBad gui=undercurl guisp=red
 	hi! SpellCap gui=undercurl guisp=blue

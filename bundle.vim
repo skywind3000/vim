@@ -86,6 +86,7 @@ endif
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'basic') >= 0
 	Plug 'tpope/vim-fugitive'
+	Plug 'tpope/vim-rhubarb'
 	Plug 'mhinz/vim-startify'
 	Plug 'flazz/vim-colorschemes'
 	Plug 'xolox/vim-misc'
@@ -418,7 +419,7 @@ if index(g:bundle_group, 'neocomplete') >= 0
 	endfunction
 endif
 
-if index(g:bundle_group, 'omni')
+if index(g:bundle_group, 'omni') >= 0
 	Plug 'vim-scripts/OmniCppComplete', {'for':['cpp']}
 	" Plug 'c9s/perlomni.vim', {'for':['perl']}
 	Plug 'shawncplus/phpcomplete.vim', {'for': ['php']}
