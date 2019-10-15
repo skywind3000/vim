@@ -60,8 +60,8 @@ if index(g:bundle_group, 'simple') >= 0
 	vnoremap gb= :Tabularize /=<CR>
 	nnoremap gb/ :Tabularize /\/\//l4c1<CR>
 	vnoremap gb/ :Tabularize /\/\//l4c1<CR>
-	nnoremap gb, :Tabularize /,/l0r1<CR>
-	vnoremap gb, :Tabularize /,/l0r1<CR>
+	nnoremap gb, :Tabularize /,/r0l1<CR>
+	vnoremap gb, :Tabularize /,/r0l1<CR>
 	nnoremap gbl :Tabularize /\|<cr>
 	vnoremap gbl :Tabularize /\|<cr>
 	nnoremap gbc :Tabularize /#/l4c1<cr>

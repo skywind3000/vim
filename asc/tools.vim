@@ -132,7 +132,6 @@ function! Tools_FileSwitch(how, ...)
 		let l:params += [a:{i + 1}]
 	endfor
 	if has('win32') || has('win16') || has('win64') || has('win95')
-		let l:filename = tolower(l:filename)
 		let l:filename = substitute(l:filename, "\\", '/', 'g')
 	endif
 	for i in range(tabpagenr('$'))
@@ -148,7 +147,6 @@ function! Tools_FileSwitch(how, ...)
 			endif
 			let l:name = fnamemodify(bufname(l:bufnr), ':p')
 			if has('win32') || has('win16') || has('win64') || has('win95')
-				let l:name = tolower(l:name)
 				let l:name = substitute(l:name, "\\", '/', 'g')
 			endif
 			if l:filename == l:name
