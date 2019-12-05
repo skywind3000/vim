@@ -125,7 +125,7 @@ endif
 
 
 if has('win32') || has('win64') || has('win16') || has('win95')
-	let g:vimmake_cflags = ['-O2', '-lwinmm', '-lstdc++', '-lgdi32', '-lws2_32', '-msse3']
+	let g:vimmake_cflags = ['-O2', '-lwinmm', '-lstdc++', '-lgdi32', '-lws2_32', '-msse3', '-liphlpapi']
 else
 	let g:vimmake_cflags = ['-O2', '-lstdc++']
 	runtime ftplugin/man.vim
