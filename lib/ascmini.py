@@ -799,7 +799,7 @@ def csv_save (filename, rows, encoding = 'utf-8'):
         fp = open(filename, 'wb')
         writer = csv.writer(fp)
     else:
-        fp = open(filename, 'w', encoding = encoding)
+        fp = open(filename, 'w', encoding = encoding, newline = '')
         writer = csv.writer(fp)
     for row in rows:
         newrow = []
