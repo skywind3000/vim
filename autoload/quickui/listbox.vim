@@ -203,8 +203,14 @@ function! quickui#listbox#create(textlist, opts)
 		let keymap["h"] = 'HALFUP'
 		let keymap["l"] = 'HALFDOWN'
 	endif
+	if has_key(a:opts, 'keymap')
+		for key in keys(a:opts.keymap)
+			let keymap[key] = a:opts.keymap[key]
+		endfor
+	endif
 	let hwnd.state = 1
 	let hwnd.code = 0
+	let hwnd.input = ''
 	if has_key(a:opts, 'syntax')
 		call win_execute(winid, 'set ft=' . fnameescape(a:opts.syntax))
 	endif
@@ -243,7 +249,8 @@ function! quickui#listbox#callback(winid, code)
 	call quickui#core#popup_clear(a:winid)
 	if has_key(hwnd.opts, 'callback')
 		let F = function(hwnd.opts.callback)
-		call F(hwnd.context, code)
+		let g:quickui#listbox#current = hwnd
+		call F(code)
 	endif
 endfunc
 
@@ -266,9 +273,14 @@ function! quickui#listbox#filter(winid, key)
 		return 1
 	elseif has_key(keymap, a:key)
 		let key = keymap[a:key]
-		let cmd = 'quickui#listbox#cursor_movement("' . key . '")'
-		call win_execute(a:winid, 'call ' . cmd)
-		return 1
+		if strpart(key, 0, 6) == 'INPUT-'
+			let hwnd.input = strpart(key, 6)
+			return popup_filter_menu(a:winid, "\<CR>")
+		else
+			let cmd = 'quickui#listbox#cursor_movement("' . key . '")'
+			call win_execute(a:winid, 'call ' . cmd)
+			return 1
+		endif
 	endif
 	return popup_filter_menu(a:winid, a:key)
 endfunc
@@ -358,10 +370,12 @@ endfunc
 "----------------------------------------------------------------------
 " any callback
 "----------------------------------------------------------------------
-function! quickui#listbox#execute(context, code)
+function! quickui#listbox#execute(code)
+	let hwnd = g:quickui#listbox#current
+	let context = hwnd.context
 	if a:code >= 0
-		if a:code < len(a:context)
-			exec a:context[a:code]
+		if a:code < len(context)
+			exec context[a:code]
 		endif
 	endif
 endfunc
@@ -403,12 +417,15 @@ if 0
 	for ix in range(1000)
 		let lines += ['line: ' . ix]
 	endfor
-	function! MyCallback(context, code)
-		echo "exit: ". a:code . ' context: '. a:context . ' bufid: '. bufnr()
+	function! MyCallback(code)
+		let hwnd = g:quickui#listbox#current
+		let context = hwnd.context
+		echo "exit: ". a:code . ' context: '. context . ' in: ' . hwnd.input
 	endfunc
 	let opts = {'title':'Select', 'border':1, 'index':400, 'close':'button'}
 	let opts.context = 'asdfasdf'
 	let opts.callback = 'MyCallback'
+	let opts.keymap = {'=':'INPUT-2', '-':'INPUT-3'}
 	if 1
 		let inst = quickui#listbox#create(lines, opts)
 		call popup_show(inst.winid)

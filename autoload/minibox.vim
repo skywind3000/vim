@@ -1,6 +1,6 @@
 "======================================================================
 "
-" listbox.vim - 
+" minibox.vim - 
 "
 " Created by skywind on 2019/12/20
 " Last Modified: 2019/12/20 15:31:14
@@ -111,7 +111,7 @@ endfunc
 "----------------------------------------------------------------------
 " parse
 "----------------------------------------------------------------------
-function! listbox#parse(lines)
+function! minibox#parse(lines)
 	let items = {'image': [], 'column':0, 'nrows':0, 'keys':[]}
 	let items.keymap = {}
 	let items.displaywidth = 0
@@ -177,7 +177,7 @@ endfunc
 "----------------------------------------------------------------------
 " reposition text offset
 "----------------------------------------------------------------------
-function! listbox#reposition()
+function! minibox#reposition()
 	exec 'normal! zz'
 	let height = winheight(0)	
 	let size = line('$')
@@ -321,10 +321,10 @@ endfunc
 "----------------------------------------------------------------------
 " init window
 "----------------------------------------------------------------------
-function! listbox#create(textlist, opts)
+function! minibox#create(textlist, opts)
 	let hwnd = {}
 	let opts = {}
-	let items = listbox#parse(a:textlist)
+	let items = minibox#parse(a:textlist)
 	let winid = popup_create(items.image, {'hidden':1, 'wrap':0})
 	let bufnr = winbufnr(winid)
 	let hwnd.winid = winid
@@ -371,14 +371,14 @@ function! listbox#create(textlist, opts)
 		call win_execute(winid, ':' . moveto)
 		call win_execute(winid, 'normal! G')
 		call win_execute(winid, ':' . moveto)
-		call win_execute(winid, 'call listbox#reposition()')
+		call win_execute(winid, 'call minibox#reposition()')
 	endif
 	call s:highlight_keys(winid, items)
 	let border = get(a:opts, 'border', 1)
 	let opts = {}
 	if get(a:opts, 'manual', 0) == 0
-		let opts.filter = 'listbox#filter'
-		let opts.callback = 'listbox#callback'
+		let opts.filter = 'minibox#filter'
+		let opts.callback = 'minibox#callback'
 	endif
 	let opts.cursorline = 1
 	let opts.drag = 1
@@ -415,7 +415,7 @@ endfunc
 "----------------------------------------------------------------------
 " close list box
 "----------------------------------------------------------------------
-function! listbox#close(hwnd)
+function! minibox#close(hwnd)
 	if a:hwnd.winid > 0
 		call popup_close(a:hwnd.winid)
 		call s:popup_clear(a:hwnd.winid)
@@ -427,7 +427,7 @@ endfunc
 "----------------------------------------------------------------------
 " exit
 "----------------------------------------------------------------------
-function! listbox#callback(winid, code)
+function! minibox#callback(winid, code)
 	let local = s:popup_local(a:winid)
 	let hwnd = local.hwnd
 	let code = a:code
@@ -449,7 +449,7 @@ endfunc
 "----------------------------------------------------------------------
 " key processing
 "----------------------------------------------------------------------
-function! listbox#filter(winid, key)
+function! minibox#filter(winid, key)
 	let local = s:popup_local(a:winid)
 	let hwnd = local.hwnd
 	let keymap = hwnd.keymap
@@ -464,7 +464,7 @@ function! listbox#filter(winid, key)
 		return 1
 	elseif has_key(keymap, a:key)
 		let key = keymap[a:key]
-		let cmd = 'listbox#cursor_movement("' . key . '")'
+		let cmd = 'minibox#cursor_movement("' . key . '")'
 		call win_execute(a:winid, 'call ' . cmd)
 		return 1
 	endif
@@ -475,7 +475,7 @@ endfunc
 "----------------------------------------------------------------------
 " how to move cursor
 "----------------------------------------------------------------------
-function! listbox#cursor_movement(where)
+function! minibox#cursor_movement(where)
 	let curline = line('.')
 	let endline = line('$')
 	let height = winheight('.')
@@ -508,13 +508,13 @@ endfunc
 "----------------------------------------------------------------------
 " block and return result
 "----------------------------------------------------------------------
-function! listbox#inputlist(textlist, opts)
+function! minibox#inputlist(textlist, opts)
 	let opts = deepcopy(a:opts)
 	let opts.manual = 1
 	if has_key(opts, 'callback')
 		call remove(opts, 'callback')
 	endif
-	let hwnd = listbox#create(a:textlist, opts)
+	let hwnd = minibox#create(a:textlist, opts)
 	let winid = hwnd.winid
 	let hr = -1
 	" call win_execute(winid, 'normal zz')
@@ -530,9 +530,9 @@ function! listbox#inputlist(textlist, opts)
 		if ch == "\<ESC>" || ch == "\<c-c>"
 			break
 		elseif ch == " " || ch == "\<cr>"
-			let cmd = 'let g:listbox#index = line(".")'
+			let cmd = 'let g:minibox#index = line(".")'
 			call win_execute(winid, cmd)
-			let hr = g:listbox#index - 1
+			let hr = g:minibox#index - 1
 			break
 		elseif has_key(hwnd.hotkey, ch)
 			let hr = hwnd.hotkey[ch]
@@ -541,13 +541,13 @@ function! listbox#inputlist(textlist, opts)
 			endif
 		elseif has_key(hwnd.keymap, ch)
 			let key = hwnd.keymap[ch]
-			let cmd = 'listbox#cursor_movement("' . key . '")'
+			let cmd = 'minibox#cursor_movement("' . key . '")'
 			call win_execute(winid, 'call ' . cmd)
 			call popup_hide(winid)
 			call popup_show(winid)
 		endif
 	endwhile
-	call listbox#close(hwnd)
+	call minibox#close(hwnd)
 	return hr
 endfunc
 
@@ -555,7 +555,7 @@ endfunc
 "----------------------------------------------------------------------
 " any callback
 "----------------------------------------------------------------------
-function! listbox#execute(context, code)
+function! minibox#execute(context, code)
 	if a:code >= 0
 		if a:code < len(a:context)
 			exec a:context[a:code]
@@ -567,9 +567,9 @@ endfunc
 "----------------------------------------------------------------------
 " open popup and run command when select an item
 "----------------------------------------------------------------------
-function! listbox#any(content, opts)
+function! minibox#any(content, opts)
 	let opts = deepcopy(a:opts)
-	let opts.callback = 'listbox#execute'
+	let opts.callback = 'minibox#execute'
 	let textlist = []
 	let cmdlist = []
 	for desc in a:content
@@ -582,7 +582,7 @@ function! listbox#any(content, opts)
 		endif
 	endfor
 	let opts.context = cmdlist
-	call listbox#create(textlist, opts)
+	call minibox#create(textlist, opts)
 endfunc
 
 
@@ -607,10 +607,10 @@ if 0
 	let opts.context = 'asdfasdf'
 	let opts.callback = 'MyCallback'
 	if 0
-		let inst = listbox#create(lines, opts)
+		let inst = minibox#create(lines, opts)
 		call popup_show(inst.winid)
 	else
-		let code = listbox#inputlist(lines, opts)
+		let code = minibox#inputlist(lines, opts)
 		echo "code: " . code
 	endif
 endif
@@ -626,7 +626,7 @@ if 0
 				\ [ 'echo 5', 'echo bufnr()' ],
 				\]
 	let opts = {'title': 'select'}
-	call listbox#any(content, opts)
+	call minibox#any(content, opts)
 endif
 
 

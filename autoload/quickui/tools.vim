@@ -35,6 +35,24 @@ let s:keymaps = '123456789abcdefgimnopqrstuvwxyz'
 
 
 "----------------------------------------------------------------------
+" 
+"----------------------------------------------------------------------
+function! quickui#tools#buffer_switch(bid)
+	let code = g:quickui#listbox#current.input
+	let name = fnamemodify(bufname(a:bid), ':p')
+	if code == ''
+		exec 'b '. bid
+	elseif code == '1'
+		exec 'vs '. fnameescape(name)
+	elseif code == '2'
+		exec 'tabe '. fnameescape(name)
+	elseif code == '3'
+		exec 'FileSwitch tabe ' . fnameescape(name)
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " get content
 "----------------------------------------------------------------------
 function! quickui#tools#ui_buffers()
@@ -57,8 +75,8 @@ function! quickui#tools#ui_buffers()
 			continue
 		endif
 		let text = text . main . "\t" . path
-		let item = [text, 'b ' . bid]
-		let content += [item]
+		let cmd = 'call quickui#tools#buffer_switch(' . bid . ')'
+		let content += [[text, cmd]]
 		if bid == bufnr()
 			let current = index
 		endif
@@ -66,6 +84,10 @@ function! quickui#tools#ui_buffers()
 	endfor
 	let opts = {'title': 'Switch Buffer', 'index':current, 'close':'button'}
 	let opts.border = g:quickui#style#border
+	let opts.keymap = {}
+	let opts.keymap["\<c-]>"] = 'INPUT-1'
+	let opts.keymap["\<c-t>"] = 'INPUT-2'
+	let opts.keymap["\<c-g>"] = 'INPUT-3'
 	" let opts.syntax = 'cpp'
 	let maxheight = (&lines - 6) * 60 / 100
 	if len(content) > maxheight
