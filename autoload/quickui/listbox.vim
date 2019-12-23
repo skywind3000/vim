@@ -328,6 +328,9 @@ function! quickui#listbox#inputlist(textlist, opts)
 	if has_key(opts, 'callback')
 		call remove(opts, 'callback')
 	endif
+	if len(a:textlist) == 0
+		return -1000
+	endif
 	let hwnd = quickui#listbox#create(a:textlist, opts)
 	let winid = hwnd.winid
 	let hr = -1
@@ -399,7 +402,11 @@ function! quickui#listbox#any(content, opts)
 		endif
 	endfor
 	let opts.context = cmdlist
+	if len(textlist) == 0
+		return -1000
+	endif
 	call quickui#listbox#create(textlist, opts)
+	return 0
 endfunc
 
 

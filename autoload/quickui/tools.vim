@@ -41,7 +41,7 @@ function! quickui#tools#buffer_switch(bid)
 	let code = g:quickui#listbox#current.input
 	let name = fnamemodify(bufname(a:bid), ':p')
 	if code == ''
-		exec 'b '. bid
+		exec 'b '. a:bid
 	elseif code == '1'
 		exec 'vs '. fnameescape(name)
 	elseif code == '2'
@@ -55,7 +55,7 @@ endfunc
 "----------------------------------------------------------------------
 " get content
 "----------------------------------------------------------------------
-function! quickui#tools#ui_buffers()
+function! quickui#tools#kit_buffers(switch)
 	let bids = s:buffer_list()
 	let content = []
 	let index = 0
@@ -76,6 +76,9 @@ function! quickui#tools#ui_buffers()
 		endif
 		let text = text . main . "\t" . path
 		let cmd = 'call quickui#tools#buffer_switch(' . bid . ')'
+		if a:switch != ''
+			let cmd = a:switch . ' ' . fnameescape(name)
+		endif
 		let content += [[text, cmd]]
 		if bid == bufnr()
 			let current = index
@@ -92,6 +95,13 @@ function! quickui#tools#ui_buffers()
 	let maxheight = (&lines - 6) * 60 / 100
 	if len(content) > maxheight
 		let opts.h = maxheight
+	endif
+	if len(content) == 0
+		redraw
+		echohl ErrorMsg
+		echo "Empty buffer list"
+		echohl None
+		return -1
 	endif
 	call quickui#listbox#any(content, opts)
 endfunc

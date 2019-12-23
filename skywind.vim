@@ -179,8 +179,8 @@ let OmniCpp_DefaultNamespaces = ["std", "_GLIBCXX_STD"]
 "----------------------------------------------------------------------
 "- bufferhint
 "----------------------------------------------------------------------
-nnoremap + :call bufferhint#Popup()<CR>
-nnoremap <leader>p :call bufferhint#LoadPrevious()<CR>
+" nnoremap + :call bufferhint#Popup()<CR>
+nnoremap <silent>+ :call quickui#tools#kit_buffers('FileSwitch tabe')<cr>
 
 let g:bufferhint_CustomHighlight = 1
 hi! default link KeyHint Statement
