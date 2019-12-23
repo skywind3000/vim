@@ -161,7 +161,7 @@ function! quickui#listbox#create(textlist, opts)
 		let opts.col = (&columns - w) / 2
 	endif
 	call popup_move(winid, opts)
-	call setwinvar(winid, '&wincolor', get(a:opts, 'color', 'TVisionBG'))
+	call setwinvar(winid, '&wincolor', get(a:opts, 'color', 'QuickBG'))
 	if get(a:opts, 'index', 0) >= 0
 		let moveto = get(a:opts, 'index', 0) + 1
 		call popup_show(winid)
@@ -171,7 +171,6 @@ function! quickui#listbox#create(textlist, opts)
 		call win_execute(winid, ':' . moveto)
 		call win_execute(winid, 'call quickui#listbox#reposition()')
 	endif
-	call s:highlight_keys(winid, items)
 	let border = get(a:opts, 'border', 1)
 	let opts = {}
 	if get(a:opts, 'manual', 0) == 0
@@ -206,6 +205,11 @@ function! quickui#listbox#create(textlist, opts)
 	endif
 	let hwnd.state = 1
 	let hwnd.code = 0
+	if has_key(a:opts, 'syntax')
+		call win_execute(winid, 'set ft=' . fnameescape(a:opts.syntax))
+	endif
+	call s:highlight_keys(winid, items)
+	call popup_show(winid)
 	return hwnd
 endfunc
 
