@@ -160,6 +160,8 @@ if has('gui_running')
 	VimImport site/hexhigh.vim
 endif
 
+runtime! macros/matchit.vim
+
 
 "----------------------------------------------------------------------
 "- OmniCpp
