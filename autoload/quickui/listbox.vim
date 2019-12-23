@@ -360,6 +360,18 @@ function! quickui#listbox#inputlist(textlist, opts)
 			call win_execute(winid, cmd)
 			let hr = g:quickui#listbox#index - 1
 			break
+		elseif ch == "\<LeftMouse>"
+			let pos = getmousepos()
+			if pos.winid == winid
+				if pos.line > 0
+					call win_execute(winid, ':' . pos.line)
+					call popup_hide(winid)
+					call popup_show(winid)
+					redraw
+					let hr = pos.line - 1
+					break
+				endif
+			endif
 		elseif has_key(hwnd.hotkey, ch)
 			let hr = hwnd.hotkey[ch]
 			if hr >= 0
@@ -422,7 +434,7 @@ endfunc
 "----------------------------------------------------------------------
 " testing suit
 "----------------------------------------------------------------------
-if 1
+if 0
 	let lines = [
 				\ "[1]\tOpen &File\t(F3)",
 				\ "[2]\tChange &Directory\t(F2)",
