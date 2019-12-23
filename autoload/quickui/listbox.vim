@@ -272,6 +272,7 @@ function! quickui#listbox#filter(winid, key)
 		if pos.winid == a:winid
 			if pos.line > 0
 				call win_execute(a:winid, ':' . pos.line)
+				call popup_setoptions(a:winid, {})
 				redraw
 				return popup_filter_menu(a:winid, "\<CR>")
 			endif
@@ -365,8 +366,7 @@ function! quickui#listbox#inputlist(textlist, opts)
 			if pos.winid == winid
 				if pos.line > 0
 					call win_execute(winid, ':' . pos.line)
-					call popup_hide(winid)
-					call popup_show(winid)
+					call popup_setoptions(winid, {})
 					redraw
 					let hr = pos.line - 1
 					break
