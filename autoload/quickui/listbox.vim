@@ -267,6 +267,15 @@ function! quickui#listbox#filter(winid, key)
 		return 1
 	elseif a:key == "\<CR>" || a:key == "\<SPACE>"
 		return popup_filter_menu(a:winid, "\<CR>")
+	elseif a:key == "\<LeftMouse>"
+		let pos = getmousepos()
+		if pos.winid == a:winid
+			if pos.line > 0
+				call win_execute(a:winid, ':' . pos.line)
+				redraw
+				return popup_filter_menu(a:winid, "\<CR>")
+			endif
+		endif
 	elseif has_key(hwnd.hotkey, a:key)
 		let index = hwnd.hotkey[a:key]
 		call popup_close(a:winid, index + 1)
@@ -413,7 +422,7 @@ endfunc
 "----------------------------------------------------------------------
 " testing suit
 "----------------------------------------------------------------------
-if 0
+if 1
 	let lines = [
 				\ "[1]\tOpen &File\t(F3)",
 				\ "[2]\tChange &Directory\t(F2)",
