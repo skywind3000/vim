@@ -21,7 +21,7 @@ if 1
 	let opts.context = 'asdfasdf'
 	let opts.callback = 'MyCallback'
 	let opts.keymap = {'=':'INPUT-2', '-':'INPUT-3'}
-	if 1
+	if 0
 		let inst = quickui#listbox#create(lines, opts)
 		call popup_show(inst.winid)
 	else

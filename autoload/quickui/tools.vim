@@ -64,7 +64,7 @@ function! quickui#tools#kit_buffers(switch)
 	for bid in bids
 		let key = (index < len(s:keymaps))? strpart(s:keymaps, index, 1) : ''
 		let text = '[' . ((key == '')? ' ' : ('&' . key)) . "]\t"
-		let text .= ''. bid . "\t"
+		let text .= "\t"
 		let name = fnamemodify(bufname(bid), ':p')
 		let main = fnamemodify(name, ':t')
 		let path = fnamemodify(name, ':h')
@@ -74,7 +74,7 @@ function! quickui#tools#kit_buffers(switch)
 		elseif buftype == 'nofile' || buftype == 'quickfix'
 			continue
 		endif
-		let text = text . main . "\t" . path
+		let text = text . main . " " . "(" . bid . ")\t" . path
 		let cmd = 'call quickui#tools#buffer_switch(' . bid . ')'
 		if a:switch != ''
 			let cmd = a:switch . ' ' . fnameescape(name)

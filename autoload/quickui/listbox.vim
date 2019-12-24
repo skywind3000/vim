@@ -172,13 +172,11 @@ function! quickui#listbox#create(textlist, opts)
 		call win_execute(winid, 'call quickui#listbox#reposition()')
 	endif
 	let border = get(a:opts, 'border', 1)
-	let opts = {}
+	let opts = {'cursorline':1, 'drag':1, 'mapping':0}
 	if get(a:opts, 'manual', 0) == 0
 		let opts.filter = 'quickui#listbox#filter'
 		let opts.callback = 'quickui#listbox#callback'
 	endif
-	let opts.cursorline = 1
-	let opts.drag = 1
 	let opts.border = [0,0,0,0,0,0,0,0,0]
 	if border > 0
 		let opts.borderchars = quickui#core#border_vim(border)
@@ -186,9 +184,6 @@ function! quickui#listbox#create(textlist, opts)
 	endif
 	let opts.title = has_key(a:opts, 'title')? ' ' . a:opts.title . ' ' : ''
 	let opts.padding = [0,1,0,1]
-	let opts.cursorline = 1
-	let opts.mapping = 0
-	let opts.drag = 1
 	if has_key(a:opts, 'close')
 		let opts.close = a:opts.close
 	endif
