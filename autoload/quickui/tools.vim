@@ -31,7 +31,7 @@ endfunc
 "----------------------------------------------------------------------
 " locals
 "----------------------------------------------------------------------
-let s:keymaps = '123456789abcdefgimnopqrstuvwxyz'
+let s:keymaps = '123456789abcdefimnopqrstuvwxyz'
 
 
 "----------------------------------------------------------------------
@@ -92,7 +92,7 @@ function! quickui#tools#kit_buffers(switch)
 	let opts.keymap["\<c-t>"] = 'INPUT-2'
 	let opts.keymap["\<c-g>"] = 'INPUT-3'
 	" let opts.syntax = 'cpp'
-	let maxheight = (&lines - 6) * 60 / 100
+	let maxheight = (&lines) * 60 / 100
 	if len(content) > maxheight
 		let opts.h = maxheight
 	endif

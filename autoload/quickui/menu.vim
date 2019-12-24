@@ -239,7 +239,9 @@ function! quickui#menu#update()
 		if item.key_pos >= 0
 			let x = item.key_pos + item.x + 1
 			let cmd = quickui#core#high_region('QuickKey', 1, x, 1, x + 1, 0)
-			call win_execute(winid, cmd)
+			if index != s:cmenu.index
+				call win_execute(winid, cmd)
+			endif
 		endif
 		let index += 1
 	endfor
@@ -311,7 +313,7 @@ function! s:movement(key)
 		let index = (index >= s:cmenu.size)? 0 : index
 		let s:cmenu.index = (s:cmenu.size == 0)? 0 : index
 		call quickui#menu#update()
-		echo "MOVE: " . index
+		" echo "MOVE: " . index
 	endif
 endfunc
 
@@ -342,7 +344,7 @@ if 1
 				\ ])
 
 	call quickui#menu#install('&Window', [])
-	call quickui#menu#change_weight('&Help', 1000)
+	call quickui#menu#change_weight('H&elp', 1000)
 	let inst = s:parse_menu()
 	" echo '"' . inst.text . '"'
 	let opts = {}
