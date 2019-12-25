@@ -52,6 +52,62 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" escape key character (starts by &) from string
+"----------------------------------------------------------------------
+function! quickui#core#escape(text)
+	let text = a:text
+	let rest = ''
+	let start = 0
+	let obj = ['', '', -1, -1, -1]
+	while 1
+		let pos = stridx(text, '&', start)
+		if pos < 0
+			let rest .= strpart(text, start)
+			break
+		end
+		let rest .= strpart(text, start, pos - start)
+		let key = strpart(text, pos + 1, 1)
+		let start = pos + 2
+		if key == '&'
+			let rest .= '&'
+		elseif key == '~'
+			let rest .= '~'
+		else
+			let obj[1] = key
+			let obj[2] = strlen(rest)
+			let obj[3] = strchars(rest)
+			let obj[4] = strdisplaywidth(rest)
+			let rest .= key
+		endif
+	endwhile
+	let obj[0] = rest
+	return obj
+endfunc
+
+
+"----------------------------------------------------------------------
+" list parse
+"----------------------------------------------------------------------
+function! quickui#core#single_parse(description)
+	let item = { 'part': [], 'size': 0 }
+	let item.key_char = ''
+	let item.key_pos = -1
+	let item.key_idx = -1
+	for text in split(a:description, "\t")
+		let obj = quickui#core#escape(text)
+		let item.part += [obj[0]]
+		if obj[2] >= 0 && item.key_idx < 0
+			let item.key_char = obj[1]
+			let item.key_pos = obj[4]
+			let item.key_idx = item.size
+		endif
+		let item.size += 1
+	endfor
+	return item
+endfunc
+
+
+"----------------------------------------------------------------------
 " object
 "----------------------------------------------------------------------
 function! quickui#core#instance()

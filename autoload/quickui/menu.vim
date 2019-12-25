@@ -157,7 +157,7 @@ function! s:parse_menu()
 	for section in names
 		let menu = s:menucfg[section]
 		let item = {'name':menu.name, 'text':''}
-		let obj = quickui#utils#escape(menu.name)
+		let obj = quickui#core#escape(menu.name)
 		let item.text = ' ' . obj[0] . ' '
 		let item.key_char = obj[1]
 		let item.key_pos = (obj[3] < 0)? -1 : (obj[3] + 1)

@@ -22,7 +22,7 @@ function! quickui#listbox#parse(lines)
 	let spliter = '  '
 	for line in a:lines
 		let line = quickui#core#expand_text(line)
-		let obj = quickui#utils#single_parse(line)
+		let obj = quickui#core#single_parse(line)
 		let objects += [obj]
 		if obj.key_pos > 0
 			let items.keymap[tolower(obj.key_char)] = items.nrows
@@ -281,6 +281,9 @@ function! quickui#listbox#filter(winid, key)
 		if strpart(key, 0, 6) == 'INPUT-'
 			let hwnd.input = strpart(key, 6)
 			return popup_filter_menu(a:winid, "\<CR>")
+		elseif key == 'ESC'
+			call popup_close(a:winid, -1)
+			return 1
 		else
 			let cmd = 'quickui#listbox#cursor_movement("' . key . '")'
 			call win_execute(a:winid, 'call ' . cmd)

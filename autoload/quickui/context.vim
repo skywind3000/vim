@@ -12,7 +12,7 @@
 "----------------------------------------------------------------------
 " compile
 "----------------------------------------------------------------------
-function! quickui#context#menu_compile(items, border)
+function! quickui#context#compile(items, border)
 	let menu = {'border':a:border}
 	let items = []
 	let helps = []
@@ -266,7 +266,7 @@ endfunc
 "----------------------------------------------------------------------
 function! quickui#context#show(items, options)
 	let border = get(a:options, 'border', g:quickui#style#border)
-	let menu = quickui#context#menu_compile(a:items, border)
+	let menu = quickui#context#compile(a:items, border)
 	let winid = quickui#core#popup_alloc('context')
 	let size = len(a:items)
 	let cursor = s:cursor_within(size, get(a:options, 'cursor', 0))
@@ -373,6 +373,92 @@ endfunc
 
 
 
+"----------------------------------------------------------------------
+" create menu object
+"----------------------------------------------------------------------
+function! quickui#context#create(textlist, opts)
+	let border = get(a:opts, 'border', g:quickui#style#border)
+	let hwnd = quickui#context#compile(a:textlist, border)
+	let winid = popup_create(hwnd.image, {'hidden':1, 'wrap':0})
+	let w = hwnd.width
+	let h = hwnd.height
+	let hwnd.winid = winid
+	let hwnd.index = -1
+	let opts = {'minwidth':w, 'maxwidth':w, 'minheight':h, 'maxheight':h}
+	call popup_move(winid, opts)
+	call setwinvar(winid, '&wincolor', get(a:opts, 'color', 'QuickBG'))
+	let opts = {'cursorline':0, 'drag':0, 'mapping':0}
+	let opts.border = [0,0,0,0,0,0,0,0,0]
+	let keymap = quickui#utils#keymap()
+	if has_key(a:opts, 'keymap')
+		for key in keys(a:opts.keymap)
+			let keymap[key] = a:opts.keymap[key]
+		endfor
+	endif
+	let hwnd.keymap = keymap
+	let hwnd.hotkey = {}
+	for item in hwnd.items
+		if item.enable != 0 && item.key_pos >= 0
+			let hwnd.hotkey[item.key_char] = item.index
+		endif
+	endfor
+	call popup_setoptions(winid, opts)
+	call quickui#context#update(hwnd)
+	call popup_show(winid)
+	return hwnd
+endfunc
+
+
+"----------------------------------------------------------------------
+" render menu 
+"----------------------------------------------------------------------
+function! quickui#context#update(hwnd)
+	let winid = a:hwnd.winid
+	let size = len(a:hwnd.items)
+	let w = a:hwnd.width
+	let h = a:hwnd.height
+	call win_execute(winid, 'syn clear')
+	for item in a:hwnd.items
+		let index = item.index
+		if index == a:hwnd.index
+			if a:hwnd.border == 0
+				let py = index + 1
+				let px = 1
+				let ps = px + w
+			else
+				let py = index + 2
+				let px = 2
+				let ps = px + w - 2
+			endif
+			let cmd = quickui#core#high_region('QuickSel', py, px, py, ps, 1)
+			call win_execute(winid, cmd)
+		elseif item.enable == 0 && item.is_sep == 0
+			if a:hwnd.border == 0
+				let py = index + 1
+				let px = 1
+				let ps = px + w
+			else
+				let py = index + 2
+				let px = 3
+				let ps = px + w - 4
+			endif
+			let cmd = quickui#core#high_region('QuickOff', py, px, py, ps, 1)
+			call win_execute(winid, cmd)
+		elseif item.key_pos >= 0
+			if a:hwnd.border == 0
+				let px = item.key_pos + 1
+				let py = index + 1
+			else
+				let px = item.key_pos + 3
+				let py = index + 2
+			endif
+			echo "high: py=".py." px=".px
+			let ps = px + 1
+			let cmd = quickui#core#high_region('QuickKey', py, px, py, ps, 1)
+			call win_execute(winid, cmd)
+		endif
+	endfor
+endfunc
 
 
 "----------------------------------------------------------------------
@@ -399,9 +485,19 @@ if 1
 	" echo quickui#core#pattern_ascii
 	" let menu = quickui#context#menu_compile(lines, 1)
 	let opts = {'cursor': -1, 'line2':'cursor+1', 'col2': 'cursor', 'horizon':1}
-	let opts.border = 2
-	let index = quickui#context#show(lines, opts)
-	echo index
+	" let opts.border = 2
+	" let index = quickui#context#show(lines, opts)
+	if 1
+		let menu = quickui#context#create(lines, opts)
+		" echo menu
+		call getchar()
+		redraw
+		call getchar()
+		call popup_close(menu.winid)
+	else
+		let item = quickui#utils#item_parse("你好吗f&aha\tAlt+x")	
+		echo item
+	endif
 endif
 
 
