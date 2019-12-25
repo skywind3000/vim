@@ -183,20 +183,6 @@ function! quickui#context#update(hwnd)
 		endif
 	endfor
 	redraw
-	if a:hwnd.index >= 0 && a:hwnd.index < len(a:hwnd.items)
-		let help = a:hwnd.items[a:hwnd.index].help
-		if help != ''
-			echohl QuickHelp
-			if g:quickui#style#help != ''
-				echo ' ' . g:quickui#style#help . ' ' . help
-			else
-				echo ' ' . help
-			endif
-			echohl None
-		else
-			echo ''
-		endif
-	endif
 endfunc
 
 
@@ -227,6 +213,14 @@ function! quickui#context#callback(winid, code)
 		let g:quickui#context#current = hwnd
 		call F(code)
 	endif
+	if code >= 0 && code < len(hwnd.items)
+		let item = hwnd.items[code]
+		if item.is_sep == 0 && item.enable != 0
+			if item.cmd != ''
+				exec item.cmd
+			endif
+		endif
+	endif
 endfunc
 
 
@@ -241,7 +235,9 @@ function! quickui#context#filter(winid, key)
 		call popup_close(a:winid, -1)
 		return 1
 	elseif a:key == "\<CR>" || a:key == "\<SPACE>"
-		return quickui#context#confirm(hwnd)
+		return s:on_confirm(hwnd)
+	elseif a:key == "\<LeftMouse>"
+		return s:on_click(hwnd)
 	elseif has_key(hwnd.hotkey, a:key)
 		let key = hwnd.hotkey[a:key]
 	elseif has_key(hwnd.keymap, a:key)
@@ -255,17 +251,24 @@ function! quickui#context#filter(winid, key)
 		elseif key == 'BOTTOM' || key == 'PAGEDOWN'
 			let hwnd.index = s:cursor_move(hwnd, hwnd.index, 'BOTTOM')
 		endif
+		if get(hwnd.opts, 'horizon', 0) != 0
+			if key == 'LEFT'
+				call popup_close(a:winid, -1000)
+			elseif key == 'RIGHT'
+				call popup_close(a:winid, -2000)
+			endif
+		endif
 		call quickui#context#update(hwnd)
 		return 1
 	endif
-	return 0
+	return 1
 endfunc
 
 
 "----------------------------------------------------------------------
 " press enter or space
 "----------------------------------------------------------------------
-function! quickui#context#confirm(hwnd)
+function! s:on_confirm(hwnd)
 	let index = a:hwnd.index
 	if index < 0 || index > len(a:hwnd.items)
 		return 0
@@ -275,6 +278,41 @@ function! quickui#context#confirm(hwnd)
 		return 0
 	endif
 	call popup_close(a:hwnd.winid, index)
+	return 1
+endfunc
+
+
+"----------------------------------------------------------------------
+" mouse left click
+"----------------------------------------------------------------------
+function! s:on_click(hwnd)
+	let hwnd = a:hwnd
+	let winid = a:hwnd.winid
+	let pos = getmousepos()
+	if pos.winid != winid
+		call popup_close(winid, -2)
+		return 0
+	endif
+	let index = -1
+	if hwnd.border == 0
+		let index = pos.line - 1
+	else
+		if pos.column > 1 && pos.column < hwnd.width
+			if pos.line > 1 && pos.line < hwnd.height
+				let index = pos.line - 2
+			endif
+		endif
+	endif
+	if index >= 0 && index < len(hwnd.items)
+		let item = hwnd.items[index]
+		if item.is_sep == 0 && item.enable != 0
+			let hwnd.index = index
+			call quickui#context#update(hwnd)
+			call popup_setoptions(winid, {})
+			redraw
+			call popup_close(winid, index)
+		endif
+	endif
 	return 1
 endfunc
 
@@ -342,7 +380,7 @@ if 1
 	let lines = [
 				\ "&New File\tCtrl+n",
 				\ "&Open File\tCtrl+o", 
-				\ ["&Close", 'test echo'],
+				\ ["&Close", 'test echo', 'echo 1234'],
 				\ "--",
 				\ "&Save\tCtrl+s",
 				\ "Save &As",
