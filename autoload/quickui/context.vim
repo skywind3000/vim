@@ -96,10 +96,12 @@ function! quickui#context#create(textlist, opts)
 	if has_key(a:opts, 'line')
 		let opts.line = a:opts.line
 	else
+		let opts.line = 'cursor+1'
 	endif
 	if has_key(a:opts, 'col')
 		let opts.col = a:opts.col
 	else
+		let opts.col = 'cursor+1'
 	endif
 	call popup_move(winid, opts)
 	call setwinvar(winid, '&wincolor', get(a:opts, 'color', 'QuickBG'))
@@ -120,7 +122,7 @@ function! quickui#context#create(textlist, opts)
 	let hwnd.hotkey = {}
 	for item in hwnd.items
 		if item.enable != 0 && item.key_pos >= 0
-			let hwnd.hotkey[item.key_char] = item.index
+			let hwnd.hotkey[tolower(item.key_char)] = item.index
 		endif
 	endfor
 	let local = quickui#core#popup_local(winid)
@@ -235,11 +237,23 @@ function! quickui#context#filter(winid, key)
 		call popup_close(a:winid, -1)
 		return 1
 	elseif a:key == "\<CR>" || a:key == "\<SPACE>"
-		return s:on_confirm(hwnd)
+		call s:on_confirm(hwnd)
+		return 1
 	elseif a:key == "\<LeftMouse>"
 		return s:on_click(hwnd)
 	elseif has_key(hwnd.hotkey, a:key)
 		let key = hwnd.hotkey[a:key]
+		if key >= 0 && key < len(hwnd.items)
+			let item = hwnd.items[key]
+			if item.is_sep == 0 && item.enable != 0
+				let hwnd.index = key
+				call quickui#context#update(hwnd)
+				call popup_setoptions(winid, {})
+				redraw
+				call popup_close(winid, key)
+				return 1
+			endif
+		endif
 	elseif has_key(hwnd.keymap, a:key)
 		let key = hwnd.keymap[a:key]
 		if key == 'UP'
@@ -271,11 +285,11 @@ endfunc
 function! s:on_confirm(hwnd)
 	let index = a:hwnd.index
 	if index < 0 || index > len(a:hwnd.items)
-		return 0
+		return 1
 	endif
 	let item = a:hwnd.items[index]
 	if item.is_sep || item.enable == 0
-		return 0
+		return 1
 	endif
 	call popup_close(a:hwnd.winid, index)
 	return 1
@@ -380,7 +394,7 @@ if 1
 	let lines = [
 				\ "&New File\tCtrl+n",
 				\ "&Open File\tCtrl+o", 
-				\ ["&Close", 'test echo', 'echo 1234'],
+				\ ["&Close", 'test echo'],
 				\ "--",
 				\ "&Save\tCtrl+s",
 				\ "Save &As",
@@ -397,6 +411,10 @@ if 1
 	" let menu = quickui#context#menu_compile(lines, 1)
 	let opts = {'cursor': -1, 'line2':'cursor+1', 'col2': 'cursor', 'horizon':1}
 	" let opts.index = 2
+	let opts.callback = 'MyCallback'
+	function! MyCallback(code)
+		echo "callback: " . a:code
+	endfunc
 	if 1
 		let menu = quickui#context#create(lines, opts)
 		" echo menu
