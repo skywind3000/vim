@@ -160,10 +160,10 @@ function! s:parse_menu()
 		let obj = quickui#core#escape(menu.name)
 		let item.text = ' ' . obj[0] . ' '
 		let item.key_char = obj[1]
-		let item.key_pos = (obj[3] < 0)? -1 : (obj[3] + 1)
+		let item.key_pos = (obj[4] < 0)? -1 : (obj[4] + 1)
 		let item.x = start
-		let item.w = strchars(item.text)
-		let start += item.w + len(split)
+		let item.w = strwidth(item.text)
+		let start += item.w + strwidth(split)
 		let inst.items += [item]
 		let inst.text .= item.text . ((index + 1 < size)? split : '')
 		let inst.width += item.w
@@ -238,7 +238,7 @@ function! quickui#menu#update()
 	for item in inst.items
 		if item.key_pos >= 0
 			let x = item.key_pos + item.x + 1
-			let cmd = quickui#core#high_region('QuickKey', 1, x, 1, x + 1, 0)
+			let cmd = quickui#core#high_region('QuickKey', 1, x, 1, x + 1, 1)
 			if index != s:cmenu.index
 				call win_execute(winid, cmd)
 			endif
@@ -249,7 +249,7 @@ function! quickui#menu#update()
 	if index >= 0 && index < s:cmenu.size
 		let x = inst.items[index].x + 1
 		let e = x + inst.items[index].w
-		let cmd = quickui#core#high_region('QuickSel', 1, x, 1, e, 0)
+		let cmd = quickui#core#high_region('QuickSel', 1, x, 1, e, 1)
 		call win_execute(winid, cmd)
 	endif
 	return 0
