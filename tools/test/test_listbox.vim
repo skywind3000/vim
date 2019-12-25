@@ -8,6 +8,7 @@ if 1
 				\ "[3]\tHelp",
 				\ "",
 				\ "[4]\tE&xit",
+				\ "[4]\t哈哈哈E&xit",
 				\ ]
 	for ix in range(1000)
 		let lines += ['line: ' . ix]
