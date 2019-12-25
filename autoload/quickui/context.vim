@@ -125,8 +125,13 @@ function! quickui#context#create(textlist, opts)
 	endfor
 	let local = quickui#core#popup_local(winid)
 	let local.hwnd = hwnd
-	let opts.callback = 'quickui#context#callback'
-	let opts.filter = 'quickui#context#filter'
+	if get(a:opts, 'manual', 0) == 0
+		let opts.callback = 'quickui#context#callback'
+		let opts.filter = 'quickui#context#filter'
+	endif
+	if has_key(a:opts, 'zindex')
+		let opts.zindex = a:opts.zindex
+	endif
 	call popup_setoptions(winid, opts)
 	call quickui#context#update(hwnd)
 	call popup_show(winid)
@@ -203,6 +208,9 @@ endfunc
 "----------------------------------------------------------------------
 function! quickui#context#callback(winid, code)
 	let local = quickui#core#popup_local(a:winid)
+	if !has_key(local, 'hwnd')
+		return 0
+	endif
 	let hwnd = local.hwnd
 	let code = a:code
 	let hwnd.state = 0
@@ -221,6 +229,7 @@ function! quickui#context#callback(winid, code)
 			endif
 		endif
 	endif
+	return 0
 endfunc
 
 
@@ -387,7 +396,7 @@ endfunc
 "----------------------------------------------------------------------
 " testing suit 
 "----------------------------------------------------------------------
-if 1
+if 0
 	call quickui#utils#highlight('default')
 	let lines = [
 				\ "&New File\tCtrl+n",

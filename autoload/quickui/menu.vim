@@ -32,7 +32,7 @@ function! quickui#menu#register(section, entry, command, help)
 		let s:menucfg[a:section].weight = maximum + 100
 	endif
 	let menu = s:menucfg[a:section]
-	let item = {'name':a:entry, 'command':a:command, 'help':a:help}
+	let item = {'name':a:entry, 'cmd':a:command, 'help':a:help}
 	let menu.items += [item]
 endfunc
 
@@ -217,6 +217,7 @@ function! quickui#menu#create(opts)
 	let s:cmenu.hotkey = s:cmenu.inst.hotkey
 	let s:cmenu.drop = -1
 	let s:cmenu.state = 1
+	let s:cmenu.context = -1
 	call popup_setoptions(winid, opts)
 	call quickui#menu#update()
 	call popup_show(winid)
@@ -273,7 +274,13 @@ endfunc
 " exit callback
 "----------------------------------------------------------------------
 function! quickui#menu#callback(winid, code)
+	echom "quickui#menu#callback"
 	let s:cmenu.state = 0
+	let s:cmenu.winid = -1
+	if s:cmenu.context >= 0
+		call popup_close(s:cmenu.context, -3)
+		let s:cmenu.context = -1
+	endif
 endfunc
 
 
@@ -293,6 +300,7 @@ function! quickui#menu#filter(winid, key)
 		redraw
 		return 1
 	endif
+	return 1
 endfunc
 
 
@@ -314,7 +322,56 @@ function! s:movement(key)
 		let s:cmenu.index = (s:cmenu.size == 0)? 0 : index
 		call quickui#menu#update()
 		" echo "MOVE: " . index
+	elseif a:key == 'ENTER'
+		call s:context_dropdown()
 	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" drop down context
+"----------------------------------------------------------------------
+function! s:context_dropdown()
+	let cursor = s:cmenu.index
+	if cursor < 0 || cursor >= s:cmenu.size || s:cmenu.state == 0
+		return 0
+	endif
+	if s:cmenu.state == 2
+		call popup_close(s:cmenu.context, -3)
+		let s:cmenu.state = 1
+		let s:cmenu.context = -1
+	endif
+	let item = s:cmenu.inst.items[s:cmenu.index]
+	let opts = {'col': item.x + 1, 'line': 2, 'horizon':1, 'zindex':31100}
+	let opts.callback = 'quickui#menu#context_exit'
+	let cfg = s:menucfg[item.name]
+	let s:cmenu.dropdown = []
+	for item in cfg.items
+		let s:cmenu.dropdown += [[item.name, item.cmd]]
+	endfor
+	let hwnd = quickui#context#create(s:cmenu.dropdown, opts)
+	let s:cmenu.context = hwnd.winid
+	let s:cmenu.state = 1
+endfunc
+
+
+"----------------------------------------------------------------------
+" context menu callback
+"----------------------------------------------------------------------
+function! quickui#menu#context_exit(code)
+	echom "quickui#menu#context_exit"
+	let s:cmenu.context = -1
+	if a:code >= 0 || a:code == -3
+		if s:cmenu.state > 0 && s:cmenu.winid >= 0
+			call popup_close(s:cmenu.winid, 0)
+		endif
+		return 0
+	elseif a:code == -1
+		if s:cmenu.state > 0 && s:cmenu.winid >= 0
+			call popup_close(s:cmenu.winid, 0)
+		endif
+	endif
+	return 0
 endfunc
 
 

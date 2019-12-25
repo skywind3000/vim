@@ -25,8 +25,8 @@ function! quickui#utils#item_parse(description)
 	elseif type(a:description) == v:t_list
 		let size = len(a:description)
 		let text = (size >= 1)? a:description[0] : ''
-		let obj.help = (size >= 2)? a:description[1] : ''
-		let obj.cmd = (size >= 3)? a:description[2] : ''
+		let obj.cmd = (size >= 2)? a:description[1] : ''
+		let obj.help = (size >= 3)? a:description[2] : ''
 		let obj.info = deepcopy(a:description)
 	endif
 	if text =~ '^-\+$'
