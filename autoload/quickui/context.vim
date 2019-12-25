@@ -187,8 +187,14 @@ function! quickui#context#update(hwnd)
 		let help = a:hwnd.items[a:hwnd.index].help
 		if help != ''
 			echohl QuickHelp
-			echo ' ' . help
+			if g:quickui#style#help != ''
+				echo ' ' . g:quickui#style#help . ' ' . help
+			else
+				echo ' ' . help
+			endif
 			echohl None
+		else
+			echo ''
 		endif
 	endif
 endfunc
@@ -234,6 +240,8 @@ function! quickui#context#filter(winid, key)
 	if a:key == "\<ESC>" || a:key == "\<c-c>"
 		call popup_close(a:winid, -1)
 		return 1
+	elseif a:key == "\<CR>" || a:key == "\<SPACE>"
+		return quickui#context#confirm(hwnd)
 	elseif has_key(hwnd.hotkey, a:key)
 		let key = hwnd.hotkey[a:key]
 	elseif has_key(hwnd.keymap, a:key)
@@ -255,9 +263,19 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" 
+" press enter or space
 "----------------------------------------------------------------------
-function! quickui#context#movement(hwnd, action)
+function! quickui#context#confirm(hwnd)
+	let index = a:hwnd.index
+	if index < 0 || index > len(a:hwnd.items)
+		return 0
+	endif
+	let item = a:hwnd.items[index]
+	if item.is_sep || item.enable == 0
+		return 0
+	endif
+	call popup_close(a:hwnd.winid, index)
+	return 1
 endfunc
 
 

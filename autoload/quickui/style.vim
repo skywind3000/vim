@@ -12,5 +12,5 @@
 "----------------------------------------------------------------------
 let quickui#style#border = get(g:, 'quickui#style#border', 1)
 
-let quickui#sytle#help = '[help] '
+let quickui#style#help = '[help]'
 
