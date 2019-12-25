@@ -93,15 +93,13 @@ function! quickui#context#create(textlist, opts)
 	let hwnd.index = get(a:opts, 'index', -1)
 	let hwnd.opts = deepcopy(a:opts)
 	let opts = {'minwidth':w, 'maxwidth':w, 'minheight':h, 'maxheight':h}
-	if has_key(a:opts, 'line')
+	if has_key(a:opts, 'line') && has_key(a:opts, 'col')
 		let opts.line = a:opts.line
-	else
-		let opts.line = 'cursor+1'
-	endif
-	if has_key(a:opts, 'col')
 		let opts.col = a:opts.col
 	else
-		let opts.col = 'cursor+1'
+		let pos = quickui#core#around_cursor(w, h)
+		let opts.line = pos[0]
+		let opts.col = pos[1]
 	endif
 	call popup_move(winid, opts)
 	call setwinvar(winid, '&wincolor', get(a:opts, 'color', 'QuickBG'))
