@@ -292,6 +292,8 @@ function! quickui#menu#filter(winid, key)
 	if a:key == "\<ESC>" || a:key == "\<c-c>"
 		call popup_close(a:winid, -1)
 		return 1
+	elseif a:key == "\<LeftMouse>"
+		return s:mouse_click()
 	elseif has_key(s:cmenu.hotkey, a:key)
 		let index = s:cmenu.hotkey[a:key]
 	elseif has_key(keymap, a:key)
@@ -322,9 +324,22 @@ function! s:movement(key)
 		let s:cmenu.index = (s:cmenu.size == 0)? 0 : index
 		call quickui#menu#update()
 		" echo "MOVE: " . index
-	elseif a:key == 'ENTER'
+	elseif a:key == 'ENTER' || a:key == 'DOWN'
 		call s:context_dropdown()
 	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" mouse click
+"----------------------------------------------------------------------
+function! s:mouse_click()
+	let pos = getmousepos()
+	if pos.winid != s:cmenu.winid
+		call popup_close(s:cmenu.winid, -1)
+		return 0
+	endif
+	return 1
 endfunc
 
 
@@ -349,6 +364,9 @@ function! s:context_dropdown()
 	for item in cfg.items
 		let s:cmenu.dropdown += [[item.name, item.cmd]]
 	endfor
+	let index = get(cfg, 'index', 0)
+	let opts.index = (index < 0 || index >= len(cfg.items))? 0 : index
+	let cfg.index = opts.index
 	let hwnd = quickui#context#create(s:cmenu.dropdown, opts)
 	let s:cmenu.context = hwnd.winid
 	let s:cmenu.state = 1
@@ -361,15 +379,34 @@ endfunc
 function! quickui#menu#context_exit(code)
 	echom "quickui#menu#context_exit"
 	let s:cmenu.context = -1
+	let hwnd = g:quickui#context#current
+	if has_key(hwnd, 'index') && hwnd.index >= 0
+		let item = s:cmenu.inst.items[s:cmenu.index]
+		let cfg = s:menucfg[item.name]
+		let cfg.index = hwnd.index
+		" echo "save index: ".hwnd.index
+	endif
 	if a:code >= 0 || a:code == -3
 		if s:cmenu.state > 0 && s:cmenu.winid >= 0
 			call popup_close(s:cmenu.winid, 0)
 		endif
 		return 0
-	elseif a:code == -1
+	elseif a:code == -1		" close context menu by ESC
 		if s:cmenu.state > 0 && s:cmenu.winid >= 0
 			call popup_close(s:cmenu.winid, 0)
 		endif
+	elseif a:code == -2     " close context menu by mouse
+		if s:cmenu.state > 0 && s:cmenu.winid >= 0
+			let pos = getmousepos()
+			if pos.winid != s:cmenu.winid
+				call popup_close(s:cmenu.winid, 0)
+			else
+					
+			endif
+		endif
+	elseif a:code == -1000 || a:code == -2000
+		call s:movement((a:code == -1000)? 'LEFT' : 'RIGHT')
+		call s:movement('DOWN')
 	endif
 	return 0
 endfunc
@@ -405,7 +442,7 @@ if 1
 	let inst = s:parse_menu()
 	" echo '"' . inst.text . '"'
 	let opts = {}
-	let s:cmenu.index = -1
+	" let s:cmenu.index = -1
 	call quickui#menu#create(opts)
 	let keymap = quickui#utils#keymap()
 	" echo keymap
