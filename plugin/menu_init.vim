@@ -32,7 +32,7 @@ call quickui#menu#install("&Build", [
 			\ ['&Stop Build', 'VimStop'],
 			\ ])
 
-call quickui#menu#install('G&oto', [
+call quickui#menu#install('&Symbol', [
 			\ [ "&Grep Word\t(In Project)", 'call menu#FindInProject()' ],
 			\ [ "--", '' ],
 			\ [ "Find &Definition\t(GNU Global)", 'call menu#Escope("g")'],
@@ -73,6 +73,7 @@ call quickui#menu#install('&Tools', [
 			\ ['Compare &File', 'call svnhelp#compare_ask_file()', ''],
 			\ ['Compare &Buffer', 'call svnhelp#compare_ask_buffer()', ''],
 			\ ['--',''],
+			\ ["&DelimitMate %{get(b:, 'delimitMate_enabled', 0)? 'Disable':'Enable'}", 'DelimitMateSwitch'],
 			\ ['Read &URL', 'call menu#ReadUrl()', ''],
 			\ ])
 
