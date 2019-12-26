@@ -44,6 +44,7 @@ call quickui#menu#install('G&oto', [
 call quickui#menu#install("&Git", [
 			\ ['&View Diff', 'call svnhelp#svn_diff("%")'],
 			\ ['&Show Log', 'call svnhelp#svn_log("%")'],
+			\ ['File &Add', 'call svnhelp#svn_add("%")'],
 			\ ])
 
 
