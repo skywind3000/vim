@@ -221,10 +221,12 @@ function! quickui#context#callback(winid, code)
 		let g:quickui#context#current = hwnd
 		call F(code)
 	endif
+	silent! call popup_hide(a:winid)
 	if code >= 0 && code < len(hwnd.items)
 		let item = hwnd.items[code]
 		if item.is_sep == 0 && item.enable != 0
 			if item.cmd != ''
+				redraw
 				exec item.cmd
 			endif
 		endif

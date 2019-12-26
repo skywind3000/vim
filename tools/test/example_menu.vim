@@ -20,14 +20,14 @@ if 1
 				\ [ "E&xit\tAlt+x", 'echo 6' ],
 				\ ])
 	call quickui#menu#install('&Edit', [
-				\ [ '&Copy', 'echo 1', 'help1' ],
-				\ [ '&Paste', 'echo 2', 'help2' ],
-				\ [ '&Find', 'echo 3', 'help3' ],
+				\ [ '&Copy', 'echo 1'],
+				\ [ '&Paste', 'echo 2'],
+				\ [ '&Find', 'echo 3'],
 				\ ])
 	call quickui#menu#install('&Tools', [
-				\ [ '&Copy', 'echo 1', 'help1' ],
-				\ [ '&Paste', 'echo 2', 'help2' ],
-				\ [ '&Find', 'echo 3', 'help3' ],
+				\ [ '&Copy', 'echo 1'],
+				\ [ '&Paste', 'echo 2'],
+				\ [ '&Find', 'echo 3'],
 				\ ])
 
 	call quickui#menu#install('&Window', [])
