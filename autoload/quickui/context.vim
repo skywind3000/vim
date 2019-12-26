@@ -157,19 +157,7 @@ function! quickui#context#update(hwnd)
 	call win_execute(winid, 'syn clear')
 	for item in a:hwnd.items
 		let index = item.index
-		if index == a:hwnd.index
-			if a:hwnd.border == 0
-				let py = index + 1
-				let px = 1
-				let ps = px + w
-			else
-				let py = index + 2
-				let px = 2
-				let ps = px + w - 2
-			endif
-			let cmd = quickui#core#high_region('QuickSel', py, px, py, ps, 1)
-			call win_execute(winid, cmd)
-		elseif item.enable == 0 && item.is_sep == 0
+		if item.enable == 0 && item.is_sep == 0
 			if a:hwnd.border == 0
 				let py = index + 1
 				let px = 1
@@ -191,6 +179,19 @@ function! quickui#context#update(hwnd)
 			endif
 			let ps = px + 1
 			let cmd = quickui#core#high_region('QuickKey', py, px, py, ps, 1)
+			call win_execute(winid, cmd)
+		endif
+		if index == a:hwnd.index
+			if a:hwnd.border == 0
+				let py = index + 1
+				let px = 1
+				let ps = px + w
+			else
+				let py = index + 2
+				let px = 2
+				let ps = px + w - 2
+			endif
+			let cmd = quickui#core#high_region('QuickSel', py, px, py, ps, 1)
 			call win_execute(winid, cmd)
 		endif
 	endfor

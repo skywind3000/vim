@@ -255,9 +255,7 @@ function! quickui#menu#update()
 		if item.key_pos >= 0
 			let x = item.key_pos + item.x + 1
 			let cmd = quickui#core#high_region('QuickKey', 1, x, 1, x + 1, 1)
-			if index != s:cmenu.index
-				call win_execute(winid, cmd)
-			endif
+			call win_execute(winid, cmd)
 		endif
 		let index += 1
 	endfor
