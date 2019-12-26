@@ -195,7 +195,7 @@ function! quickui#context#update(hwnd)
 		endif
 	endfor
 	redraw
-	if get(g:, 'quickui_show_help', 1) != 0
+	if get(g:, 'quickui_show_help', 0) != 0
 		if a:hwnd.index >= 0 && a:hwnd.index < len(a:hwnd.items)
 			let help = a:hwnd.items[a:hwnd.index].help
             if help != ''
@@ -242,6 +242,10 @@ function! quickui#context#callback(winid, code)
 		call F(code)
 	endif
 	silent! call popup_hide(a:winid)
+	if get(g:, 'quickui_show_help', 0) != 0
+		redraw
+		echo ''
+	endif
 	if code >= 0 && code < len(hwnd.items)
 		let item = hwnd.items[code]
 		if item.is_sep == 0 && item.enable != 0
