@@ -83,6 +83,7 @@ call quickui#menu#install('H&elp', [
 			\ ["&Tutorial", 'help tutor', ''],
 			\ ['&Quick Reference', 'help quickref', ''],
 			\ ['&Summary', 'help summary', ''],
+			\ ['T&ips', 'help tips', ''],
 			\ ['--',''],
 			\ ['&Vim Script', 'help eval', ''],
 			\ ['&Function List', 'help function-list', ''],
