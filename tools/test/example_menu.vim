@@ -32,9 +32,7 @@ if 1
 
 	call quickui#menu#install('&Window', [])
 	call quickui#menu#change_weight('H&elp', 1000)
-	let opts = {}
-	call quickui#menu#create(opts)
-	let keymap = quickui#utils#keymap()
+	call quickui#menu#open()
 endif
 
 

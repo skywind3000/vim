@@ -449,7 +449,7 @@ endfunc
 "----------------------------------------------------------------------
 function! quickui#menu#open()
 	let opts = {}
-	call quickui#menu#create()
+	call quickui#menu#create(opts)
 endfunc
 
 
