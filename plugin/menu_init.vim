@@ -22,17 +22,17 @@ call quickui#menu#install("&File", [
 			\ ])
 
 call quickui#menu#install("&Build", [
-			\ ['&Compile File', 'VimBuild gcc'],
-			\ ['E&xecute File', 'VimExecute Run'],
+			\ ["&Compile File\tF9", 'VimBuild gcc'],
+			\ ["E&xecute File\tF5", 'VimExecute Run'],
 			\ ['--', ''],
 			\ ['Project &Make', 'VimBuild make'],
-			\ ['Project &EMake', 'VimBuild auto'],
+			\ ["Project &EMake\tF7", 'VimBuild auto'],
 			\ ['Project &Run', 'VimExecute auto'],
 			\ ['--', ''],
 			\ ['&Stop Build', 'VimStop'],
 			\ ])
 
-call quickui#menu#install('&Tags', [
+call quickui#menu#install('G&oto', [
 			\ [ "&Grep Word\t(In Project)", 'call menu#FindInProject()' ],
 			\ [ "--", '' ],
 			\ [ "Find &Definition\t(GNU Global)", 'call menu#Escope("g")'],
@@ -64,6 +64,27 @@ if has('win32') || has('win64') || has('win16') || has('win95')
 				\ ])
 endif
 
+call quickui#menu#install('&Tools', [
+			\ ['&Trailing Space', 'call StripTrailingWhitespace()', ''],
+			\ ['&Update ModTime', 'call UpdateLastModified()', ''],
+			\ ['&Paste Mode Line', 'call PasteVimModeLine', ''],
+			\ ['--',''],
+			\ ['Compare &File', 'call svnhelp#compare_ask_file()', ''],
+			\ ['Compare &Buffer', 'call svnhelp#compare_ask_buffer()', ''],
+			\ ['--',''],
+			\ ['Read &URL', 'call menu#ReadUrl()', ''],
+			\ ])
+
+call quickui#menu#install('H&elp', [
+			\ ["&Cheatsheet", 'help index', ''],
+			\ ['--',''],
+			\ ["&Tutorial", 'help tutor', ''],
+			\ ['&Quick Reference', 'help quickref', ''],
+			\ ['&Summary', 'help summary', ''],
+			\ ['--',''],
+			\ ['&Vim Script', 'help eval', ''],
+			\ ['&Function List', 'help function-list', ''],
+			\ ])
 
 
 "----------------------------------------------------------------------
