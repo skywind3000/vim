@@ -406,7 +406,7 @@ function! s:context_dropdown()
 	let cfg = s:menucfg[item.name]
 	let s:cmenu.dropdown = []
 	for item in cfg.items
-		let s:cmenu.dropdown += [[item.name, item.cmd]]
+		let s:cmenu.dropdown += [[item.name, item.cmd, item.help]]
 	endfor
 	let index = get(cfg, 'index', 0)
 	let opts.index = (index < 0 || index >= len(cfg.items))? 0 : index

@@ -14,8 +14,8 @@ endif
 call quickui#menu#reset()
 
 call quickui#menu#install("&File", [
-			\ [ "LeaderF &File", 'Leaderf file'],
-			\ [ "LeaderF &Mru", 'Leaderf mru --regexMode'],
+			\ [ "LeaderF &File", 'Leaderf file', 'help1'],
+			\ [ "LeaderF &Mru", 'Leaderf mru --regexMode', 'help2'],
 			\ [ "LeaderF &Buffer", 'Leaderf buffer'],
 			\ [ "--", ],
 			\ [ "&Save\t(:w)", 'write'],

@@ -195,6 +195,19 @@ function! quickui#context#update(hwnd)
 		endif
 	endfor
 	redraw
+	if get(g:, 'quickui_show_help', 1) != 0
+		if a:hwnd.index >= 0 && a:hwnd.index < len(a:hwnd.items)
+			let help = a:hwnd.items[a:hwnd.index].help
+            if help != ''
+                let head = g:quickui#style#help
+                echohl QuickHelp
+                echo ' ' . ((head != '')? (head . ' ') : '') . help
+                echohl None
+            else
+                echo ''
+            endif
+		endif
+	endif
 endfunc
 
 
