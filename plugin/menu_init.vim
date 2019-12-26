@@ -79,11 +79,11 @@ call quickui#menu#install('&Tools', [
 
 call quickui#menu#install('H&elp', [
 			\ ["&Cheatsheet", 'help index', ''],
+			\ ['T&ips', 'help tips', ''],
 			\ ['--',''],
 			\ ["&Tutorial", 'help tutor', ''],
 			\ ['&Quick Reference', 'help quickref', ''],
 			\ ['&Summary', 'help summary', ''],
-			\ ['T&ips', 'help tips', ''],
 			\ ['--',''],
 			\ ['&Vim Script', 'help eval', ''],
 			\ ['&Function List', 'help function-list', ''],
