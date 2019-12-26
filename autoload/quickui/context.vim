@@ -120,7 +120,14 @@ function! quickui#context#create(textlist, opts)
 	let hwnd.hotkey = {}
 	for item in hwnd.items
 		if item.enable != 0 && item.key_pos >= 0
-			let hwnd.hotkey[tolower(item.key_char)] = item.index
+			let key = tolower(item.key_char)
+			if get(a:opts, 'reserve', 0) == 0
+				let hwnd.hotkey[key] = item.index
+			else
+				if key != 'h' && key != 'j' && key != 'k' && key != 'l'
+					let hwnd.hotkey[key] = item.index
+				endif
+			endif
 		endif
 	endfor
 	let local = quickui#core#popup_local(winid)
