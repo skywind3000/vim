@@ -7,6 +7,10 @@
 "
 "======================================================================
 
+if has('patch-8.2.1') == 0 || has('nvim')
+	finish
+endif
+
 call quickui#menu#reset()
 
 call quickui#menu#install("&File", [
@@ -38,8 +42,8 @@ call quickui#menu#install('&Tags', [
 			\ ])
 
 call quickui#menu#install("&Git", [
-			\ ['View &Diff', 'call svnhelp#svn_diff("%")'],
-			\ ['Show &Log', 'call svnhelp#svn_log("%")'],
+			\ ['&View Diff', 'call svnhelp#svn_diff("%")'],
+			\ ['&Show Log', 'call svnhelp#svn_log("%")'],
 			\ ])
 
 
@@ -49,12 +53,12 @@ if has('win32') || has('win64') || has('win16') || has('win95')
 				\ ["Project &Update\t(Tortoise)", 'call svnhelp#tp_update()'],
 				\ ["Project &Commit\t(Tortoise)", 'call svnhelp#tp_commit()'],
 				\ ["Project L&og\t(Tortoise)", 'call svnhelp#tp_log()'],
-				\ ["Project D&iff\t(Tortoise)", 'call svnhelp#tp_diff()'],
+				\ ["Project &Diff\t(Tortoise)", 'call svnhelp#tp_diff()'],
 				\ ['--',''],
 				\ ["File &Add\t(Tortoise)", 'call svnhelp#tf_add()'],
 				\ ["File &Blame\t(Tortoise)", 'call svnhelp#tf_blame()'],
 				\ ["File Co&mmit\t(Tortoise)", 'call svnhelp#tf_commit()'],
-				\ ["File Di&ff\t(Tortoise)", 'call svnhelp#tf_diff()'],
+				\ ["File D&iff\t(Tortoise)", 'call svnhelp#tf_diff()'],
 				\ ["File &Revert\t(Tortoise)", 'call svnhelp#tf_revert()'],
 				\ ["File Lo&g\t(Tortoise)", 'call svnhelp#tf_log()'],
 				\ ])
