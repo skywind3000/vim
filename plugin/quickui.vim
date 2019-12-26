@@ -24,7 +24,7 @@ endfunc
 hi! QuickDefaultBackground ctermfg=0 ctermbg=7 guifg=black guibg=gray
 hi! QuickDefaultKey ctermfg=9 guifg=#f92772
 hi! QuickDefaultDisable ctermfg=59 guifg=#75715e
-hi! QuickDefaultSel cterm=bold,reverse ctermfg=2 ctermbg=0 gui=bold,reverse guifg=brown guibg=gray
+hi! QuickDefaultSel cterm=bold ctermfg=0 ctermbg=2 gui=bold guibg=brown guifg=gray
 hi! QuickDefaultHelp term=bold ctermfg=13 gui=bold guifg=Magenta
 
 " hi! QuickDefaultSel ctermbg=
