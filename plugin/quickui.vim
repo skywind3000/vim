@@ -28,7 +28,7 @@ hi! QuickDefaultSel cterm=bold ctermfg=0 ctermbg=2 gui=bold guibg=brown guifg=gr
 hi! QuickDefaultHelp term=bold ctermfg=13 gui=bold guifg=Magenta
 
 " hi! QuickDefaultSel ctermbg=
-if 1
+if 0
 	call s:hilink('QuickBG', 'Pmenu')
 	call s:hilink('QuickKey', 'Title')
 	call s:hilink('QuickOff', 'Comment')
