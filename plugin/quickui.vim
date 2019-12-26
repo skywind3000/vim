@@ -28,10 +28,19 @@ hi! QuickDefaultSel cterm=bold,reverse ctermfg=2 ctermbg=0 gui=bold,reverse guif
 hi! QuickDefaultHelp term=bold ctermfg=13 gui=bold guifg=Magenta
 
 " hi! QuickDefaultSel ctermbg=
-call s:hilink('QuickBG', 'QuickDefaultBackground')
-call s:hilink('QuickKey', 'QuickDefaultKey')
-call s:hilink('QuickOff', 'QuickDefaultDisable')
-call s:hilink('QuickSel', 'QuickDefaultSel')
-call s:hilink('QuickHelp', 'QuickDefaultHelp')
+if 1
+	call s:hilink('QuickBG', 'Pmenu')
+	call s:hilink('QuickKey', 'Title')
+	call s:hilink('QuickOff', 'Comment')
+	call s:hilink('QuickSel', 'PmenuSel')
+	call s:hilink('QuickHelp', 'WarningMsg')
+else
+	call s:hilink('QuickBG', 'QuickDefaultBackground')
+	call s:hilink('QuickKey', 'QuickDefaultKey')
+	call s:hilink('QuickOff', 'QuickDefaultDisable')
+	call s:hilink('QuickSel', 'QuickDefaultSel')
+	call s:hilink('QuickHelp', 'QuickDefaultHelp')
+endif
+
 
 
