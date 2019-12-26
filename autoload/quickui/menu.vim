@@ -106,6 +106,10 @@ function! quickui#menu#install(section, content)
 			let cmd = a:content[name]
 			call quickui#menu#register(a:section, name, cmd, '')
 		endfor
+	elseif type(a:content) == v:t_string
+		if a:content =~ '^-\+$'
+			call quickui#menu#register(a:section, '--', '', '')
+		endif
 	endif
 endfunc
 
