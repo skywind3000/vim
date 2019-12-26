@@ -97,6 +97,9 @@ function! quickui#menu#install(section, content)
 			if type(item) == v:t_dict
 				call quickui#menu#register(a:section, item.name, item.command)
 			elseif type(item) == v:t_list
+				let size = len(item)
+				let name = (size >= 1)? item[0] : ''
+				let cmd = (size >= 2)? item[1] : ''
 				let help = (len(item) >= 3)? item[2] : ''
 				call quickui#menu#register(a:section, item[0], item[1], help)
 			endif

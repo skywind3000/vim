@@ -13,7 +13,7 @@ call quickui#menu#install("&File", [
 			\ [ "LeaderF &File", 'Leaderf file'],
 			\ [ "LeaderF &Mru", 'Leaderf mru --regexMode'],
 			\ [ "LeaderF &Buffer", 'Leaderf buffer'],
-			\ [ "--", '--' ],
+			\ "--",
 			\ ])
 
 call quickui#menu#install("&Build", [
