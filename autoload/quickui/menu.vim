@@ -29,7 +29,7 @@ function! quickui#menu#register(section, entry, command, help)
 			let index += 1
 		endfor
 		let s:menucfg[a:section] = {'name':a:section, 'weight':0, 'items':[]}
-		let s:menucfg[a:section].weight = maximum + 100
+		let s:menucfg[a:section].weight = maximum + 10
 	endif
 	let menu = s:menucfg[a:section]
 	let item = {'name':a:entry, 'cmd':a:command, 'help':a:help}
@@ -69,6 +69,14 @@ function! quickui#menu#remove(section, index)
 		endif
 	endif
 	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" clear all entries in menucfg
+"----------------------------------------------------------------------
+function! quickui#menu#reset()
+	let s:menucfg = {}
 endfunc
 
 
@@ -439,16 +447,22 @@ endfunc
 "----------------------------------------------------------------------
 " testing suit
 "----------------------------------------------------------------------
-if 1
+if 0
 	let s:menucfg = {}
 	call quickui#menu#install('H&elp', [
 				\ [ '&Content', 'echo 4' ],
 				\ [ '&About', 'echo 5' ],
 				\ ])
 	call quickui#menu#install('&File', [
-				\ [ '&Open', 'echo 1' ],
-				\ [ '&Save', 'echo 2' ],
-				\ [ '&Close', 'echo 3' ],
+				\ [ "&New File\tCtrl+n", '' ],
+				\ [ "&Open File\t(F3)", 'echo 1' ],
+				\ [ "&Close", 'echo 3' ],
+				\ [ "--", '' ],
+				\ [ "&Save\tCtrl+s", ''],
+				\ [ "Save &As", '' ],
+				\ [ "Save All", '' ],
+				\ [ "--", '' ],
+				\ [ "E&xit\tAlt+x", '' ],
 				\ ])
 	call quickui#menu#install('&Edit', [
 				\ [ '&Copy', 'echo 1', 'help1' ],
