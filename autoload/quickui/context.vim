@@ -198,14 +198,16 @@ function! quickui#context#update(hwnd)
 	if get(g:, 'quickui_show_help', 0) != 0
 		if a:hwnd.index >= 0 && a:hwnd.index < len(a:hwnd.items)
 			let help = a:hwnd.items[a:hwnd.index].help
-            if help != ''
-                let head = g:quickui#style#help
-                echohl QuickHelp
-                echo ' ' . ((head != '')? (head . ' ') : '') . help
-                echohl None
-            else
-                echo ''
-            endif
+			let head = g:quickui#style#help
+			echohl QuickHelp
+			if help == ''
+				echo ''
+			else
+				echo ' ' . ((head != '')? (head . ' ') : '') . help
+			endif
+			echohl None
+		else
+			echo ''
 		endif
 	endif
 endfunc
