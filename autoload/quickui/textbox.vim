@@ -177,7 +177,8 @@ if 0
 	let opts = {}
 	let opts.index = 30
 	let opts.resize = 1
-	let opts.title = "hahahahahahhaha12345"
+	let opts.title = "title"
+	" let opts.exit_on_click = 0
 	let winid = quickui#textbox#open(lines, opts)
 	" call getchar()
 	" call quickui#textbox#close(winid)
