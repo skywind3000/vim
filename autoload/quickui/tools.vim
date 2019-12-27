@@ -107,7 +107,7 @@ function! quickui#tools#kit_buffers(switch)
 		echohl None
 		return -1
 	endif
-	call quickui#listbox#any(content, opts)
+	call quickui#listbox#open(content, opts)
 endfunc
 
 
