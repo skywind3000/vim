@@ -243,9 +243,9 @@ function! quickui#listbox#callback(winid, code)
 	let hwnd.code = code
 	call quickui#core#popup_clear(a:winid)
 	silent! call popup_hide(a:winid)
+	let g:quickui#listbox#current = hwnd
 	if has_key(hwnd.opts, 'callback')
 		let F = function(hwnd.opts.callback)
-		let g:quickui#listbox#current = hwnd
 		call F(code)
 	endif
 	if code >= 0 && code < hwnd.items.nrows
@@ -394,20 +394,6 @@ function! quickui#listbox#inputlist(textlist, opts)
 	" echo 'size: '. winheight(winid)
 	call quickui#listbox#close(hwnd)
 	return hr
-endfunc
-
-
-"----------------------------------------------------------------------
-" any callback
-"----------------------------------------------------------------------
-function! quickui#listbox#execute(code)
-	let hwnd = g:quickui#listbox#current
-	let context = hwnd.context
-	if a:code >= 0
-		if a:code < len(context)
-			exec context[a:code]
-		endif
-	endif
 endfunc
 
 
