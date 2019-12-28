@@ -96,6 +96,9 @@ call quickui#menu#install('&Plugin', [
 			\ ["&Gist", "Gist", "open gist with mattn/gist-vim"],
 			\ ["&Edit Note", "Note", "edit note with vim-notes"],
 			\ ["&Display Calendar", "Calendar", "display a calender"],
+			\ ["-"],
+			\ ["Plugin &List", "PlugList", "Update list"],
+			\ ["Plugin &Update", "PlugUpdate", "Update plugin"],
 			\ ])
 
 call quickui#menu#install('H&elp', [

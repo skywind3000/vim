@@ -1,7 +1,7 @@
 "----------------------------------------------------------------------
 " testing suit
 "----------------------------------------------------------------------
-if 1
+if 0
 	let lines = [
 				\ "[1]\tOpen &File\t(F3)",
 				\ "[2]\tChange &Directory\t(F2)",
@@ -45,4 +45,23 @@ if 0
 endif
 
 
+if 0
+	let content = [
+				\ [ 'echo 1', 'echo 100' ],
+				\ [ 'echo 2', 'echo 200' ],
+				\ [ 'echo 3', 'echo 300' ],
+				\ [ 'echo 4' ],
+				\ [ 'echo 5', 'echo 500' ],
+				\]
+	let opts = {'title': 'select'}
+	call quickui#listbox#open(content, opts)
+endif
+
+if 1
+	let linelist = [
+				\ "line 1",
+				\ "line 2",
+				\ "line 3" ]
+	echo quickui#listbox#inputlist(linelist, {'title':'select'})
+endif
 
