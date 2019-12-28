@@ -74,7 +74,7 @@ call quickui#menu#install('&Move', [
 
 call quickui#menu#install('&Tools', [
 			\ ['&Trailing Space', 'call StripTrailingWhitespace()', ''],
-			\ ['&Update ModTime', 'call UpdateLastModified()', ''],
+			\ ['Update &ModTime', 'call UpdateLastModified()', ''],
 			\ ['&Paste Mode Line', 'call PasteVimModeLine()', ''],
 			\ ['--',''],
 			\ ['Compare &File', 'call svnhelp#compare_ask_file()', ''],
