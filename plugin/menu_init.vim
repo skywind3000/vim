@@ -87,8 +87,15 @@ call quickui#menu#install('&Tools', [
 			\ ])
 
 call quickui#menu#install('&Plugin', [
-			\ ['&NERDTree', 'NERDTreeToggle', 'toggle nerdtree'],
+			\ ["&NERDTree\t<space>tn", 'NERDTreeToggle', 'toggle nerdtree'],
 			\ ['&Tagbar', '', 'toggle tagbar'],
+			\ ["&Choose Window/Tab\tAlt+e", "ChooseWin", "fast switch win/tab with vim-choosewin"],
+			\ ["-"],
+			\ ["&Browse in github\trhubarb", "Gbrowse", "using tpope's rhubarb to open browse and view the file"],
+			\ ["&Startify", "Startify", "using tpope's rhubarb to open browse and view the file"],
+			\ ["&Gist", "Gist", "open gist with mattn/gist-vim"],
+			\ ["&Edit Note", "Note", "edit note with vim-notes"],
+			\ ["&Display Calendar", "Calendar", "display a calender"],
 			\ ])
 
 call quickui#menu#install('H&elp', [

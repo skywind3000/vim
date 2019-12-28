@@ -146,7 +146,7 @@ end
 if index(g:bundle_group, 'inter') >= 0
 	Plug 'vim-scripts/L9'
 	" Plug 'wsdjeg/FlyGrep.vim'
-	Plug 'tpope/vim-abolish'
+	" Plug 'tpope/vim-abolish'
 	Plug 'honza/vim-snippets'
 	Plug 'MarcWeber/vim-addon-mw-utils'
 	Plug 'tomtom/tlib_vim'
