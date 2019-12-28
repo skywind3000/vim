@@ -14,8 +14,8 @@ endif
 call quickui#menu#reset()
 
 call quickui#menu#install("&File", [
-			\ [ "LeaderF &File", 'Leaderf file', 'help1'],
-			\ [ "LeaderF &Mru", 'Leaderf mru --regexMode', 'help2'],
+			\ [ "LeaderF &File", 'Leaderf file', 'Open file with leaderf'],
+			\ [ "LeaderF &Mru", 'Leaderf mru --regexMode', 'Open recently accessed files'],
 			\ [ "LeaderF &Buffer", 'Leaderf buffer'],
 			\ [ "--", ],
 			\ [ "&Save\t(:w)", 'write'],
@@ -90,7 +90,7 @@ call quickui#menu#install('H&elp', [
 			\ ['&Function List', 'help function-list', ''],
 			\ ])
 
-let g:quickui_show_help = 1
+let g:quickui_show_tip = 1
 
 "----------------------------------------------------------------------
 " hotkey

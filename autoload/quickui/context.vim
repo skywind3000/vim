@@ -200,14 +200,13 @@ function! quickui#context#update(hwnd)
 	endfor
 	if a:hwnd.state != 0
 		redraw
-		if get(g:, 'quickui_show_help', 0) != 0
+		if get(g:, 'quickui_show_tip', 0) != 0
 			let help = ''
 			if a:hwnd.index >= 0 && a:hwnd.index < len(a:hwnd.items)
 				let help = a:hwnd.items[a:hwnd.index].help
-				let head = g:quickui#style#help
-				" let help = a:hwnd.items[a:hwnd.index].content
+				let head = g:quickui#style#tip_head
 				if help != ''
-					let help = ' ' . ((head != '')? (head . ' ') : '') . help
+					let help = '' . ((head != '')? (head . ' ') : '') . help
 				endif
 			endif
 			echohl QuickHelp
@@ -243,7 +242,7 @@ function! quickui#context#callback(winid, code)
 	let hwnd.state = 0
 	let hwnd.code = code
 	call quickui#core#popup_clear(a:winid)
-	if get(g:, 'quickui_show_help', 0) != 0
+	if get(g:, 'quickui_show_tip', 0) != 0
 		redraw
 		echo ''
 	endif
