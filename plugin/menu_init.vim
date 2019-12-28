@@ -68,13 +68,14 @@ endif
 call quickui#menu#install('&Tools', [
 			\ ['&Trailing Space', 'call StripTrailingWhitespace()', ''],
 			\ ['&Update ModTime', 'call UpdateLastModified()', ''],
-			\ ['&Paste Mode Line', 'call PasteVimModeLine', ''],
+			\ ['&Paste Mode Line', 'call PasteVimModeLine()', ''],
 			\ ['--',''],
 			\ ['Compare &File', 'call svnhelp#compare_ask_file()', ''],
 			\ ['Compare &Buffer', 'call svnhelp#compare_ask_buffer()', ''],
 			\ ['--',''],
 			\ ["&DelimitMate %{get(b:, 'delimitMate_enabled', 0)? 'Disable':'Enable'}", 'DelimitMateSwitch'],
 			\ ['Read &URL', 'call menu#ReadUrl()', ''],
+			\ ['&Switch Buffer', 'call quickui#tools#kit_buffers("FileSwitch tabe")', ],
 			\ ])
 
 call quickui#menu#install('H&elp', [
@@ -89,6 +90,7 @@ call quickui#menu#install('H&elp', [
 			\ ['&Function List', 'help function-list', ''],
 			\ ])
 
+let g:quickui_show_help = 1
 
 "----------------------------------------------------------------------
 " hotkey
