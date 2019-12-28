@@ -33,9 +33,11 @@ highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE
 hi! SignColumn guibg=NONE ctermbg=NONE
 
 if get(g:, 'quickui_color_pmenu', 0) == 0
-	" tune completion popup menu
-	hi! Pmenu guibg=gray guifg=black ctermbg=gray ctermfg=black
-	hi! PmenuSel guibg=gray guifg=brown ctermbg=brown ctermfg=gray
+	if get(g:, 'quickui_color_theme', '') != 'vim'
+		" tune completion popup menu
+		hi! Pmenu guibg=gray guifg=black ctermbg=gray ctermfg=black
+		hi! PmenuSel guibg=gray guifg=brown ctermbg=brown ctermfg=gray
+	endif
 endif
 
 
