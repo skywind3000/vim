@@ -1,6 +1,6 @@
 "======================================================================
 "
-" menu_init.vim - 
+" menu_init.vim -
 "
 " Created by skywind on 2019/12/26
 " Last Modified: 2019/12/26 16:23:48
@@ -73,6 +73,7 @@ call quickui#menu#install('&Move', [
 			\ ])
 
 call quickui#menu#install('&Tools', [
+			\ ['Copyright &Header', 'call feedkeys("\<esc> ec")', 'Insert copyright information at the beginning'],
 			\ ['&Trailing Space', 'call StripTrailingWhitespace()', ''],
 			\ ['Update &ModTime', 'call UpdateLastModified()', ''],
 			\ ['&Paste Mode Line', 'call PasteVimModeLine()', ''],
@@ -102,15 +103,15 @@ call quickui#menu#install('&Plugin', [
 			\ ])
 
 call quickui#menu#install('H&elp', [
-			\ ["&Cheatsheet", 'help index', ''],
-			\ ['T&ips', 'help tips', ''],
+			\ ["&Cheatsheet", 'tab help index', ''],
+			\ ['T&ips', 'tab help tips', ''],
 			\ ['--',''],
-			\ ["&Tutorial", 'help tutor', ''],
-			\ ['&Quick Reference', 'help quickref', ''],
-			\ ['&Summary', 'help summary', ''],
+			\ ["&Tutorial", 'tab help tutor', ''],
+			\ ['&Quick Reference', 'tab help quickref', ''],
+			\ ['&Summary', 'tab help summary', ''],
 			\ ['--',''],
-			\ ['&Vim Script', 'help eval', ''],
-			\ ['&Function List', 'help function-list', ''],
+			\ ['&Vim Script', 'tab help eval', ''],
+			\ ['&Function List', 'tab help function-list', ''],
 			\ ], 10000)
 
 let g:quickui_show_tip = 1
