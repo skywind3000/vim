@@ -3,6 +3,7 @@
 " testing suit
 "----------------------------------------------------------------------
 if 1
+	call quickui#menu#switch('test')
 	call quickui#menu#reset()
 	call quickui#menu#install('H&elp', [
 				\ [ '&Content', 'echo 4' ],
@@ -32,7 +33,8 @@ if 1
 
 	call quickui#menu#install('&Window', [])
 	call quickui#menu#change_weight('H&elp', 1000)
-	call quickui#menu#open()
+	call quickui#menu#switch('system')
+	call quickui#menu#open('test')
 endif
 
 
