@@ -39,6 +39,11 @@ call quickui#menu#install('&Symbol', [
 			\ [ "Find &Symbol\t(GNU Global)", 'call menu#Escope("s")', 'GNU Gloal search s'],
 			\ [ "Find &Called by\t(GNU Global)", 'call menu#Escope("d")', 'GNU Global search d'],
 			\ [ "Find C&alling\t(GNU Global)", 'call menu#Escope("c")', 'GNU Global search c'],
+			\ [ "--", ],
+			\ [ "&Goto Definition\t(YCM)", 'YcmCompleter GoToDefinitionElseDeclaration'],
+			\ [ "Goto &References\t(YCM)", 'YcmCompleter GoToReferences'],
+			\ [ "Get D&oc\t(YCM)", 'YcmCompleter GetDoc'],
+			\ [ "Get &Type\t(YCM)", 'YcmCompleter GetTypeImprecise'],
 			\ ])
 
 call quickui#menu#install("&Git", [
