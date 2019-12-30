@@ -79,11 +79,11 @@ call quickui#menu#install('&Tools', [
 			\ ['&Paste Mode Line', 'call PasteVimModeLine()', ''],
 			\ ['--',''],
 			\ ['Compare &File', 'call svnhelp#compare_ask_file()', ''],
-			\ ['Compare &Buffer', 'call svnhelp#compare_ask_buffer()', ''],
+			\ ['&Compare Buffer', 'call svnhelp#compare_ask_buffer()', ''],
 			\ ['--',''],
 			\ ["&DelimitMate %{get(b:, 'delimitMate_enabled', 0)? 'Disable':'Enable'}", 'DelimitMateSwitch'],
 			\ ['Read &URL', 'call menu#ReadUrl()', 'load content from url into current buffer'],
-			\ ['&Switch Buffer', 'call quickui#tools#kit_buffers("FileSwitch tabe")', ],
+			\ ['List &Buffer', 'call quickui#tools#list_buffer("FileSwitch tabe")', ],
 			\ ['S&pell %{&spell? "Disable":"Enable"}', 'set spell!', 'Toggle spell check %{&spell? "off" : "on"}'],
 			\ ])
 

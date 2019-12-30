@@ -180,7 +180,7 @@ let OmniCpp_DefaultNamespaces = ["std", "_GLIBCXX_STD"]
 "- bufferhint
 "----------------------------------------------------------------------
 if has('patch-8.2.1')
-	nnoremap <silent>+ :call quickui#tools#kit_buffers('FileSwitch tabe')<cr>
+	nnoremap <silent>+ :call quickui#tools#list_buffer('FileSwitch tabe')<cr>
 else
 	nnoremap + :call bufferhint#Popup()<CR>
 endif
