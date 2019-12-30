@@ -29,7 +29,7 @@ call quickui#menu#install("&Build", [
 			\ ["Project &EMake\tF7", 'VimBuild auto'],
 			\ ['Project &Run', 'VimExecute auto'],
 			\ ['--', ''],
-			\ ['&Stop Build', 'VimStop'],
+			\ ['&Stop Building', 'VimStop'],
 			\ ])
 
 call quickui#menu#install('&Symbol', [
