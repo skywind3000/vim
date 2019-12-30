@@ -77,6 +77,7 @@ call quickui#menu#install('&Tools', [
 			\ ['&Trailing Space', 'call StripTrailingWhitespace()', ''],
 			\ ['Update &ModTime', 'call UpdateLastModified()', ''],
 			\ ['&Paste Mode Line', 'call PasteVimModeLine()', ''],
+			\ ['Format J&son', '%!python -m json.tool', ''],
 			\ ['--',''],
 			\ ['Compare &File', 'call svnhelp#compare_ask_file()', ''],
 			\ ['&Compare Buffer', 'call svnhelp#compare_ask_buffer()', ''],

@@ -23,6 +23,12 @@ let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 
 
 "----------------------------------------------------------------------
+" setup variables
+"----------------------------------------------------------------------
+let g:quickui#style#border = get(g:, 'quickui_border_style', 1)
+
+
+"----------------------------------------------------------------------
 " default highlighting
 "----------------------------------------------------------------------
 function! s:hilink(name, target)
@@ -33,7 +39,7 @@ endfunc
 
 
 function! QuickThemeChange(theme)
-	if a:theme == ''
+	if a:theme == '' || a:theme == 'borland' || a:theme == 'turboc'
 		hi! QuickDefaultBackground ctermfg=0 ctermbg=7 guifg=black guibg=gray
 		hi! QuickDefaultSel cterm=bold ctermfg=0 ctermbg=2 gui=bold guibg=brown guifg=gray
 		hi! QuickDefaultKey term=bold ctermfg=9 gui=bold guifg=#f92772
@@ -81,8 +87,8 @@ function! QuickThemeChange(theme)
 	endif
 endfunc
 
-let s:theme = get(g:, 'quickui_color_theme', '')
-call QuickThemeChange(s:theme)
+let s:scheme = get(g:, 'quickui_color_scheme', '')
+call QuickThemeChange(s:scheme)
 
 
 " hi! QuickDefaultSel ctermbg=
