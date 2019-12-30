@@ -21,5 +21,3 @@ function! s:get_indent(lineno)
 endfunc
 
 
-echo s:get_indent(9)
-echo s:get_indent(10)
