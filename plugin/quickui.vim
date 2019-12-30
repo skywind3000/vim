@@ -39,7 +39,7 @@ endfunc
 
 
 function! QuickThemeChange(theme)
-	if a:theme == '' || a:theme == 'borland' || a:theme == 'turboc'
+	if a:theme == '' || a:theme == 'borland' || a:theme == 'turboc' || a:theme == 'default'
 		hi! QuickDefaultBackground ctermfg=0 ctermbg=7 guifg=black guibg=gray
 		hi! QuickDefaultSel cterm=bold ctermfg=0 ctermbg=2 gui=bold guibg=brown guifg=gray
 		hi! QuickDefaultKey term=bold ctermfg=9 gui=bold guifg=#f92772
