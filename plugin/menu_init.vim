@@ -128,7 +128,7 @@ call quickui#menu#install('&Plugin', [
 			\ ["Plugin &Update", "PlugUpdate", "Update plugin"],
 			\ ])
 
-call quickui#menu#install('Help(&?)', [
+call quickui#menu#install('Help (&?)', [
 			\ ["&Index", 'tab help index', ''],
 			\ ['Ti&ps', 'tab help tips', ''],
 			\ ['--',''],
@@ -138,6 +138,7 @@ call quickui#menu#install('Help(&?)', [
 			\ ['--',''],
 			\ ['&Vim Script', 'tab help eval', ''],
 			\ ['&Function List', 'tab help function-list', ''],
+			\ ['&Dash Help', 'call asclib#utils#dash_ft(&ft, expand("<cword>"))'],
 			\ ], 10000)
 
 let g:quickui_show_tip = 1
