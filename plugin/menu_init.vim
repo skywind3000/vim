@@ -30,6 +30,11 @@ if has('win32') || has('win64') || has('win16')
 				\ ])
 endif
 
+call quickui#menu#install("&File", [
+			\ [ "--", ],
+			\ [ "E&xit", 'qa' ],
+			\ ])
+
 call quickui#menu#install("&Edit", [
 			\ ['Copyright &Header', 'call feedkeys("\<esc> ec")', 'Insert copyright information at the beginning'],
 			\ ['&Trailing Space', 'call StripTrailingWhitespace()', ''],

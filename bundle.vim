@@ -135,8 +135,8 @@ if index(g:bundle_group, 'basic') >= 0
 	let g:python_highlight_builtin_types = 1
 	let g:python_highlight_builtin_funcs = 1
 
-	map <m-=> <Plug>(expand_region_expand)
-	map <m--> <Plug>(expand_region_shrink)
+	map <m-+> <Plug>(expand_region_expand)
+	map <m-_> <Plug>(expand_region_shrink)
 end
 
 

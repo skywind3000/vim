@@ -154,8 +154,6 @@ if has('gui_running') || (has('nvim') && (has('win32') || has('win64')))
 	inoremap <M-r> <ESC>:VimExecute run<cr>
 	noremap <M-b> :VimBuild emake<cr>
 	inoremap <M-b> <ESC>:VimBuild emake<cr>
-	noremap <m-_> :call Change_Transparency(-2)<cr>
-	noremap <m-+> :call Change_Transparency(+2)<cr>
 	if has('gui_macvim')
 		noremap <m-\|> :call Toggle_Transparency(9)<cr>
 	else
@@ -178,7 +176,7 @@ nnoremap <m-Z> zA
 " terminal
 "----------------------------------------------------------------------
 if has('terminal')
-	tnoremap <m-=> <c-w>N
+	" tnoremap <m-=> <c-w>N
 endif
 
 
