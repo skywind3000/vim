@@ -128,8 +128,18 @@ endfunc
 "----------------------------------------------------------------------
 " display python help in the textbox
 "----------------------------------------------------------------------
-function! quickui#tools#python_help(python, word)
-	let cmd = a:python . ' -m pydoc ' . shellescape(a:word)
+function! quickui#tools#python_help(word)
+	let python = get(g:, 'quickui_tools_python', '')
+	if python == ''
+		if executable('python')
+			let python = 'python'
+		elseif executable('python3')
+			let python = 'python3'
+		elseif executable('python2')
+			let python = 'python2'
+		endif
+	endif
+	let cmd = python . ' -m pydoc ' . shellescape(a:word)
 	let title = 'PyDoc <'. a:word . '>'
 	let opts = {'title':title}
 	call quickui#tools#command_box(cmd, opts)
