@@ -123,8 +123,8 @@ call quickui#menu#install('&Plugin', [
 			\ ])
 
 call quickui#menu#install('Help(&?)', [
-			\ ["&Cheatsheet", 'tab help index', ''],
-			\ ['T&ips', 'tab help tips', ''],
+			\ ["&Index", 'tab help index', ''],
+			\ ['Ti&ps', 'tab help tips', ''],
 			\ ['--',''],
 			\ ["&Tutorial", 'tab help tutor', ''],
 			\ ['&Quick Reference', 'tab help quickref', ''],
