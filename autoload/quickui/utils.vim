@@ -251,6 +251,12 @@ function! quickui#utils#movement(offset)
 			let offset = -1
 		elseif a:offset == 'DOWN'
 			let offset = 1
+		elseif a:offset == 'TOP'
+			exec "normal gg"
+			return
+		elseif a:offset == 'BOTTOM'
+			exec "normal G"
+			return
 		endif
 	endif
 	echom "offset: ". offset

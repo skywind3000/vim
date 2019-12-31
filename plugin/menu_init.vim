@@ -27,6 +27,7 @@ if has('win32') || has('win64') || has('win16')
 				\ [ "--", ],
 				\ [ "Start &Cmd", 'silent !start /b cmd /C c:\drivers\clink\clink.cmd' ],
 				\ [ "Start &PowerShell", 'silent !start powershell.exe' ],
+				\ [ "Open &Explore", 'call Show_Explore()' ],
 				\ ])
 endif
 

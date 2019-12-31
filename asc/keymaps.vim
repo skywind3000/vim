@@ -250,11 +250,6 @@ endif
 nnoremap <silent><m-a> :PreviewSignature<cr>
 inoremap <silent><m-a> <c-\><c-o>:PreviewSignature<cr>
 
-if has('win32') || has('win64') || has('win95') || has('win32unix')
-	" noremap <silent><m-s> :WriteFileGuard<cr>
-	" inoremap <silent><m-s> <ESC>:WriteFileGuard<cr>
-endif
-
 
 "----------------------------------------------------------------------
 " GUI/Terminal

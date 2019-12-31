@@ -19,53 +19,6 @@ set wildmenu
 set wcm=<C-Z>
 "set splitbelow
 
-
-" retry saving on windows
-function! Tools_SaveRetry() 
-	let windows = has('win32') || has('win64') || has('win95') 
-	let windows = windows || has('win32unix') || has('win16')
-	let v:errmsg = ''
-	if bufname('%') == ''
-		echohl ErrorMsg
-		echom "E32: No file name"
-		echohl None
-		return
-	endif
-	if windows == 0 || &readonly != 0
-		try
-			exec 'w'
-		catch /.*/
-			echohl ErrorMsg
-			echom v:exception
-			echohl None
-		endtry
-		return
-	endif
-	let retry = 30
-	while retry > 0
-		let retry -= 1
-		try
-			silent exec 'w'
-			echom "'". bufname('%'). "' written"
-			break
-		catch /^Vim\%((\a\+)\)\=:E505/
-			sleep 25m
-			" echom "retry"
-		catch
-			echohl ErrorMsg
-			echom v:errmsg
-			echohl None
-			break
-		endtry
-	endwhile
-	if retry <= 0
-		silent exec "w!"
-	endif
-endfunc
-
-command! -nargs=0 WriteFileGuard call Tools_SaveRetry()
-
-
 " open quickfix
 function! Toggle_QuickFix(size)
 	function! s:WindowCheck(mode)
