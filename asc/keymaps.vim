@@ -217,10 +217,6 @@ noremap <silent><space>jm :call Tools_SwitchMakeFile()<cr>
 "----------------------------------------------------------------------
 " space + t : toggle plugins
 "----------------------------------------------------------------------
-noremap <silent><space>tq :call Toggle_QuickFix(6)<cr>
-noremap <silent><space>tb :TagbarToggle<cr>
-noremap <silent><space>tf :FuzzyFileSearch<cr>
-
 "noremap <silent><C-F10> :call Toggle_Taglist()<cr>
 "inoremap <silent><C-F10> <c-\><c-o>:call Toggle_Taglist()<cr>
 noremap <silent><S-F10> :call quickmenu#toggle(0)<cr>
@@ -413,15 +409,6 @@ endif
 noremap <C-F10> :VimBuild gcc -pg<cr>
 
 
-
-"----------------------------------------------------------------------
-" g command
-"----------------------------------------------------------------------
-nnoremap gyd :YcmCompleter GoToDefinitionElseDeclaration<cr>
-nnoremap gyr :YcmCompleter GoToReferences<cr>
-nnoremap gyh :YcmCompleter GetDoc<cr>
-
-
 "----------------------------------------------------------------------
 " vimmake faster
 "----------------------------------------------------------------------
@@ -437,10 +424,6 @@ inoremap <silent><c-f11> <ESC>:call quickmenu#toggle(2)<cr>
 noremap <silent><c-f12> :call asclib#utils#script_menu()<cr>
 inoremap <silent><c-f12> <ESC>:call asclib#utils#script_menu()<cr>
 
-nnoremap <silent>g1 :GrepCode <C-R>=expand("<cword>")<cr><cr>
-nnoremap <silent>g2 :GrepCode! <C-R>=expand("<cword>")<cr><cr>
-nnoremap <silent>g3 :VimScope g <C-R>=expand("<cword>")<cr><cr>
-nnoremap <silent>g4 :VimScope s <C-R>=expand("<cword>")<cr><cr>
 nnoremap <silent>g5 :PreviewTag<cr>
 nnoremap <silent>g6 :call vimmake#update_tags('!', 'cs', '.cscope')<cr>
 nnoremap <silent>g7 :call vimmake#update_tags('!', 'py', '.cscopy')<cr>

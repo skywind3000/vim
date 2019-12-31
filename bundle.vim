@@ -178,10 +178,12 @@ if index(g:bundle_group, 'inter') >= 0
 		silent! call mkdir(expand('~/.vim/notes'), 'p')
 	endif
 
-	noremap <silent><tab>- :FufMruFile<cr>
-	noremap <silent><tab>= :FufFile<cr>
-	noremap <silent><tab>[ :FufBuffer<cr>
-	noremap <silent><tab>] :FufBufferTag<cr>
+	if 0
+		noremap <silent><tab>- :FufMruFile<cr>
+		noremap <silent><tab>= :FufFile<cr>
+		noremap <silent><tab>[ :FufBuffer<cr>
+		noremap <silent><tab>] :FufBufferTag<cr>
+	endif
 
 	if 0
 		imap <expr> <m-e> pumvisible() ? '<c-g>u<Plug>snipMateTrigger' : '<Plug>snipMateTrigger'

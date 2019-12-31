@@ -12,6 +12,6 @@ function! MenuHelp_FormatJson()
 endfunc
 
 function! MenuHelp_Gscope(scope)
-	silent exec "GscopeFind ". a:scope . " " . fnameescape(expand('<cword>'))
+	exec "GscopeFind ". a:scope . " " . fnameescape(expand('<cword>'))
 endfunc
 

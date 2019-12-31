@@ -248,7 +248,7 @@ function! s:GscopeFind(bang, what, ...)
 	endif
 	let text = "[cscope ".a:what.": ".text."]"
 	let title = "GscopeFind ".a:what.' "'.keyword.'"'
-	exec 'cexpr text'
+	silent exec 'cexpr text'
 	if has('nvim') == 0 && (v:version >= 800 || has('patch-7.4.2210'))
 		call setqflist([], 'a', {'title':title})
 	elseif has('nvim') && has('nvim-0.2.2')
