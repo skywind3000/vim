@@ -346,35 +346,6 @@ endif
 exec 'nnoremap <space>hn :FileSwitch tabe '.fnameescape(s:nvimrc).'<cr>'
 
 
-"----------------------------------------------------------------------
-" space + g : misc
-"----------------------------------------------------------------------
-" nnoremap <space>gr :%s/\<<C-r><C-w>\>//gc<Left><Left><Left>
-" nnoremap <space>gq :AsyncStop<cr>
-" nnoremap <space>gQ :AsyncStop!<cr>
-" nnoremap <space>gj :%!python -m json.tool<cr>
-" nnoremap <space>gg :setlocal ts=8 sts=4 sw=4 et<cr>
-" nnoremap <space>gG :setlocal ts=4 sts=4 sw=4 noet<cr>
-" nnoremap <silent><space>gf :call Tools_QuickfixCursor(3)<cr>
-" nnoremap <silent><space>gb :call Tools_QuickfixCursor(2)<cr>
-
-" noremap <silent><space>g; :PreviewTag<cr>
-" noremap <silent><space>g: :PreviewClose<cr>
-" noremap <silent><space>g' :PreviewGoto edit<cr>
-" noremap <silent><space>g" :PreviewGoto tabe<cr>
-
-if has('win32') || has('win64')
-	" noremap <space>gc :silent !start cmd.exe<cr>
-	" noremap <space>gs :silent !start powershell.exe<cr>
-	" noremap <space>ge :silent !start /b cmd.exe /C start .<cr>
-else
-endif
-
-
-"----------------------------------------------------------------------
-" square brackets: g,h,j,k,r,v,w
-"----------------------------------------------------------------------
-
 
 
 "----------------------------------------------------------------------

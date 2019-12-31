@@ -14,11 +14,31 @@ endif
 call quickui#menu#reset()
 
 call quickui#menu#install("&File", [
+			\ [ "&Open\t(:w)", 'call feedkeys(":tabe ")'],
+			\ [ "&Save\t(:w)", 'write'],
+			\ [ "--", ],
 			\ [ "LeaderF &File", 'Leaderf file', 'Open file with leaderf'],
 			\ [ "LeaderF &Mru", 'Leaderf mru --regexMode', 'Open recently accessed files'],
 			\ [ "LeaderF &Buffer", 'Leaderf buffer', 'List current buffers in leaderf'],
-			\ [ "--", ],
-			\ [ "&Save\t(:w)", 'write'],
+			\ ])
+
+if has('win32') || has('win64') || has('win16')
+	call quickui#menu#install('&File', [
+				\ [ "--", ],
+				\ [ "Start &Cmd", 'silent !start /b cmd /C c:\drivers\clink\clink.cmd' ],
+				\ [ "Start &PowerShell", 'silent !start powershell.exe' ],
+				\ ])
+endif
+
+call quickui#menu#install("&Edit", [
+			\ ['Copyright &Header', 'call feedkeys("\<esc> ec")', 'Insert copyright information at the beginning'],
+			\ ['&Trailing Space', 'call StripTrailingWhitespace()', ''],
+			\ ['Update &ModTime', 'call UpdateLastModified()', ''],
+			\ ['&Paste Mode Line', 'call PasteVimModeLine()', ''],
+			\ ['Format J&son', '%!python -m json.tool', ''],
+			\ ['--'],
+			\ ['&Align Table', 'Tabularize /|', ''],
+			\ ['Align &Cheatsheet', 'MyCheatSheetAlign', ''],
 			\ ])
 
 call quickui#menu#install("&Build", [
@@ -78,12 +98,6 @@ call quickui#menu#install('&Move', [
 			\ ])
 
 call quickui#menu#install('&Tools', [
-			\ ['Copyright &Header', 'call feedkeys("\<esc> ec")', 'Insert copyright information at the beginning'],
-			\ ['&Trailing Space', 'call StripTrailingWhitespace()', ''],
-			\ ['Update &ModTime', 'call UpdateLastModified()', ''],
-			\ ['&Paste Mode Line', 'call PasteVimModeLine()', ''],
-			\ ['Format J&son', '%!python -m json.tool', ''],
-			\ ['--',''],
 			\ ['Compare &File', 'call svnhelp#compare_ask_file()', ''],
 			\ ['&Compare Buffer', 'call svnhelp#compare_ask_buffer()', ''],
 			\ ['--',''],
@@ -108,7 +122,7 @@ call quickui#menu#install('&Plugin', [
 			\ ["Plugin &Update", "PlugUpdate", "Update plugin"],
 			\ ])
 
-call quickui#menu#install('H&elp', [
+call quickui#menu#install('Help(&?)', [
 			\ ["&Cheatsheet", 'tab help index', ''],
 			\ ['T&ips', 'tab help tips', ''],
 			\ ['--',''],
