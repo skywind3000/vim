@@ -43,7 +43,7 @@ function! TerminalOpen()
 	endif
 	if succeed == 0
 		let shell = get(g:, 'terminal_shell', '')
-		let close = get(g:, 'terminal_close', 1)
+		let close = get(g:, 'terminal_close', 0)
 		let savedir = getcwd()
 		silent execute cd . ' '. fnameescape(expand('%:p:h'))
 		let cmd = pos . ' term ' . (close? '++close' : '++noclose') 
