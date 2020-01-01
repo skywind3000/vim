@@ -60,7 +60,6 @@ function! quickui#textbox#create(textlist, opts)
 		call popup_move(winid, opts)
 	endif
 	if has_key(a:opts, 'line') == 0 || has_key(a:opts, 'col') == 0
-		" echo "FUCK"
 		call quickui#utils#center(winid)
 	endif
 	let opts = {'mapping':0, 'cursorline':0, 'drag':1}
