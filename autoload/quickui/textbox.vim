@@ -200,7 +200,11 @@ endfunc
 function! quickui#textbox#command(cmd, opts)
 	let text = quickui#utils#system(a:cmd)
 	let linelist = []
+	let enc = get(g:, 'quickui_shell_encoding', '')
 	for line in split(text, "\n")
+		if enc != ''
+			let line = iconv(line, enc, &encoding)
+		endif
 		let line = trim(line, "\r")
 		let linelist += [line]
 	endfor
