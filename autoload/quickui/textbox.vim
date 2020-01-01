@@ -72,9 +72,7 @@ function! quickui#textbox#create(textlist, opts)
 	let opts.filter = 'quickui#textbox#filter'
 	let opts.callback = 'quickui#textbox#exit'
 	let opts.resize = get(a:opts, 'resize', 0)
-	if has_key(a:opts, 'color')
-		let opts.highlight = a:opts.color
-	endif
+	let opts.highlight = get(a:opts, 'color', 'QuickBG')
 	if has_key(a:opts, 'index')
 		let index = (a:opts.index < 1)? 1 : a:opts.index
 		let opts.firstline = index
@@ -92,6 +90,9 @@ function! quickui#textbox#create(textlist, opts)
 			call win_execute(winid, 'setl nolist')
 		endif
 	endif
+	if has_key(a:opts, 'bordercolor')
+		let opts.borderhighlight = repeat([a:opts.bordercolor], 4)
+	endif
 	if has_key(a:opts, 'syntax')
 		call win_execute(winid, 'set ft=' . fnameescape(a:opts.syntax))
 	endif
@@ -101,6 +102,7 @@ function! quickui#textbox#create(textlist, opts)
 	if get(a:opts, 'number', 0) != 0
 		call win_execute(winid, 'setlocal number')
 	endif
+	call win_execute(winid, 'setlocal tabstop=' . get(a:opts, 'tabstop', 4))
 	call popup_setoptions(winid, opts)
 	call quickui#utils#update_cursor(winid)
 	call popup_show(winid)
@@ -177,7 +179,7 @@ function! quickui#textbox#open(textlist, opts)
 		if type(a:textlist) == v:t_list
 			let opts.w = 1
 			for line in a:textlist
-				let size = strwidth(line)
+				let size = strdisplaywidth(line)
 				let opts.w = (size < opts.w)? opts.w : size
 			endfor
 			if opts.w > maxwidth
@@ -191,6 +193,19 @@ function! quickui#textbox#open(textlist, opts)
 	call quickui#textbox#create(a:textlist, opts)
 endfunc
 
+
+"----------------------------------------------------------------------
+" run shell command and display result in the text box
+"----------------------------------------------------------------------
+function! quickui#textbox#command(cmd, opts)
+	let text = quickui#utils#system(a:cmd)
+	let linelist = []
+	for line in split(text, "\n")
+		let line = trim(line, "\r")
+		let linelist += [line]
+	endfor
+	call quickui#textbox#open(linelist, a:opts)
+endfunc
 
 
 "----------------------------------------------------------------------
@@ -207,6 +222,7 @@ if 0
 	let opts.title = "title"
 	let opts.syntax = "cpp"
 	let opts.color = "Normal"
+	let opts.bordercolor = "QuickBG"
 	let opts.cursor = 38
 	let opts.number = 1
 	" let opts.exit_on_click = 0
