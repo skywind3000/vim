@@ -3,7 +3,7 @@
 " textbox.vim - 
 "
 " Created by skywind on 2019/12/27
-" Last Modified: 2019/12/27 15:20:02
+" Last Modified: 2020/01/02 04:21
 "
 "======================================================================
 
@@ -25,7 +25,7 @@ function! quickui#textbox#reposition()
 	let size = line('$')
 	let winline = winline()
 	let topline = curline - winline + 1
-	let botline = curline + height - 1
+	let botline = topline + height - 1
 	let disline = botline - size
 	if disline > 0
 		exec 'normal ggG'
@@ -78,6 +78,7 @@ function! quickui#textbox#create(textlist, opts)
 	if has_key(a:opts, 'index')
 		let index = (a:opts.index < 1)? 1 : a:opts.index
 		let opts.firstline = index
+		call win_execute(winid, ':' . index)
 	endif
 	let local = quickui#core#popup_local(winid)
 	let local.winid = winid
@@ -91,8 +92,19 @@ function! quickui#textbox#create(textlist, opts)
 			call win_execute(winid, 'setl nolist')
 		endif
 	endif
+	if has_key(a:opts, 'syntax')
+		call win_execute(winid, 'set ft=' . fnameescape(a:opts.syntax))
+	endif
+	let cursor = get(a:opts, 'cursor', -1)
+	call setbufvar(winbufnr(winid), '__quickui_cursor__', cursor)
+	call setbufvar(winbufnr(winid), '__quickui_line__', -1)
+	if get(a:opts, 'number', 0) != 0
+		call win_execute(winid, 'setlocal number')
+	endif
 	call popup_setoptions(winid, opts)
+	call quickui#utils#update_cursor(winid)
 	call popup_show(winid)
+	redraw
 	return winid
 endfunc
 
@@ -140,6 +152,8 @@ function! quickui#textbox#filter(winid, key)
 			return 1
 		else
 			call quickui#utils#scroll(a:winid, key)
+			redraw
+			call quickui#utils#update_cursor(a:winid)
 		endif
 	endif
 	return popup_filter_yesno(a:winid, a:key)
@@ -150,21 +164,28 @@ endfunc
 " open
 "----------------------------------------------------------------------
 function! quickui#textbox#open(textlist, opts)
-	let size = len(a:textlist)
 	let maxheight = (&lines) * 70 / 100
 	let maxwidth = (&columns) * 80 / 100
 	let opts = deepcopy(a:opts)
+	let maxheight = has_key(opts, 'maxheight')? opts.maxheight : maxheight
+	let maxwidth = has_key(opts, 'maxwidth')? opts.maxwidth : maxwidth
 	if has_key(opts, 'h') == 0
+		let size = (type(a:textlist) == v:t_list)? len(a:textlist) : 20
 		let opts.h = (size < maxheight)? size : maxheight
 	endif
 	if has_key(opts, 'w') == 0
-		let opts.w = 1
-		for line in a:textlist
-			let size = strwidth(line)
-			let opts.w = (size < opts.w)? opts.w : size
-		endfor
-		if opts.w > maxwidth
-			let opts.w = maxwidth
+		if type(a:textlist) == v:t_list
+			let opts.w = 1
+			for line in a:textlist
+				let size = strwidth(line)
+				let opts.w = (size < opts.w)? opts.w : size
+			endfor
+			if opts.w > maxwidth
+				let opts.w = maxwidth
+			endif
+			if get(a:opts, 'number', 0) != 0
+				let opts.w += len(string(len(a:textlist))) + 3
+			endif
 		endif
 	endif
 	call quickui#textbox#create(a:textlist, opts)
@@ -178,12 +199,16 @@ endfunc
 if 0
 	let lines = []
 	for i in range(2000)
-		let lines += ['text line ' . (i + 1)]
+		let lines += ['printf("%d\n", ' . (i + 1) . ');']
 	endfor
 	let opts = {}
 	let opts.index = 30
 	let opts.resize = 1
 	let opts.title = "title"
+	let opts.syntax = "cpp"
+	let opts.color = "Normal"
+	let opts.cursor = 38
+	let opts.number = 1
 	" let opts.exit_on_click = 0
 	let winid = quickui#textbox#open(lines, opts)
 	" call getchar()
