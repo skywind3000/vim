@@ -601,7 +601,6 @@ endfunc
 "----------------------------------------------------------------------
 function! s:neovim_click()
 	if v:mouse_winid != s:cmenu.winid || v:mouse_lnum != 1
-		echom "exit1 winid: " . v:mouse_winid . "/". s:cmenu_winid
 		return 1
 	endif
 	let x = v:mouse_col - 1
@@ -646,8 +645,7 @@ function! quickui#menu#nvim_open_menu(opts)
 	let s:cmenu.width = &columns
 	let s:cmenu.size = len(s:cmenu.inst.items)
 	let s:cmenu.current = current
-	let bid = nvim_create_buf(v:false, v:true)
-	call nvim_buf_set_lines(bid, 0, -1, v:true, [s:cmenu.inst.text])
+	let bid = quickui#core#neovim_buffer('menu', [s:cmenu.inst.text])
 	let w = s:cmenu.width
 	let opts = {'width':w, 'height':1, 'focusable':1, 'style':'minimal'}
 	let opts.col = 0
@@ -696,7 +694,7 @@ function! quickui#menu#nvim_open_menu(opts)
 				break
 			endif
 		elseif has_key(s:cmenu.hotkey, ch)
-			let index = s:cmenu.hotkey[a:key]
+			let index = s:cmenu.hotkey[ch]
 			let index = (index < 0)? (s:cmenu.size - 1) : index
 			let index = (index >= s:cmenu.size)? 0 : index
 			let s:cmenu.index = (s:cmenu.size == 0)? 0 : index

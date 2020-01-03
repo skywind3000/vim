@@ -23,6 +23,12 @@ let g:quickui#core#has_floating = has('nvim-0.4')
 
 
 "----------------------------------------------------------------------
+" internal variables
+"----------------------------------------------------------------------
+let s:buffer_cache = {}
+
+
+"----------------------------------------------------------------------
 " replace string
 "----------------------------------------------------------------------
 function! quickui#core#string_replace(text, old, new)
@@ -230,6 +236,20 @@ function! quickui#core#win_execute(winid, command)
 		endif
 		call nvim_set_current_win(current)
 	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" get a named buffer
+"----------------------------------------------------------------------
+function! quickui#core#neovim_buffer(name, textlist)
+	let bid = get(s:buffer_cache, a:name, -1)
+	if bid < 0
+		let bid = nvim_create_buf(v:false, v:true)
+		let s:buffer_cache[a:name] = bid
+	endif
+	call nvim_buf_set_lines(bid, 0, -1, v:true, a:textlist)
+	return bid
 endfunc
 
 

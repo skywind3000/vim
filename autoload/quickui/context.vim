@@ -470,13 +470,12 @@ endfunc
 function! s:nvim_create_context(textlist, opts)
 	let border = get(a:opts, 'border', g:quickui#style#border)
 	let hwnd = quickui#context#compile(a:textlist, border)
-	let bid = nvim_create_buf(v:false, v:true)
+	let bid = quickui#core#neovim_buffer('context', hwnd.image)
 	let hwnd.bid = bid
 	let w = hwnd.width
 	let h = hwnd.height
 	let hwnd.index = get(a:opts, 'index', -1)
 	let hwnd.opts = deepcopy(a:opts)
-	call nvim_buf_set_lines(bid, 0, -1, v:true, hwnd.image)
 	let opts = {'width':w, 'height':h, 'focusable':1, 'style':'minimal'}
 	if has_key(a:opts, 'line') && has_key(a:opts, 'col')
 		let opts.row = a:opts.line - 1
