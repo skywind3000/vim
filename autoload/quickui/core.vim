@@ -17,6 +17,7 @@
 "----------------------------------------------------------------------
 " global variables
 "----------------------------------------------------------------------
+let g:quickui#core#has_nvim = has('nvim')
 let g:quickui#core#has_popup = exists('*popup_create') && v:version >= 800
 let g:quickui#core#has_floating = has('nvim-0.4')
 

@@ -7,32 +7,32 @@
 "
 "======================================================================
 
+let s:windows = has('win32') || has('win64') || has('win16') || has('win95')
 
-
-if 1
-	let lines = [
-				\ "&New File\tCtrl+n",
-				\ "&Open File\tCtrl+o", 
-				\ ["&Close", 'test echo'],
-				\ "--",
-				\ "&Save\tCtrl+s",
-				\ "Save &As",
-				\ "Save All",
-				\ "-",
-				\ "&User Menu\tF9",
-				\ "&Dos Shell",
-				\ "~&Time %{&undolevels? '+':'-'}",
-				\ "--",
-				\ "E&xit\tAlt+x",
-				\ "&Help",
-				\ ]
-	let opts = {}
-	let opts.index = 2
-	let opts.reserve = 1
-	let opts.horizon = 1
-	" let opts.border = 1
-	echo quickui#context#nvim_popup(lines, opts)
-endif
+function! minibox#clear_leader_mru()
+	if s:windows == 0
+		return 0
+	endif
+	let fn = expand('~/.vim/cache/.LfCache/python3/mru/mruCache')
+	let content = []
+	let avail = {}
+	if !filereadable(fn)
+		let fn = expand('~/.vim/cache/.LfCache/python2/mru/mruCache')
+		if !filereadable(expand(fn))
+			return -1
+		endif
+	endif
+	for name in readfile(fn)
+		let name = substitute(name, '/', '\\', 'g')
+		let name = substitute(name, '\n*$', '', 'g')
+		let key = tolower(name)
+		if !has_key(avail, key)
+			let avail[key] = 1
+			let content += [name]
+		endif
+	endfor
+	call writefile(content, fn)
+endfunc
 
 
 

@@ -102,3 +102,9 @@ function! auxlib#tweak_wallpaper(image)
 	call bgimg#set_image(expand("~/.vim/") . "wallpaper.bmp")
 endfunc
 
+function! auxlib#clear_leader_mru()
+	let name = '~/.vim/cache/.LfCache/python3/mru'
+
+endfunc
+
+
