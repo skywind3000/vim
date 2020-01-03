@@ -36,10 +36,6 @@ if !exists('g:bundle_group')
 	let g:bundle_group = []
 endif
 
-if !exists('g:bundle_post')
-	let g:bundle_post = ''
-endif
-
 call plug#begin(get(g:, 'bundle_home', '~/.vim/bundles'))
 
 
@@ -466,8 +462,14 @@ endif
 "----------------------------------------------------------------------
 " packages end
 "----------------------------------------------------------------------
-if g:bundle_post != ''
-	exec g:bundle_post
+if exists('g:bundle_post')
+	if type(g:bundle_post) == v:t_string
+		exec g:bundle_post
+	elseif type(g:bundle_post) == v:t_list
+		for line in g:bundle_post
+			exec line
+		endfor
+	endif
 endif
 
 call plug#end()
