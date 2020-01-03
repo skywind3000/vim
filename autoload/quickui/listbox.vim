@@ -187,7 +187,6 @@ function! quickui#listbox#create(textlist, opts)
 	if has_key(a:opts, 'close')
 		let opts.close = a:opts.close
 	endif
-	call popup_setoptions(winid, opts)
 	let local = quickui#core#popup_local(winid)
 	let local.hwnd = hwnd
 	let local.winid = winid
@@ -205,7 +204,8 @@ function! quickui#listbox#create(textlist, opts)
 	endif
 	let hwnd.state = 1
 	let hwnd.code = 0
-	let hwnd.input = ''
+	let hwnd.tag = ''
+	call popup_setoptions(winid, opts)
 	if has_key(a:opts, 'syntax')
 		call win_execute(winid, 'set ft=' . fnameescape(a:opts.syntax))
 	endif
