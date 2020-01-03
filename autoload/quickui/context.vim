@@ -157,7 +157,7 @@ function! quickui#context#update(hwnd)
 	let size = len(a:hwnd.items)
 	let w = a:hwnd.width
 	let h = a:hwnd.height
-	call win_execute(winid, 'syn clear')
+	let cmdlist = ['syn clear']
 	for item in a:hwnd.items
 		let index = item.index
 		if item.enable == 0 && item.is_sep == 0
@@ -171,7 +171,7 @@ function! quickui#context#update(hwnd)
 				let ps = px + w - 4
 			endif
 			let cmd = quickui#core#high_region('QuickOff', py, px, py, ps, 1)
-			call win_execute(winid, cmd)
+			let cmdlist += [cmd]
 		elseif item.key_pos >= 0
 			if a:hwnd.border == 0
 				let px = item.key_pos + 1
@@ -182,7 +182,7 @@ function! quickui#context#update(hwnd)
 			endif
 			let ps = px + 1
 			let cmd = quickui#core#high_region('QuickKey', py, px, py, ps, 1)
-			call win_execute(winid, cmd)
+			let cmdlist += [cmd]
 		endif
 		if index == a:hwnd.index
 			if a:hwnd.border == 0
@@ -195,9 +195,10 @@ function! quickui#context#update(hwnd)
 				let ps = px + w - 2
 			endif
 			let cmd = quickui#core#high_region('QuickSel', py, px, py, ps, 1)
-			call win_execute(winid, cmd)
+			let cmdlist += [cmd]
 		endif
 	endfor
+	call quickui#core#win_execute(winid, cmdlist)
 	if a:hwnd.state != 0
 		redraw
 		if get(g:, 'quickui_show_tip', 0) != 0
@@ -430,6 +431,115 @@ function! s:cursor_move(menu, cursor, toward)
 			return selection[-1]
 		endif
 	endif
+	return -1
+endfunc
+
+
+"----------------------------------------------------------------------
+" open context menu in neovim and returns index
+"----------------------------------------------------------------------
+function! quickui#context#nvim_popup(textlist, opts)
+	let border = get(a:opts, 'border', g:quickui#style#border)
+	let hwnd = quickui#context#compile(a:textlist, border)
+	let bid = nvim_create_buf(v:false, v:true)
+	let hwnd.bid = bid
+	let w = hwnd.width
+	let h = hwnd.height
+	let hwnd.index = get(a:opts, 'index', -1)
+	let hwnd.opts = deepcopy(a:opts)
+	call nvim_buf_set_lines(bid, 0, -1, v:true, hwnd.image)
+	let opts = {'width':w, 'height':h, 'focusable':0, 'style':'minimal'}
+	if has_key(a:opts, 'line') && has_key(a:opts, 'col')
+		let opts.row = a:opts.line - 1
+		let opts.col = a:opts.col - 1
+	else
+		let pos = quickui#core#around_cursor(w, h)
+		let opts.row = pos[0] - 1
+		let opts.col = pos[1] - 1
+	endif
+	let opts.relative = 'editor'
+	let winid = nvim_open_win(bid, 0, opts)
+	let hwnd.winid = winid
+	let keymap = quickui#utils#keymap()
+	let keymap['J'] = 'BOTTOM'
+	let keymap['K'] = 'TOP'
+	let hwnd.code = 0
+	let hwnd.state = 1
+	let hwnd.keymap = keymap
+	let hwnd.hotkey = {}
+	for item in hwnd.items
+		if item.enable != 0 && item.key_pos >= 0
+			let key = tolower(item.key_char)
+			if get(a:opts, 'reserve', 0) == 0
+				let hwnd.hotkey[key] = item.index
+			else
+				if key != 'h' && key != 'j' && key != 'k' && key != 'l'
+					let hwnd.hotkey[key] = item.index
+				endif
+			endif
+		endif
+	endfor
+	let hwnd.opts.color = get(a:opts, 'color', 'QuickBG')
+    call nvim_win_set_option(winid, 'winhl', 'Normal:'. hwnd.opts.color)
+	let retval = -1
+	while 1
+		call quickui#context#update(hwnd)
+		redraw
+		try
+			let code = getchar()
+		catch /^Vim:Interrupt$/
+			let code = "\<C-C>"
+		endtry
+		let ch = (type(code) == v:t_number)? nr2char(code) : code
+		if ch == "\<ESC>" || ch == "\<c-c>"
+			break
+		elseif ch == " " || ch == "\<cr>"
+			let index = hwnd.index
+			if index >= 0 && index < len(hwnd.items)
+				let item = hwnd.items[index]
+				if item.is_sep == 0 && item.enable != 0
+					let retval = index
+					break
+				endif
+			endif
+		elseif has_key(hwnd.hotkey, ch)
+			let hr = hwnd.hotkey[ch]
+			if hr >= 0
+				let retval = hr
+				break
+			endif
+		elseif has_key(hwnd.keymap, ch)
+			let key = hwnd.keymap[ch]
+			if key == 'ESC'
+				break
+			elseif key == 'UP'
+				let hwnd.index = s:cursor_move(hwnd, hwnd.index, -1)
+			elseif key == 'DOWN'
+				let hwnd.index = s:cursor_move(hwnd, hwnd.index, 1)
+			elseif key == 'TOP'
+				let hwnd.index = s:cursor_move(hwnd, hwnd.index, 'TOP')
+			elseif key == 'BOTTOM'
+				let hwnd.index = s:cursor_move(hwnd, hwnd.index, 'BOTTOM')
+			endif
+			if get(hwnd.opts, 'horizon', 0) != 0
+				if key == 'LEFT'
+					let retval = -1000
+					break
+				elseif key == 'RIGHT'
+					let retval = -2000
+					break
+				elseif key == 'PAGEUP'
+					let retval = -1001
+					break
+				elseif key == 'PAGEDOWN'
+					let retval = -2001
+					break
+				endif
+			endif
+		endif
+	endwhile
+	call nvim_win_close(winid, 0)
+	return retval
 endfunc
 
 

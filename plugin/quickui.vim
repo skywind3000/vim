@@ -12,7 +12,7 @@
 
 " require vim 8.2+
 if has('patch-8.2.1') == 0 || has('nvim')
-	finish
+	" finish
 endif
 
 

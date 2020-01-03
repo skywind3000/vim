@@ -89,6 +89,7 @@ function! s:setup_dirvish()
 	let name = '^' . escape(text, '.*[]~\') . '[/*|@=|\\*]\=\%($\|\s\+\)'
 	" let name = '\V\^'.escape(text, '\').'\$'
 	" echom "search: ".name
+	exec "normal gg"
 	call search(name, 'wc')
 	noremap <silent><buffer> ~ :Dirvish ~<cr>
 	noremap <buffer> % :e %

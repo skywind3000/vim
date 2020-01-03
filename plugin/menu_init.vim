@@ -128,7 +128,7 @@ call quickui#menu#install('&Plugin', [
 			\ ["Plugin &Update", "PlugUpdate", "Update plugin"],
 			\ ])
 
-call quickui#menu#install('Help (&?)', [
+call quickui#menu#install('&Help (?)', [
 			\ ["&Index", 'tab help index', ''],
 			\ ['Ti&ps', 'tab help tips', ''],
 			\ ['--',''],
