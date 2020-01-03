@@ -466,9 +466,7 @@ if exists('g:bundle_post')
 	if type(g:bundle_post) == v:t_string
 		exec g:bundle_post
 	elseif type(g:bundle_post) == v:t_list
-		for line in g:bundle_post
-			exec line
-		endfor
+		exec join(g:bundle_post, "\n")
 	endif
 endif
 

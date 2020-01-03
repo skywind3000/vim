@@ -226,7 +226,7 @@ let g:Lf_NormalMap = {
 		\ "Function": [["<ESC>", ':exec g:Lf_py "functionExplManager.quit()"<cr>']],
 		\ }
 
-if exists('*popup_create') && has('patch-8.1.2000')
+if (exists('*popup_create') && has('patch-8.1.2000')) || has('nvim-0.4')
 	let g:Lf_WindowPosition = 'popup'
 endif
 

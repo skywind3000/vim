@@ -286,8 +286,8 @@ function! quickui#listbox#filter(winid, key)
 		return 1
 	elseif has_key(keymap, a:key)
 		let key = keymap[a:key]
-		if strpart(key, 0, 6) == 'INPUT-'
-			let hwnd.input = strpart(key, 6)
+		if strpart(key, 0, 4) == 'TAG:'
+			let hwnd.tag = strpart(key, 4)
 			return popup_filter_menu(a:winid, "\<CR>")
 		elseif key == 'ESC'
 			call popup_close(a:winid, -1)
