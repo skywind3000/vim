@@ -541,6 +541,7 @@ function! s:nvim_create_context(textlist, opts)
 		elseif has_key(hwnd.hotkey, ch)
 			let hr = hwnd.hotkey[ch]
 			if hr >= 0
+				let hwnd.index = hr
 				let retval = hr
 				break
 			endif

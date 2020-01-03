@@ -676,8 +676,9 @@ function! quickui#menu#nvim_open_menu(opts)
 	call quickui#menu#update()
 	while 1
 		call quickui#menu#update()
-		redraw
-		if s:cmenu.next == 1
+		if s:cmenu.next == 0
+			redraw
+		elseif s:cmenu.next == 1
 			let s:cmenu.next = 0
 			call quickui#menu#update()
 			if s:neovim_dropdown() != 0
