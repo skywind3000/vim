@@ -7,7 +7,7 @@
 "
 "======================================================================
 
-if has('patch-8.2.1') == 0 || has('nvim')
+if has('patch-8.2.1') == 0 && exists('*nvim_open_win') == 0
 	finish
 endif
 
@@ -128,7 +128,7 @@ call quickui#menu#install('&Plugin', [
 			\ ["Plugin &Update", "PlugUpdate", "Update plugin"],
 			\ ])
 
-call quickui#menu#install('&Help (?)', [
+call quickui#menu#install('Help (&?)', [
 			\ ["&Index", 'tab help index', ''],
 			\ ['Ti&ps', 'tab help tips', ''],
 			\ ['--',''],
