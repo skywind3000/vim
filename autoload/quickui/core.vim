@@ -25,7 +25,39 @@ let g:quickui#core#has_floating = has('nvim-0.4')
 "----------------------------------------------------------------------
 " internal variables
 "----------------------------------------------------------------------
-let s:buffer_cache = {}
+
+
+"----------------------------------------------------------------------
+" object pool acquire
+"----------------------------------------------------------------------
+function! quickui#core#object_acquire(name)
+	if !exists('g:quickui#core#__object_pool__')
+		let g:quickui#core#__object_pool__ = {}
+	endif
+	if !has_key(g:quickui#core#__object_pool__, a:name)
+		let g:quickui#core#__object_pool__[a:name] = []
+	endif
+	let array = g:quickui#core#__object_pool__[a:name]
+	if len(array) == 0
+		return v:null
+	endif
+	let obj = remove(array, -1)	
+	return obj
+endfunc
+
+
+"----------------------------------------------------------------------
+" object pool release
+"----------------------------------------------------------------------
+function! quickui#core#object_release(name, obj)
+	if !exists('g:quickui#core#__object_pool__')
+		let g:quickui#core#__object_pool__ = {}
+	endif
+	if !has_key(g:quickui#core#__object_pool__, a:name)
+		let g:quickui#core#__object_pool__[a:name] = []
+	endif
+	call add(g:quickui#core#__object_pool__[a:name], a:obj)
+endfunc
 
 
 "----------------------------------------------------------------------
@@ -243,6 +275,9 @@ endfunc
 " get a named buffer
 "----------------------------------------------------------------------
 function! quickui#core#neovim_buffer(name, textlist)
+	if !exists('s:buffer_cache')
+		let s:buffer_cache = {}
+	endif
 	let bid = get(s:buffer_cache, a:name, -1)
 	if bid < 0
 		let bid = nvim_create_buf(v:false, v:true)
