@@ -73,19 +73,42 @@ endfunc
 " compose two string
 "----------------------------------------------------------------------
 function! quickui#core#string_compose(target, pos, source)
+	if a:source == ''
+		return a:target
+	endif
 	let pos = a:pos
 	let source = a:source
 	if pos < 0
-		let source = strpart(a:source, -pos)
+		let source = strcharpart(a:source, -pos)
 		let pos = 0
 	endif
-	let target = strpart(a:target, 0, pos)
-	if len(target) < pos
-		let target .= repeat(' ', pos - len(target))
+	let target = strcharpart(a:target, 0, pos)
+	if strchars(target) < pos
+		let target .= repeat(' ', pos - strchars(target))
 	endif
 	let target .= source
-	let target .= strpart(a:target, pos + len(source))
+	let target .= strcharpart(a:target, pos + strchars(source))
 	return target
+endfunc
+
+
+"----------------------------------------------------------------------
+" fit size
+"----------------------------------------------------------------------
+function! quickui#core#string_fit(source, size)
+	let require = a:size
+	let source = a:source
+	let size = len(source)
+	if size <= require
+		return source
+	endif
+	let avail = require - 2
+	let left = avail / 2
+	let right = avail - left
+	let p1 = strpart(source, 0, left)
+	let p2 = strpart(source, size - right)
+	let text = p1 . '..' . p2
+	return text
 endfunc
 
 

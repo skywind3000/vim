@@ -356,7 +356,7 @@ endfunc
 "----------------------------------------------------------------------
 " make border
 "----------------------------------------------------------------------
-function! quickui#utils#make_border(width, height, border)
+function! quickui#utils#make_border(width, height, border, title, button)
 	let pattern = quickui#core#border_get(a:border)
 	let image = []
 	let w = a:width
@@ -371,6 +371,13 @@ function! quickui#utils#make_border(width, height, border)
 	endwhile
 	let text = pattern[6] . repeat(pattern[7], w) . pattern[8]
 	let image += [text]
+	let text = image[0]
+	let title = quickui#core#string_fit(a:title, w)
+	let text = quickui#core#string_compose(text, 1, title)
+	if a:button != 0
+		let text = quickui#core#string_compose(text, w + 1, 'X')
+	endif
+	let image[0] = text
 	return image
 endfunc
 
