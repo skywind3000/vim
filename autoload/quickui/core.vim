@@ -70,6 +70,26 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" compose two string
+"----------------------------------------------------------------------
+function! quickui#core#string_compose(target, pos, source)
+	let pos = a:pos
+	let source = a:source
+	if pos < 0
+		let source = strpart(a:source, -pos)
+		let pos = 0
+	endif
+	let target = strpart(a:target, 0, pos)
+	if len(target) < pos
+		let target .= repeat(' ', pos - len(target))
+	endif
+	let target .= source
+	let target .= strpart(a:target, pos + len(source))
+	return target
+endfunc
+
+
+"----------------------------------------------------------------------
 " eval & expand: '%{script}' in string
 "----------------------------------------------------------------------
 function! quickui#core#expand_text(string) abort

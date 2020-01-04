@@ -1,7 +1,7 @@
 "----------------------------------------------------------------------
 " testing suit
 "----------------------------------------------------------------------
-if 0
+if 1
 	let lines = [
 				\ "[1]\tOpen &File\t(F3)",
 				\ "[2]\tChange &Directory\t(F2)",
@@ -16,12 +16,12 @@ if 0
 	function! MyCallback(code)
 		let hwnd = g:quickui#listbox#current
 		let context = hwnd.context
-		echo "exit: ". a:code . ' context: '. context . ' in: ' . hwnd.input
+		echo "exit: ". a:code . ' context: '. context . ' in: ' . hwnd.tag
 	endfunc
 	let opts = {'title':'Select', 'border':1, 'index':400, 'close':'button'}
 	let opts.context = 'asdfasdf'
 	let opts.callback = 'MyCallback'
-	let opts.keymap = {'=':'INPUT-2', '-':'INPUT-3'}
+	let opts.keymap = {'=':'TAG:2', '-':'TAG:3'}
 	if 1
 		let inst = quickui#listbox#create(lines, opts)
 		call popup_show(inst.winid)
@@ -57,7 +57,7 @@ if 0
 	call quickui#listbox#open(content, opts)
 endif
 
-if 1
+if 0
 	let linelist = [
 				\ "line 1",
 				\ "line 2",

@@ -81,7 +81,7 @@ endfunc
 "----------------------------------------------------------------------
 function! quickui#listbox#reposition()
 	exec 'normal! zz'
-	let height = winheight(0)	
+	let height = winheight(0)
 	let size = line('$')
 	let curline = line('.')
 	let winline = winline()
@@ -100,19 +100,21 @@ endfunc
 "----------------------------------------------------------------------
 " highlight keys
 "----------------------------------------------------------------------
-function! s:highlight_keys(winid, items)
+function! quickui#listbox#highlight_keys(winid, items)
 	let items = a:items
 	let index = 0
+	let cmdlist = []
 	while index < items.nrows
 		let key = items.keys[index]
 		if key[1] >= 0
 			let px = key[1] + 1
 			let py = index + 1
 			let cmd = quickui#core#high_region('QuickKey', py, px, py, px + 1, 1)
-			call win_execute(a:winid, cmd)
+			let cmdlist += [cmd]
 		endif
 		let index += 1
 	endwhile
+	call quickui#core#win_execute(a:winid, cmdlist)
 endfunc
 
 
@@ -171,7 +173,7 @@ function! quickui#listbox#create(textlist, opts)
 		call win_execute(winid, ':' . moveto)
 		call win_execute(winid, 'call quickui#listbox#reposition()')
 	endif
-	let border = get(a:opts, 'border', 1)
+	let border = get(a:opts, 'border', g:quickui#style#border)
 	let opts = {'cursorline':1, 'drag':1, 'mapping':0}
 	if get(a:opts, 'manual', 0) == 0
 		let opts.filter = 'quickui#listbox#filter'
@@ -209,7 +211,8 @@ function! quickui#listbox#create(textlist, opts)
 	if has_key(a:opts, 'syntax')
 		call win_execute(winid, 'set ft=' . fnameescape(a:opts.syntax))
 	endif
-	call s:highlight_keys(winid, items)
+	" call s:highlight_keys(winid, items)
+	call quickui#listbox#highlight_keys(winid, items)
 	call popup_show(winid)
 	return hwnd
 endfunc
