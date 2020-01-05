@@ -211,15 +211,19 @@ function! s:GscopeFind(bang, what, ...)
 		call s:ErrorMsg("no gtags database for this project, check gutentags's documents")
 		return 0
 	endif
-	if !filereadable(dbname)
-		call s:ErrorMsg('gtags database is not ready yet')
-		return 0
-	endif
 	if a:0 == 0 || keyword == ''
 		redraw! | echo '' | redraw!
 		echohl ErrorMsg
-		echom 'E560: Usage: GscopeFind a|c|d|e|f|g|i|s|t name'
+		echom 'E560: Usage: GscopeFind a|c|d|e|f|g|i|s|t|z name'
 		echohl NONE
+		return 0
+	endif
+	if a:what == 'z'
+		let ft = (a:0 > 1)? a:2 : (&ft)
+		return s:FindTags(a:bang, keyword, ft)
+	endif
+	if !filereadable(dbname)
+		call s:ErrorMsg('gtags database is not ready yet')
 		return 0
 	endif
 	call s:GscopeAdd()
@@ -306,6 +310,328 @@ endfunc
 command! -nargs=0 GscopeKill call s:GscopeKill()
 
 
+"----------------------------------------------------------------------
+" taglist
+"----------------------------------------------------------------------
+function! s:taglist(pattern)
+    let ftags = []
+    try
+        let ftags = taglist(a:pattern)
+    catch /^Vim\%((\a\+)\)\=:E/
+        " if error occured, reset tagbsearch option and try again.
+        let bak = &tagbsearch
+        set notagbsearch
+        let ftags = taglist(a:pattern)
+        let &tagbsearch = bak
+    endtry
+	" take care ctags windows filename bug
+	let win = has('win32') || has('win64') || has('win95') || has('win16')
+	for item in ftags
+		let name = get(item, 'filename', '')
+		let item.baditem = 0
+		if win != 0
+			if stridx(name, '\\') >= 0
+				let part = split(name, '\\', 1)
+				let elem = []
+				for n in part
+					if n != ''
+						let elem += [n]
+					endif
+				endfor
+				let name = join(elem, '\')
+				let item.filename = name
+				if has_key(item, 'line') == 0
+					if has_key(item, 'signature') == 0
+						let kind = get(item, 'kind', '')
+						if kind != 'p' && kind != 'f'
+							let item.baditem = 1
+						endif
+					endif
+				endif
+			end
+		endif
+	endfor
+    return ftags
+endfunc
+
+
+"----------------------------------------------------------------------
+" easy tagname
+"----------------------------------------------------------------------
+function! s:tagfind(tagname)
+	let pattern = escape(a:tagname, '[\*~^')
+	let result = s:taglist("^". pattern . "$")
+	if type(result) == 0 || (type(result) == 3 && result == [])
+		if pattern !~ '^\(catch\|if\|for\|while\|switch\)$'
+			let result = s:taglist('::'. pattern .'$')
+		endif
+	endif
+	if type(result) == 0 || (type(result) == 3 && result == [])
+		return []
+	endif
+	let final = []
+	let check = {}
+	for item in result
+		if item.baditem != 0
+			continue
+		endif
+		" remove duplicated tags
+		let signature = get(item, 'name', '') . ':'
+		let signature .= get(item, 'cmd', '') . ':'
+		let signature .= get(item, 'kind', '') . ':'
+		let signature .= get(item, 'line', '') . ':'
+		let signature .= get(item, 'filename', '')
+		if !has_key(check, signature)
+			let final += [item]
+			let check[signature] = 1
+		endif
+	endfor
+	return final
+endfunc
+
+
+"----------------------------------------------------------------------
+" function signature
+"----------------------------------------------------------------------
+function! s:signature(funname, fn_only, filetype)
+	let tags = s:tagfind(a:funname)
+    let funpat = escape(a:funname, '[\*~^')
+	let fill_tag = []
+	let ft = (a:filetype == '')? &filetype : a:filetype
+	for i in tags
+		if !has_key(i, 'name')
+			continue
+		endif
+		if has_key(i, 'language')
+		endif
+		if has_key(i, 'filename') && ft != '*'
+			let ename = tolower(fnamemodify(i.filename, ':e'))
+			let c = ['c', 'cpp', 'cc', 'cxx', 'h', 'hpp', 'hh', 'm', 'mm']
+			if index(['c', 'cpp', 'objc', 'objcpp'], ft) >= 0
+				if index(c, ename) < 0
+					continue
+				endif
+			elseif ft == 'python'
+				if index(['py', 'pyw'], ename) < 0
+					continue
+				endif
+			elseif ft == 'java' && ename != 'java'
+				continue
+			elseif ft == 'ruby' && ename != 'rb'
+				continue
+			elseif ft == 'vim' && ename != 'vim'
+				continue
+			elseif ft == 'cs' && ename != 'cs'
+				continue
+			elseif ft == 'php' 
+				if index(['php', 'php4', 'php5', 'php6'], ename) < 0
+					continue
+				endif
+			elseif ft == 'javascript'
+				if index(['html', 'js', 'html5', 'xhtml', 'php'], ename) < 0
+					continue
+				endif
+			endif
+		endif
+		if has_key(i, 'kind')
+			" p: prototype/procedure; f: function; m: member
+			if (a:fn_only == 0 || (i.kind == 'p' || i.kind == 'f') ||
+						\ (i.kind == 'm' && has_key(i, 'cmd') &&
+						\		match(i.cmd, '(') != -1)) &&
+						\ i.name =~ funpat
+				if ft != 'cpp' || !has_key(i, 'class') ||
+							\ i.name !~ '::' || i.name =~ i.class
+					let fill_tag += [i]
+				endif
+			endif
+		else
+			if a:fn_only == 0 && i.name == a:funname
+				let fill_tag += [i]
+			endif
+		endif
+	endfor
+	let res = []
+	let check = {}
+	for i in fill_tag
+		if has_key(i, 'kind') && has_key(i, 'signature')
+			if i.cmd[:1] == '/^' && i.cmd[-2:] == '$/'
+				let tmppat = substitute(escape(i.name,'[\*~^'),
+							\ '^.*::','','')
+				if ft == 'cpp'
+					let tmppat = substitute(tmppat,'\<operator ',
+								\ 'operator\\s*','')
+					let tmppat=tmppat . '\s*(.*'
+					let tmppat='\([A-Za-z_][A-Za-z_0-9]*::\)*'.tmppat
+				else
+					let tmppat=tmppat . '\>.*'
+				endif
+				let name = substitute(i.cmd[2:-3],tmppat,'','').
+							\ i.name . i.signature
+				if i.kind == 'm'
+					if has_key(i, 'class')
+						let name = name . ' <-- class ' . i.class
+					elseif has_key(i, 'struct')
+						let name = name . ' <-- struct ' . i.struct
+					elseif has_key(i, 'union')
+						let name = name . ' <-- union ' . i.union
+					endif
+				endif
+			else
+				let name = i.name . i.signature
+				if has_key(i, 'kind') && match('fm', i.kind) >= 0
+					let sep = (ft == 'cpp' || ft == 'c')? '::' : '.'
+					if has_key(i, 'class')
+						let name = i.class . sep . name
+					elseif has_key(i, 'struct')
+						let name = i.struct . sep. name
+					elseif has_key(i, 'union')
+						let name = i.struct . sep. name
+					endif
+				endif
+			endif
+		elseif has_key(i, 'kind')
+			if i.kind == 'd'
+				let name = 'macro '. i.name
+			elseif i.kind == 'c'
+				let name = ((ft == 'vim')? 'command ' : 'class '). i.name
+			elseif i.kind == 's'
+				let name = 'struct '. i.name
+			elseif i.kind == 'u'
+				let name = 'union '. i.name
+			elseif (match('fpmvt', i.kind) != -1) &&
+						\(has_key(i, 'cmd') && i.cmd[0] == '/')
+				let tmppat = '\(\<'.i.name.'\>.\{-}\)'
+				if index(['c', 'cpp', 'cs', 'java', 'javascript'], ft) >= 0
+					" let tmppat = tmppat . ';.*'
+				elseif ft == 'python' && (i.kind == 'm' || i.kind == 'f')
+					let tmppat = tmppat . ':.*'
+				elseif ft == 'tcl' && (i.kind == 'm' || i.kind == 'p')
+					let tmppat = tmppat . '\({\)\?$'
+				endif
+				if i.kind == 'm' && &filetype == 'cpp'
+					let tmppat=substitute(tmppat,'^\(.*::\)','\\(\1\\)\\?','')
+				endif
+				if match(i.cmd[2:-3], tmppat) != -1
+					let name=substitute(i.cmd[2:-3], tmppat, '\1', '')
+					if i.kind == 't' && name !~ '^\s*typedef\>'
+						let name = 'typedef ' . i.name
+					endif
+				elseif i.kind == 't'
+					let name = 'typedef ' . i.name
+				elseif i.kind == 'v'
+					let name = 'var ' . i.name
+				else
+					let name = i.name
+				endif
+				if i.kind == 'm'
+					if has_key(i, 'class')
+						let name = name . ' <-- class ' . i.class
+					elseif has_key(i, 'struct')
+						let name = name . ' <-- struct ' . i.struct
+					elseif has_key(i, 'union')
+						let name = name . ' <-- union ' . i.union
+					endif
+				endif
+				let name = substitute(name, '^\s*\(.\{-}\)\s*$', '\1', '')
+				if name[-1:] == ';'
+					let name = name[0:-2]
+				endif
+			else
+				let name = i.name
+			endif
+		else
+			let name = i.name
+		endif
+		let name = substitute(name, '^\s\+', '', '')
+		let name = substitute(name, '\s\+$', '', '')
+		let name = substitute(name, '\s\+', ' ', 'g')
+		let i.func_prototype = name
+		let file_line = ''
+		if has_key(i, 'filename')
+			let file_line = fnamemodify(i.filename, ':t')
+			if has_key(i, 'line')
+				let file_line .= ':'. i.line
+			elseif i.cmd > 0
+				let file_line .= ':'. i.cmd
+				if i.cmd =~ '^\s*\d\+\s*$'
+					let i.line = str2nr(i.cmd)
+				endif
+			endif
+		endif
+		let i.file_line = file_line
+		let res += [i]
+	endfor
+	let index = 1
+	for i in res
+		let name = i.func_prototype
+		let file_line = i.file_line
+		let desc = name. ' ('.index.'/'.len(res).') '.file_line
+		let i.func_desc = desc
+		let index += 1
+	endfor
+	return res
+endfunc
+
+
+"----------------------------------------------------------------------
+" 
+"----------------------------------------------------------------------
+function! TagFind(tagname)
+	return s:signature(a:tagname, 0, &ft)
+endfunc
+
+
+"----------------------------------------------------------------------
+" find tags
+"----------------------------------------------------------------------
+function! s:FindTags(bang, tagname, ...)
+	let ft = (a:0 > 0)? a:1 : &ft
+	let keyword = a:tagname
+	let signatures = s:signature(a:tagname, 0, ft)
+	if len(signatures) == 0
+		redraw
+		redrawstatus
+		echohl ErrorMsg
+		echo "E259: not find '". (a:tagname) ."'"
+		echohl NONE
+		return 0
+	endif
+	let ncol = col('.')
+	let nrow = line('.')
+	let nbuf = winbufnr('%')
+	let text = 'ctags "'.keyword.'"'
+	let text = "[cscope z: ".text."]"
+	let title = "GscopeFind z \"" .keyword.'"'
+	silent exec 'cexpr text'
+	if has('nvim') == 0 && (v:version >= 800 || has('patch-7.4.2210'))
+		call setqflist([], 'a', {'title':title})
+	elseif has('nvim') && has('nvim-0.2.2')
+		call setqflist([], 'a', {'title':title})
+	elseif has('nvim')
+		call setqflist([], 'a', title)
+	else
+		call setqflist([], 'a')
+	endif
+	let save_local = &l:efm
+	let save_global = &g:efm
+	for item in signatures
+		let t = item.filename . ':'. item.line . ': ' . item.func_prototype
+		silent caddexpr t
+	endfor
+	let &g:efm = save_global
+	let &l:efm = save_local
+	let &g:efm = '%f:%l:%m'
+	let &l:efm = '%f:%l:%m'
+	if winbufnr('%') == nbuf
+		call cursor(nrow, ncol)
+	endif
+	if a:bang == 0
+		let height = get(g:, 'gutentags_plus_height', 6)
+		call s:quickfix_open(height)
+	endif
+	return 1
+endfunc
+
 
 "----------------------------------------------------------------------
 " setup keymaps
@@ -320,6 +646,7 @@ if get(g:, 'gutentags_plus_nomap', 0) == 0
 	noremap <silent> <leader>ci :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
 	noremap <silent> <leader>cd :GscopeFind d <C-R><C-W><cr>
 	noremap <silent> <leader>ca :GscopeFind a <C-R><C-W><cr>
+	noremap <silent> <leader>cz :GscopeFind z <C-R><C-W><cr>
 	noremap <silent> <leader>ck :GscopeKill<cr>
 endif
 
