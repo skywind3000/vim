@@ -7,7 +7,7 @@
 "
 "======================================================================
 
-if has('patch-8.2.1') == 0 && exists('*nvim_open_win') == 0
+if has('patch-8.1.2292') == 0 && exists('*nvim_open_win') == 0
 	finish
 endif
 
@@ -65,6 +65,7 @@ call quickui#menu#install('&Symbol', [
 			\ [ "Find &Symbol\t(GNU Global)", 'call MenuHelp_Gscope("s")', 'GNU Gloal search s'],
 			\ [ "Find &Called by\t(GNU Global)", 'call MenuHelp_Gscope("d")', 'GNU Global search d'],
 			\ [ "Find C&alling\t(GNU Global)", 'call MenuHelp_Gscope("c")', 'GNU Global search c'],
+			\ [ "Find &From Ctags\t(GNU Global)", 'call MenuHelp_Gscope("z")', 'GNU Global search c'],
 			\ [ "--", ],
 			\ [ "&Goto Definition\t(YCM)", 'YcmCompleter GoToDefinitionElseDeclaration'],
 			\ [ "Goto &References\t(YCM)", 'YcmCompleter GoToReferences'],
