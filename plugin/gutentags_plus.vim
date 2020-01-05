@@ -616,7 +616,7 @@ function! s:FindTags(bang, tagname, ...)
 	let save_global = &g:efm
 	for item in signatures
 		let t = item.filename . ':'. item.line . ': ' . item.func_prototype
-		silent caddexpr t
+		noautocmd silent caddexpr t
 	endfor
 	let &g:efm = save_global
 	let &l:efm = save_local
