@@ -107,9 +107,11 @@ call quickui#menu#install('&Tools', [
 			\ ['Compare &File', 'call svnhelp#compare_ask_file()', ''],
 			\ ['&Compare Buffer', 'call svnhelp#compare_ask_buffer()', ''],
 			\ ['--',''],
+			\ ['List &Buffer', 'call quickui#tools#list_buffer("FileSwitch tabe")', ],
+			\ ['Display &Messages', 'call quickui#tools#display_messages()', ],
+			\ ['--',''],
 			\ ["&DelimitMate %{get(b:, 'delimitMate_enabled', 0)? 'Disable':'Enable'}", 'DelimitMateSwitch'],
 			\ ['Read &URL', 'call menu#ReadUrl()', 'load content from url into current buffer'],
-			\ ['List &Buffer', 'call quickui#tools#list_buffer("FileSwitch tabe")', ],
 			\ ['S&pell %{&spell? "Disable":"Enable"}', 'set spell!', 'Toggle spell check %{&spell? "off" : "on"}'],
 			\ ])
 
