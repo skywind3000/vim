@@ -601,6 +601,7 @@ function! s:nvim_create_context(textlist, opts)
 		let item = hwnd.items[retval]
 		if item.is_sep == 0 && item.enable != 0
 			if item.cmd != ''
+				redraw
 				exec item.cmd
 			endif
 		endif
