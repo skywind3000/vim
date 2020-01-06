@@ -113,7 +113,9 @@ call quickui#menu#install('&Tools', [
 			\ ['--',''],
 			\ ["&DelimitMate %{get(b:, 'delimitMate_enabled', 0)? 'Disable':'Enable'}", 'DelimitMateSwitch'],
 			\ ['Read &URL', 'call menu#ReadUrl()', 'load content from url into current buffer'],
-			\ ['S&pell %{&spell? "Disable":"Enable"}', 'set spell!', 'Toggle spell check %{&spell? "off" : "on"}'],
+			\ ['&Spell %{&spell? "Disable":"Enable"}', 'set spell!', 'Toggle spell check %{&spell? "off" : "on"}'],
+			\ ['Start &Profile', 'call MonitorInit()', ''],
+			\ ['S&top Profile', 'call MonitorExit()', ''],
 			\ ])
 
 call quickui#menu#install('&Plugin', [
