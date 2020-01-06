@@ -99,6 +99,11 @@ function! TerminalToggle()
 	endif
 endfunc
 
+function! Tapi_TerminalOpen(cmd, name)
+	exec a:cmd . ' ' . fnameescape(a:name)
+endfunc
+
+
 nnoremap <silent><m-=> :call TerminalToggle()<cr>
 tnoremap <silent><m-=> <c-_>p:call TerminalToggle()<cr>
 
