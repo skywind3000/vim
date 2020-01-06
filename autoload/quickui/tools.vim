@@ -147,7 +147,7 @@ function! quickui#tools#list_function()
 	let opts.h = (opts.h < maxheight)? opts.h : maxheight
 	let opts.w = maxwidth
 	if opts.w < maxsize
-		let opts.w = (opts.w < 70)? 70 : opts.w
+		let opts.w = (opts.w < 60)? 60 : opts.w
 	endif
 	call quickui#listbox#open(content, opts)
 	return 0
