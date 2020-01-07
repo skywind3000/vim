@@ -115,10 +115,16 @@ endfunc
 " list function
 "----------------------------------------------------------------------
 function! quickui#tools#list_function()
+	let ctags = get(g:, 'quickui_ctags_exe', 'ctags2')
+	if !executable(ctags)
+		let msg = 'Not find ctags, add to $PATH or specify in '
+		call quickui#utils#errmsg(msg . 'g:quickui_ctags_exe')
+		return -1
+	endif
 	let items = quickui#tags#function_list(bufnr(), &ft)
 	if len(items) == 0
 		call quickui#utils#errmsg('No content !')
-		return -1
+		return -2
 	endif
 	let content = []
 	let cursor = -1
