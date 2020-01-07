@@ -475,7 +475,11 @@ endfunc
 "----------------------------------------------------------------------
 function! quickui#core#input(prompt, text)
 	call inputsave()
-	let t = input(a:prompt, a:text)
+	try
+		let t = input(a:prompt, a:text)
+	catch /^Vim:Interrupt$/
+		let t = "\<c-c>"
+	endtry
 	call inputrestore()
 	return t
 endfunc

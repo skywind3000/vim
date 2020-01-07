@@ -450,7 +450,7 @@ function! quickui#utils#search_or_jump(winid, cmd)
 		let prompt = (a:cmd == '/')? '/' : '?'
 		let prompt = (a:cmd == '/')? '(search): ' : '(search backwards): '
 		let t = quickui#core#input(prompt, '')
-		if t != ''
+		if t != '' && t != "\<c-c>"
 			try
 				call quickui#core#win_execute(a:winid, a:cmd . t)
 			catch /^Vim\%((\a\+)\)\=:E486:/
