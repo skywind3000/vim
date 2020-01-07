@@ -103,7 +103,9 @@ function! quickui#tools#list_buffer(switch)
 	let opts.keymap["\<c-]>"] = 'TAG:2'
 	let opts.keymap["\<c-t>"] = 'TAG:3'
 	let opts.keymap["\<c-g>"] = 'TAG:4'
-	let opts.w = quickui#utils#tools_width()
+	if exists('g:quickui_tools_width')
+		let opts.w = quickui#utils#tools_width()
+	endif
 	" let opts.syntax = 'cpp'
 	let maxheight = (&lines) * 60 / 100
 	if len(content) > maxheight
@@ -149,6 +151,7 @@ function! quickui#tools#list_function()
 		let index += 1
 		let text = '' . item.mode . '' . "   \t" . item.text
 		let text = text . '  [:' . item.line . ']'
+		let maxwidth = (maxwidth < len(text))? len(text) : maxwidth
 		let text = substitute(text, '&', '&&', 'g')
 		let content += [[text, ':' . item.line]]
 	endfor
@@ -156,13 +159,16 @@ function! quickui#tools#list_function()
 	if cursor >= 0
 		let opts.index = cursor
 	endif
+	let limit = &columns * 90 / 100
 	let opts.h = len(content)
 	let opts.h = (opts.h < maxheight)? opts.h : maxheight
-	let opts.w = maxwidth
+	let opts.w = (maxwidth < limit)? maxwidth : limit
 	if opts.w < maxsize
 		let opts.w = (opts.w < 60)? 60 : opts.w
 	endif
-	let opts.w = quickui#utils#tools_width()
+	if exists('g:quickui_tools_width')
+		let opts.w = quickui#utils#tools_width()
+	endif
 	" let content += ["1\t".repeat('0', 100)]
 	call quickui#listbox#open(content, opts)
 	return 0
@@ -215,7 +221,9 @@ function! quickui#tools#display_messages()
 		return -1
 	endif
 	let opts = {"close":"button", "title":"Vim Messages"}
-	let opts.w = quickui#utils#tools_width()
+	if exists('g:quickui_tools_width')
+		let opts.w = quickui#utils#tools_width()
+	endif
 	call quickui#textbox#open(content, opts)
 endfunc
 
