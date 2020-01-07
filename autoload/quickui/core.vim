@@ -470,4 +470,14 @@ function! quickui#core#around_cursor(width, height)
 endfunc
 
 
+"----------------------------------------------------------------------
+" safe input
+"----------------------------------------------------------------------
+function! quickui#core#input(prompt, text)
+	call inputsave()
+	let t = input(a:prompt, a:text)
+	call inputrestore()
+	return t
+endfunc
+
 
