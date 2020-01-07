@@ -447,10 +447,16 @@ endfunc
 "----------------------------------------------------------------------
 function! quickui#utils#search_or_jump(winid, cmd)
 	if a:cmd == '/' || a:cmd == '?'
-		let t = quickui#core#input(a:cmd, '')
+		let prompt = (a:cmd == '/')? '/' : '?'
+		let prompt = (a:cmd == '/')? '(search): ' : '(search backwards): '
+		let t = quickui#core#input(prompt, '')
 		if t != ''
-			call quickui#core#win_execute(a:winid, a:cmd . t)
-			call quickui#core#win_execute(a:winid, 'nohl')
+			try
+				call quickui#core#win_execute(a:winid, a:cmd . t)
+			catch /^Vim\%((\a\+)\)\=:E486:/
+				call quickui#utils#errmsg('E486: Pattern not find: '. t)
+			endtry
+			silent! call quickui#core#win_execute(a:winid, 'nohl')
 			call setwinvar(a:winid, '__quickui_search_cmd', a:cmd)
 			call setwinvar(a:winid, '__quickui_search_key', t)
 		endif
@@ -475,7 +481,10 @@ function! quickui#utils#search_next(winid, cmd)
 		else
 			let cmd = (prev_cmd == '/')? '?' : '/'
 		endif
-		noautocmd call quickui#core#win_execute(a:winid, cmd . prev_key)
+		try
+			noautocmd call quickui#core#win_execute(a:winid, cmd . prev_key)
+		catch /^Vim\%((\a\+)\)\=:E486:/
+		endtry
 		noautocmd call quickui#core#win_execute(a:winid, 'nohl')
 	endif
 endfunc

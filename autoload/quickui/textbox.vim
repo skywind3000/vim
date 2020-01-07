@@ -158,6 +158,12 @@ function! quickui#textbox#filter(winid, key)
 				return 1
 			endif
 		endif
+	elseif a:key == ':' || a:key == '/' || a:key == '?'
+		call quickui#utils#search_or_jump(a:winid, a:key)
+		call popup_hide(a:winid)
+		call popup_show(a:winid)
+		redraw
+		return 1
 	elseif has_key(keymap, a:key)
 		let key = keymap[a:key]
 		if key == "ENTER" || key == "ESC"
