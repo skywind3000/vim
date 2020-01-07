@@ -405,7 +405,9 @@ function! quickui#listbox#inputlist(textlist, opts)
 			endif
 		elseif has_key(hwnd.keymap, ch)
 			let key = hwnd.keymap[ch]
-			if key == 'NEXT' || key == 'PREV'
+			if key == 'ESC'
+				break
+			elseif key == 'NEXT' || key == 'PREV'
 				call quickui#utils#search_next(winid, key)
 				call popup_hide(winid)
 				call popup_show(winid)
@@ -545,6 +547,8 @@ function! s:nvim_create_listbox(textlist, opts)
 					endif
 				endif
 			endif
+		elseif ch == ':' || ch == '/' || ch == '?'
+			call quickui#utils#search_or_jump(winid, ch)
 		elseif has_key(hwnd.hotkey, ch)
 			let retval = hwnd.hotkey[ch]
 			break
@@ -556,6 +560,8 @@ function! s:nvim_create_listbox(textlist, opts)
 				break
 			elseif key == "ESC"
 				break
+			elseif key == 'NEXT' || key == 'PREV'
+				call quickui#utils#search_next(winid, key)
 			else
 				let cmd = 'quickui#listbox#cursor_movement("' . key . '")'
 				noautocmd call quickui#core#win_execute(winid, 'call ' . cmd)
