@@ -448,7 +448,7 @@ endfunc
 function! quickui#utils#search_or_jump(winid, cmd)
 	if a:cmd == '/' || a:cmd == '?'
 		let prompt = (a:cmd == '/')? '/' : '?'
-		let prompt = (a:cmd == '/')? '(search): ' : '(search backwards): '
+		" let prompt = (a:cmd == '/')? '(search): ' : '(search backwards): '
 		let t = quickui#core#input(prompt, '')
 		if t != '' && t != "\<c-c>"
 			try
@@ -461,7 +461,9 @@ function! quickui#utils#search_or_jump(winid, cmd)
 			call setwinvar(a:winid, '__quickui_search_key', t)
 		endif
 	elseif a:cmd == ':'
-		let t = quickui#core#input(':', '')
+		let prompt = ':'
+		" let prompt = '(goto): '
+		let t = quickui#core#input(prompt, '')
 		if t != ''
 			call quickui#core#win_execute(a:winid, ':' . t)	
 		endif
