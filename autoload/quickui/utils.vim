@@ -452,7 +452,7 @@ function! quickui#utils#search_or_jump(winid, cmd)
 		let t = quickui#core#input(prompt, '')
 		if t != '' && t != "\<c-c>"
 			try
-				call quickui#core#win_execute(a:winid, a:cmd . t)
+				silent call quickui#core#win_execute(a:winid, a:cmd . t)
 			catch /^Vim\%((\a\+)\)\=:E486:/
 				call quickui#utils#errmsg('E486: Pattern not find: '. t)
 			endtry
@@ -482,7 +482,7 @@ function! quickui#utils#search_next(winid, cmd)
 			let cmd = (prev_cmd == '/')? '?' : '/'
 		endif
 		try
-			noautocmd call quickui#core#win_execute(a:winid, cmd . prev_key)
+			silent call quickui#core#win_execute(a:winid, cmd . prev_key)
 		catch /^Vim\%((\a\+)\)\=:E486:/
 		endtry
 		noautocmd call quickui#core#win_execute(a:winid, 'nohl')
