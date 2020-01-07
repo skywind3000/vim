@@ -29,13 +29,21 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" get default width
+"----------------------------------------------------------------------
+function! s:get_tools_width()
+	let width = get(g:, 'quickui_tools_width', 70)
+endfunc
+
+
+"----------------------------------------------------------------------
 " locals
 "----------------------------------------------------------------------
 let s:keymaps = '123456789abcdefimnopqrstuvwxyz'
 
 
 "----------------------------------------------------------------------
-" 
+" switch buffer callback
 "----------------------------------------------------------------------
 function! quickui#tools#buffer_switch(bid)
 	let code = g:quickui#listbox#current.tag
@@ -95,6 +103,7 @@ function! quickui#tools#list_buffer(switch)
 	let opts.keymap["\<c-]>"] = 'TAG:2'
 	let opts.keymap["\<c-t>"] = 'TAG:3'
 	let opts.keymap["\<c-g>"] = 'TAG:4'
+	let opts.w = quickui#utils#tools_width()
 	" let opts.syntax = 'cpp'
 	let maxheight = (&lines) * 60 / 100
 	if len(content) > maxheight
@@ -115,7 +124,7 @@ endfunc
 " list function
 "----------------------------------------------------------------------
 function! quickui#tools#list_function()
-	let ctags = get(g:, 'quickui_ctags_exe', 'ctags2')
+	let ctags = get(g:, 'quickui_ctags_exe', 'ctags')
 	if !executable(ctags)
 		let msg = 'Not find ctags, add to $PATH or specify in '
 		call quickui#utils#errmsg(msg . 'g:quickui_ctags_exe')
@@ -140,9 +149,7 @@ function! quickui#tools#list_function()
 		let index += 1
 		let text = '' . item.mode . '' . "   \t" . item.text
 		let text = text . '  [:' . item.line . ']'
-		let text = strcharpart(text, 0, maxsize)
-		let size = strdisplaywidth(text)
-		let maxwidth = (maxwidth > size)? maxwidth : size
+		let text = substitute(text, '&', '&&', 'g')
 		let content += [[text, ':' . item.line]]
 	endfor
 	let opts = {'title': 'Function List', 'close':'button'}
@@ -155,6 +162,8 @@ function! quickui#tools#list_function()
 	if opts.w < maxsize
 		let opts.w = (opts.w < 60)? 60 : opts.w
 	endif
+	let opts.w = quickui#utils#tools_width()
+	" let content += ["1\t".repeat('0', 100)]
 	call quickui#listbox#open(content, opts)
 	return 0
 endfunc
@@ -201,7 +210,12 @@ function! quickui#tools#display_messages()
 	redir END
 	let x = substitute(x, '[\n\r]\+\%$', '', 'g')
 	let content = filter(split(x, "\n"), 'v:key != ""')
+	if len(content) == 0
+		call quickui#utils#errmsg('Empty messages')
+		return -1
+	endif
 	let opts = {"close":"button", "title":"Vim Messages"}
+	let opts.w = quickui#utils#tools_width()
 	call quickui#textbox#open(content, opts)
 endfunc
 
