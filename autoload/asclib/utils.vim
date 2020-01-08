@@ -27,7 +27,7 @@ endfunc
 "----------------------------------------------------------------------
 function! asclib#utils#terminal(mode, cmd, wait, ...) abort
 	let home = asclib#setting#script_home()
-	let script = asclib#path_join(home, '../../lib/terminal.py')
+	let script = asclib#path#join(home, '../../lib/terminal.py')
 	let script = fnamemodify(script, ':p')
 	let cmd = ''
 	if a:mode != ''
@@ -85,7 +85,7 @@ endfunc
 "----------------------------------------------------------------------
 function! asclib#utils#shell_invoke(mode, cmd, ...)
 	let home = asclib#setting#script_home()
-	let script = asclib#path_join(home, '../../lib/shell.py')
+	let script = asclib#path#join(home, '../../lib/shell.py')
 	let script = fnamemodify(script, ':p')
 	let cmdline = 'python ' . shellescape(script) . ' ' . a:cmd
 	for i in range(a:0)
@@ -118,7 +118,7 @@ function! s:list_script()
 	let path = get(g:, 'vimmake_path', expand('~/.vim/script'))
 	let names = []
 	if s:windows
-		for name in split(glob(vimmake#path_join(path, '*.cmd')), '\n')
+		for name in split(glob(asclib#path#join(path, '*.cmd')), '\n')
 			let item = {}
 			let item.name = fnamemodify(name, ':t')
 			let item.path = name
@@ -128,7 +128,7 @@ function! s:list_script()
 			endif
 			let names += [item]
 		endfor
-		for name in split(glob(vimmake#path_join(path, '*.bat')), '\n')
+		for name in split(glob(asclib#path#join(path, '*.bat')), '\n')
 			let item = {}
 			let item.name = fnamemodify(name, ':t')
 			let item.path = name
@@ -136,7 +136,7 @@ function! s:list_script()
 			let names += [item]
 		endfor
 	else
-		for name in split(glob(vimmake#path_join(path, '*.sh')), '\n')
+		for name in split(glob(asclib#path#join(path, '*.sh')), '\n')
 			let item = {}
 			let item.name = fnamemodify(name, ':t')
 			let item.path = name
@@ -145,7 +145,7 @@ function! s:list_script()
 		endfor
 	endif
 
-	for name in split(glob(vimmake#path_join(path, '*.py')), '\n')
+	for name in split(glob(asclib#path#join(path, '*.py')), '\n')
 		let item = {}
 		let item.name = fnamemodify(name, ':t')
 		let item.path = name
@@ -153,7 +153,7 @@ function! s:list_script()
 		let names += [item]
 	endfor
 
-	for name in split(glob(vimmake#path_join(path, '*.rb')), '\n')
+	for name in split(glob(asclib#path#join(path, '*.rb')), '\n')
 		let item = {}
 		let item.name = fnamemodify(name, ':t')
 		let item.path = name
@@ -161,7 +161,7 @@ function! s:list_script()
 		let names += [item]
 	endfor
 
-	for name in split(glob(vimmake#path_join(path, '*.pl')), '\n')
+	for name in split(glob(asclib#path#join(path, '*.pl')), '\n')
 		let item = {}
 		let item.name = fnamemodify(name, ':t')
 		let item.path = name

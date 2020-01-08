@@ -32,13 +32,13 @@ endfunc
 " returns none(0), svn(1), git(2)
 "----------------------------------------------------------------------
 function! svnhelp#svn_or_git(target)
-	let root = vimmake#get_root(a:target, ['.svn', '.git'])
+	let root = asyncrun#get_root(a:target, ['.svn', '.git'])
 	if root == ''
 		return 0
 	endif
-	if isdirectory(vimmake#path_join(root, '.svn'))
+	if isdirectory(asclib#path#join(root, '.svn'))
 		return 1
-	elseif isdirectory(vimmake#path_join(root, '.git'))
+	elseif isdirectory(asclib#path#join(root, '.git'))
 		return 2
 	endif
 	return 0
@@ -162,9 +162,9 @@ function! svnhelp#svn_log(filename)
 		call svnhelp#errmsg('not a svn/git repository')
 		return
 	elseif mode == 1
-		exec 'VimMake! -raw svn log '.name
+		exec 'AsyncRun! -raw svn log '.name
 	else
-		exec 'VimMake! -raw -cwd='.home.' git log '.name
+		exec 'AsyncRun! -raw -cwd='.home.' git log '.name
 	endif
 endfunc
 
@@ -177,9 +177,9 @@ function! svnhelp#svn_add(filename)
 		call svnhelp#errmsg('not a svn/git repository')
 		return
 	elseif mode == 1
-		exec 'VimMake! -raw svn add '.name
+		exec 'AsyncRun! -raw svn add '.name
 	else
-		exec 'VimMake! -raw -cwd='.home.' git add '.name
+		exec 'AsyncRun! -raw -cwd='.home.' git add '.name
 	endif
 endfunc
 
@@ -282,7 +282,7 @@ endfunc
 function! svnhelp#tinfo() abort
 	let info = {}
 	let info.mode = 0
-	let root = vimmake#get_root('%', ['.svn', '.git'])
+	let root = asyncrun#get_root('%', ['.svn', '.git'])
 	let info.root = root
 	let info.filename = expand('%:t')
 	let info.filedir = expand('%:p:h')
@@ -296,9 +296,9 @@ function! svnhelp#tinfo() abort
 	let info.filerel = expand('%')
 	exec cd . savecwd
 	let info.filerel = substitute(info.filerel, '\\', '/', 'g')
-	if isdirectory(vimmake#path_join(root, '.svn'))
+	if isdirectory(asclib#path#join(root, '.svn'))
 		let info.mode = 1
-	elseif isdirectory(vimmake#path_join(root, '.git'))
+	elseif isdirectory(asclib#path#join(root, '.git'))
 		let info.mode = 2
 	else
 		return info
