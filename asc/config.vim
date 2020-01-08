@@ -306,8 +306,11 @@ endfunc
 
 
 call Terminal_SwitchTab()
-call Terminal_MetaMode(0)
-call Terminal_FnInit(1)
+
+if get(g:, 'asc_skip_meta_fn_setup', 0) == 0
+	call Terminal_MetaMode(0)
+	call Terminal_FnInit(1)
+endif
 
 
 
