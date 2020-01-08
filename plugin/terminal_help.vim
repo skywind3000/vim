@@ -7,6 +7,13 @@
 "
 "======================================================================
 
+"----------------------------------------------------------------------
+" check compatible
+"----------------------------------------------------------------------
+if has('patch-8.1.0') == 0 && has('nvim') == 0
+	finish
+endif
+
 
 "----------------------------------------------------------------------
 " Initialize
@@ -85,7 +92,7 @@ function! TerminalOpen()
 		silent execute cd . ' '. fnameescape(workdir)
 		if has('nvim') == 0
 			let cmd = pos . ' term ' . (close? '++close' : '++noclose') 
-			exec cmd . ' ++rows=' . height . ' ' . shell
+			exec cmd . ' ++norestore ++rows=' . height . ' ' . shell
 		else
 			exec pos . ' ' . height . 'split'
 			exec 'term ' . shell
