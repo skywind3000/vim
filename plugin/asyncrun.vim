@@ -1046,6 +1046,19 @@ function! s:start_in_terminal(opts)
 			endif
 		endif
 	endfor
+	if pos == 'tab'
+		if has('nvim') == 0
+			let cmd = 'tab term ++noclose ++norestore'
+			if has('patch-8.1.2255') || v:version >= 802
+				exec cmd . ' ++shell ' . command
+			else
+				exec cmd . ' ' . command
+			endif
+		else
+			exec 'tabe term://'. fnameescape(&shell)
+		endif
+		return 0
+	endif
 	if avail < 0
 		if pos == 'top'
 			exec "leftabove " . rows . "split"	
@@ -1055,18 +1068,6 @@ function! s:start_in_terminal(opts)
 			exec "leftabove " . cols . "vs"
 		elseif pos == 'right'
 			exec "rightbelow " . cols . "vs"
-		elseif pos == 'tab'
-			if has('nvim') == 0
-				let cmd = 'tab term ++noclose ++norestore'
-				if has('patch-8.1.2255') || v:version >= 802
-					exec cmd . ' ++shell ' . command
-				else
-					exec cmd . ' ' . command
-				endif
-			else
-				exec 'tabe term://'. fnameescape(&shell)
-			endif
-			return 0
 		else
 			exec "rightbelow " . rows . "split"
 		endif
