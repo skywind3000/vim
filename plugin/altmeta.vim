@@ -1,11 +1,16 @@
 "======================================================================
 "
-" vimmeta.vim - enable alt key in terminal vim as the meta key
+" altmeta.vim - enable alt key in terminal vim as the meta key
 "
 " Created by skywind on 2020/01/08
 " Last Modified: 2020/01/08 21:16:47
 "
 "======================================================================
+
+" skip if this is set
+if get(g:, 'altmeta_skip_init', 0) != 0
+	finish
+endif
 
 " enable alt key in terminal vim
 if has('nvim') == 0 && has('gui_running') == 0
@@ -33,7 +38,7 @@ if has('nvim') == 0 && has('gui_running') == 0
 	endfor
 	function! s:key_escape(name, code)
 		exec "set ".a:name."=\e".a:code
-	endif
+	endfunc
 	call s:key_escape('<F1>', 'OP')
 	call s:key_escape('<F2>', 'OQ')
 	call s:key_escape('<F3>', 'OR')
