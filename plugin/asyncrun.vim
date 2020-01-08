@@ -70,6 +70,13 @@
 "     g:asyncrun_encs - shell program output encoding
 "     g:asyncrun_open - open quickfix window at given height
 "
+" Modes:
+"     -mode=async     - run in quickfix window (default)
+"     -mode=make      - run in makeprg
+"     -mode=bang      - run in !xxx
+"     -mode=system    - run in new system window (windows) or ! (others)
+"     -mode=terminal  - run in a reusable terminal window
+"
 " Variables:
 "     g:asyncrun_code - exit code
 "     g:asyncrun_status - 'running', 'success' or 'failure'
@@ -1090,7 +1097,7 @@ function! s:run(opts)
 
 	" mode alias
 	let l:modemap = {'async':0, 'make':1, 'bang':2, 'python':3, 'os':4,
-				\ 'hide':5, 'terminal': 6, 'execute':1, 'term':6}
+		\ 'hide':5, 'terminal': 6, 'execute':1, 'term':6, 'system':4}
 
 	let l:mode = get(l:modemap, l:mode, l:mode)
 
