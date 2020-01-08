@@ -59,7 +59,7 @@ function! TerminalOpen()
 			startinsert
 		endif
 		silent execute cd . ' '. fnameescape(savedir)
-		let t:__terminal_bid__ = bufnr()
+		let t:__terminal_bid__ = bufnr('')
 		setlocal bufhidden=hide
 	endif
 	let uid = win_getid()
