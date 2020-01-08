@@ -109,8 +109,14 @@ function! TerminalToggle()
 	endif
 endfunc
 
-function! Tapi_TerminalOpen(cmd, name)
-	exec a:cmd . ' ' . fnameescape(a:name)
+
+"----------------------------------------------------------------------
+" can be calling from internal terminal.
+"----------------------------------------------------------------------
+function! Tapi_TerminalOpen(name)
+	let cmd = get(g:, 'terminal_drop', 'drop')
+	silent exec cmd . ' ' . fnameescape(a:name)
+	return ''
 endfunc
 
 
