@@ -1058,7 +1058,11 @@ function! s:start_in_terminal(opts)
 		elseif pos == 'tab'
 			if has('nvim') == 0
 				let cmd = 'tab term ++noclose ++norestore'
-				exec cmd . ' ++shell ' . command
+				if has('patch-8.1.2255') || v:version >= 802
+					exec cmd . ' ++shell ' . command
+				else
+					exec cmd . ' ' . command
+				endif
 			else
 				exec 'tabe term://'. fnameescape(&shell)
 			endif
@@ -1071,8 +1075,12 @@ function! s:start_in_terminal(opts)
 		exec "normal! ". avail . "\<c-w>\<c-w>"
 	endif
 	if has('nvim') == 0
-		let cmd = 'term ++noclose ++norestore ++curwin ++shell '
-		exec cmd . '++kill=term ' . command
+		let cmd = 'term ++noclose ++norestore ++curwin '
+		if has('patch-8.2.2255') || v:version >= 802
+			exec cmd . ' ++shell ++kill=term ' . command
+		else
+			exec cmd . ' ++kill=term ' . command
+		endif
 	else
 		exec 'term '. command
 		setlocal nonumber signcolumn=no
