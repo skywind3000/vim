@@ -155,7 +155,7 @@ endfunc
 "----------------------------------------------------------------------
 " can be calling from internal terminal.
 "----------------------------------------------------------------------
-function! Tapi_TerminalOpen(name)
+function! Tapi_TerminalDrop(name)
 	let cmd = get(g:, 'terminal_drop', 'tab drop')
 	silent exec cmd . ' ' . fnameescape(a:name)
 	return ''
