@@ -12,12 +12,11 @@ if "%NVIM_LISTEN_ADDRESS%" == "" GOTO vim
 goto neovim
 
 :vim
-call "%VIM_EXE%" --servername "%VIM_SERVERNAME%" --remote-expr "Tapi_TerminalOpen('%NAME%')"
+call "%VIM_EXE%" --servername "%VIM_SERVERNAME%" --remote-expr "Tapi_TerminalEdit(0, '%NAME%')"
 goto end
 
 :neovim
-if "%VIM_NVR%" == "" GOTO nonvr
-call "%VIM_NVR%" --servername "%VIM_SERVERNAME%" --remote-expr "Tapi_TerminalOpen('%NAME%')"
+call "nvr" --servername "%VIM_SERVERNAME%" --remote-expr "Tapi_TerminalEdit(0, '%NAME%')"
 goto end
 
 :nonvr
@@ -25,7 +24,7 @@ echo missing nvr, you need install neovim-remote
 goto end
 
 :help
-echo Usage: drop {filename}
+echo usage: drop {filename}
 goto end
 
 :missing
