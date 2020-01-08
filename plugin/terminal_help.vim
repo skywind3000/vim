@@ -7,6 +7,39 @@
 "
 "======================================================================
 
+
+"----------------------------------------------------------------------
+" Initialize
+"----------------------------------------------------------------------
+let $VIM_SERVERNAME = v:servername
+let $VIM_EXE = v:progpath
+
+let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+let s:script = fnamemodify(s:home . '/../tools/utils', ':p')
+let s:windows = has('win32') || has('win64') || has('win95') || has('win16')
+
+" setup PATH for utils
+if stridx($PATH, s:script) < 0
+	if s:windows == 0
+		let $PATH .= ':' . s:script
+	else
+		let $PATH .= ';' . s:script
+	endif
+endif
+
+" search for neovim-remote for nvim
+let $VIM_NVR = ''
+if has('nvim')
+	let name = get(g:, 'terminal_nvr', 'nvr')
+	if executable(name)
+		let $VIM_NVR=name
+	endif
+endif
+
+
+"----------------------------------------------------------------------
+" open a new/previous terminal
+"----------------------------------------------------------------------
 function! TerminalOpen()
 	let bid = get(t:, '__terminal_bid__', -1)
 	let pos = get(g:, 'terminal_pos', 'rightbelow')
@@ -48,13 +81,14 @@ function! TerminalOpen()
 		let shell = get(g:, 'terminal_shell', '')
 		let close = get(g:, 'terminal_close', 0)
 		let savedir = getcwd()
-		silent execute cd . ' '. fnameescape(expand('%:p:h'))
+		let workdir = (expand('%') == '')? expand('~') : expand('%:p:h')
+		silent execute cd . ' '. fnameescape(workdir)
 		if has('nvim') == 0
 			let cmd = pos . ' term ' . (close? '++close' : '++noclose') 
 			exec cmd . ' ++rows=' . height . ' ' . shell
 		else
 			exec pos . ' ' . height . 'split'
-			exec 'term'
+			exec 'term ' . shell
 			setlocal nonumber signcolumn=no
 			startinsert
 		endif
@@ -67,6 +101,10 @@ function! TerminalOpen()
 	call win_gotoid(uid)
 endfunc
 
+
+"----------------------------------------------------------------------
+" hide terminal
+"----------------------------------------------------------------------
 function! TerminalClose()
 	let bid = get(t:, '__terminal_bid__', -1)
 	if bid < 0
@@ -96,6 +134,10 @@ function! TerminalClose()
 	call win_gotoid(sid)
 endfunc
 
+
+"----------------------------------------------------------------------
+" toggle open/close
+"----------------------------------------------------------------------
 function! TerminalToggle()
 	let bid = get(t:, '__terminal_bid__', -1)
 	let alive = 0
@@ -114,7 +156,7 @@ endfunc
 " can be calling from internal terminal.
 "----------------------------------------------------------------------
 function! Tapi_TerminalOpen(name)
-	let cmd = get(g:, 'terminal_drop', 'drop')
+	let cmd = get(g:, 'terminal_drop', 'tab drop')
 	silent exec cmd . ' ' . fnameescape(a:name)
 	return ''
 endfunc
