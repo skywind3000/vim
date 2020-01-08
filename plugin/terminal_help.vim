@@ -157,7 +157,7 @@ endfunc
 "----------------------------------------------------------------------
 function! Tapi_TerminalEdit(bid, arglist)
 	let name = (type(a:arglist) == v:t_string)? a:arglist : a:arglist[0]
-	let cmd = get(g:, 'terminal_drop', 'tab drop')
+	let cmd = get(g:, 'terminal_edit', 'tab drop')
 	silent exec cmd . ' ' . fnameescape(name)
 	return ''
 endfunc
