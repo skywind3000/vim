@@ -204,36 +204,38 @@ endif
 "----------------------------------------------------------------------
 " fast window switching: ALT+SHIFT+HJKL
 "----------------------------------------------------------------------
-noremap <m-H> <c-w>h
-noremap <m-L> <c-w>l
-noremap <m-J> <c-w>j
-noremap <m-K> <c-w>k
-inoremap <m-H> <esc><c-w>h
-inoremap <m-L> <esc><c-w>l
-inoremap <m-J> <esc><c-w>j
-inoremap <m-K> <esc><c-w>k
+if get(g:, 'terminal_default_mapping', 1)
+	noremap <m-H> <c-w>h
+	noremap <m-L> <c-w>l
+	noremap <m-J> <c-w>j
+	noremap <m-K> <c-w>k
+	inoremap <m-H> <esc><c-w>h
+	inoremap <m-L> <esc><c-w>l
+	inoremap <m-J> <esc><c-w>j
+	inoremap <m-K> <esc><c-w>k
 
-if has('terminal') && exists(':terminal') == 2 && has('patch-8.1.1')
-	set termwinkey=<c-_>
-	tnoremap <m-H> <c-_>h
-	tnoremap <m-L> <c-_>l
-	tnoremap <m-J> <c-_>j
-	tnoremap <m-K> <c-_>k
-	tnoremap <m-q> <c-\><c-n>
-elseif has('nvim')
-	tnoremap <m-H> <c-\><c-n><c-w>h
-	tnoremap <m-L> <c-\><c-n><c-w>l
-	tnoremap <m-J> <c-\><c-n><c-w>j
-	tnoremap <m-K> <c-\><c-n><c-w>k
-	tnoremap <m-q> <c-\><c-n>
-endif
+	if has('terminal') && exists(':terminal') == 2 && has('patch-8.1.1')
+		set termwinkey=<c-_>
+		tnoremap <m-H> <c-_>h
+		tnoremap <m-L> <c-_>l
+		tnoremap <m-J> <c-_>j
+		tnoremap <m-K> <c-_>k
+		tnoremap <m-q> <c-\><c-n>
+	elseif has('nvim')
+		tnoremap <m-H> <c-\><c-n><c-w>h
+		tnoremap <m-L> <c-\><c-n><c-w>l
+		tnoremap <m-J> <c-\><c-n><c-w>j
+		tnoremap <m-K> <c-\><c-n><c-w>k
+		tnoremap <m-q> <c-\><c-n>
+	endif
 
-nnoremap <silent><m-=> :call TerminalToggle()<cr>
+	nnoremap <silent><m-=> :call TerminalToggle()<cr>
 
-if has('nvim') == 0
-	tnoremap <silent><m-=> <c-_>p:call TerminalToggle()<cr>
-else
-	tnoremap <silent><m-=> <c-\><c-n>:call TerminalToggle()<cr>
+	if has('nvim') == 0
+		tnoremap <silent><m-=> <c-_>p:call TerminalToggle()<cr>
+	else
+		tnoremap <silent><m-=> <c-\><c-n>:call TerminalToggle()<cr>
+	endif
 endif
 
 
