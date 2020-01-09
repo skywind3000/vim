@@ -267,10 +267,21 @@ elseif has('nvim')
 	let g:asyncrun_support = 1
 endif
 
-" check gvim
-if has('nvim') && exists("+termguicolors") && (&termguicolors) != 0
-	let s:asyncrun_gui = 1
-	let g:asyncrun_gui = 1
+" check is gui loaded in neovim
+if has('nvim')
+	if exists('g:GuiLoaded')
+		if g:GuiLoaded != 0
+			let s:asyncrun_gui = 1
+			let g:asyncrun_gui = 1
+		endif
+	elseif exists('*nvim_list_uis') && len(nvim_list_uis()) > 0
+		let uis = nvim_list_uis()[0]
+		let s:asyncrun_gui = get(uis, 'ext_termcolors', 0)? 0 : 1
+		let g:asyncrun_gui = s:asyncrun_gui
+	elseif exists("+termguicolors") && (&termguicolors) != 0
+		let s:asyncrun_gui = 1
+		let g:asyncrun_gui = 1
+	endif
 endif
 
 
@@ -1465,7 +1476,7 @@ endfunc
 " asyncrun -version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.1.2'
+	return '2.1.3'
 endfunc
 
 
