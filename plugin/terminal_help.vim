@@ -170,6 +170,36 @@ function! Tapi_TerminalEdit(bid, arglist)
 endfunc
 
 
+"----------------------------------------------------------------------
+" enable alt key in terminal vim
+"----------------------------------------------------------------------
+if has('nvim') == 0 && has('gui_running') == 0
+	set ttimeout
+	if $TMUX != ''
+		set ttimeoutlen=35
+	elseif &ttimeoutlen > 80 || &ttimeoutlen <= 0
+		set ttimeoutlen=85
+	endif
+	function! s:meta_code(key)
+		if get(g:, 'terminal_skip_key_init', 0) == 0
+			exec "set <M-".a:key.">=\e".a:key
+		endif
+	endfunc
+	for i in range(10)
+		call s:meta_code(nr2char(char2nr('0') + i))
+	endfor
+	for i in range(26)
+		call s:meta_code(nr2char(char2nr('a') + i))
+		call s:meta_code(nr2char(char2nr('A') + i))
+	endfor
+	for c in [',', '.', '/', ';', '{', '}']
+		call s:meta_code(c)
+	endfor
+	for c in ['?', ':', '-', '_', '+', '=', "'"]
+		call s:meta_code(c)
+	endfor
+endif
+
 
 "----------------------------------------------------------------------
 " fast window switching: ALT+SHIFT+HJKL
