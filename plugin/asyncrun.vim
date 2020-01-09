@@ -233,6 +233,15 @@ function! s:chdir(path)
 	silent execute cmd . ' '. fnameescape(a:path)
 endfunc
 
+" save/restore view
+function! s:save_restore_view(mode)
+	if a:mode == 0
+		let w:__asyncrun_view__ = winsaveview()
+	elseif exists('w:__asyncrun_view__')
+		call winrestview(w:__asyncrun_view__)
+		unlet w:__asyncrun_view__
+	endif
+endfunc
 
 let s:asyncrun_windows = 0
 let g:asyncrun_windows = 0
@@ -1054,6 +1063,9 @@ function! s:start_in_terminal(opts)
 		endif
 		return 0
 	endif
+	let uid = win_getid()
+	noautocmd windo call s:save_restore_view(0)
+	noautocmd call win_gotoid(uid)
 	if avail < 0
 		let rows = get(a:opts, 'rows', '')
 		let cols = get(a:opts, 'cols', '')
@@ -1072,6 +1084,9 @@ function! s:start_in_terminal(opts)
 	if avail > 0 
 		exec "normal! ". avail . "\<c-w>\<c-w>"
 	endif
+	let uid = win_getid()
+	noautocmd windo call s:save_restore_view(1)
+	noautocmd call win_gotoid(uid)
 	if has('nvim') == 0
 		let cmd = 'term ++noclose ++norestore ++curwin '
 		if has('patch-8.2.2255') || v:version >= 802
