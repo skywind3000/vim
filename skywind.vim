@@ -105,16 +105,16 @@ endif
 "- Vimmake
 "----------------------------------------------------------------------
 let g:vimmake_run_guess = ['go']
-let g:vimmake_ftrun = {}
-let g:vimmake_ftrun['make'] = 'make -f'
-let g:vimmake_ftrun['zsh'] = 'zsh'
-let g:vimmake_ftrun['erlang'] = 'escript'
-let g:vimmake_ftrun['csh'] = 'csh'
-let g:vimmake_ftrun['tcsh'] = 'tcsh'
-let g:vimmake_ftrun['fish'] = 'fish'
-let g:vimmake_ftrun['bash'] = 'bash'
-let g:vimmake_ftrun['ksh'] = 'ksh'
-let g:vimmake_ftrun['markdown'] = 'markpress -u'
+let g:asyncrun_ftrun = {}
+let g:asyncrun_ftrun['make'] = 'make -f'
+let g:asyncrun_ftrun['zsh'] = 'zsh'
+let g:asyncrun_ftrun['erlang'] = 'escript'
+let g:asyncrun_ftrun['csh'] = 'csh'
+let g:asyncrun_ftrun['tcsh'] = 'tcsh'
+let g:asyncrun_ftrun['fish'] = 'fish'
+let g:asyncrun_ftrun['bash'] = 'bash'
+let g:asyncrun_ftrun['ksh'] = 'ksh'
+let g:asyncrun_ftrun['markdown'] = 'markpress -u'
 let g:vimmake_ftmake = {}
 
 if has('win32') || has('win16') || has('win64') || has('win95')
