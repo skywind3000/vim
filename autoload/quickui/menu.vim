@@ -139,8 +139,10 @@ function! quickui#menu#install(section, content, ...)
 		endfor
 	endif
 	if a:0 > 0 && has_key(current, a:section)
-		if a:1 >= 0
-			let current[a:section].weight = a:1
+		if type(a:1) == v:t_number
+			if a:1 >= 0
+				let current[a:section].weight = a:1
+			endif
 		endif
 	endif
 	if a:0 > 1 && has_key(current, a:section)
