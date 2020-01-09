@@ -63,19 +63,9 @@ if !exists('g:vimmake_text')
 	let g:vimmake_text = ''
 endif
 
-" whether to change directory
-if !exists('g:vimmake_cwd')
-	let g:vimmake_cwd = 0
-endif
-
 " main run
 if !exists('g:vimmake_run_guess')
 	let g:vimmake_run_guess = []
-endif
-
-" filetype -> command
-if !exists('g:vimmake_ftrun')
-	let g:vimmake_ftrun = {}
 endif
 
 " filetype -> VimMake sub command
@@ -244,7 +234,7 @@ command! -bang -nargs=+ VimTool call s:Cmd_VimTool('<bang>', <f-args>)
 "----------------------------------------------------------------------
 function! s:Cmd_VimExecute(bang, ...)
 	let mode = (a:0 >= 1)? a:1 : ''
-	let cwd = (a:0 >= 2)? a:2 : g:vimmake_cwd
+	let cwd = (a:0 >= 2)? a:2 : get(g:, 'vimmake_cwd', 0)
 	if a:bang != '!' | silent! wall | endif
 	call asyncrun#execute(mode, cwd, 0)
 endfunc
