@@ -249,7 +249,7 @@ function! s:ExecuteMe(mode)
 			if !has('nvim')
 				silent exec '!start cmd /C '. l:fname .' & pause'
 			else
-				call vimmake#run('', {'mode':4}, l:fname)
+				call asyncrun#run('', {'mode':4}, l:fname)
 			endif
 		else
 			exec '!' . l:fname
@@ -260,7 +260,7 @@ function! s:ExecuteMe(mode)
 			if !has('nvim')
 				silent exec '!start cmd /C '. l:fname .' & pause'
 			else
-				call vimmake#run('', {'mode':4}, l:fname)
+				call asyncrun#run('', {'mode':4}, l:fname)
 			endif
 		else
 			exec '!' . l:fname
@@ -271,7 +271,7 @@ function! s:ExecuteMe(mode)
 			if !has('nvim')
 				silent exec '!start cmd /C emake -e '. l:fname .' & pause'
 			else
-				call vimmake#run('', {'mode':4}, "emake -e ". l:fname)
+				call asyncrun#run('', {'mode':4}, "emake -e ". l:fname)
 			endif
 		else
 			exec '!emake -e ' . l:fname
@@ -297,7 +297,7 @@ function! s:ExecuteMe(mode)
 			if !has('nvim')
 				silent exec '!start cmd /C '.l:cmdline . ' & pause'
 			else
-				call vimmake#run('', {'mode':4}, l:cmdline)
+				call asyncrun#run('', {'mode':4}, l:cmdline)
 			endif
 		else
 			exec '!'.l:makeprg.' '.l:fname
@@ -864,7 +864,7 @@ function! vimmake#update_tags(cwd, mode, outname)
         let l:command = 'ctags -R -f '. shellescape(l:ctags)
 		let l:parameters = ' '. g:vimmake_ctags_flags. ' '
 		let l:parameters .= '--sort=yes '
-        call vimmake#run('', l:options, l:command . l:parameters . ' .')
+        call asyncrun#run('', l:options, l:command . l:parameters . ' .')
 	endif
 	if index(['cscope', 'cs', 'pycscope', 'py'], a:mode) >= 0
 		let l:fullname = s:PathJoin(l:cwd, a:outname)
@@ -881,10 +881,10 @@ function! vimmake#update_tags(cwd, mode, outname)
 		endif
 		if a:mode == 'cscope' || a:mode == 'cs'
 			let l:fullname = shellescape(l:fullname)
-			call vimmake#run('', l:options, 'cscope -b -R -f '.l:fullname)
+			call asyncrun#run('', l:options, 'cscope -b -R -f '.l:fullname)
 		elseif a:mode == 'pycscope' || a:mode == 'py'
 			let l:fullname = shellescape(l:fullname)
-			call vimmake#run('', l:options, 'pycscope -R -f '.l:fullname)
+			call asyncrun#run('', l:options, 'pycscope -R -f '.l:fullname)
 		endif
 	endif
 endfunc
