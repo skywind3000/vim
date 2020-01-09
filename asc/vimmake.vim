@@ -397,7 +397,7 @@ function! s:Cmd_VimExecute(bang, ...)
 		elseif !has('nvim')
 			silent exec '!start cmd /C '. l:cmd . ' ' . l:fname . ' & pause'
 		else
-			call vimmake#run('', {'mode':4}, l:cmd . ' ' . l:fname)
+			call asyncrun#run('', {'mode':4}, l:cmd . ' ' . l:fname)
 		endif
 	else
 		let l:cmd = get(g:vimmake_ftrun, &ft, '')
