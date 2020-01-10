@@ -105,6 +105,7 @@ endif
 "- Vimmake
 "----------------------------------------------------------------------
 let g:vimmake_run_guess = ['go']
+let g:asyncrun_encs = (g:asc_uname == 'windows')? 'gbk' : ''
 let g:asyncrun_ftrun = {}
 let g:asyncrun_ftrun['make'] = 'make -f'
 let g:asyncrun_ftrun['zsh'] = 'zsh'
