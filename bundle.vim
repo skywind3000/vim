@@ -393,6 +393,10 @@ if index(g:bundle_group, 'neomake') >= 0
 	Plug 'neomake/neomake'
 endif
 
+if index(g:bundle_group, 'vista') >= 0
+	Plug 'liuchengxu/vista.vim'
+endif
+
 
 if index(g:bundle_group, 'neocomplete') >= 0
 	Plug 'Shougo/neocomplete.vim'
