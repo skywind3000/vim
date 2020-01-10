@@ -111,6 +111,37 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" full file name
+"----------------------------------------------------------------------
+function! asclib#path#fullname(f)
+	let f = a:f
+	if f =~ "'."
+		try
+			redir => m
+			silent exe ':marks' f[1]
+			redir END
+			let f = split(split(m, '\n')[-1])[-1]
+			let f = filereadable(f)? f : ''
+		catch
+			let f = '%'
+		endtry
+	endif
+	let f = (f != '%')? f : expand('%')
+	let f = fnamemodify(f, ':p')
+	if has('win32') || has('win64') || has('win16') || has('win95')
+		let f = substitute(f, "\\", '/', 'g')
+	endif
+	if len(f) > 1
+		let size = len(f)
+		if f[size - 1] == '/'
+			let f = strpart(f, 0, size - 1)
+		endif
+	endif
+	return f
+endfunc
+
+
+"----------------------------------------------------------------------
 " dirname
 "----------------------------------------------------------------------
 function! asclib#path#dirname(path)
@@ -212,9 +243,9 @@ endfunc
 "----------------------------------------------------------------------
 " find project root
 "----------------------------------------------------------------------
-function! s:find_root(path, markers)
+function! s:find_root(path, markers, strict)
     function! s:guess_root(filename, markers)
-        let fullname = vimmake#fullname(a:filename)
+        let fullname = asclib#path#fullname(a:filename)
         if exists('b:asclib_path_root')
             return b:asclib_path_root
         endif
@@ -246,8 +277,10 @@ function! s:find_root(path, markers)
         return ''
     endfunc
 	let root = s:guess_root(a:path, a:markers)
-	if len(root)
+	if root != ''
 		return asclib#path#abspath(root)
+	elseif a:strict != 0
+		return ''
 	endif
 	" Not found: return parent directory of current file / file itself.
 	let fullname = asclib#path#abspath(a:path)
@@ -267,9 +300,12 @@ function! asclib#path#get_root(path, ...)
 		let markers = g:asclib_path_rootmarks
 	endif
 	if a:0 > 0
-		let markers = a:1
+		if type(a:1) == type([])
+			let markers = a:1
+		endif
 	endif
-	let l:hr = s:find_root(a:path, markers)
+	let strict = (a:0 >= 2)? (a:2) : 0
+	let l:hr = s:find_root(a:path, markers, strict)
 	if s:windows != 0
 		let l:hr = join(split(l:hr, '/', 1), "\\")
 	endif
