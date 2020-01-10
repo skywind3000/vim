@@ -70,8 +70,12 @@ function! TerminalOpen()
 			if wid < 0
 				exec pos . ' ' . height . 'split'
 				exec 'b '. bid
-				if has('nvim')
-					startinsert
+				if mode() != 't'
+					if has('nvim')
+						startinsert
+					else
+						exec "normal i"
+					endif
 				endif
 			else
 				exec "normal ". wid . "\<c-w>w"
@@ -238,7 +242,7 @@ if get(g:, 'terminal_default_mapping', 1)
 	nnoremap <silent><m-=> :call TerminalToggle()<cr>
 
 	if has('nvim') == 0
-		tnoremap <silent><m-=> <c-_>p:call TerminalToggle()<cr>
+		tnoremap <silent><m-=> <c-_>:call TerminalToggle()<cr>
 	else
 		tnoremap <silent><m-=> <c-\><c-n>:call TerminalToggle()<cr>
 	endif
