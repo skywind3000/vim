@@ -91,7 +91,7 @@ function! TerminalOpen()
 		let workdir = (expand('%') == '')? expand('~') : expand('%:p:h')
 		silent execute cd . ' '. fnameescape(workdir)
 		if has('nvim') == 0
-			let kill = get(g:, 'terminal_kill', 'term')
+			let kill = get(g:, 'terminal_kill', '')
 			let cmd = pos . ' term ' . (close? '++close' : '++noclose') 
 			let cmd = cmd . ((kill != '')? (' ++kill=' . kill) : '')
 			exec cmd . ' ++norestore ++rows=' . height . ' ' . shell
@@ -104,6 +104,9 @@ function! TerminalOpen()
 		silent execute cd . ' '. fnameescape(savedir)
 		let t:__terminal_bid__ = bufnr('')
 		setlocal bufhidden=hide
+		if get(g:, 'terminal_list', 1) == 0
+			setlocal nobuflisted
+		endif
 	endif
 	let x = win_getid()
 	noautocmd windo call s:terminal_view(1)
