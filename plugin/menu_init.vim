@@ -155,3 +155,4 @@ let g:quickui_show_tip = 1
 nnoremap <silent><space><space> :call quickui#menu#open()<cr>
 
 
+
