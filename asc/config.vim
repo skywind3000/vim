@@ -55,9 +55,12 @@ endfunc
 " get a single tab name 
 function! Vim_NeatBuffer(bufnr, fullname)
 	let l:name = bufname(a:bufnr)
+	let bt = getbufvar(a:bufnr, '&buftype')
 	if getbufvar(a:bufnr, '&modifiable')
 		if l:name == ''
 			return '[No Name]'
+		elseif bt == 'terminal'
+			return '[Terminal]'
 		else
 			if a:fullname 
 				return fnamemodify(l:name, ':p')
@@ -74,9 +77,11 @@ function! Vim_NeatBuffer(bufnr, fullname)
 			endif
 		endif
 	else
-		let l:buftype = getbufvar(a:bufnr, '&buftype')
-		if l:buftype == 'quickfix'
+		let bt = getbufvar(a:bufnr, '&buftype')
+		if bt == 'quickfix'
 			return '[Quickfix]'
+		elseif bt == 'terminal'
+			return '[Terminal]'
 		elseif l:name != ''
 			if a:fullname 
 				return '-'.fnamemodify(l:name, ':p')
@@ -95,6 +100,7 @@ function! Vim_NeatTabLabel(n)
 	let l:winnr = tabpagewinnr(a:n)
 	let l:bufnr = l:buflist[l:winnr - 1]
 	let l:fname = Vim_NeatBuffer(l:bufnr, 0)
+	let l:buftype = getbufvar(l:bufnr, '&buftype')
 	let l:num = a:n
 	if g:config_vim_tab_style == 0
 		return l:fname
