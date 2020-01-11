@@ -231,12 +231,14 @@ if get(g:, 'terminal_default_mapping', 1)
 		tnoremap <m-J> <c-_>j
 		tnoremap <m-K> <c-_>k
 		tnoremap <m-q> <c-\><c-n>
+		tnoremap <m--> <c-_>"0
 	elseif has('nvim')
 		tnoremap <m-H> <c-\><c-n><c-w>h
 		tnoremap <m-L> <c-\><c-n><c-w>l
 		tnoremap <m-J> <c-\><c-n><c-w>j
 		tnoremap <m-K> <c-\><c-n><c-w>k
 		tnoremap <m-q> <c-\><c-n>
+		tnoremap <m--> <c-\><c-n>"0pa
 	endif
 
 	nnoremap <silent><m-=> :call TerminalToggle()<cr>
