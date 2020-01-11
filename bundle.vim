@@ -156,19 +156,12 @@ if index(g:bundle_group, 'inter') >= 0
 	Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
 	" Plug 'Yggdroot/indentLine'
 
-	if has('python') || has('python3')
+	if has('python3') || has('python')
 		" Plug 'SirVer/ultisnips'
 	endif
 
 	if !isdirectory(expand('~/.vim/notes'))
 		silent! call mkdir(expand('~/.vim/notes'), 'p')
-	endif
-
-	if 0
-		noremap <silent><tab>- :FufMruFile<cr>
-		noremap <silent><tab>= :FufFile<cr>
-		noremap <silent><tab>[ :FufBuffer<cr>
-		noremap <silent><tab>] :FufBufferTag<cr>
 	endif
 
 	if 0
