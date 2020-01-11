@@ -124,7 +124,7 @@ if has('terminal') && exists(':terminal') == 2
 	if exists('##TerminalOpen')
 		augroup VimUnixTerminalGroup
 			au! 
-			au TerminalOpen * setlocal nonumber signcolumn=no
+			" au TerminalOpen * setlocal nonumber signcolumn=no
 		augroup END
 	endif
 endif

@@ -99,6 +99,7 @@ function! TerminalOpen()
 			let cmd = pos . ' term ' . (close? '++close' : '++noclose') 
 			let cmd = cmd . ((kill != '')? (' ++kill=' . kill) : '')
 			exec cmd . ' ++norestore ++rows=' . height . ' ' . shell
+			setlocal nonumber signcolumn=no
 		else
 			exec pos . ' ' . height . 'split'
 			exec 'term ' . shell
