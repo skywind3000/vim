@@ -382,8 +382,8 @@ endfunc
 let g:status_var = ""
 let g:asyncrun_status = ''
 augroup QuickfixStatus
-	au! BufWinEnter quickfix setlocal 
-		\ statusline=%t\ [%{g:asyncrun_status}]\ %{exists('w:quickfix_title')?\ '\ '.w:quickfix_title\ :\ ''}\ %=%-15(%l,%c%V%)\ %P
+	" au! BufWinEnter quickfix setlocal 
+	" 	\ statusline=%t\ [%{g:asyncrun_status}]\ %{exists('w:quickfix_title')?\ '\ '.w:quickfix_title\ :\ ''}\ %=%-15(%l,%c%V%)\ %P
 augroup END
 
 
