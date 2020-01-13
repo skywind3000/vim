@@ -198,12 +198,18 @@ let s:ft_guess = {'py':'python', 'c':'cpp', 'cpp':'cpp', 'cc':'cpp',
 "----------------------------------------------------------------------
 " preview file
 "----------------------------------------------------------------------
-function! quickui#preview#open(filename, lnum)
+function! quickui#preview#open(filename, ...)
+	if !filereadable(a:filename)
+		call quickui#utils#errmsg('E484: Cannot open file ' . a:filename)
+		return -1
+	endif
+	let lnum = (a:0 >= 1)? a:1 : -1
 	let opts = {}
 	let opts.w = get(g:, 'quickui_preview_width', 55)
 	let opts.h = get(g:, 'quickui_preview_height', 10)
 	let name = fnamemodify(a:filename, ':p:t')
 	let opts.title = 'Preview: ' . name
+	let opts.persist = (a:0 >= 2)? a:2 : 0
 	if has('nvim')
 		let extname = tolower(fnamemodify(a:filename, ':p:e'))
 		if has_key(s:ft_guess, extname)
@@ -212,7 +218,7 @@ function! quickui#preview#open(filename, lnum)
 			let opts.neovim_ft = &ft
 		endif
 	endif
-	call quickui#preview#display(a:filename, a:lnum, opts)
+	return quickui#preview#display(a:filename, lnum, opts)
 endfunc
 
 
