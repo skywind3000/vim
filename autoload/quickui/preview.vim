@@ -53,7 +53,7 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" 
+" create preview window
 "----------------------------------------------------------------------
 function! quickui#preview#display(filename, cursor, opts)
 	call quickui#preview#close()
@@ -62,7 +62,7 @@ function! quickui#preview#display(filename, cursor, opts)
 		return -1
 	endif
 	let s:private.state = 0
-	let bid = bufadd(a:filename)
+	silent let bid = bufadd(a:filename)
 	let winid = -1
 	let title = has_key(a:opts, 'title')? (' ' . a:opts.title .' ') : ''
 	let w = get(a:opts, 'w', -1)
@@ -88,6 +88,7 @@ function! quickui#preview#display(filename, cursor, opts)
 		let opts.drag = 1
 		let opts.line = p[0]
 		let opts.col = p[1]
+		let opts.callback = 'quickui#preview#callback'
 		" let opts.fixed = 'true'
 		call popup_setoptions(winid, opts)
 		let s:private.winid = winid
@@ -128,6 +129,9 @@ function! quickui#preview#display(filename, cursor, opts)
 	else
 		let cmdlist += ['setlocal number']
 	endif
+	if a:cursor > 0
+		let cmdlist += ['normal! gg' . a:cursor . 'Gzz']
+	endif
 	if has_key(a:opts, 'syntax')
 		let cmdlist += ['set ft=' . fnameescape(a:opts.syntax) ]
 	endif
@@ -151,6 +155,7 @@ function! quickui#preview#callback(winid, code)
 	if has('nvim') == 0
 		let s:private.winid = -1
 	endif
+	let s:private.state = 0
 endfunc
 
 
@@ -176,6 +181,14 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" return state
+"----------------------------------------------------------------------
+function! quickui#preview#visible()
+	return s:private.state
+endfunc
+
+
+"----------------------------------------------------------------------
 " quit
 "----------------------------------------------------------------------
 function! s:nvim_autocmd()
@@ -192,6 +205,10 @@ endfunc
 "----------------------------------------------------------------------
 let s:ft_guess = {'py':'python', 'c':'cpp', 'cpp':'cpp', 'cc':'cpp',
 			\ 'h':'cpp', 'hh':'cpp', 'sh': 'sh', 'lua': 'lua',
+			\ 'go':'go', 'java': 'java', 'xml':'xml', 'html':'html',
+			\ 'js':'javascript', 'cmd':'dosbatch', 'bat':'dosbatch',
+			\ 'txt': 'text', 'text':'text', 'json':'json', 'pyw':'python',
+			\ 'as': 'actionscript', 'php':'php', 'pl':'perl',
 			\ }
 
 
@@ -204,9 +221,11 @@ function! quickui#preview#open(filename, ...)
 		return -1
 	endif
 	let lnum = (a:0 >= 1)? a:1 : -1
+	let display_num = g:quickui#style#preview_number
 	let opts = {}
-	let opts.w = get(g:, 'quickui_preview_width', 55)
-	let opts.h = get(g:, 'quickui_preview_height', 10)
+	let opts.w = get(g:, 'quickui_preview_w', g:quickui#style#preview_w)
+	let opts.h = get(g:, 'quickui_preview_h', g:quickui#style#preview_h)
+	let opts.number = get(g:, 'quickui_preview_num', display_num)
 	let name = fnamemodify(a:filename, ':p:t')
 	let opts.title = 'Preview: ' . name
 	let opts.persist = (a:0 >= 2)? a:2 : 0

@@ -229,7 +229,7 @@ if has('autocmd')
 		if &buftype != 'quickfix'
 			return
 		endif
-		nnoremap <silent><buffer> p :PreviewQuickfix<cr>
+		nnoremap <silent><buffer> p :call quickui#tools#preview_quickfix()<cr>
 		nnoremap <silent><buffer> P :PreviewClose<cr>
 		nnoremap <silent><buffer> q :close<cr>
 		setlocal nonumber
