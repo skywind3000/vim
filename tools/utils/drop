@@ -42,7 +42,7 @@ if [ -z "$NVIM_LISTEN_ADDRESS" ]; then
 	printf '\033]51;["call", "Tapi_TerminalEdit", ["%s"]]\007' "$name"
 else
 	if [ -x "$(which nvr 2> /dev/null)" ]; then
-		nvr --servername "$VIM_SERVERNAME" --remote_expr "Tapi_TerminalEdit(0, '%NAME%')"
+		nvr --servername "$VIM_SERVERNAME" --remote-expr "Tapi_TerminalEdit(0, '$name')"
 	else
 		echo "cannot find nvr executable, please install neovim-remote"
 		exit 2
