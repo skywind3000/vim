@@ -202,6 +202,28 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" class tasks
+"----------------------------------------------------------------------
+let s:tasks = {}
+
+" constructor
+function! s:tasks.new(path) abort
+	let obj = deepcopy(s:tasks)
+	call obj.__init__(a:path)
+	return obj
+endfunc
+
+" initializor
+function! s:tasks.__init__(path) abort
+	let self.path = s:abspath(a:path)
+endfunc
+
+function! s:tasks.display()
+endfunc
+
+
+
+"----------------------------------------------------------------------
 " get project root
 "----------------------------------------------------------------------
 function! asynctasks#project_root(name, ...)
