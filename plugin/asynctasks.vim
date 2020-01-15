@@ -19,6 +19,13 @@ let s:scripthome = fnamemodify(s:scriptname, ':h:h')
 
 
 "----------------------------------------------------------------------
+" internal object
+"----------------------------------------------------------------------
+let s:private = { 'cache':{} }
+let s:error = ''
+
+
+"----------------------------------------------------------------------
 " internal function
 "----------------------------------------------------------------------
 
@@ -49,9 +56,13 @@ function! s:readini(source)
 	endif
 	let sections = {}
 	let current = 'default'
+	let index = 0
 	for line in content
 		let t = substitute(line, '^\s*\(.\{-}\)\s*$', '\1', '')
-		if t =~ '^[;#].*$'
+		let index += 1
+		if t == ''
+			continue
+		elseif t =~ '^[;#].*$'
 			continue
 		elseif t =~ '^\[.*\]$'
 			let current = substitute(t, '^\[\s*\(.\{-}\)\s*\]$', '\1', '')
@@ -66,6 +77,8 @@ function! s:readini(source)
 					let sections[current] = {}
 				endif
 				let sections[current][key] = val
+			else
+				return index
 			endif
 		endif
 	endfor
@@ -106,14 +119,106 @@ function! s:project_root(name, strict)
 	return s:find_root(a:name, markers, a:strict)
 endfunc
 
+" change directory in a proper way
+function! s:chdir(path)
+	if has('nvim')
+		let cmd = haslocaldir()? 'lcd' : (haslocaldir(-1, 0)? 'tcd' : 'cd')
+	else
+		let cmd = haslocaldir()? ((haslocaldir() == 1)? 'lcd' : 'tcd') : 'cd'
+	endif
+	silent execute cmd . ' '. fnameescape(a:path)
+endfunc
+
+" search files upwards
+function! s:search_parent(name, cwd)
+	let finding = findfile(a:name, a:cwd . '/;', -1)
+	let output = []
+	for name in finding
+		let name = fnamemodify(name, ':p')
+		let output += [name]
+	endfor
+	return output
+endfunc
+
+" get absolute path
+function! s:abspath(path)
+	let f = a:path
+	if f =~ "'."
+		try
+			redir => m
+			silent exe ':marks' f[1]
+			redir END
+			let f = split(split(m, '\n')[-1])[-1]
+			let f = filereadable(f)? f : ''
+		catch
+			let f = '%'
+		endtry
+	endif
+	let f = (f != '%')? f : expand('%')
+	let f = fnamemodify(f, ':p')
+	if s:windows != 0
+		let f = substitute(f, "\\", '/', 'g')
+	endif
+	if len(f) > 1
+		let size = len(f)
+		if f[size - 1] == '/'
+			let f = strpart(f, 0, size - 1)
+		endif
+	endif
+	return f
+endfunc
+
+" read ini
+function! s:cache_load_ini(name)
+	let name = s:abspath(a:name)
+	let p1 = name
+	if s:windows || has('win32unix')
+		let p1 = tr(tolower(p1), "\\", '/')
+	endif
+	let ts = getftime(name)
+	if ts < 0
+		let s:error = 'cannot load ' . a:name
+		return -1
+	endif
+	if has_key(s:private.cache, p1)
+		let obj = s:private.cache[p1]
+		if ts <= obj.ts
+			return obj
+		endif
+	endif
+	let config = s:readini(name)
+	if type(config) != v:t_dict
+		let s:error = 'syntax error in '. a:name . ' line '. config
+		return config
+	endif
+	let s:private.cache[p1] = {}
+	let obj = s:private.cache[p1]
+	let obj.ts = ts
+	let obj.name = name
+	let obj.config = config
+	let obj.keys = keys(config)
+	return obj
+endfunc
 
 
 "----------------------------------------------------------------------
-" global export
+" get project root
 "----------------------------------------------------------------------
 function! asynctasks#project_root(name, ...)
 	return s:project_root(a:name, (a:0 == 0)? 0 : (a:1))
 endfunc
 
+
+"----------------------------------------------------------------------
+" read all profile
+"----------------------------------------------------------------------
+function! asynctasks#cache_load(name)
+	let s:error = ''
+	let s = s:cache_load_ini(a:name)
+	if s:error != ''
+		echo "ERROR: " . s:error
+	endif
+	return s
+endfunc
 
 

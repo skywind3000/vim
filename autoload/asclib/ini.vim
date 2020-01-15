@@ -24,9 +24,13 @@ function! asclib#ini#read(source)
 	endif
 	let sections = {}
 	let current = 'default'
+	let index = 0
 	for line in content
 		let t = substitute(line, '^\s*\(.\{-}\)\s*$', '\1', '')
-		if t =~ '^[;#].*$'
+		let index += 1
+		if t == ''
+			continue
+		elseif t =~ '^[;#].*$'
 			continue
 		elseif t =~ '^\[.*\]$'
 			let current = substitute(t, '^\[\s*\(.\{-}\)\s*\]$', '\1', '')
@@ -41,6 +45,8 @@ function! asclib#ini#read(source)
 					let sections[current] = {}
 				endif
 				let sections[current][key] = val
+			else
+				return index
 			endif
 		endif
 	endfor
