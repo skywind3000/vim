@@ -23,7 +23,7 @@ if 1
 	let opts.callback = 'MyCallback'
 	let opts.keymap = {'=':'TAG:2', '-':'TAG:3'}
 	if 0
-		let inst = quickui#listbox#create(lines, opts)
+		let inst = quickui#listbox#open(lines, opts)
 		call popup_show(inst.winid)
 	else
 		let code = quickui#listbox#inputlist(lines, opts)
