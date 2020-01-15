@@ -28,7 +28,7 @@ if !exists('g:asynctasks_system')
 endif
 
 " local config
-if !exists('g:asynctasks_config_name')
+if !exists('g:asynctasks_config_file')
 	let g:asynctasks_config_name = '.tasks'
 endif
 
