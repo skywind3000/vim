@@ -19,6 +19,31 @@ let s:scripthome = fnamemodify(s:scriptname, ':h:h')
 
 
 "----------------------------------------------------------------------
+" default values
+"----------------------------------------------------------------------
+
+" system identifier
+if !exists('g:asynctasks_system')
+	let g:asynctasks_system = (s:windows)? 'win' : 'unix'
+endif
+
+" local config
+if !exists('g:asynctasks_config_name')
+	let g:asynctasks_config_name = '.tasks'
+endif
+
+" global config in every runtimepath
+if !exists('g:asynctasks_global_config')
+	let g:asynctasks_global_config = 'tasks.ini'
+endif
+
+" config by vimrc
+if !exists('g:asynctasks_tasks')
+	let g:asynctasks_tasks = {}
+endif
+
+
+"----------------------------------------------------------------------
 " internal object
 "----------------------------------------------------------------------
 let s:private = { 'cache':{} }
