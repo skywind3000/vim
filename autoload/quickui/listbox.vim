@@ -424,6 +424,7 @@ function! quickui#listbox#inputlist(textlist, opts)
 	" echo 'size: '. winheight(winid)
 	if hr > 0
 		call quickui#core#win_execute(winid, ':' . (hr + 1))
+		redraw
 	endif
 	let g:quickui#listbox#cursor = quickui#utils#get_cursor(winid) - 1
 	call quickui#listbox#close(hwnd)
