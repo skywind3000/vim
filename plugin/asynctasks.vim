@@ -46,7 +46,7 @@ endif
 "----------------------------------------------------------------------
 " internal object
 "----------------------------------------------------------------------
-let s:private = { 'cache':{}, 'rtp':{} }
+let s:private = { 'cache':{}, 'rtp':{}, 'local':{}, 'tasks':{} }
 let s:error = ''
 
 
@@ -254,15 +254,16 @@ function! s:collect_rtp_config() abort
 			endif
 		endif
 	endfor
-	let s:private.rtp.names = names
 	let s:private.rtp.ini = {}
 	let config = {}
 	let s:error = ''
 	for name in names
-		let config = s:cache_load_ini(name)
+		let obj = s:cache_load_ini(name)
 		if s:error == ''
-			for key in keys(config.config)
-				let s:private.rtp.ini[key] = config.config[key]
+			for key in keys(obj.config)
+				let s:private.rtp.ini[key] = obj.config[key]
+				let s:private.rtp.ini[key].__name__ = name
+				let s:private.rtp.ini[key].__mode__ = "rtp"
 			endfor
 		else
 			call s:errmsg(s:error)
@@ -272,6 +273,8 @@ function! s:collect_rtp_config() abort
 	let config = deepcopy(s:private.rtp.ini)
 	for key in keys(g:asynctasks_tasks)
 		let config[key] = g:asynctasks_tasks[key]
+		let config[key].__name__ = 'vim'
+		let config[key].__mode__ = 'vim'
 	endfor
 	let s:private.rtp.config = config
 	return s:private.rtp.config
@@ -301,12 +304,15 @@ function! s:compose_local_config(path)
 		if s:error == ''
 			for key in keys(obj.config)
 				let config[key] = obj.config[key]
+				let config[key].__name__ = name
+				let config[key].__mode__ = 'local'
 			endfor
 		else
 			call s:errmsg(s:error)
 			let s:error = ''
 		endif
 	endfor
+	let s:private.local.config = config
 	return config
 endfunc
 
@@ -317,26 +323,23 @@ endfunc
 function! asynctasks#collect_config(path, force)
 	let c1 = s:compose_rtp_config(a:force)
 	let c2 = s:compose_local_config(a:path)
-	let obj = {'config':{}, 'names':{}, 'avail':[]}
-	for key in keys(c1)
-		let obj.config[key] = c1[key]
-		let obj.names[key] = 'global'
+	let tasks = {'config':{}, 'names':{}, 'avail':[]}
+	for cc in [c1, c2]
+		for key in keys(cc)
+			let tasks.config[key] = cc[key]
+		endfor
 	endfor
-	for key in keys(c2)
-		let obj.config[key] = c2[key]
-		let obj.names[key] = 'local'
-	endfor
-	for key in keys(obj.names)
+	for key in keys(tasks.config)
 		let parts = split(key, ':')
 		let name = (len(parts) >= 1)? parts[0] : ''
 		let system = (len(parts) >= 2)? parts[1] : ''
 		if system == ''
-			let obj.avail += [key]
+			let tasks.avail += [key]
 		elseif system == g:asynctasks_system
-			let obj.avail += [key]
+			let tasks.avail += [key]
 		endif
 	endfor
-	return obj
+	let s:private.tasks = tasks
 endfunc
 
 
@@ -377,10 +380,10 @@ endfunc
 "----------------------------------------------------------------------
 function! asynctasks#rtp_config()
 	let ts = reltime()
-	call s:collect_rtp_config()
+	" call s:collect_rtp_config()
 	call asynctasks#collect_config('.', 1)
 	let tt = reltimestr(reltime(ts))
-	" echo s:private.rtp.config
+	echo s:private.rtp.config
 	return tt
 endfunc
 
