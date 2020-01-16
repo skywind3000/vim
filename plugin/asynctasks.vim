@@ -67,6 +67,12 @@ function! s:strip(text)
 	return substitute(a:text, '^\s*\(.\{-}\)\s*$', '\1', '')
 endfunc
 
+" replace string
+function! s:replace(text, old, new)
+	let l:data = split(a:text, a:old, 1)
+	return join(l:data, a:new)
+endfunc
+
 " load ini file
 function! s:readini(source)
 	if type(a:source) == type('')
@@ -223,6 +229,14 @@ function! s:cache_load_ini(name)
 	let obj.name = name
 	let obj.config = config
 	let obj.keys = keys(config)
+	let home = fnamemodify(name, ':h')
+	for sect in obj.keys
+		let section = obj.config[sect]
+		for key in keys(section)
+			let val = section[key]
+			let section[key] = s:replace(val, '$(CFGHOME)', home)
+		endfor
+	endfor
 	return obj
 endfunc
 
