@@ -33,8 +33,8 @@ if !exists('g:asynctasks_config_file')
 endif
 
 " global config in every runtimepath
-if !exists('g:asynctasks_global_config')
-	let g:asynctasks_global_config = 'tasks.ini'
+if !exists('g:asynctasks_rtp_config')
+	let g:asynctasks_rtp_config = 'tasks.ini'
 endif
 
 " config by vimrc
@@ -227,6 +227,21 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" collect config in rtp
+"----------------------------------------------------------------------
+function! s:collect_rtp_config()
+	let config = []
+	for rtp in split(&rtp, ',')
+		let path = s:abspath(rtp . '/' . g:asynctasks_rtp_config)
+		if filereadable(path)
+			let config += [path]
+		endif
+	endfor
+	return config
+endfunc
+
+
+"----------------------------------------------------------------------
 " class tasks
 "----------------------------------------------------------------------
 let s:tasks = {}
@@ -266,6 +281,17 @@ function! asynctasks#cache_load(name)
 		echo "ERROR: " . s:error
 	endif
 	return s
+endfunc
+
+
+"----------------------------------------------------------------------
+" 
+"----------------------------------------------------------------------
+function! asynctasks#rtp_config()
+	let ts = reltime()
+	call s:collect_rtp_config()
+	let tt = reltimestr(reltime(ts))
+	return tt
 endfunc
 
 
