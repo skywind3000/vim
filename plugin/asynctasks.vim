@@ -349,6 +349,17 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" split section name:system
+"----------------------------------------------------------------------
+function! asynctasks#split(name)
+	let parts = split(name, ':')
+	let name = (len(parts) >= 1)? parts[0] : ''
+	let system = (len(parts) >= 2)? parts[1] : ''
+	return [name, system]
+endfunc
+
+
+"----------------------------------------------------------------------
 " read all profile
 "----------------------------------------------------------------------
 function! asynctasks#cache_load(name)
@@ -372,5 +383,6 @@ function! asynctasks#rtp_config()
 	" echo s:private.rtp.config
 	return tt
 endfunc
+
 
 
