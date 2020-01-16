@@ -28,7 +28,7 @@ if !exists('g:asynctasks_system')
 endif
 
 " local config
-if !exists('g:asynctasks_config_file')
+if !exists('g:asynctasks_config_name')
 	let g:asynctasks_config_name = '.tasks'
 endif
 
@@ -46,7 +46,7 @@ endif
 "----------------------------------------------------------------------
 " internal object
 "----------------------------------------------------------------------
-let s:private = { 'cache':{} }
+let s:private = { 'cache':{}, 'rtp':{} }
 let s:error = ''
 
 
@@ -195,7 +195,8 @@ endfunc
 
 " read ini
 function! s:cache_load_ini(name)
-	let name = s:abspath(a:name)
+	let name = (stridx(a:name, '~') >= 0)? expand(a:name) : a:name
+	let name = s:abspath(name)
 	let p1 = name
 	if s:windows || has('win32unix')
 		let p1 = tr(tolower(p1), "\\", '/')
@@ -229,12 +230,67 @@ endfunc
 "----------------------------------------------------------------------
 " collect config in rtp
 "----------------------------------------------------------------------
-function! s:collect_rtp_config()
-	let config = []
+function! s:collect_rtp_config() abort
+	let names = []
 	for rtp in split(&rtp, ',')
-		let path = s:abspath(rtp . '/' . g:asynctasks_rtp_config)
-		if filereadable(path)
-			let config += [path]
+		if rtp != ''
+			let path = s:abspath(rtp . '/' . g:asynctasks_rtp_config)
+			if filereadable(path)
+				let names += [path]
+			endif
+		endif
+	endfor
+	let s:private.rtp.names = names
+	let s:private.rtp.ini = {}
+	let config = {}
+	let s:error = ''
+	for name in names
+		let config = s:cache_load_ini(name)
+		if s:error == ''
+			for key in keys(config.config)
+				let s:private.rtp.ini[key] = config.config[key]
+			endfor
+		else
+			call s:errmsg(s:error)
+			let s:error = ''
+		endif
+	endfor
+	let config = deepcopy(s:private.rtp.ini)
+	for key in keys(g:asynctasks_tasks)
+		let config[key] = g:asynctasks_tasks[key]
+	endfor
+	let s:private.rtp.config = config
+	return s:private.rtp.config
+endfunc
+
+
+"----------------------------------------------------------------------
+" fetch rtp config
+"----------------------------------------------------------------------
+function! s:compose_rtp_config(force)
+	if (!has_key(s:private.rtp, 'config')) || a:force != 0
+		call s:collect_rtp_config()
+	endif
+	return s:private.rtp.config
+endfunc
+
+
+"----------------------------------------------------------------------
+" fetch local config
+"----------------------------------------------------------------------
+function! s:compose_local_config(path)
+	let names = s:search_parent(g:asynctasks_config_name, a:path)
+	let config = {}
+	for name in names
+		let s:error = ''
+		let obj = s:cache_load_ini(name)
+		if s:error == ''
+			for key in keys(obj.config)
+				let config[key] = obj.config[key]
+			endfor
+		else
+			call s:errmsg(s:error)
+			let s:error = ''
 		endif
 	endfor
 	return config
@@ -242,23 +298,31 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" class tasks
+" fetch all config
 "----------------------------------------------------------------------
-let s:tasks = {}
-
-" constructor
-function! s:tasks.new(path) abort
-	let obj = deepcopy(s:tasks)
-	call obj.__init__(a:path)
+function! asynctasks#collect_config(path, force)
+	let c1 = s:compose_rtp_config(a:force)
+	let c2 = s:compose_local_config(a:path)
+	let obj = {'config':{}, 'names':{}, 'avail':[]}
+	for key in keys(c1)
+		let obj.config[key] = c1[key]
+		let obj.names[key] = 'global'
+	endfor
+	for key in keys(c2)
+		let obj.config[key] = c2[key]
+		let obj.names[key] = 'local'
+	endfor
+	for key in keys(obj.names)
+		let parts = split(key, ':')
+		let name = (len(parts) >= 1)? parts[0] : ''
+		let system = (len(parts) >= 2)? parts[1] : ''
+		if system == ''
+			let obj.avail += [key]
+		elseif system == g:asynctasks_system
+			let obj.avail += [key]
+		endif
+	endfor
 	return obj
-endfunc
-
-" initializor
-function! s:tasks.__init__(path) abort
-	let self.path = s:abspath(a:path)
-endfunc
-
-function! s:tasks.display()
 endfunc
 
 
@@ -290,7 +354,9 @@ endfunc
 function! asynctasks#rtp_config()
 	let ts = reltime()
 	call s:collect_rtp_config()
+	call asynctasks#collect_config('.', 1)
 	let tt = reltimestr(reltime(ts))
+	" echo s:private.rtp.config
 	return tt
 endfunc
 
