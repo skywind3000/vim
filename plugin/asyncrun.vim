@@ -1132,9 +1132,7 @@ function! s:start_in_terminal(opts)
 	else
 		exec 'term '. command
 		setlocal nonumber signcolumn=no
-		if focus != 0
-			startinsert
-		endif
+		startinsert
 	endif
 	if focus == 0
 		silent! stopinsert
