@@ -582,7 +582,7 @@ function! asynctasks#run(bang, taskname, path)
 	let opts = s:task_option(task)
 	let skip = g:asyncrun_skip
 	if opts.mode == 'bang' || opts.mode == 2
-		let g:asyncrun_skip = 2
+		let g:asyncrun_skip = or(g:asyncrun_skip, 2)
 	endif
 	call asyncrun#run(a:bang, opts, task.command)
 	let g:asyncrun_skip = skip
