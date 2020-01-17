@@ -1132,7 +1132,9 @@ function! s:start_in_terminal(opts)
 	else
 		exec 'term '. command
 		setlocal nonumber signcolumn=no
-		startinsert
+		if focus != 0
+			startinsert
+		endif
 	endif
 	if focus == 0
 		call win_gotoid(origin)
