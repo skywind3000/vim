@@ -209,6 +209,15 @@ if has('nvim') == 0 && has('gui_running') == 0
 	for c in ['?', ':', '-', '_', '+', '=', "'"]
 		call s:meta_code(c)
 	endfor
+	function! s:key_escape(name, code)
+		if get(g:, 'terminal_skip_key_init', 0) == 0
+			exec "set ".a:name."=\e".a:code
+		endif
+	endfunc
+	call s:key_escape('<F1>', 'OP')
+	call s:key_escape('<F2>', 'OQ')
+	call s:key_escape('<F3>', 'OR')
+	call s:key_escape('<F4>', 'OS')
 endif
 
 
