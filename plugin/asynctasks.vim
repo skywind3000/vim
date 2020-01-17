@@ -65,6 +65,10 @@ if !exists('g:asynctasks_term_rows')
 	let g:asynctasks_term_rows = ''
 endif
 
+if !exists('g:asynctasks_term_focus')
+	let g:asynctasks_term_focus = 0
+endif
+
 
 "----------------------------------------------------------------------
 " internal object
@@ -523,7 +527,7 @@ function! s:task_option(task)
 				let opts.pos = pos
 				let opts.cols = g:asynctasks_term_cols
 				let opts.rows = g:asynctasks_term_rows
-				let opts.focus = 1
+				let opts.focus = g:asynctasks_term_focus
 			elseif s:windows && gui != 0
 				let opts.mode = 'system'
 			else
@@ -531,6 +535,7 @@ function! s:task_option(task)
 				let opts.pos = 'bottom'
 				let opts.cols = g:asynctasks_term_cols
 				let opts.rows = g:asynctasks_term_rows
+				let opts.focus = g:asynctasks_term_focus
 			endif
 		elseif output == 'vim'
 			let opts.mode = 'bang'
