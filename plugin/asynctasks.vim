@@ -442,10 +442,18 @@ endfunc
 "----------------------------------------------------------------------
 " display table
 "----------------------------------------------------------------------
-function! s:print_table(rows)
+function! s:print_table(rows, highhead)
 	let content = asynctasks#tabulify(a:rows)
+	let index = 0
 	for line in content
-		echo ' '. line
+		if index == 0 && a:highhead
+			let index += 1
+			echohl ModeMsg
+			echo ' '. line
+			echohl None
+		else
+			echo ' '. line
+		endif
 	endfor
 endfunc
 
@@ -550,14 +558,14 @@ function! s:task_list(path)
 	let tasks = s:private.tasks
 	let rows = []
 	let rows += [['Task', 'Type', 'Detail']]
-	let rows += [['----', '----', '------']]
+	" let rows += [['----', '----', '------']]
 	for task in tasks.avail
 		let item = tasks.config[task]
 		let command = get(item, 'command', '')
 		let rows += [[task, item.__mode__, command]]
 		let rows += [['', '', item.__name__]]
 	endfor
-	call s:print_table(rows)
+	call s:print_table(rows, 1)
 endfunc
 
 
