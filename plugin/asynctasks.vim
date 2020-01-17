@@ -625,27 +625,29 @@ function! s:task_edit(mode, path)
 	endif
 	let newfile = filereadable(name)? 0 : 1
 	exec "split " . fnameescape(name)
-	exec "setlocal ft=dosini"
+	exec "setlocal ft=dosini sts=4 sw=4 ts=4 noet"
+	let textlist = [
+		\ '# vim: set noet fenc=utf-8 sts=4 sw=4 ts=4 ft=dosini:',
+		\ '',
+		\ '# define a new task named "default"',
+		\ '[default]',
+		\ '',
+		\ '# shell command, use quotation for filenames containing spaces',
+		\ 'command=gcc "$(VIM_FILEPATH)" -o "$(VIM_FILENOEXT)"',
+		\ '',
+		\ '# working directory, can change to $(VIM_ROOT) for project root',
+		\ 'cwd=$(VIM_FILEDIR)',
+		\ '',
+		\ '# output mode, can be either quickfix or terminal',
+		\ 'output=quickfix',
+		\ '',
+		\ '# this can be omitted (use the errorformat in vim)',
+		\ 'errorformat=%f:%l:%m',
+		\ '',
+		\ '',
+		\ ]
 	if newfile
 		exec "normal ggVGx"
-		let textlist = [
-					\ '# define a new task named "default"',
-					\ '[default]',
-					\ '',
-					\ '# shell command, use quotation for filenames containing spaces',
-					\ 'command=gcc "$(VIM_FILEPATH)" -o "$(VIM_FILENOEXT)"',
-					\ '',
-					\ '# working directory, can change to $(VIM_ROOT) for project root',
-					\ 'cwd=$(VIM_FILEDIR)',
-					\ '',
-					\ '# output mode, can be either quickfix or terminal',
-					\ 'output=quickfix',
-					\ '',
-					\ '# this can be omitted (use the errorformat in vim)',
-					\ 'errorformat=%f:%l:%m',
-					\ '',
-					\ '',
-					\ ]
 		call append(line('.') - 1, textlist)
 	endif
 endfunc
