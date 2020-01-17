@@ -47,6 +47,19 @@ if !exists('g:asynctasks_init_tasks')
 	let g:asynctasks_init_tasks = 1
 endif
 
+" terminal mode: tab/top/bottom/left/right/external
+if !exists('g:asynctasks_term_pos')
+	let g:asynctasks_term_pos = 'bottom'
+endif
+
+if !exists('g:asynctasks_term_cols')
+	let g:asynctasks_term_cols = ''
+endif
+
+if !exists('g:asynctasks_term_rows')
+	let g:asynctasks_term_rows = ''
+endif
+
 
 "----------------------------------------------------------------------
 " internal object
@@ -455,6 +468,27 @@ function! s:task_option(task)
 	if has_key(task, 'save')
 		let opts.save = task.save
 	endif
+	if has_key(task, 'output')
+		let output = task.output
+		let opts.mode = 'async'
+		if output == 'term' || output == 'terminal'
+			let pos = g:asynctasks_term_pos
+			let gui = get(g:, 'asyncrun_gui', 0)
+			if pos != 'external' && pos != 'system' && pos != 'os'
+				let opts.mode = 'term'
+				let opts.pos = pos
+				let opts.cols = g:asynctasks_term_cols
+				let opts.rows = g:asynctasks_term_rows
+			elseif s:windows && gui != 0
+				let opts.mode = 'system'
+			else
+				let opts.mode = 'term'
+				let opts.pos = 'bottom'
+				let opts.cols = g:asynctasks_term_cols
+				let opts.rows = g:asynctasks_term_rows
+			endif
+		endif
+	endif
 	if has_key(task, 'errorformat')
 		let opts.errorformat = task.errorformat
 		if task.errorformat == ''
@@ -515,11 +549,13 @@ function! s:task_list(path)
 	endif
 	let tasks = s:private.tasks
 	let rows = []
-	let rows += [['Task', 'Type', 'Config']]
+	let rows += [['Task', 'Type', 'Detail']]
 	let rows += [['----', '----', '------']]
 	for task in tasks.avail
 		let item = tasks.config[task]
-		let rows += [[task, item.__mode__, item.__name__]]
+		let command = get(item, 'command', '')
+		let rows += [[task, item.__mode__, command]]
+		let rows += [['', '', item.__name__]]
 	endfor
 	call s:print_table(rows)
 endfunc
