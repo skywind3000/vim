@@ -524,6 +524,8 @@ function! asynctasks#cmd(bang, ...)
 		call s:errmsg('empty task name, use ":AsyncTask -h" for help')
 		return -1
 	elseif taskname == '-h'
+		let text = 'usage: "AsyncTasks {taskname}" to run task, '
+		echo text . 'and "AsyncTasks -l" to list tasks.'
 		return 0
 	elseif taskname == '-l'
 		call s:task_list('')
