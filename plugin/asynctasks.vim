@@ -601,38 +601,15 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" command AsyncTask
+" edit task
 "----------------------------------------------------------------------
-function! asynctasks#cmd(bang, ...)
-	let taskname = (a:0 >= 1)? (a:1) : ''
-	if taskname == ''
-		call s:errmsg('empty task name, use ":AsyncTask -h" for help')
-		return -1
-	elseif taskname == '-h'
-		echo 'usage:  :AsyncTask <operation>'
-		echo 'operations:'
-		echo '    :AsyncTask {taskname}      - run specific task'
-		echo '    :AsyncTask -l              - list tasks'
-		echo '    :AsyncTask -h              - show this help'
-		return 0
-	elseif taskname == '-l'
-		call s:task_list('')
-		return 0
-	endif
-	call asynctasks#run(a:bang, taskname, '')
-endfunc
-
-
-"----------------------------------------------------------------------
-" edit files
-"----------------------------------------------------------------------
-function! asynctasks#edit(bang, ...)
-	let name = (a:0 >= 1)? (a:1) : ''
+function! s:task_edit(mode, path)
+	let name = a:path
 	if s:requirement('asyncrun') == 0
 		return -1
 	endif
 	if name == ''
-		if a:bang == ''
+		if a:mode ==# '-e'
 			let name = asyncrun#get_root('%')
 			let name = name . '/' . g:asynctasks_config_name
 			let name = fnamemodify(expand(name), ':p')
@@ -671,7 +648,34 @@ function! asynctasks#edit(bang, ...)
 					\ ]
 		call append(line('.') - 1, textlist)
 	endif
-	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" command AsyncTask
+"----------------------------------------------------------------------
+function! asynctasks#cmd(bang, ...)
+	let taskname = (a:0 >= 1)? (a:1) : ''
+	if taskname == ''
+		call s:errmsg('empty task name, use ":AsyncTask -h" for help')
+		return -1
+	elseif taskname == '-h'
+		echo 'usage:  :AsyncTask <operation>'
+		echo 'operations:'
+		echo '    :AsyncTask {taskname}      - run specific task'
+		echo '    :AsyncTask -l              - list tasks'
+		echo '    :AsyncTask -h              - show this help'
+		echo '    :AsyncTask -e              - edit local task in project root'
+		echo '    :AsyncTask -E              - edit global task in ~/.vim'
+		return 0
+	elseif taskname == '-l'
+		call s:task_list('')
+		return 0
+	elseif taskname ==# '-e' || taskname ==# '-E'
+		call s:task_edit(taskname, (a:0 >= 2)? (a:2) : '')
+		return 0
+	endif
+	call asynctasks#run(a:bang, taskname, '')
 endfunc
 
 
@@ -681,9 +685,6 @@ endfunc
 
 command! -bang -nargs=* AsyncTask
 			\ call asynctasks#cmd('<bang>', <q-args>)
-
-command! -bang -nargs=* AsyncTaskEdit
-			\ call asynctasks#edit('<bang>', <q-args>)
 
 
 "----------------------------------------------------------------------
