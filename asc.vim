@@ -1,6 +1,7 @@
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 command! -nargs=1 IncScript exec 'so '.s:home.'/'.'<args>'
 exec 'set rtp+='.s:home
+exec 'set rtp+=~/.vim'
 
 IncScript asc/viminit.vim
 IncScript asc/vimmake.vim

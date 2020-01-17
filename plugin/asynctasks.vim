@@ -267,6 +267,21 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" check requirement
+"----------------------------------------------------------------------
+function! s:requirement(what)
+	if a:what == 'asyncrun'
+		if exists(':AsyncRun') == 0
+			let t = 'asyncrun is required, install from '
+			call s:errmsg(t . '"skywind3000/asyncrun.vim"')
+			return 0
+		endif
+	endif
+	return 1
+endfunc
+
+
+"----------------------------------------------------------------------
 " collect config in rtp
 "----------------------------------------------------------------------
 function! s:collect_rtp_config() abort
@@ -609,12 +624,66 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" edit files
+"----------------------------------------------------------------------
+function! asynctasks#edit(bang, ...)
+	let name = (a:0 >= 1)? (a:1) : ''
+	if s:requirement('asyncrun') == 0
+		return -1
+	endif
+	if name == ''
+		if a:bang == ''
+			let name = asyncrun#get_root('%')
+			let name = name . '/' . g:asynctasks_config_name
+			let name = fnamemodify(expand(name), ':p')
+		else
+			let name = expand('~/.vim/' . g:asynctasks_rtp_config)
+		endif
+	endif
+	call inputsave()
+	let r = input('(Edit task config): ', name)
+	call inputrestore()
+	if r == ''
+		return -1
+	endif
+	let newfile = filereadable(name)? 0 : 1
+	exec "split " . fnameescape(name)
+	exec "setlocal ft=dosini"
+	if newfile
+		exec "normal ggVGx"
+		let textlist = [
+					\ '# define a new task named "default"',
+					\ '[default]',
+					\ '',
+					\ '# shell command, use quotation for filenames containing spaces',
+					\ 'command=gcc "$(VIM_FILEPATH)" -o "$(VIM_FILENOEXT)"',
+					\ '',
+					\ '# working directory, can change to $(VIM_ROOT) for project root',
+					\ 'cwd=$(VIM_FILEDIR)',
+					\ '',
+					\ '# output mode, can be either quickfix or terminal',
+					\ 'output=quickfix',
+					\ '',
+					\ '# this can be omitted (use the errorformat in vim)',
+					\ 'errorformat=%f:%l:%m',
+					\ '',
+					\ '',
+					\ ]
+		call append(line('.') - 1, textlist)
+	endif
+	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
 " commands
 "----------------------------------------------------------------------
 
 command! -bang -nargs=* AsyncTask
 			\ call asynctasks#cmd('<bang>', <q-args>)
 
+command! -bang -nargs=* AsyncTaskEdit
+			\ call asynctasks#edit('<bang>', <q-args>)
 
 
 "----------------------------------------------------------------------
