@@ -495,7 +495,8 @@ function! asynctasks#run(bang, taskname, path)
 		return -3
 	endif
 	if exists(':AsyncRun') == 0
-		call s:errmsg('asyncrun is not installed')
+		let t = 'asyncrun is required, install from '
+		call s:errmsg(t . '"skywind3000/asyncrun.vim"')
 		return -4
 	endif
 	let opts = s:task_option(task)
