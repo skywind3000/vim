@@ -526,6 +526,8 @@ function! s:task_option(task)
 				let opts.cols = g:asynctasks_term_cols
 				let opts.rows = g:asynctasks_term_rows
 			endif
+		elseif output == 'vim'
+			let opts.mode = 'bang'
 		endif
 	endif
 	if has_key(task, 'errorformat')
