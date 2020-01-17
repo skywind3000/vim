@@ -53,6 +53,7 @@ endif
 "----------------------------------------------------------------------
 let s:private = { 'cache':{}, 'rtp':{}, 'local':{}, 'tasks':{} }
 let s:error = ''
+let s:index = 0
 
 
 "----------------------------------------------------------------------
@@ -65,6 +66,7 @@ function! s:errmsg(msg)
 	echohl ErrorMsg
 	echom a:msg
 	echohl NONE
+	let s:index += 1
 endfunc
 
 " trim leading & trailing spaces
@@ -79,7 +81,7 @@ function! s:replace(text, old, new)
 endfunc
 
 " load ini file
-function! s:readini(source)
+function! s:readini(source, strict)
 	if type(a:source) == type('')
 		if !filereadable(a:source)
 			return -1
@@ -113,7 +115,7 @@ function! s:readini(source)
 					let sections[current] = {}
 				endif
 				let sections[current][key] = val
-			else
+			elseif a:strict != 0
 				return index
 			endif
 		endif
@@ -223,7 +225,7 @@ function! s:cache_load_ini(name)
 			return obj
 		endif
 	endif
-	let config = s:readini(name)
+	let config = s:readini(name, 1)
 	if type(config) != v:t_dict
 		let s:error = 'syntax error in '. a:name . ' line '. config
 		return config
@@ -378,49 +380,82 @@ endfunc
 "----------------------------------------------------------------------
 " run task
 "----------------------------------------------------------------------
-function! asynctasks#run(bang, taskname, ...)
-	let s:error = ''
-	let path = ''
-	if a:bang != ''
-		let path = getcwd()
-	else
-		let path = (a:0 >= 1)? a:1 : ''
-	endif
+function! asynctasks#run(bang, taskname, path)
+	let path = (a:bang != '')? getcwd() : a:path
 	let path = (path == '')? expand('%:p') : path
-	call asynctasks#collect_config(path, 0)
-	if s:error != ''
+	let s:error = ''
+	let s:index = 0
+	call asynctasks#collect_config(path, 1)
+	if s:error != '' || s:index != 0
 		return -1
 	endif
 	let s:error = ''
 	let tasks = s:private.tasks
 	if !has_key(tasks.names, a:taskname)
-		call s:errmsg('Not find task [' . a:taskname . ']')
+		call s:errmsg('Error: not find task [' . a:taskname . ']')
 		return -2
 	endif
 	let item = tasks.config[a:taskname]
 	let ininame = item.__name__
 	let source = 'task ['. a:taskname . '] from ' . ininame
 	if !has_key(item, 'command') || item.command == ''
-		call s:errmsg('Not find command in ' . source)
+		call s:errmsg('Error: not find command in ' . source)
 		return -3
 	endif
-	if item.command == ''
+	if exists(':AsyncRun') == 0
+		call s:errmsg('Error: asyncrun is not installed')
+		return -4
 	endif
+	let opts = {}
+	if has_key(item, 'cwd')
+		let opts.cwd = item.cwd
+	endif
+	if has_key(item, 'mode')
+		let opts.mode = item.mode
+	endif
+	if has_key(item, 'raw')
+		let opts.raw = item.raw
+	endif
+	if has_key(item, 'save')
+		let opts.save = item.save
+	endif
+	if has_key(item, 'errorformat')
+		let opts.errorformat = item.errorformat
+		if item.errorformat == ''
+			let opts.raw = 1
+		endif
+	endif
+	if has_key(item, 'strip')
+		let opts.strip = item.strip
+	endif
+	for key in ['pos', 'rows', 'cols']
+		if has_key(item, key)
+			let opts[key] = item[key]
+		endif
+	endfor
+	" echo opts
+	call asyncrun#run(a:bang, opts, item.command)
 	return 0
 endfunc
 
 
+
 "----------------------------------------------------------------------
-" read all profile
+" command AsyncTask
 "----------------------------------------------------------------------
-function! asynctasks#cache_load(name)
-	let s:error = ''
-	let s = s:cache_load_ini(a:name)
-	if s:error != ''
-		echo "ERROR: " . s:error
+function! asynctasks#cmd(bang, ...)
+	let taskname = (a:0 >= 1)? (a:1) : ''
+	if taskname == ''
+		call s:errmsg('Error: empty task name, use ":AsyncTask -h" for help')
+		return -1
+	elseif taskname == '-h'
+		return 0
+	elseif taskname == '-l'
+		return 0
 	endif
-	return s
+	call asynctasks#run(a:bang, taskname, '')
 endfunc
+
 
 
 "----------------------------------------------------------------------
@@ -434,6 +469,14 @@ function! asynctasks#rtp_config()
 	echo s:private.rtp.config
 	return tt
 endfunc
+
+
+"----------------------------------------------------------------------
+" commands
+"----------------------------------------------------------------------
+
+command! -bang -nargs=* AsyncTask
+	\ call asynctasks#cmd('<bang>', <q-args>)
 
 
 
