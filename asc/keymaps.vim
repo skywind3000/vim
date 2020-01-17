@@ -95,7 +95,6 @@ noremap <M-h> b
 noremap <M-l> w
 noremap <M-j> gj
 noremap <M-k> gk
-noremap <M-y> d$
 inoremap <M-h> <c-left>
 inoremap <M-l> <c-right>
 inoremap <M-j> <c-\><c-o>gj
@@ -408,5 +407,6 @@ nnoremap <silent><space>at :MyCheatSheetAlign<cr>
 vnoremap <silent><space>at :MyCheatSheetAlign<cr>
 
 noremap <m-i> :call quickui#tools#list_function()<cr>
-noremap <m-I> :call quickui#tools#list_function()<cr>
+noremap <m-y> :call quickui#tools#list_function()<cr>
+
 

@@ -37,6 +37,11 @@ if !exists('g:asynctasks_rtp_config')
 	let g:asynctasks_rtp_config = 'tasks.ini'
 endif
 
+" global config
+if !exists('g:asynctasks_extra_config')
+	let g:asynctasks_extra_config = []
+endif
+
 " config by vimrc
 if !exists('g:asynctasks_tasks')
 	let g:asynctasks_tasks = {}
@@ -272,12 +277,23 @@ function! s:collect_rtp_config() abort
 			let names += [name]
 		endif
 	endif
-	for rtp in split(&rtp, ',')
-		if rtp != ''
-			let path = s:abspath(rtp . '/' . g:asynctasks_rtp_config)
-			if filereadable(path)
-				let names += [path]
+	if g:asynctasks_rtp_config != ''
+		let rtp_name = g:asynctasks_rtp_config
+		let rtp_name = s:replace(rtp_name, '$(system)', g:asynctasks_system)
+		let rtp_name = s:replace(rtp_name, '<system>', g:asynctasks_system)
+		for rtp in split(&rtp, ',')
+			if rtp != ''
+				let path = s:abspath(rtp . '/' . rtp_name)
+				if filereadable(path)
+					let names += [path]
+				endif
 			endif
+		endfor
+	endif
+	for name in g:asynctasks_extra_config
+		let name = s:abspath(name)
+		if filereadable(name)
+			let names += [name]
 		endif
 	endfor
 	let s:private.rtp.ini = {}
@@ -289,7 +305,7 @@ function! s:collect_rtp_config() abort
 			for key in keys(obj.config)
 				let s:private.rtp.ini[key] = obj.config[key]
 				let s:private.rtp.ini[key].__name__ = name
-				let s:private.rtp.ini[key].__mode__ = "rtp"
+				let s:private.rtp.ini[key].__mode__ = "global"
 			endfor
 		else
 			call s:errmsg(s:error)
