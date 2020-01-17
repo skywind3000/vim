@@ -429,11 +429,47 @@ endfunc
 "----------------------------------------------------------------------
 " display table
 "----------------------------------------------------------------------
-function! asynctasks#print_table(rows)
+function! s:print_table(rows)
 	let content = asynctasks#tabulify(a:rows)
 	for line in content
 		echo ' '. line
 	endfor
+endfunc
+
+
+"----------------------------------------------------------------------
+" format parameter
+"----------------------------------------------------------------------
+function! s:task_option(task)
+	let task = a:task
+	let opts = {}
+	if has_key(task, 'cwd')
+		let opts.cwd = task.cwd
+	endif
+	if has_key(task, 'mode')
+		let opts.mode = task.mode
+	endif
+	if has_key(task, 'raw')
+		let opts.raw = task.raw
+	endif
+	if has_key(task, 'save')
+		let opts.save = task.save
+	endif
+	if has_key(task, 'errorformat')
+		let opts.errorformat = task.errorformat
+		if task.errorformat == ''
+			let opts.raw = 1
+		endif
+	endif
+	if has_key(task, 'strip')
+		let opts.strip = task.strip
+	endif
+	for key in ['pos', 'rows', 'cols']
+		if has_key(task, key)
+			let opts[key] = task[key]
+		endif
+	endfor
+	return opts
 endfunc
 
 
@@ -451,10 +487,10 @@ function! asynctasks#run(bang, taskname, path)
 		call s:errmsg('not find task [' . a:taskname . ']')
 		return -2
 	endif
-	let item = tasks.config[a:taskname]
-	let ininame = item.__name__
+	let task = tasks.config[a:taskname]
+	let ininame = task.__name__
 	let source = 'task ['. a:taskname . '] from ' . ininame
-	if !has_key(item, 'command') || item.command == ''
+	if !has_key(task, 'command') || task.command == ''
 		call s:errmsg('not find command in ' . source)
 		return -3
 	endif
@@ -462,35 +498,8 @@ function! asynctasks#run(bang, taskname, path)
 		call s:errmsg('asyncrun is not installed')
 		return -4
 	endif
-	let opts = {}
-	if has_key(item, 'cwd')
-		let opts.cwd = item.cwd
-	endif
-	if has_key(item, 'mode')
-		let opts.mode = item.mode
-	endif
-	if has_key(item, 'raw')
-		let opts.raw = item.raw
-	endif
-	if has_key(item, 'save')
-		let opts.save = item.save
-	endif
-	if has_key(item, 'errorformat')
-		let opts.errorformat = item.errorformat
-		if item.errorformat == ''
-			let opts.raw = 1
-		endif
-	endif
-	if has_key(item, 'strip')
-		let opts.strip = item.strip
-	endif
-	for key in ['pos', 'rows', 'cols']
-		if has_key(item, key)
-			let opts[key] = item[key]
-		endif
-	endfor
-	" echo opts
-	call asyncrun#run(a:bang, opts, item.command)
+	let opts = s:task_option(task)
+	call asyncrun#run(a:bang, opts, task.command)
 	return 0
 endfunc
 
@@ -511,7 +520,7 @@ function! s:task_list(path)
 		let item = tasks.config[task]
 		let rows += [[task, item.__mode__, item.__name__]]
 	endfor
-	call asynctasks#print_table(rows)
+	call s:print_table(rows)
 endfunc
 
 
@@ -524,8 +533,11 @@ function! asynctasks#cmd(bang, ...)
 		call s:errmsg('empty task name, use ":AsyncTask -h" for help')
 		return -1
 	elseif taskname == '-h'
-		let text = 'usage: "AsyncTasks {taskname}" to run task, '
-		echo text . 'and "AsyncTasks -l" to list tasks.'
+		echo 'usage:  :AsyncTask <operation>'
+		echo 'operations:'
+		echo '    :AsyncTask {taskname}      - run specific task'
+		echo '    :AsyncTask -l              - list tasks'
+		echo '    :AsyncTask -h              - show this help'
 		return 0
 	elseif taskname == '-l'
 		call s:task_list('')
@@ -536,9 +548,18 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" 
+" commands
 "----------------------------------------------------------------------
-function! asynctasks#rtp_config()
+
+command! -bang -nargs=* AsyncTask
+			\ call asynctasks#cmd('<bang>', <q-args>)
+
+
+
+"----------------------------------------------------------------------
+" benchmark
+"----------------------------------------------------------------------
+function! asynctasks#timing()
 	let ts = reltime()
 	" call s:collect_rtp_config()
 	call asynctasks#collect_config('.', 1)
@@ -546,14 +567,6 @@ function! asynctasks#rtp_config()
 	echo s:private.rtp.config
 	return tt
 endfunc
-
-
-"----------------------------------------------------------------------
-" commands
-"----------------------------------------------------------------------
-
-command! -bang -nargs=* AsyncTask
-	\ call asynctasks#cmd('<bang>', <q-args>)
 
 
 
