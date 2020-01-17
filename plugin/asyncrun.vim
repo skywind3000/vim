@@ -1137,6 +1137,7 @@ function! s:start_in_terminal(opts)
 		endif
 	endif
 	if focus == 0
+		stopinsert
 		call win_gotoid(origin)
 	endif
 	return 0
