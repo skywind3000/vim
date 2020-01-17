@@ -24,7 +24,7 @@ endif
 " asynctasks
 "----------------------------------------------------------------------
 let s:config = (s:windows)? 'tasks.win32.ini' : 'tasks.linux.ini'
-let g:asynctasks_extra_config = [s:home . '/tools/tasks/'. s:config]
+let g:asynctasks_extra_config = [s:home . '/'. s:config]
 let g:asynctasks_term_pos = (s:windows && s:gui)? 'external' : 'tab'
 
 
