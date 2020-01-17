@@ -644,6 +644,8 @@ function! s:task_edit(mode, path)
 		\ '# this can be omitted (use the errorformat in vim)',
 		\ 'errorformat=%f:%l:%m',
 		\ '',
+		\ '# save file before execute',
+		\ 'save=1',
 		\ '',
 		\ ]
 	if newfile
@@ -664,7 +666,7 @@ function! asynctasks#cmd(bang, ...)
 	elseif taskname == '-h'
 		echo 'usage:  :AsyncTask <operation>'
 		echo 'operations:'
-		echo '    :AsyncTask {taskname}      - run specific task'
+		echo '    :AsyncTask {taskname}      - run task'
 		echo '    :AsyncTask -l              - list tasks'
 		echo '    :AsyncTask -h              - show this help'
 		echo '    :AsyncTask -e              - edit local task in project root'
