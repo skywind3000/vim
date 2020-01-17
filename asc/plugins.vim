@@ -3,9 +3,29 @@
 "----------------------------------------------------------------------
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
 let s:windows = has('win32') || has('win64') || has('win95') || has('win16')
-
+let s:gui = has('gui_running')
 
 " echo s:path('tools/win32')
+if has('nvim')
+	if exists('g:GuiLoaded')
+		if g:GuiLoaded != 0
+			let s:gui = 1
+		endif
+	elseif exists('*nvim_list_uis') && len(nvim_list_uis()) > 0
+		let uis = nvim_list_uis()[0]
+		let s:gui = get(uis, 'ext_termcolors', 0)? 0 : 1
+	elseif exists("+termguicolors") && (&termguicolors) != 0
+		let s:gui = 1
+	endif
+endif
+
+
+"----------------------------------------------------------------------
+" asynctasks
+"----------------------------------------------------------------------
+let s:config = (s:windows)? 'tasks.win32.ini' : 'tasks.linux.ini'
+let g:asynctasks_extra_config = [s:home . '/tools/tasks/'. s:config]
+let g:asynctasks_term_pos = (s:windows && s:gui)? 'external' : 'tab'
 
 
 "-----------------------------------------------------

@@ -243,7 +243,7 @@ function! s:cache_load_ini(name)
 			return obj
 		endif
 	endif
-	let config = s:readini(name, 1)
+	let config = s:readini(name, 0)
 	if type(config) != v:t_dict
 		let s:error = 'syntax error in '. a:name . ' line '. config
 		return config
