@@ -42,6 +42,11 @@ if !exists('g:asynctasks_tasks')
 	let g:asynctasks_tasks = {}
 endif
 
+" builtin
+if !exists('g:asynctasks_init_tasks')
+	let g:asynctasks_init_tasks = 1
+endif
+
 
 "----------------------------------------------------------------------
 " internal object
@@ -246,6 +251,12 @@ endfunc
 "----------------------------------------------------------------------
 function! s:collect_rtp_config() abort
 	let names = []
+	if g:asynctasks_init_tasks != 0
+		let name = s:abspath(s:scripthome . '/tools/default.ini')
+		if filereadable(name)
+			let names += [name]
+		endif
+	endif
 	for rtp in split(&rtp, ',')
 		if rtp != ''
 			let path = s:abspath(rtp . '/' . g:asynctasks_rtp_config)
@@ -335,8 +346,10 @@ function! asynctasks#collect_config(path, force)
 		let system = (len(parts) >= 2)? parts[1] : ''
 		if system == ''
 			let tasks.avail += [key]
+			let tasks.names[key] = 1
 		elseif system == g:asynctasks_system
 			let tasks.avail += [key]
+			let tasks.names[key] = 1
 		endif
 	endfor
 	let s:private.tasks = tasks
@@ -359,6 +372,41 @@ function! asynctasks#split(name)
 	let name = (len(parts) >= 1)? parts[0] : ''
 	let system = (len(parts) >= 2)? parts[1] : ''
 	return [name, system]
+endfunc
+
+
+"----------------------------------------------------------------------
+" run task
+"----------------------------------------------------------------------
+function! asynctasks#run(bang, taskname, ...)
+	let s:error = ''
+	let path = ''
+	if a:bang != ''
+		let path = getcwd()
+	else
+		let path = (a:0 >= 1)? a:1 : ''
+	endif
+	let path = (path == '')? expand('%:p') : path
+	call asynctasks#collect_config(path, 0)
+	if s:error != ''
+		return -1
+	endif
+	let s:error = ''
+	let tasks = s:private.tasks
+	if !has_key(tasks.names, a:taskname)
+		call s:errmsg('Not find task [' . a:taskname . ']')
+		return -2
+	endif
+	let item = tasks.config[a:taskname]
+	let ininame = item.__name__
+	let source = 'task ['. a:taskname . '] from ' . ininame
+	if !has_key(item, 'command') || item.command == ''
+		call s:errmsg('Not find command in ' . source)
+		return -3
+	endif
+	if item.command == ''
+	endif
+	return 0
 endfunc
 
 
