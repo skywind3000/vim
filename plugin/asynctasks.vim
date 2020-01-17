@@ -66,7 +66,7 @@ if !exists('g:asynctasks_term_rows')
 endif
 
 if !exists('g:asynctasks_term_focus')
-	let g:asynctasks_term_focus = 0
+	let g:asynctasks_term_focus = 1
 endif
 
 
