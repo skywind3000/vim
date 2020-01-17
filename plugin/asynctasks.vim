@@ -513,7 +513,12 @@ function! s:task_option(task)
 		if output == 'term' || output == 'terminal'
 			let pos = g:asynctasks_term_pos
 			let gui = get(g:, 'asyncrun_gui', 0)
-			if pos != 'external' && pos != 'system' && pos != 'os'
+			if pos == 'vim' || pos == 'bang'
+				let opts.mode = 'bang'
+			elseif pos == 'quickfix'
+				let opts.mode = 'async'
+				let opts.raw = 1
+			elseif pos != 'external' && pos != 'system' && pos != 'os'
 				let opts.mode = 'term'
 				let opts.pos = pos
 				let opts.cols = g:asynctasks_term_cols
