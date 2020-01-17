@@ -64,7 +64,7 @@ let s:index = 0
 function! s:errmsg(msg)
 	redraw | echo '' | redraw
 	echohl ErrorMsg
-	echom a:msg
+	echom 'Error: ' . a:msg
 	echohl NONE
 	let s:index += 1
 endfunc
@@ -286,8 +286,8 @@ function! s:collect_rtp_config() abort
 	let config = deepcopy(s:private.rtp.ini)
 	for key in keys(g:asynctasks_tasks)
 		let config[key] = g:asynctasks_tasks[key]
-		let config[key].__name__ = 'vim'
-		let config[key].__mode__ = 'vim'
+		let config[key].__name__ = 'vimscript'
+		let config[key].__mode__ = 'vimscript'
 	endfor
 	let s:private.rtp.config = config
 	return s:private.rtp.config
@@ -334,6 +334,8 @@ endfunc
 " fetch all config
 "----------------------------------------------------------------------
 function! asynctasks#collect_config(path, force)
+	let s:index = 0
+	let s:error = ''
 	let c1 = s:compose_rtp_config(a:force)
 	let c2 = s:compose_local_config(a:path)
 	let tasks = {'config':{}, 'names':{}, 'avail':[]}
@@ -355,6 +357,7 @@ function! asynctasks#collect_config(path, force)
 		endif
 	endfor
 	let s:private.tasks = tasks
+	return (s:index == 0)? 0 : -1
 endfunc
 
 
@@ -378,32 +381,85 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" format table
+"----------------------------------------------------------------------
+function! asynctasks#tabulify(rows)
+	let content = []
+	let rows = []
+	let nrows = len(a:rows)
+	let ncols = 0
+	for row in a:rows
+		if len(row) > ncols
+			let ncols = len(row)
+		endif
+	endfor
+	if nrows == 0 || ncols == 0
+		return content
+	endif
+	let sizes = repeat([0], ncols)
+	let index = range(ncols)
+	for row in a:rows
+		let newrow = deepcopy(row)
+		if len(newrow) < ncols
+			let newrow += repeat([''], ncols - len(newrow))
+		endif
+		for i in index
+			let size = len(newrow[i])
+			let sizes[i] = (sizes[i] < size)? size : sizes[i]
+		endfor
+		let rows += [newrow]
+	endfor
+	for row in rows
+		let ni = []
+		for i in index
+			let x = row[i]
+			let size = len(x)
+			if len(x) < sizes[i]
+				let x = x . repeat(' ', sizes[i] - size)
+			endif
+			let ni += [x]
+		endfor
+		let text = join(ni, '  ')
+		let content += [text]
+	endfor
+	return content
+endfunc
+
+
+"----------------------------------------------------------------------
+" display table
+"----------------------------------------------------------------------
+function! asynctasks#print_table(rows)
+	let content = asynctasks#tabulify(a:rows)
+	for line in content
+		echo ' '. line
+	endfor
+endfunc
+
+
+"----------------------------------------------------------------------
 " run task
 "----------------------------------------------------------------------
 function! asynctasks#run(bang, taskname, path)
-	let path = (a:bang != '')? getcwd() : a:path
-	let path = (path == '')? expand('%:p') : path
-	let s:error = ''
-	let s:index = 0
-	call asynctasks#collect_config(path, 1)
-	if s:error != '' || s:index != 0
+	let path = (a:path == '')? expand('%:p') : a:path
+	if asynctasks#collect_config(path, 1) != 0
 		return -1
 	endif
 	let s:error = ''
 	let tasks = s:private.tasks
 	if !has_key(tasks.names, a:taskname)
-		call s:errmsg('Error: not find task [' . a:taskname . ']')
+		call s:errmsg('not find task [' . a:taskname . ']')
 		return -2
 	endif
 	let item = tasks.config[a:taskname]
 	let ininame = item.__name__
 	let source = 'task ['. a:taskname . '] from ' . ininame
 	if !has_key(item, 'command') || item.command == ''
-		call s:errmsg('Error: not find command in ' . source)
+		call s:errmsg('not find command in ' . source)
 		return -3
 	endif
 	if exists(':AsyncRun') == 0
-		call s:errmsg('Error: asyncrun is not installed')
+		call s:errmsg('asyncrun is not installed')
 		return -4
 	endif
 	let opts = {}
@@ -439,6 +495,25 @@ function! asynctasks#run(bang, taskname, path)
 endfunc
 
 
+"----------------------------------------------------------------------
+" list tasks
+"----------------------------------------------------------------------
+function! s:task_list(path)
+	let path = (a:path == '')? expand('%:p') : a:path
+	if asynctasks#collect_config(path, 1) != 0
+		return -1
+	endif
+	let tasks = s:private.tasks
+	let rows = []
+	let rows += [['Task', 'Type', 'Config']]
+	let rows += [['----', '----', '------']]
+	for task in tasks.avail
+		let item = tasks.config[task]
+		let rows += [[task, item.__mode__, item.__name__]]
+	endfor
+	call asynctasks#print_table(rows)
+endfunc
+
 
 "----------------------------------------------------------------------
 " command AsyncTask
@@ -446,16 +521,16 @@ endfunc
 function! asynctasks#cmd(bang, ...)
 	let taskname = (a:0 >= 1)? (a:1) : ''
 	if taskname == ''
-		call s:errmsg('Error: empty task name, use ":AsyncTask -h" for help')
+		call s:errmsg('empty task name, use ":AsyncTask -h" for help')
 		return -1
 	elseif taskname == '-h'
 		return 0
 	elseif taskname == '-l'
+		call s:task_list('')
 		return 0
 	endif
 	call asynctasks#run(a:bang, taskname, '')
 endfunc
-
 
 
 "----------------------------------------------------------------------
