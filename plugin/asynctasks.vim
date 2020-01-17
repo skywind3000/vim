@@ -3,7 +3,7 @@
 " asynctasks.vim - 
 "
 " Created by skywind on 2020/01/16
-" Last Modified: 2020/01/16 00:50:59
+" Last Modified: 2020/01/18 04:29
 "
 "======================================================================
 
@@ -523,6 +523,7 @@ function! s:task_option(task)
 				let opts.pos = pos
 				let opts.cols = g:asynctasks_term_cols
 				let opts.rows = g:asynctasks_term_rows
+				let opts.focus = 1
 			elseif s:windows && gui != 0
 				let opts.mode = 'system'
 			else
@@ -544,7 +545,7 @@ function! s:task_option(task)
 	if has_key(task, 'strip')
 		let opts.strip = task.strip
 	endif
-	for key in ['pos', 'rows', 'cols']
+	for key in ['pos', 'rows', 'cols', 'focus']
 		if has_key(task, key)
 			let opts[key] = task[key]
 		endif
