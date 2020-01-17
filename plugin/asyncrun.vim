@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/01/18 04:19
+" Last Modified: 2020/01/18 04:28
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1098,6 +1098,8 @@ function! s:start_in_terminal(opts)
 	let uid = win_getid()
 	noautocmd windo call s:save_restore_view(0)
 	noautocmd call win_gotoid(uid)
+	let focus = get(a:opts, 'focus', 0)
+	let origin = win_getid()
 	if avail < 0
 		let rows = get(a:opts, 'rows', '')
 		let cols = get(a:opts, 'cols', '')
@@ -1131,6 +1133,9 @@ function! s:start_in_terminal(opts)
 		exec 'term '. command
 		setlocal nonumber signcolumn=no
 		startinsert
+	endif
+	if focus == 0
+		call win_gotoid(origin)
 	endif
 	return 0
 endfunc
@@ -1506,7 +1511,7 @@ endfunc
 " asyncrun -version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.2.0'
+	return '2.2.1'
 endfunc
 
 
