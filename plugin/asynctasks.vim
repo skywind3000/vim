@@ -537,6 +537,9 @@ function! s:task_option(task)
 				let opts.rows = g:asynctasks_term_rows
 				let opts.focus = g:asynctasks_term_focus
 			endif
+		elseif output == 'quickfix-raw' || output == 'raw'
+			let opts.mode = 'async'
+			let opts.raw = 1
 		elseif output == 'vim'
 			let opts.mode = 'bang'
 		endif
