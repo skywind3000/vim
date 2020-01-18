@@ -103,7 +103,7 @@ function! s:replace(text, old, new)
 endfunc
 
 " load ini file
-function! s:readini(source, strict)
+function! s:readini(source)
 	if type(a:source) == type('')
 		if !filereadable(a:source)
 			return -1
@@ -126,6 +126,9 @@ function! s:readini(source, strict)
 			continue
 		elseif t =~ '^\[.*\]$'
 			let current = substitute(t, '^\[\s*\(.\{-}\)\s*\]$', '\1', '')
+			if !has_key(sections, current)
+				let sections[current] = {}
+			endif
 		else
 			let pos = stridx(t, '=')
 			if pos >= 0
@@ -137,8 +140,6 @@ function! s:readini(source, strict)
 					let sections[current] = {}
 				endif
 				let sections[current][key] = val
-			elseif a:strict != 0
-				return index
 			endif
 		endif
 	endfor
@@ -228,7 +229,10 @@ function! s:abspath(path)
 	return f
 endfunc
 
-" read ini
+
+"----------------------------------------------------------------------
+" read ini in cache
+"----------------------------------------------------------------------
 function! s:cache_load_ini(name)
 	let name = (stridx(a:name, '~') >= 0)? expand(a:name) : a:name
 	let name = s:abspath(name)
@@ -247,7 +251,7 @@ function! s:cache_load_ini(name)
 			return obj
 		endif
 	endif
-	let config = s:readini(name, 0)
+	let config = s:readini(name)
 	if type(config) != v:t_dict
 		let s:error = 'syntax error in '. a:name . ' line '. config
 		return config
@@ -259,12 +263,30 @@ function! s:cache_load_ini(name)
 	let obj.config = config
 	let obj.keys = keys(config)
 	let home = fnamemodify(name, ':h')
+	let special = []
 	for sect in obj.keys
 		let section = obj.config[sect]
+		if stridx(sect, ':') >= 0
+			let special += [sect]
+		endif
 		for key in keys(section)
 			let val = section[key]
 			let section[key] = s:replace(val, '$(CFGHOME)', home)
 		endfor
+	endfor
+	let sys = g:asynctasks_system
+	for key in special
+		let parts = split(key, ':')
+		let name = s:strip((len(parts) >= 1)? parts[0] : '')
+		let system = s:strip((len(parts) >= 2)? parts[1] : '')
+		if name == '' 
+			unlet obj.config[key]
+		elseif system == g:asynctasks_system || system == ''
+			let obj.config[name] = obj.config[key]
+			unlet obj.config[key]
+		else
+			unlet obj.config[key]
+		endif
 	endfor
 	return obj
 endfunc

@@ -34,6 +34,9 @@ function! asclib#ini#read(source)
 			continue
 		elseif t =~ '^\[.*\]$'
 			let current = substitute(t, '^\[\s*\(.\{-}\)\s*\]$', '\1', '')
+			if !has_key(sections, current)
+				let sections[current] = {}
+			endif
 		else
 			let pos = stridx(t, '=')
 			if pos >= 0
@@ -45,8 +48,6 @@ function! asclib#ini#read(source)
 					let sections[current] = {}
 				endif
 				let sections[current][key] = val
-			else
-				return index
 			endif
 		endif
 	endfor
