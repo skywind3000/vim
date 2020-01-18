@@ -307,7 +307,7 @@ function! quickui#tools#display_help(tag)
 	let opts.title = 'Help: ' . fnamemodify(name, ':t')
 	let opts.command = command
 	let opts.w = 80
-	echom opts
+	" echom opts
 	let winid = quickui#textbox#open(content, opts)
 	" call win_execute(winid, command)
 	return 0
