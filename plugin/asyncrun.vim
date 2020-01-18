@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/01/18 13:52
+" Last Modified: 2020/01/18 13:56
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -193,6 +193,9 @@ if !exists('g:asyncrun_stdin')
 	let g:asyncrun_stdin = has('win32') || has('win64') || has('win95')
 endif
 
+if !exists('g:asyncrun_script')
+	let g:asyncrun_script = ''
+endif
 
 
 "----------------------------------------------------------------------
