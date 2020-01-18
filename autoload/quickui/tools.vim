@@ -308,7 +308,7 @@ function! quickui#tools#display_help(tag)
 	let g:quickui#tools#hint = item[1]
 	let opts.command = ['silent! exec g:quickui#tools#hint']
 	let opts.command += ["exec 'nohl'"]
-	let opts.command += ["normal zz4\<c-E>"]
+	let opts.command += ["normal zz"]
 	let opts.w = 80
 	" echom opts
 	let winid = quickui#textbox#open(content, opts)
