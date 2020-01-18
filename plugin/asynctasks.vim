@@ -308,6 +308,24 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" merge starry
+"----------------------------------------------------------------------
+function! s:starry_merge(target, source)
+	let g1 = s:strip(get(a:target, 'grep', ''))
+	let g2 = s:strip(get(a:source, 'grep', ''))
+	if g1 != '' && g2 != ''
+		let gg = g1 . ',' . g2
+	elseif g1 != '' && g2 == ''
+		let gg = g1
+	else
+		let gg = g2
+	endif
+	let a:target['grep'] = gg
+	return a:target
+endfunc
+
+
+"----------------------------------------------------------------------
 " collect config in rtp
 "----------------------------------------------------------------------
 function! s:collect_rtp_config() abort
@@ -337,14 +355,19 @@ function! s:collect_rtp_config() abort
 			let names += [name]
 		endif
 	endfor
-	let s:private.rtp.ini = {}
+	let s:private.rtp.ini = {'*':{'__name__':'', '__mode__':''}}
 	let config = {}
 	let s:error = ''
+	let starry = s:private.rtp.ini['*']
 	for name in names
 		let obj = s:cache_load_ini(name)
 		if s:error == ''
 			for key in keys(obj.config)
-				let s:private.rtp.ini[key] = obj.config[key]
+				if key != '*'
+					let s:private.rtp.ini[key] = obj.config[key]
+				else
+					call s:starry_merge(starry, obj.config['*'])
+				endif
 				let s:private.rtp.ini[key].__name__ = name
 				let s:private.rtp.ini[key].__mode__ = "global"
 			endfor
@@ -355,7 +378,11 @@ function! s:collect_rtp_config() abort
 	endfor
 	let config = deepcopy(s:private.rtp.ini)
 	for key in keys(g:asynctasks_tasks)
-		let config[key] = g:asynctasks_tasks[key]
+		if key != '*'
+			let config[key] = g:asynctasks_tasks[key]
+		else
+			call s:starry_merge(starry, g:asynctasks_tasks['*'])
+		endif
 		let config[key].__name__ = 'vimscript'
 		let config[key].__mode__ = 'vimscript'
 	endfor
@@ -380,13 +407,18 @@ endfunc
 "----------------------------------------------------------------------
 function! s:compose_local_config(path)
 	let names = s:search_parent(g:asynctasks_config_name, a:path)
-	let config = {}
+	let config = {'*':{'__name__':'', '__mode__':''}}
+	let starry = config['*']
 	for name in names
 		let s:error = ''
 		let obj = s:cache_load_ini(name)
 		if s:error == ''
 			for key in keys(obj.config)
-				let config[key] = obj.config[key]
+				if key != '*'
+					let config[key] = obj.config[key]
+				else
+					call s:starry_merge(starry, obj.config['*'])
+				endif
 				let config[key].__name__ = name
 				let config[key].__mode__ = 'local'
 			endfor
@@ -397,6 +429,13 @@ function! s:compose_local_config(path)
 	endfor
 	let s:private.local.config = config
 	return config
+endfunc
+
+
+"----------------------------------------------------------------------
+" 
+"----------------------------------------------------------------------
+function! s:sort_item(i1, i2)
 endfunc
 
 
@@ -414,17 +453,17 @@ function! asynctasks#collect_config(path, force)
 			let tasks.config[key] = cc[key]
 		endfor
 	endfor
+	let avail = []
+	let modes = {'global':2, 'vimscript':1, 'local':0}
 	for key in keys(tasks.config)
-		let parts = split(key, ':')
-		let name = (len(parts) >= 1)? parts[0] : ''
-		let system = (len(parts) >= 2)? parts[1] : ''
-		if system == ''
-			let tasks.avail += [key]
+		if key != '*'
 			let tasks.names[key] = 1
-		elseif system == g:asynctasks_system
-			let tasks.avail += [key]
-			let tasks.names[key] = 1
+			let avail += [[key, modes[tasks.config[key].__mode__]]]
 		endif
+	endfor
+	call sort(avail)
+	for item in avail
+		let tasks.avail += [item[0]]
 	endfor
 	let s:private.tasks = tasks
 	return (s:index == 0)? 0 : -1
@@ -520,7 +559,7 @@ endfunc
 "----------------------------------------------------------------------
 function! s:task_option(task)
 	let task = a:task
-	let opts = {}
+	let opts = {'mode':''}
 	if has_key(task, 'cwd')
 		let opts.cwd = task.cwd
 	endif
@@ -587,7 +626,7 @@ endfunc
 "----------------------------------------------------------------------
 " run task
 "----------------------------------------------------------------------
-function! asynctasks#run(bang, taskname, path)
+function! asynctasks#start(bang, taskname, path)
 	let path = (a:path == '')? expand('%:p') : a:path
 	if asynctasks#collect_config(path, 1) != 0
 		return -1
@@ -722,7 +761,7 @@ function! asynctasks#cmd(bang, ...)
 		call s:task_edit(taskname, (a:0 >= 2)? (a:2) : '')
 		return 0
 	endif
-	call asynctasks#run(a:bang, taskname, '')
+	call asynctasks#start(a:bang, taskname, '')
 endfunc
 
 
