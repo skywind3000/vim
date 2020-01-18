@@ -1217,7 +1217,8 @@ function! s:run(opts)
 		if s:asyncrun_windows != 0 && s:asyncrun_gui != 0
 			let l:mode = 4
 		else
-			let l:mode = (s:asyncrun_script == '')? 2 : 4
+			let script = get(g:, 'asyncrun_script', '')
+			let l:mode = (script == '')? 2 : 4
 		endif
 	endif
 
