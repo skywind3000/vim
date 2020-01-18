@@ -50,7 +50,7 @@ function! asclib#utils#terminal(mode, cmd, wait, ...) abort
 		let cmd .= ' '
 	endif
 	let cmd = 'python '.shellescape(script). ' ' .cmd . a:cmd
-	exec 'VimMake -mode=5 '.cmd
+	exec 'AsyncRun -mode=5 '.cmd
 endfunc
 
 
@@ -184,7 +184,7 @@ function! asclib#utils#script_menu()
 	call quickmenu#append('# Scripts', '')
 	
 	for item in s:list_script()
-		let cmd = 'VimMake -raw ' . item.cmd
+		let cmd = 'AsyncRun -raw ' . item.cmd
 		call quickmenu#append(item.name, cmd, 'run ' . item.name)	
 	endfor
 

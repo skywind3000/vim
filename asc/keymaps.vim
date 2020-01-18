@@ -159,11 +159,11 @@ if has('gui_running') || (has('nvim') && (has('win32') || has('win64')))
 		noremap <m-\|> :call Toggle_Transparency(15)<cr>
 	endif
 	if has('win32') || has('win64') || has('win16')
-		noremap <silent><m-f> :VimMake -mode=0 -cwd=<root> mingw32-make -f Makefile<cr>
-		noremap <silent><m-g> :VimMake -mode=4 -cwd=<root> mingw32-make -f Makefile test<cr>
+		noremap <silent><m-f> :AsyncRun -mode=0 -cwd=<root> mingw32-make -f Makefile<cr>
+		noremap <silent><m-g> :AsyncRun -mode=4 -cwd=<root> mingw32-make -f Makefile test<cr>
 	else
-		noremap <silent><m-f> :VimMake -mode=0 -cwd=<root> make -f Makefile<cr>
-		noremap <silent><m-g> :VimMake -mode=4 -cwd=<root> make -f Makefile test<cr>
+		noremap <silent><m-f> :AsyncRun -mode=0 -cwd=<root> make -f Makefile<cr>
+		noremap <silent><m-g> :AsyncRun -mode=4 -cwd=<root> make -f Makefile test<cr>
 	endif
 endif
 
@@ -182,9 +182,9 @@ endif
 "----------------------------------------------------------------------
 " space + s : svn
 "----------------------------------------------------------------------
-noremap <space>sc :VimMake svn co -m "update from vim"<cr>
-noremap <space>su :VimMake svn up<cr>
-noremap <space>st :VimMake svn st<cr>
+noremap <space>sc :AsyncRun svn co -m "update from vim"<cr>
+noremap <space>su :AsyncRun svn up<cr>
+noremap <space>st :AsyncRun svn st<cr>
 
 " editing commands
 noremap <space>aa ggVG
@@ -193,20 +193,20 @@ noremap <space>aa ggVG
 "----------------------------------------------------------------------
 " space + j : make
 "----------------------------------------------------------------------
-noremap <silent><space>jj  :VimMake -cwd=<root> make<cr>
-noremap <silent><space>jc  :VimMake -cwd=<root> make clean<cr>
-noremap <silent><space>jk  :VimMake -mode=4 -cwd=<root> make run<cr>
-noremap <silent><space>jl  :VimMake -mode=4 -cwd=<root> make test<cr>
-noremap <silent><space>j1  :VimMake -mode=4 -cwd=<root> make t1<cr>
-noremap <silent><space>j2  :VimMake -mode=4 -cwd=<root> make t2<cr>
-noremap <silent><space>j3  :VimMake -mode=4 -cwd=<root> make t3<cr>
-noremap <silent><space>j4  :VimMake -mode=4 -cwd=<root> make t4<cr>
-noremap <silent><space>j5  :VimMake -mode=4 -cwd=<root> make t5<cr>
-noremap <silent><space>k1  :VimMake -cwd=<root> make t1<cr>
-noremap <silent><space>k2  :VimMake -cwd=<root> make t2<cr>
-noremap <silent><space>k3  :VimMake -cwd=<root> make t3<cr>
-noremap <silent><space>k4  :VimMake -cwd=<root> make t4<cr>
-noremap <silent><space>k5  :VimMake -cwd=<root> make t5<cr>
+noremap <silent><space>jj  :AsyncRun -cwd=<root> make<cr>
+noremap <silent><space>jc  :AsyncRun -cwd=<root> make clean<cr>
+noremap <silent><space>jk  :AsyncRun -mode=4 -cwd=<root> make run<cr>
+noremap <silent><space>jl  :AsyncRun -mode=4 -cwd=<root> make test<cr>
+noremap <silent><space>j1  :AsyncRun -mode=4 -cwd=<root> make t1<cr>
+noremap <silent><space>j2  :AsyncRun -mode=4 -cwd=<root> make t2<cr>
+noremap <silent><space>j3  :AsyncRun -mode=4 -cwd=<root> make t3<cr>
+noremap <silent><space>j4  :AsyncRun -mode=4 -cwd=<root> make t4<cr>
+noremap <silent><space>j5  :AsyncRun -mode=4 -cwd=<root> make t5<cr>
+noremap <silent><space>k1  :AsyncRun -cwd=<root> make t1<cr>
+noremap <silent><space>k2  :AsyncRun -cwd=<root> make t2<cr>
+noremap <silent><space>k3  :AsyncRun -cwd=<root> make t3<cr>
+noremap <silent><space>k4  :AsyncRun -cwd=<root> make t4<cr>
+noremap <silent><space>k5  :AsyncRun -cwd=<root> make t5<cr>
 
 noremap <silent><space>jm :call Tools_SwitchMakeFile()<cr>
 
@@ -364,9 +364,9 @@ noremap <silent><space>lt :call asclib#html_prettify()<cr>
 " more personal in gvim
 "----------------------------------------------------------------------
 if has('gui_running') && (has('win32') || has('win64'))
-	noremap <S-F11> :VimMake -mode=4 -cwd=$(VIM_FILEDIR) -save=1 d:\\software\\anaconda3\\python.exe "$(VIM_FILENAME)"<cr>
-	inoremap <S-F11> <ESC>:VimMake -mode=4 -cwd=$(VIM_FILEDIR) d:\\software\\anaconda3\\python.exe "$(VIM_FILENAME)"<cr>
-	noremap <S-F12> :VimMake -mode=4 -save=1 -cwd=$(VIM_FILEDIR) d:\\dev\\python64\\python.exe "$(VIM_FILENAME)"<cr>
+	noremap <S-F11> :AsyncRun -mode=4 -cwd=$(VIM_FILEDIR) -save=1 d:\\software\\anaconda3\\python.exe "$(VIM_FILENAME)"<cr>
+	inoremap <S-F11> <ESC>:AsyncRun -mode=4 -cwd=$(VIM_FILEDIR) d:\\software\\anaconda3\\python.exe "$(VIM_FILENAME)"<cr>
+	noremap <S-F12> :AsyncRun -mode=4 -save=1 -cwd=$(VIM_FILEDIR) d:\\dev\\python64\\python.exe "$(VIM_FILENAME)"<cr>
 endif
 
 noremap <C-F10> :VimBuild gcc -pg<cr>

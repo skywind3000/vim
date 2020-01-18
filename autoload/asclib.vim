@@ -213,7 +213,7 @@ function! asclib#open_win32_help(hlp, keyword)
 		if a:keyword != ''
 			let cmd .= ' ' . shellescape(a:keyword)
 		endif
-		exec 'VimMake -mode=5 '.cmd
+		exec 'AsyncRun -mode=5 '.cmd
 		return 0
 	endif
 	let cmd = 'WinHlp32.exe '
@@ -223,7 +223,7 @@ function! asclib#open_win32_help(hlp, keyword)
 			let cmd .= '-k '.kw. ' '
 		endif
 	endif
-	exec 'VimMake -mode=5 '.cmd. shellescape(a:hlp)
+	exec 'AsyncRun -mode=5 '.cmd. shellescape(a:hlp)
 	return 0
 endfunc
 
@@ -234,7 +234,7 @@ function! asclib#open_win32_chm(chm, keyword)
 		return 1
 	endif
 	if a:keyword == ''
-		silent exec 'VimMake -mode=5 '.shellescape(a:chm)
+		silent exec 'AsyncRun -mode=5 '.shellescape(a:chm)
 		return 0
 	else
 		if asclib#path#which('KeyHH.exe') == ''

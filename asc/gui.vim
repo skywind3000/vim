@@ -151,9 +151,9 @@ endif
 amenu 80.10 B&uild.&Run<TAB>F5 :VimExecute run<cr>
 amenu 80.20 B&uild.E&xecute<TAB>F6 :VimExecute filename<cr>
 amenu 80.25 B&uild.-s1- :
-amenu 80.30 B&uild.&Gcc<TAB>F9 :VimMake gcc<cr>
-amenu 80.35 B&uild.&Emake<Tab>F7 :VimMake emake<cr>
-amenu 80.40 B&uild.GNU\ &Make :VimMake make<cr>
+amenu 80.30 B&uild.&Gcc<TAB>F9 :AsyncRun gcc<cr>
+amenu 80.35 B&uild.&Emake<Tab>F7 :AsyncRun emake<cr>
+amenu 80.40 B&uild.GNU\ &Make :AsyncRun make<cr>
 amenu 80.42 B&uild.-s2- :
 amenu 80.45 B&uild.User\ Tool\ 1 :VimTool 1<cr>
 amenu 80.50 B&uild.User\ Tool\ 2 :VimTool 2<cr>
