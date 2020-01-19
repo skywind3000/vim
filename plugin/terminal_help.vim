@@ -24,7 +24,7 @@ if !exists('g:terminal_key')
 	let g:terminal_key = '<m-=>'
 endif
 
-" where (working directory) to open terminal: 
+" initialize shell directory
 " 0: vim's current working directory (which :pwd returns)
 " 1: file path of current file.
 " 2: project root of current file.
