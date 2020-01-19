@@ -16,6 +16,29 @@ endif
 
 
 "----------------------------------------------------------------------
+" configuration
+"----------------------------------------------------------------------
+
+" which key is used to toggle terminal
+if !exists('g:terminal_key')
+	let g:terminal_key = '<m-=>'
+endif
+
+" where (working directory) to open terminal: 
+" 0: vim's current working directory (which :pwd returns)
+" 1: file path of current file.
+" 2: project root of current file.
+if !exists('g:terminal_cwd')
+	let g:terminal_cwd = 1
+endif
+
+" root markers to identify the project root
+if !exists('g:terminal_rootmarkers')
+	let g:terminal_rootmarkers = ['.git', '.svn', '.project', '.root', '.hg']
+endif
+
+
+"----------------------------------------------------------------------
 " Initialize
 "----------------------------------------------------------------------
 let $VIM_SERVERNAME = v:servername
@@ -42,6 +65,42 @@ if has('nvim')
 		let $VIM_NVR=name
 	endif
 endif
+
+
+"----------------------------------------------------------------------
+" internal utils
+"----------------------------------------------------------------------
+
+" returns nearest parent directory contains one of the markers
+function! s:find_root(name, markers, strict)
+	let name = fnamemodify((a:name != '')? a:name : bufname(), ':p')
+	let finding = ''
+	" iterate all markers
+	for marker in split(g:projectile#marker, ',')
+		if marker != ''
+			" search as a file
+			let x = findfile(marker, name . '/;')
+			let x = (x == '')? '' : fnamemodify(x, ':p:h')
+			" search as a directory
+			let y = finddir(marker, name . '/;')
+			let y = (y == '')? '' : fnamemodify(y, ':p:h:h')
+			" which one is the nearest directory ?
+			let z = (strchars(x) > strchars(y))? x : y
+			" keep the nearest one in finding
+			let finding = (strchars(z) > strchars(finding))? z : finding
+		endif
+	endfor
+	if finding == ''
+		return (a:strict == 0)? fnamemodify(name, ':h') : ''
+	endif
+	return fnamemodify(finding, ':p')
+endfunc
+
+" returns project root of current file
+function! s:project_root()
+	let name = expand('%:p')
+	return s:find_root(name, g:terminal_rootmarkers, 0)
+endfunc
 
 
 "----------------------------------------------------------------------
@@ -93,7 +152,11 @@ function! TerminalOpen()
 		let close = get(g:, 'terminal_close', 0)
 		let savedir = getcwd()
 		let workdir = (expand('%') == '')? expand('~') : expand('%:p:h')
-		silent execute cd . ' '. fnameescape(workdir)
+		if g:terminal_cwd == 1
+			silent execute cd . ' '. fnameescape(workdir)
+		elseif g:terminal_cwd == 2
+			silent execute cd . ' '. fnameescape(s:project_root())
+		endif
 		if has('nvim') == 0
 			let kill = get(g:, 'terminal_kill', '')
 			let cmd = pos . ' term ' . (close? '++close' : '++noclose') 
@@ -251,12 +314,15 @@ if get(g:, 'terminal_default_mapping', 1)
 		tnoremap <m--> <c-\><c-n>"0pa
 	endif
 
-	nnoremap <silent><m-=> :call TerminalToggle()<cr>
+	let s:cmd = 'nnoremap <silent>'.(g:terminal_key). ' '
+	exec s:cmd . ':call TerminalToggle()<cr>'
 
 	if has('nvim') == 0
-		tnoremap <silent><m-=> <c-_>:call TerminalToggle()<cr>
+		let s:cmd = 'tnoremap <silent>'.(g:terminal_key). ' '
+		exec s:cmd . '<c-_>:call TerminalToggle()<cr>'
 	else
-		tnoremap <silent><m-=> <c-\><c-n>:call TerminalToggle()<cr>
+		let s:cmd = 'tnoremap <silent>'.(g:terminal_key). ' '
+		exec s:cmd . '<c-\><c-n>:call TerminalToggle()<cr>'
 	endif
 endif
 
