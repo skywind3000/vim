@@ -151,8 +151,8 @@ function! TerminalOpen()
 		let shell = get(g:, 'terminal_shell', '')
 		let close = get(g:, 'terminal_close', 0)
 		let savedir = getcwd()
-		let workdir = (expand('%') == '')? getcwd() : expand('%:p:h')
 		if g:terminal_cwd == 1
+			let workdir = (expand('%') == '')? getcwd() : expand('%:p:h')
 			silent execute cd . ' '. fnameescape(workdir)
 		elseif g:terminal_cwd == 2
 			silent execute cd . ' '. fnameescape(s:project_root())
