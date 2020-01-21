@@ -151,7 +151,7 @@ function! s:find_root(name, markers, strict)
 	let name = fnamemodify((a:name != '')? a:name : bufname(), ':p')
 	let finding = ''
 	" iterate all markers
-	for marker in split(g:projectile#marker, ',')
+	for marker in split(a:markers, ',')
 		if marker != ''
 			" search as a file
 			let x = findfile(marker, name . '/;')
