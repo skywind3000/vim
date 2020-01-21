@@ -237,7 +237,7 @@ endfunc
 "----------------------------------------------------------------------
 " safe print
 "----------------------------------------------------------------------
-function! quickui#utils#print(content, highlight)
+function! quickui#utils#print(content, highlight, ...)
 	let saveshow = &showmode
 	set noshowmode
     let wincols = &columns
@@ -251,7 +251,10 @@ function! quickui#utils#print(content, highlight)
 		let width = len(l:content)
 	endif
 	" prevent scrolling caused by multiple echo
-	redraw 
+	let needredraw = (a:0 >= 1)? a:1 : 1
+	if needredraw != 0
+		redraw 
+	endif
 	if a:highlight != 0
 		echohl Type
 		echo l:content

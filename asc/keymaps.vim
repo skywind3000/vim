@@ -218,7 +218,7 @@ noremap <silent><space>jm :call Tools_SwitchMakeFile()<cr>
 "inoremap <silent><C-F10> <c-\><c-o>:call Toggle_Taglist()<cr>
 noremap <silent><S-F10> :call quickmenu#toggle(0)<cr>
 inoremap <silent><S-F10> <ESC>:call quickmenu#toggle(0)<cr>
-noremap <silent><M-;> :PreviewTag<cr>
+noremap <silent><M-;> :call quickui#tools#preview_tag('')<cr>
 noremap <silent><M-:> :PreviewClose<cr>
 noremap <silent><tab>; :PreviewGoto edit<cr>
 noremap <silent><tab>: :PreviewGoto tabe<cr>
