@@ -407,6 +407,7 @@ nnoremap <silent><space>at :MyCheatSheetAlign<cr>
 vnoremap <silent><space>at :MyCheatSheetAlign<cr>
 
 noremap <m-i> :call quickui#tools#list_function()<cr>
+noremap <m-I> :call quickui#tools#list_function()<cr>
 noremap <m-y> :call quickui#tools#list_function()<cr>
 
 
