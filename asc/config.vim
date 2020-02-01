@@ -310,6 +310,12 @@ function! Terminal_FnInit(mode)
 	endif
 endfunc
 
+function! Terminal_MetaShiftNum()
+	for i in range(10)
+		exec "set <m-" . (i + 1) . ">=\e" . nr2char(char2nr('!') + i)
+	endfor
+endfunc
+
 
 call Terminal_SwitchTab()
 
