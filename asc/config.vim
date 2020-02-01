@@ -311,12 +311,9 @@ function! Terminal_FnInit(mode)
 endfunc
 
 function! Terminal_MetaShiftNum()
+	let array = [')', '!', '@', '#', '$', '%', '^', '&', '*', '(']
 	for i in range(10)
-		if i == 0
-			exec "set <m-0>=\e)"
-		else
-			exec "set <m-" . (i + 1) . ">=\e" . nr2char(char2nr('!') + i - 1)
-		endif
+		exec "set <m-" . i . ">=\e" . array[i]
 	endfor
 endfunc
 
