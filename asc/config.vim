@@ -312,7 +312,11 @@ endfunc
 
 function! Terminal_MetaShiftNum()
 	for i in range(10)
-		exec "set <m-" . (i + 1) . ">=\e" . nr2char(char2nr('!') + i)
+		if i == 0
+			exec "set <m-0>=\e)"
+		else
+			exec "set <m-" . (i + 1) . ">=\e" . nr2char(char2nr('!') + i - 1)
+		endif
 	endfor
 endfunc
 
