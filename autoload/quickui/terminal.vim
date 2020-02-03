@@ -177,7 +177,7 @@ endfunc
 "----------------------------------------------------------------------
 function! quickui#terminal#open(cmd, opts)
 	let opts = deepcopy(a:opts)
-	let border = get(opts, 'border', 0)
+	let border = get(a:opts, 'border', g:quickui#style#border)
 	if border == 0
 		if has_key(opts, 'title')
 			unlet opts['title']
