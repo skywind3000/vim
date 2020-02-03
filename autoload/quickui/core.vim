@@ -341,6 +341,7 @@ function! quickui#core#neovim_buffer(name, textlist)
 		let bid = nvim_create_buf(v:false, v:true)
 		let s:buffer_cache[a:name] = bid
 	endif
+	call nvim_buf_set_option(bid, 'modifiable', v:true)
 	call nvim_buf_set_lines(bid, 0, -1, v:true, a:textlist)
 	return bid
 endfunc

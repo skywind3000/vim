@@ -42,7 +42,7 @@ function! quickui#terminal#create(cmd, opts)
 		let opts = {'hidden': 1, 'term_rows':h, 'term_cols':w}
 		let opts.term_kill = get(a:opts, 'term_kill', 'term')
 		let opts.norestore = 1
-		let opts.exit_cb = 'quickui#terminal#exit_cb'
+		let opts.exit_cb = function('s:vim_term_exit')
 		let opts.term_finish = 'close'
 		let savedir = getcwd()
 		if has_key(a:opts, 'cwd')
@@ -65,13 +65,54 @@ function! quickui#terminal#create(cmd, opts)
 		let opts.borderchars = quickui#core#border_vim(border)
 		let opts.drag = get(a:opts, 'drag', 1)
 		let opts.resize = 0
-		let opts.callback = 'quickui#terminal#callback'
+		let opts.callback = function('s:vim_popup_callback')
 		let winid = popup_create(bid, opts)
 		call popup_move(winid, {'line':hwnd.opts.line, 'col':hwnd.opts.col})
 		let hwnd.winid = winid
 		let g:quickui#terminal#current = hwnd
+		let s:current = hwnd
 		call popup_show(winid)
 	else
+		let bid = quickui#core#neovim_buffer('terminal', [])
+		let opts = {'focusable':1, 'style':'minimal', 'relative':'editor'}
+		let opts.width = w
+		let opts.height = h
+		let opts.row = hwnd.opts.line - 1 + ((border > 0)? 1 : 0)
+		let opts.col = hwnd.opts.col - 1 + ((border > 0)? 1 : 0)
+		let winid = nvim_open_win(bid, 1, opts)
+		let hwnd.winid = winid
+		let hwnd.background = -1
+		let hl = 'Normal:'.color.',NonText:'.color.',EndOfBuffer:'.color
+		call nvim_win_set_option(winid, 'winhl', hl)
+		if winid < 0
+			return -1
+		endif
+		if border > 0
+			let title = has_key(a:opts, 'title')? ' ' . a:opts.title . ' ':''
+			let back = quickui#utils#make_border(w, h, border, title, button)
+			let nbid = quickui#core#neovim_buffer('terminalborder', back)
+			let op = {'relative':'editor', 'focusable':0, 'style':'minimal'}
+			let op.width = w + 2
+			let op.height = h + 2
+			let pos = nvim_win_get_config(winid)
+			let op.row = hwnd.opts.line - 1
+			let op.col = hwnd.opts.col - 1
+			let background = nvim_open_win(nbid, 0, op)
+			call nvim_win_set_option(background, 'winhl', 'Normal:'. color)
+			let hwnd.background = background
+		endif
+		call nvim_set_current_win(winid)
+		setlocal nomodified
+		let opts = {'width': w, 'height':h}
+		let opts.on_exit = function('s:nvim_term_exit')
+		call termopen(a:cmd, opts)
+		let g:quickui#terminal#current = hwnd
+		let s:current = hwnd
+		let init = []
+		let init += ['setlocal nonumber norelativenumber scrolloff=0']
+		let init += ['setlocal signcolumn=no']
+		call quickui#core#win_execute(winid, init)
+		startinsert
 	endif
 	return hwnd
 endfunc
@@ -80,9 +121,9 @@ endfunc
 "----------------------------------------------------------------------
 " terminal exit_cb
 "----------------------------------------------------------------------
-function! quickui#terminal#exit_cb(job, message)
-	if exists('g:quickui#terminal#current')
-		let hwnd = g:quickui#terminal#current
+function! s:vim_term_exit(job, message)
+	if exists('s:current')
+		let hwnd = s:current
 		let hwnd.code = a:message
 	endif
 endfunc
@@ -91,17 +132,39 @@ endfunc
 "----------------------------------------------------------------------
 " popup callback 
 "----------------------------------------------------------------------
-function! quickui#terminal#callback(winid, code)
-	if exists('g:quickui#terminal#current')
-		let hwnd = g:quickui#terminal#current
+function! s:vim_popup_callback(winid, code)
+	if exists('s:current')
+		let hwnd = s:current
 		let hwnd.winid = -1
 		if has_key(hwnd, 'callback')
 			let F = function(hwnd.callback)
-			call F(code)
+			call F(hwnd.code)
 		endif
 	endif
 endfunc
 
 
+
+"----------------------------------------------------------------------
+" neovim exit
+"----------------------------------------------------------------------
+function! s:nvim_term_exit(jobid, data, event)
+	if exists('s:current')
+		let hwnd = s:current
+		let hwnd.code = a:data
+		if hwnd.winid >= 0
+			call nvim_win_close(hwnd.winid, 0)
+		endif
+		if hwnd.background >= 0
+			call nvim_win_close(hwnd.background, 0)
+		endif
+		let hwnd.winid = -1
+		let hwnd.background = -1
+		if has_key(hwnd.opts, 'callback')
+			let F = function(hwnd.callback)
+			call F(hwnd.code)
+		endif
+	endif
+endfunc
 
 
