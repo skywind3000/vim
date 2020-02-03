@@ -82,12 +82,13 @@ function! quickui#terminal#create(cmd, opts)
 		let winid = nvim_open_win(bid, 1, opts)
 		let hwnd.winid = winid
 		let hwnd.background = -1
-		let cc = get(g:, 'terminal_color_0', 0)
-		let hl = 'Normal:'.cc.',NonText:'.cc.',EndOfBuffer:'.cc
-		silent! call nvim_win_set_option(winid, 'winhl', hl)
 		if winid < 0
 			return -1
 		endif
+		let cc = get(g:, 'terminal_color_0', 0)
+		let hl = 'Normal:'.cc.',NonText:'.cc.',EndOfBuffer:'.cc
+		" silent! call nvim_win_set_option(winid, 'winhl', hl)
+		call setwinvar(winid, '&winhighlight', 'NormalFloat:Normal')
 		if border > 0
 			let title = has_key(a:opts, 'title')? ' ' . a:opts.title . ' ':''
 			let back = quickui#utils#make_border(w, h, border, title, button)
@@ -143,7 +144,6 @@ function! s:vim_popup_callback(winid, code)
 		endif
 	endif
 endfunc
-
 
 
 "----------------------------------------------------------------------
