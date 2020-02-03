@@ -82,6 +82,10 @@ function! quickui#terminal#create(cmd, opts)
 		let winid = nvim_open_win(bid, 1, opts)
 		let hwnd.winid = winid
 		let hwnd.background = -1
+		let cc = get(g:, 'terminal_color_0', 0)
+		let cc = color
+		let hl = 'Normal:'.cc.',NonText:'.cc.',EndOfBuffer:'.cc
+		" call nvim_win_set_option(winid, 'winhl', hl)
 		if winid < 0
 			return -1
 		endif
