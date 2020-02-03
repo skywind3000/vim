@@ -20,8 +20,24 @@ function! quickui#terminal#create(cmd, opts)
 	let title = has_key(a:opts, 'title')? (' ' . a:opts.title .' ') : ''
 	let border = get(a:opts, 'border', g:quickui#style#border)
 	let button = (get(a:opts, 'close', '') == 'button')? 1 : 0
-	let color = get(a:opts, 'color', 'QuickTerminal')
+	let color = get(a:opts, 'color', 'QuickBG')
+	let ww = w + ((border != 0)? 2 : 0)
+	let hh = h + ((border != 0)? 2 : 0)
 	let obj = {'opts':deepcopy(a:opts)}
+	if !has_key(obj.opts, 'line')
+		let limit1 = (&lines - 2) * 90 / 100
+		let limit2 = (&lines - 2)
+		if h + 4 < limit1
+			let obj.opts.line = (limit1 - hh) / 2
+		else
+			let obj.opts.line = (limit2 - hh) / 2
+		endif
+		let obj.opts.line = (obj.opts.line < 1)? 1 : obj.opts.line
+	endif
+	if !has_key(obj.opts, 'col')
+		let obj.opts.col = (&columns - ww) / 2
+		let obj.opts.col = (obj.opts.col < 1)? 1 : obj.opts.col
+	endif
 	if has('nvim') == 0
 		let opts = {'hidden': 1, 'term_rows':h, 'term_cols':w}
 		let opts.term_kill = get(a:opts, 'term_kill', 'term')
@@ -43,9 +59,9 @@ function! quickui#terminal#create(cmd, opts)
 		let opts.resize = 0
 		let opts.callback = 'quickui#terminal#callback'
 		let winid = popup_create(bid, opts)
+		call popup_move(winid, {'line':obj.opts.line, 'col':obj.opts.col})
 		let obj.winid = winid
 		let g:quickui#terminal#current = obj
-		" call popup_move(opts)
 		call popup_show(winid)
 	else
 	endif
