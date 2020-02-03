@@ -141,8 +141,8 @@ function! s:vim_popup_callback(winid, code)
 	if exists('s:current')
 		let hwnd = s:current
 		let hwnd.winid = -1
-		if has_key(hwnd, 'callback')
-			let F = function(hwnd.callback)
+		if has_key(hwnd.opts, 'callback')
+			let F = function(hwnd.opts.callback)
 			call F(hwnd.code)
 		endif
 	endif
@@ -177,6 +177,22 @@ endfunc
 "----------------------------------------------------------------------
 function! quickui#terminal#open(cmd, opts)
 	let opts = deepcopy(a:opts)
+	let border = get(opts, 'border', 0)
+	if border == 0
+		if has_key(opts, 'title')
+			unlet opts['title']
+		endif
+		if has_key(opts, 'close')
+			unlet opts['close']
+		endif
+	endif
+	if has_key(opts, 'callback')
+		if type(opts.callback) == v:t_string
+			if opts.callback == ''
+				unlet opts['callback']
+			endif
+		endif
+	endif
 	return quickui#terminal#create(a:cmd, opts)
 endfunc
 
