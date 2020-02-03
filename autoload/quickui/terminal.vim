@@ -11,10 +11,9 @@
 
 
 "----------------------------------------------------------------------
-" 
+" create a terminal popup
 "----------------------------------------------------------------------
-
-function! quickui#terminal#open(cmd, opts)
+function! quickui#terminal#create(cmd, opts)
 	let w = get(a:opts, 'w', 80)
 	let h = get(a:opts, 'h', 24)
 	let winid = -1
@@ -22,10 +21,12 @@ function! quickui#terminal#open(cmd, opts)
 	let border = get(a:opts, 'border', g:quickui#style#border)
 	let button = (get(a:opts, 'close', '') == 'button')? 1 : 0
 	let color = get(a:opts, 'color', 'QuickTerminal')
+	let obj = {'opts':deepcopy(a:opts)}
 	if has('nvim') == 0
 		let opts = {'hidden': 1, 'term_rows':h, 'term_cols':w}
 		let opts.term_kill = get(a:opts, 'term_kill', 'term')
 		let opts.norestore = 1
+		let opts.exit_cb = 'quickui#terminal#exit_cb'
 		let bid = term_start(a:cmd, opts)
 		if bid <= 0
 			return -1
@@ -34,7 +35,7 @@ function! quickui#terminal#open(cmd, opts)
 		let opts.wrap = 0
 		let opts.mapping = 0
 		let opts.title = title
-		let opts.close = (button)? 'button' : ''
+		let opts.close = (button)? 'button' : 'none'
 		let opts.border = border? [1,1,1,1,1,1,1,1,1] : repeat([0], 9)
 		let opts.highlight = color
 		let opts.borderchars = quickui#core#border_vim(border)
@@ -42,6 +43,8 @@ function! quickui#terminal#open(cmd, opts)
 		let opts.resize = 0
 		let opts.callback = 'quickui#terminal#callback'
 		let winid = popup_create(bid, opts)
+		let obj.winid = winid
+		let g:quickui#terminal#current = obj
 		" call popup_move(opts)
 		call popup_show(winid)
 	else
@@ -50,8 +53,35 @@ function! quickui#terminal#open(cmd, opts)
 endfunc
 
 
-function! quickui#terminal#callback(winid, code)
-	echom "callback: ".a:winid. " code: ". a:code
+"----------------------------------------------------------------------
+" terminal exit_cb
+"----------------------------------------------------------------------
+function! quickui#terminal#exit_cb(job, message)
+	if exists('g:quickui#terminal#current')
+		let obj = g:quickui#terminal#current
+		if obj.winid >= 0 && win_getid() == obj.winid
+			let obj.code = a:message
+			silent! close
+			let obj.winid = -1
+		endif
+	endif
 endfunc
+
+
+"----------------------------------------------------------------------
+" popup callback 
+"----------------------------------------------------------------------
+function! quickui#terminal#callback(winid, code)
+	if exists('g:quickui#terminal#current')
+		let obj = g:quickui#terminal#current
+		let obj.winid = -1
+		if has_key(obj, 'callback')
+			let F = function(obj.callback)
+			call F(code)
+		endif
+	endif
+endfunc
+
+
 
 
