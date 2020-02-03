@@ -312,19 +312,19 @@ endfunc
 function! quickui#core#win_execute(winid, command)
 	if g:quickui#core#has_popup != 0
 		if type(a:command) == v:t_string
-			call win_execute(a:winid, a:command)
+			keepalt call win_execute(a:winid, a:command)
 		elseif type(a:command) == v:t_list
-			call win_execute(a:winid, join(a:command, "\n"))
+			keepalt call win_execute(a:winid, join(a:command, "\n"))
 		endif
 	else
 		let current = nvim_get_current_win()
-		call nvim_set_current_win(a:winid)
+		keepalt call nvim_set_current_win(a:winid)
 		if type(a:command) == v:t_string
 			exec a:command
 		elseif type(a:command) == v:t_list
 			exec join(a:command, "\n")
 		endif
-		call nvim_set_current_win(current)
+		keepalt call nvim_set_current_win(current)
 	endif
 endfunc
 
