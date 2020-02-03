@@ -107,7 +107,14 @@ function! quickui#terminal#create(cmd, opts)
 		setlocal nomodified
 		let opts = {'width': w, 'height':h}
 		let opts.on_exit = function('s:nvim_term_exit')
+		let savedir = getcwd()
+		if has_key(a:opts, 'cwd')
+			call quickui#core#chdir(a:opts.cwd)
+		endif
 		call termopen(a:cmd, opts)
+		if has_key(a:opts, 'cwd')
+			call quickui#core#chdir(savedir)
+		endif
 		let g:quickui#terminal#current = hwnd
 		let s:current = hwnd
 		let init = []
