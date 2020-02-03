@@ -43,7 +43,14 @@ function! quickui#terminal#create(cmd, opts)
 		let opts.term_kill = get(a:opts, 'term_kill', 'term')
 		let opts.norestore = 1
 		let opts.exit_cb = 'quickui#terminal#exit_cb'
+		let savedir = getcwd()
+		if has_key(a:opts, 'cwd')
+			call quickui#core#chdir(a:opts.cwd)
+		endif
 		let bid = term_start(a:cmd, opts)
+		if has_key(a:opts, 'cwd')
+			call quickui#core#chdir(savedir)
+		endif
 		if bid <= 0
 			return -1
 		endif

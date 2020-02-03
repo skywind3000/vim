@@ -506,3 +506,16 @@ function! quickui#core#input(prompt, text)
 endfunc
 
 
+"----------------------------------------------------------------------
+" safe change dir
+"----------------------------------------------------------------------
+function! quickui#core#chdir(path)
+	if has('nvim')
+		let cmd = haslocaldir()? 'lcd' : (haslocaldir(-1, 0)? 'tcd' : 'cd')
+	else
+		let cmd = haslocaldir()? ((haslocaldir() == 1)? 'lcd' : 'tcd') : 'cd'
+	endif
+	silent execute cmd . ' '. fnameescape(a:path)
+endfunc
+
+
