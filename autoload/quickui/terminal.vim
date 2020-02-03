@@ -23,26 +23,27 @@ function! quickui#terminal#create(cmd, opts)
 	let color = get(a:opts, 'color', 'QuickBG')
 	let ww = w + ((border != 0)? 2 : 0)
 	let hh = h + ((border != 0)? 2 : 0)
-	let obj = {'opts':deepcopy(a:opts)}
-	if !has_key(obj.opts, 'line')
+	let hwnd = {'opts':deepcopy(a:opts), 'code':-1}
+	if !has_key(hwnd.opts, 'line')
 		let limit1 = (&lines - 2) * 90 / 100
 		let limit2 = (&lines - 2)
 		if h + 4 < limit1
-			let obj.opts.line = (limit1 - hh) / 2
+			let hwnd.opts.line = (limit1 - hh) / 2
 		else
-			let obj.opts.line = (limit2 - hh) / 2
+			let hwnd.opts.line = (limit2 - hh) / 2
 		endif
-		let obj.opts.line = (obj.opts.line < 1)? 1 : obj.opts.line
+		let hwnd.opts.line = (hwnd.opts.line < 1)? 1 : hwnd.opts.line
 	endif
-	if !has_key(obj.opts, 'col')
-		let obj.opts.col = (&columns - ww) / 2
-		let obj.opts.col = (obj.opts.col < 1)? 1 : obj.opts.col
+	if !has_key(hwnd.opts, 'col')
+		let hwnd.opts.col = (&columns - ww) / 2
+		let hwnd.opts.col = (hwnd.opts.col < 1)? 1 : hwnd.opts.col
 	endif
 	if has('nvim') == 0
 		let opts = {'hidden': 1, 'term_rows':h, 'term_cols':w}
 		let opts.term_kill = get(a:opts, 'term_kill', 'term')
 		let opts.norestore = 1
 		let opts.exit_cb = 'quickui#terminal#exit_cb'
+		let opts.term_finish = 'close'
 		let savedir = getcwd()
 		if has_key(a:opts, 'cwd')
 			call quickui#core#chdir(a:opts.cwd)
@@ -66,13 +67,13 @@ function! quickui#terminal#create(cmd, opts)
 		let opts.resize = 0
 		let opts.callback = 'quickui#terminal#callback'
 		let winid = popup_create(bid, opts)
-		call popup_move(winid, {'line':obj.opts.line, 'col':obj.opts.col})
-		let obj.winid = winid
-		let g:quickui#terminal#current = obj
+		call popup_move(winid, {'line':hwnd.opts.line, 'col':hwnd.opts.col})
+		let hwnd.winid = winid
+		let g:quickui#terminal#current = hwnd
 		call popup_show(winid)
 	else
 	endif
-	return winid
+	return hwnd
 endfunc
 
 
@@ -81,12 +82,8 @@ endfunc
 "----------------------------------------------------------------------
 function! quickui#terminal#exit_cb(job, message)
 	if exists('g:quickui#terminal#current')
-		let obj = g:quickui#terminal#current
-		if obj.winid >= 0 && win_getid() == obj.winid
-			let obj.code = a:message
-			silent! close
-			let obj.winid = -1
-		endif
+		let hwnd = g:quickui#terminal#current
+		let hwnd.code = a:message
 	endif
 endfunc
 
@@ -96,10 +93,10 @@ endfunc
 "----------------------------------------------------------------------
 function! quickui#terminal#callback(winid, code)
 	if exists('g:quickui#terminal#current')
-		let obj = g:quickui#terminal#current
-		let obj.winid = -1
-		if has_key(obj, 'callback')
-			let F = function(obj.callback)
+		let hwnd = g:quickui#terminal#current
+		let hwnd.winid = -1
+		if has_key(hwnd, 'callback')
+			let F = function(hwnd.callback)
 			call F(code)
 		endif
 	endif
