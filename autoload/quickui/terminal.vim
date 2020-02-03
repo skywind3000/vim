@@ -169,3 +169,12 @@ function! s:nvim_term_exit(jobid, data, event)
 endfunc
 
 
+"----------------------------------------------------------------------
+" open terminal in popup window
+"----------------------------------------------------------------------
+function! quickui#terminal#open(cmd, opts)
+	let opts = deepcopy(a:opts)
+	return quickui#terminal#create(a:cmd, opts)
+endfunc
+
+
