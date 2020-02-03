@@ -165,7 +165,7 @@ function! s:nvim_term_exit(jobid, data, event)
 		let hwnd.winid = -1
 		let hwnd.background = -1
 		if has_key(hwnd.opts, 'callback')
-			let F = function(hwnd.callback)
+			let F = function(hwnd.opts.callback)
 			call F(hwnd.code)
 		endif
 	endif
