@@ -213,7 +213,7 @@ end
 " package group - opt
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'opt') >= 0
-	Plug 'junegunn/fzf'
+	Plug 'junegunn/fzf.vim'
 	Plug 'mhartington/oceanic-next'
 	Plug 'asins/vim-dict'
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
