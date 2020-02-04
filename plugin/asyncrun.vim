@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/02/05 05:40
+" Last Modified: 2020/02/05 05:44
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1208,7 +1208,7 @@ function! s:run(opts)
 			if dist != ''
 				let cmd = cmd . ' -d ' . dist
 			endif
-			let l:command = cmd . ' ' . l:commands
+			let l:command = cmd . ' ' . l:command
 		else
 			call s:ErrorMsg("Error: only available on Windows")
 			return
