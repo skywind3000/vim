@@ -117,6 +117,7 @@ call quickui#menu#install('&Tools', [
 			\ ['&Spell %{&spell? "Disable":"Enable"}', 'set spell!', 'Toggle spell check %{&spell? "off" : "on"}'],
 			\ ['&Profile Start', 'call MonitorInit()', ''],
 			\ ['Profile S&top', 'call MonitorExit()', ''],
+			\ ["Relati&ve number %{&relativenumber? 'OFF':'ON'}", 'set relativenumber!'],
 			\ ])
 
 call quickui#menu#install('&Plugin', [
