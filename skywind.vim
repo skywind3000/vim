@@ -134,6 +134,8 @@ else
 	let g:ft_man_open_mode = 'vert'
 endif
 
+let g:cppman_open_mode = 'vert'
+
 let g:vimmake_mode = {}
 
 for s:i in range(10)
