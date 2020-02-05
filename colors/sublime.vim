@@ -918,4 +918,6 @@ hi! link zshTypes    Keyword
 " lua
 hi! link luaStatement Keyword
 
+" man
+hi! link manSectionHeading Keyword
 

@@ -206,7 +206,7 @@ function! s:load_buffer(section, page, width)
 		call s:errmsg('bad buffer number: ' .. bid)
 		return -1
 	endif
-	silent! call bufload(bid)
+	noautocmd silent! call bufload(bid)
 	call setbufvar(bid, "&buftype", 'nofile')
 	call setbufvar(bid, "&buflisted", 0)
 	call setbufvar(bid, "&swapfile", 0)
@@ -214,8 +214,8 @@ function! s:load_buffer(section, page, width)
 	if a:width > 0
 		call setbufvar(bid, "&readonly", 0)
 		call setbufvar(bid, "&modifiable", 1)
-		silent! call deletebufline(bid, 1, '$')
-		call setbufline(bid, 1, split(content, "\n"))
+		noautocmd silent! call deletebufline(bid, 1, '$')
+		noautocmd call setbufline(bid, 1, split(content, "\n"))
 	endif
 	call setbufvar(bid, "&modifiable", 0)
 	call setbufvar(bid, "&readonly", 1)
@@ -269,6 +269,7 @@ function! cppman#display(mods, section, page)
 	let bid = s:load_buffer(a:section, a:page, (width > limit)? limit : width)
 	setl nonumber norelativenumber signcolumn=no
 	setl fdc=0 nofen
+	noautocmd setl ft=man
 	if bid < 0
 		return
 	endif
@@ -277,7 +278,6 @@ function! cppman#display(mods, section, page)
 	else
 		call s:highlight_man()
 	endif
-	let b:current_syntax = 'man'
 	exec "normal \<c-g>"
 endfunc
 
@@ -328,6 +328,12 @@ command! -bang -nargs=+ Cppman
 " highlight_man
 "----------------------------------------------------------------------
 function! s:highlight_man()
+	if get(b:, 'current_syntax', '') == 'man'
+		return
+	endif
+
+	let b:current_syntax = 'man'
+
 	syntax clear
 	runtime! syntax/ctrlh.vim
 
@@ -365,6 +371,12 @@ endfunc
 " highlight cppman
 "----------------------------------------------------------------------
 function! s:highlight_cppman()
+	if get(b:, 'current_syntax', '') == 'cppman'
+		return
+	endif
+
+	let b:current_syntax = 'cppman'
+
 	syntax clear
 	syntax case ignore
 	syntax match  manReference       "[a-z_:+-\*][a-z_:+-~!\*<>]\+([1-9][a-z]\=)"
@@ -384,22 +396,13 @@ function! s:highlight_cppman()
 	" For version 5.7 and earlier: only when not done already
 	" For version 5.8 and later: only when an item doesn't have highlighting yet
 	if version >= 508 || !exists("did_man_syn_inits")
-		if version < 508
-			let did_man_syn_inits = 1
-			command -nargs=+ HiLink hi link <args>
-		else
-			command -nargs=+ HiLink hi def link <args>
-		endif
-
-		HiLink manTitle	    Title
-		HiLink manSectionHeading  Statement
-		HiLink manOptionDesc	    Constant
-		HiLink manLongOptionDesc  Constant
-		HiLink manReference	    PreProc
-		HiLink manSubHeading      Function
-		HiLink manCFuncDefinition Function
-
-		delcommand HiLink
+		hi def link manTitle	    Title
+		hi def link manSectionHeading  Statement
+		hi def link manOptionDesc	    Constant
+		hi def link manLongOptionDesc  Constant
+		hi def link manReference	    PreProc
+		hi def link manSubHeading      Function
+		hi def link manCFuncDefinition Function
 	endif
 
 endfunc
