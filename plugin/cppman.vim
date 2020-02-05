@@ -270,13 +270,21 @@ function! cppman#display(mods, section, page)
 	setl nonumber norelativenumber signcolumn=no
 	setl fdc=0 nofen
 	noautocmd setl ft=man
+	exec "normal! gg"
 	if bid < 0
 		return
 	endif
 	if a:section == 'cppman'
 		call s:highlight_cppman()
+		setl keywordprg=:Cppman
+		setl iskeyword=@,48-57,_,192-255,:,=,~,[,],*,!,<,>
 	else
 		call s:highlight_man()
+		setl keywordprg=:Cppman!
+		setl iskeyword=@,48-57,_,192-255,.,-
+	endif
+	if get(g:, 'cppman_no_keymaps', 0) == 0
+		call s:setup_keymaps()
 	endif
 	exec "normal \<c-g>"
 endfunc
@@ -329,6 +337,63 @@ command! -bang -nargs=+ Cppman
 
 
 "----------------------------------------------------------------------
+" pre get page
+"----------------------------------------------------------------------
+function! <SID>LoadManPage(cnt)
+  if a:cnt == 0
+    let old_isk = &iskeyword
+    if &ft == 'man'
+      setl iskeyword+=(,)
+    endif
+    let str = expand("<cword>")
+    let &l:iskeyword = old_isk
+    let page = substitute(str, '(*\(\k\+\).*', '\1', '')
+    let sect = substitute(str, '\(\k\+\)(\([^()]*\)).*', '\2', '')
+    if match(sect, '^[0-9 ]\+$') == -1
+      let sect = ""
+    endif
+    if sect == page
+      let sect = ""
+    endif
+  else
+    let sect = a:cnt
+    let page = expand("<cword>")
+  endif
+  if b:cppman_section == 'cppman'
+	  call cppman#display('', 'cppman', page)
+  else
+	  call cppman#display('', sect, page)
+  endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" load cppman
+"----------------------------------------------------------------------
+function! <SID>LoadCppmanPage()
+	let name = expand('<cword>')
+	call cppman#display('', 'cppman', name)
+endfunc
+
+
+"----------------------------------------------------------------------
+" setup_keymaps
+"----------------------------------------------------------------------
+function! s:setup_keymaps()
+	let section = b:cppman_section
+	if section == 'cppman'
+		noremap <buffer> K :call <SID>LoadCppmanPage()<CR>
+		map <buffer> <CR> K
+		map <buffer> <C-]> K
+		map <buffer> <2-LeftMouse> K
+	else
+		noremap <buffer> K :call <SID>LoadManPage(0)<cr>
+		nnoremap <buffer> <c-]> :call <SID>LoadManPage(v:count)<CR>
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " highlight_man
 "----------------------------------------------------------------------
 function! s:highlight_man()
@@ -351,9 +416,9 @@ function! s:highlight_man()
 	" syn match  manHistory		"^[a-z].*last change.*$"
 
 	if getline(1) =~ '^[a-zA-Z_]\+([23])'
-	  syntax include @cCode <sfile>:p:h/c.vim
-	  syn match manCFuncDefinition  display "\<\h\w*\>\s*("me=e-1 contained
-	  syn region manSynopsis start="^SYNOPSIS"hs=s+8 end="^\u\+\s*$"me=e-12 keepend contains=manSectionHeading,@cCode,manCFuncDefinition
+		syntax include @cCode runtime! syntax/c.vim
+		syn match manCFuncDefinition  display "\<\h\w*\>\s*("me=e-1 contained
+		syn region manSynopsis start="^SYNOPSIS"hs=s+8 end="^\u\+\s*$"me=e-12 keepend contains=manSectionHeading,@cCode,manCFuncDefinition
 	endif
 
 
