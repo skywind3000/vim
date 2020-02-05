@@ -25,7 +25,11 @@
 "     "K"      : jump to keyword under cursor
 "     "CTRL+]" : same as "K"
 "
-" Hints:
+" Running on Windows:
+"     It can use WSL to run cppman/man. If WSL is not available,
+"     you can setup g:cppman_msys_home to use msys alternatively.
+"
+" C/C++ keywords help:
 "     You can setup your "keywordprg" for c/cpp in your vimrc:
 "         autocmd FileType c,cpp setlocal keywordprg=:Cppman
 "
