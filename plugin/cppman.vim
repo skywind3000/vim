@@ -1,9 +1,35 @@
 "======================================================================
 "
-" cppman.vim - 
+" cppman.vim - Cppman/man intergration
 "
-" Created by skywind on 2020/02/05
-" Last Modified: 2020/02/05 23:40:28
+" Maintainer: skywind3000 (at) gmail.com, 2020
+"
+" Last Modified: 2020/02/06 06:40
+" Verision: 12
+"
+" Display cppman/man pages:
+"     :Cppman[!] [section] keyword
+"
+"     When "!" is included, load pages from "man" command, otherwise
+"     use "cppman" instead. For performance, use "cppman -c" to cache
+"     all pages before this.
+"
+"     The "[section]" is only available for "man":
+"         :Cppman! printf
+"         :Cppman! 3 printf
+"
+"     Use "-k" to search sections:
+"         :Cppman! -k printf
+"
+" Keymaps:
+"     "K"      : jump to keyword under cursor
+"     "CTRL+]" : same as "K"
+"
+" Hints:
+"     You can setup your "keywordprg" for c/cpp in your vimrc:
+"         autocmd FileType c,cpp setlocal keywordprg=:Cppman
+"
+"     Than, you can use "K" in to lookup keywords in c/cpp files.
 "
 "======================================================================
 
