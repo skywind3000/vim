@@ -7,6 +7,37 @@
 "
 "======================================================================
 
+" vim: set noet fenc=utf-8 ff=unix sts=4 sw=4 ts=4 :
+
+"----------------------------------------------------------------------
+" configuration
+"----------------------------------------------------------------------
+
+" for windows only, if set, use msys instead of wsl
+if !exists('g:cppman_msys_home')
+	let g:cppman_msys_home = ''
+endif
+
+" for windows only, WSL distribution name, when g:cppman_msys_home is unset
+if !exists('g:cppman_wsl_dist')
+	let g:cppman_wsl_dist = ''
+endif
+
+" open mode: tab/vert/botright vert/topleft/...
+if !exists('g:cppman_open_mode')
+	let g:cppman_open_mode = ''
+endif
+
+" disable keymaps ??
+if !exists('g:cppman_no_keymaps')
+	let g:cppman_no_keymaps = 0
+endif
+
+" max width
+if !exists('g:cppman_max_width')
+	let g:cppman_max_width = 200
+endif
+
 
 "----------------------------------------------------------------------
 " internal states
