@@ -131,7 +131,7 @@ endfunc
 "----------------------------------------------------------------------
 function! s:unix_system(cmd)
 	if s:windows == 0
-		return system(a:cmd)
+		return s:system(a:cmd)
 	endif
 	let msys = get(g:, 'cppman_msys_home', '')
 	if msys == ''
