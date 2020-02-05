@@ -313,7 +313,11 @@ function! s:cppman_cmd(mods, bang, ...)
 			return 
 		endif
 	endif
-	call cppman#display(a:mods, section, page)
+	let mods = a:mods
+	if mods == ''
+		let mods = get(g:, 'cppman_open_mode', '')
+	endif
+	call cppman#display(mods, section, page)
 endfunc
 
 
