@@ -420,6 +420,7 @@ function! s:setup_keymaps()
 	else
 		noremap <buffer> K :call <SID>LoadManPage(0)<cr>
 		nnoremap <buffer> <c-]> :call <SID>LoadManPage(v:count)<CR>
+		map <buffer> <2-LeftMouse> K
 	endif
 endfunc
 
