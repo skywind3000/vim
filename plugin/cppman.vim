@@ -21,9 +21,21 @@
 "     Use "-k" to search sections:
 "         :Cppman! -k printf
 "
+" Window position:
+"     Option "g:cppman_open_mode" can allow you specify how to open:
+"         :let g:cppman_open_mode = "vertical"
+"         :let g:cppman_open_mode = "tab"
+"         :let g:cppman_open_mode = "vert botright"
+"
+" Position modifiers:
+"     Another way to indicate window position is using modifiers:
+"         :vertical Cppman keyword
+"         :tab Cppman keyword
+"         :vert botright Cppman keyword
+"
 " Keymaps:
-"     "K"      : jump to keyword under cursor
-"     "CTRL+]" : same as "K"
+"     "K"       - jump to keyword under cursor
+"     "CTRL+]"  - same as "K"
 "
 " Running on Windows:
 "     It can use WSL to run cppman/man. If WSL is not available,
