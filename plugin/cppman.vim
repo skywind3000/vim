@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/06 13:53
-" Verision: 13
+" Last Modified: 2020/02/06 15:23
+" Verision: 14
 "
 " Display cppman/man pages:
 "     :Cppman[!] [section] keyword
@@ -284,8 +284,7 @@ function! s:load_buffer(section, page, width)
 	call setbufvar(bid, "&buftype", 'nofile')
 	call setbufvar(bid, "&buflisted", 0)
 	call setbufvar(bid, "&swapfile", 0)
-	call setbufvar(bid, '&hidden', 1)
-	" call setbufvar(bid, "&bufhidden", 'delete')
+	call setbufvar(bid, '&bufhidden', 'hide')
 	if a:width > 0
 		call setbufvar(bid, "&readonly", 0)
 		call setbufvar(bid, "&modifiable", 1)
