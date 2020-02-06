@@ -134,7 +134,7 @@ else
 	let g:ft_man_open_mode = 'vert'
 endif
 
-let g:cppman_open_mode = 'vert'
+let g:cppman_open_mode = '<auto>'
 
 let g:vimmake_mode = {}
 

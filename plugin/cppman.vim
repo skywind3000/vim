@@ -399,6 +399,9 @@ function! s:cppman_cmd(mods, bang, ...)
 	let mods = a:mods
 	if mods == ''
 		let mods = get(g:, 'cppman_open_mode', '')
+		if mods == 'auto' || mods == '<auto>'
+			let mods = (winwidth(0) >= 160)? 'vert' : ''
+		endif
 	endif
 	call cppman#display(mods, section, page)
 endfunc
