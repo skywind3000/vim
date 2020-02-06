@@ -264,7 +264,8 @@ function! quickui#tools#preview_quickfix(...)
 		return -4
 	endif
 	let name = bufname(item.bufnr)
-	call quickui#preview#open(name, item.lnum)
+	let opts = {'cursor':item.lnum}
+	call quickui#preview#open(name, opts)
 	" echom 'lnum:'. item.lnum
 endfunc
 
@@ -317,7 +318,8 @@ function! quickui#tools#preview_tag(tagname)
 		return 3
 	endif
 	let text = '('.(ptag.index + 1).'/'.len(ptag.taglist).')'
-	call quickui#preview#open(filename, taginfo.line, 0, text)
+	let opts = {'cursor':taginfo.line, 'title':text}
+	call quickui#preview#open(filename, opts)
 	let text = taginfo.name
 	let text.= ' ('.(ptag.index + 1).'/'.len(ptag.taglist).') '
 	let text.= filename
