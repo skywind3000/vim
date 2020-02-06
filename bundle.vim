@@ -391,6 +391,9 @@ if index(g:bundle_group, 'vista') >= 0
 	Plug 'liuchengxu/vista.vim'
 endif
 
+if index(g:bundle_group, 'neoformat') >= 0
+	Plug 'sbdchd/neoformat'
+endif
 
 if index(g:bundle_group, 'neocomplete') >= 0
 	Plug 'Shougo/neocomplete.vim'

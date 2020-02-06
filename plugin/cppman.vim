@@ -11,7 +11,7 @@
 "     :Cppman[!] [section] keyword
 "
 "     When "!" is included, load pages from "man" command, otherwise
-"     use "cppman" instead. For performance, use "cppman -c" to cache
+"     use "cppman" instead. For performance, run "cppman -c" to cache
 "     all pages before this.
 "
 "     The "[section]" is only available for "man":
