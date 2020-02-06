@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/06 06:40
-" Verision: 12
+" Last Modified: 2020/02/06 13:53
+" Verision: 13
 "
 " Display cppman/man pages:
 "     :Cppman[!] [section] keyword
@@ -26,6 +26,7 @@
 "         :let g:cppman_open_mode = "vertical"
 "         :let g:cppman_open_mode = "tab"
 "         :let g:cppman_open_mode = "vert botright"
+"         :let g:cppman_open_mode = "<auto>"
 "
 " Position modifiers:
 "     Another way to indicate window position is using modifiers:
