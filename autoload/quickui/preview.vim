@@ -139,7 +139,7 @@ function! quickui#preview#display(content, opts)
 	endif
 	let cursor = get(a:opts, 'cursor', -1)
 	if cursor > 0
-		let cmdlist += ['normal! gg' . cursor . 'Gzz']
+		let cmdlist += ['exec "normal! gg' . cursor . 'Gzz"']
 	endif
 	if has_key(a:opts, 'syntax')
 		let cmdlist += ['setl ft=' . fnameescape(a:opts.syntax) ]
