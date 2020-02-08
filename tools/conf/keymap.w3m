@@ -1,5 +1,6 @@
 # w3m vim-like keymap file
 #   by @sansna
+# copy to ~/.w3m/keymap
 
 ########## invalidate defaults ##########
 keymap K NULL
