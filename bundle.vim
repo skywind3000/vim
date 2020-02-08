@@ -222,6 +222,7 @@ if index(g:bundle_group, 'opt') >= 0
 	Plug 'dyng/ctrlsf.vim'
 	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 	Plug 'tpope/vim-speeddating'
+	Plug 'chiel92/vim-autoformat'
 	" Plug 'itchyny/vim-cursorword'
 	let g:gutentags_modules = []
 	if executable('ctags')
@@ -389,10 +390,6 @@ endif
 
 if index(g:bundle_group, 'vista') >= 0
 	Plug 'liuchengxu/vista.vim'
-endif
-
-if index(g:bundle_group, 'autoformat') >= 0
-	Plug 'chiel92/vim-autoformat'
 endif
 
 if index(g:bundle_group, 'neoformat') >= 0
