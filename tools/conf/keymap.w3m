@@ -177,14 +177,14 @@ keymap zz CENTER_V
 keymap C-f NEXT_PAGE
 keymap C-b PREV_PAGE
 ########## cursor ##########
-#keymap l MOVE_RIGHT
-keymap l NEXT_TAB
+keymap l MOVE_RIGHT
+# keymap l NEXT_TAB
 #keymap h MOVE_LEFT
-keymap h PREV_TAB
-#keymap j MOVE_DOWN1
-keymap j UP
-#keymap k MOVE_UP1
-keymap k DOWN
+keymap h MOVE_LEFT1
+keymap j MOVE_DOWN1
+# keymap j UP
+keymap k MOVE_UP1
+# keymap k DOWN
 keymap RIGHT MOVE_RIGHT
 keymap LEFT MOVE_LEFT
 keymap DOWN MOVE_DOWN1
@@ -251,4 +251,5 @@ keymap ZZ EXIT
 keymap C-Q EXIT
 keymap ZQ QUIT
 keymap :q QUIT
+keymap q QUIT
 
