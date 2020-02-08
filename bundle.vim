@@ -391,9 +391,24 @@ if index(g:bundle_group, 'vista') >= 0
 	Plug 'liuchengxu/vista.vim'
 endif
 
+if index(g:bundle_group, 'autoformat') >= 0
+	Plug 'chiel92/vim-autoformat'
+endif
+
 if index(g:bundle_group, 'neoformat') >= 0
 	Plug 'sbdchd/neoformat'
+    let g:neoformat_python_autopep8 = {
+            \ 'exe': 'autopep8',
+            \ 'args': ['-s 4', '-E'],
+            \ 'replace': 1, 
+            \ 'stdin': 0, 
+            \ 'valid_exit_codes': [0, 23],
+            \ 'no_append': 1,
+            \ }
+
+    let g:neoformat_enabled_python = ['autopep8']
 endif
+
 
 if index(g:bundle_group, 'neocomplete') >= 0
 	Plug 'Shougo/neocomplete.vim'

@@ -234,7 +234,7 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" can be calling from internal terminal.
+" can be called from internal terminal.
 "----------------------------------------------------------------------
 function! Tapi_TerminalEdit(bid, arglist)
 	let name = (type(a:arglist) == v:t_string)? a:arglist : a:arglist[0]
