@@ -4,7 +4,7 @@
 -- z.lua - a cd command that learns, by skywind 2018, 2019, 2020
 -- Licensed under MIT license.
 --
--- Version 1.8.2, Last Modified: 2020/02/09 23:33
+-- Version 1.8.3, Last Modified: 2020/02/09 23:57
 --
 -- * 10x faster than fasd and autojump, 3x faster than z.sh
 -- * available for posix shells: bash, zsh, sh, ash, dash, busybox
@@ -1818,15 +1818,7 @@ function cd_breadcrumbs(pwd, interactive)
 	if interactive == 1 then
 		io.stderr:write('> ')
 		io.stderr:flush()
-		local input = io.read('*l')
-		if input == nil or input == '' then
-			return nil
-		end
-		local index = tonumber(input)
-		if index == nil or index < 1 or index > #elements then
-			return nil
-		end
-		retval = elements[index][2]
+		local retval = io.read('*l')
 	elseif interactive == 2 then
 		local fzf = os.environ('_ZL_FZF', 'fzf')
 		local cmd = '--reverse --inline-info --tac '
@@ -1852,11 +1844,13 @@ function cd_breadcrumbs(pwd, interactive)
 			return nil
 		end
 		retval = retval:sub(1, pos - 1):gsub('^%s*', '')
-		index = tonumber((retval == nil) and '0' or retval)
-		if index == nil or index < 1 or index > #elements then
-			return nil
-		end
-		retval = elements[index][2]
+	end
+	if retval == nil or retval == '' then
+		return nil
+	end
+	local index = tonumber(retval)
+	if index == nil or index < 1 or index > #elements then
+		return nil
 	end
 	return retval
 end
