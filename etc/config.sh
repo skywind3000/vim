@@ -136,6 +136,8 @@ if [[ -z "$DISABLE_Z_PLUGIN" ]]; then
 		alias zb='z -b'
 		alias zf='z -I'
 		alias zh='z -I -t .'
+		alias zbi='z -b -i'
+		alias zbf='z -b -I'
 		_ZL_ECHO=1
 	else
 		[[ -f "$HOME/.local/etc/z.sh" ]] && . "$HOME/.local/etc/z.sh"

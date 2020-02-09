@@ -571,6 +571,8 @@ function zlua_enable() {
 		alias zb='z -b'
 		alias zf='z -I'
 		alias zh='z -I -t .'
+		alias zbi='z -b -i'
+		alias zbf='z -b -I'
 	fi
 }
 

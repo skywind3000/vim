@@ -52,7 +52,7 @@ if !exists('g:asynctasks_init_tasks')
 	let g:asynctasks_init_tasks = 1
 endif
 
-" terminal mode: tab/top/bottom/left/right/external
+" terminal mode: tab/curwin/top/bottom/left/right/external
 if !exists('g:asynctasks_term_pos')
 	let g:asynctasks_term_pos = 'bottom'
 endif
