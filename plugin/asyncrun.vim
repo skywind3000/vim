@@ -1105,14 +1105,8 @@ function! s:start_in_terminal(opts)
 			endif
 		endif
 	endfor
-	if pos == 'tab' || pos == 'tabreuse' || pos == 'reusetab' || pos == 'tab2'
-		if pos == 'tab'
-			exec "tab split"
-		else
-			if !(winnr('$') == 1 && (&bt == 'terminal'))
-				exec "tab split"
-			endif
-		endif
+	if pos == 'tab'
+		exec "tab split"
 		if has('nvim') == 0
 			let cmd = 'tab term ++noclose ++norestore ++curwin'
 			if has('patch-8.1.2255') || v:version >= 802
@@ -1125,7 +1119,7 @@ function! s:start_in_terminal(opts)
 		endif
 		if &bt == 'terminal'
 			setlocal nonumber signcolumn=no norelativenumber
-			let b:asyncrun_cmd = command
+			let b:asyncrun_cmd = a:opts.command
 			exec has('nvim')? 'startinsert' : ''
 			if has_key(a:opts, 'hidden')
 				exec 'setlocal bufhidden=' . (hidden? 'hide' : '')
@@ -1193,7 +1187,7 @@ function! s:start_in_terminal(opts)
 	endif
 	if &bt == 'terminal'
 		setlocal nonumber signcolumn=no norelativenumber
-		let b:asyncrun_cmd = command
+		let b:asyncrun_cmd = a:opts.command
 		exec has('nvim')? 'startinsert' : ''
 		if has_key(a:opts, 'hidden')
 			exec 'setlocal bufhidden=' . (hidden? 'hide' : '')
