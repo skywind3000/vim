@@ -1814,11 +1814,12 @@ function cd_breadcrumbs(pwd, interactive)
 	if fp ~= io.stderr then
 		fp:close()
 	end
+	local retval = ''
 	-- select from stdin or fzf
 	if interactive == 1 then
 		io.stderr:write('> ')
 		io.stderr:flush()
-		local retval = io.read('*l')
+		retval = io.read('*l')
 	elseif interactive == 2 then
 		local fzf = os.environ('_ZL_FZF', 'fzf')
 		local cmd = '--reverse --inline-info --tac '
