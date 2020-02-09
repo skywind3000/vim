@@ -1082,11 +1082,14 @@ function! s:start_in_terminal(opts)
 		call s:ErrorMsg("Terminal is not available in this vim")
 		return -1
 	endif
+	if has('nvim') == 0 && (has('patch-8.1.2255') || v:version >= 802)
+		let shell = '++shell'
+	else
+		let shell = ''
+	endif
 	if get(a:opts, 'safe', get(g:, 'asyncrun_term_safe', 0)) != 0
 		let command = s:ScriptWrite(a:opts.command, 0)
-		if s:asyncrun_windows != 0
-			let command = shellescape(command)
-		endif
+		" let shell = ''
 	endif
 	let avail = -1
 	for ii in range(winnr('$'))
@@ -1101,25 +1104,56 @@ function! s:start_in_terminal(opts)
 			else
 				let ch = getwinvar(wid, '&channel')
 				let status = (jobwait([ch], 0)[0] == -1)? 1 : 0
-				let avail = (status == 0)? wid : avail
+				if status == 0
+					let avail = wid
+					break
+				endif
 			endif
 		endif
 	endfor
-	if pos == 'tab'
-		exec "tab split"
+	if pos == 'tab' || pos == 'tabreuse' || pos == 'tabpage'
+		if pos == 'tab'
+			exec "tab split"
+		else
+			let avail = -1
+			for i in range(tabpagenr('$'))
+				if tabpagewinnr(i + 1, '$') == 1
+					let bid = tabpagebuflist(i + 1)[0]
+					if getbufvar(bid, '&bt', '') == 'terminal'
+						if has('nvim') == 0
+							if term_getstatus(bid) == 'finished'
+								let avail = i + 1
+								break
+							endif
+						else
+							let ch = getbufvar(bid, '&channel')
+							let status = (jobwait([ch], 0)[0] == -1)? 1 : 0
+							if status == 0
+								let avail = i + 1
+								break
+							endif
+						endif
+					endif
+				endif
+			endfor
+			if avail < 0
+				exec "tab split"
+			else
+				exec 'tabn ' . avail
+			endif
+		endif
 		if has('nvim') == 0
 			let cmd = 'tab term ++noclose ++norestore ++curwin'
-			if has('patch-8.1.2255') || v:version >= 802
-				exec cmd . ' ++shell ++kill=term ' . command
-			else
-				exec cmd . ' ++kill=term ' . command
-			endif
+			exec cmd . ' ' . shell . ' ++kill=term ' . command
 		else
 			exec 'term '. command
 		endif
 		if &bt == 'terminal'
 			setlocal nonumber signcolumn=no norelativenumber
 			let b:asyncrun_cmd = a:opts.command
+			if get(a:opts, 'listed', 1) == 0
+				setlocal nobuflisted
+			endif
 			exec has('nvim')? 'startinsert' : ''
 			if has_key(a:opts, 'hidden')
 				exec 'setlocal bufhidden=' . (hidden? 'hide' : '')
@@ -1129,17 +1163,16 @@ function! s:start_in_terminal(opts)
 	elseif pos == 'cur' || pos == 'curwin' || pos == 'current'
 		if has('nvim') == 0
 			let cmd = 'term ++noclose ++norestore ++curwin'
-			if has('patch-8.1.2255') || v:version >= 802
-				exec cmd . ' ++shell ++kill=term ' . command
-			else
-				exec cmd . ' ++kill=term ' . command
-			endif
+			exec cmd . ' ' . shell . ' ++kill=term ' . command
 		else
 			exec 'term '. command
 		endif
 		if &bt == 'terminal'
 			setlocal nonumber signcolumn=no norelativenumber
 			let b:asyncrun_cmd = a:opts.command
+			if get(a:opts, 'listed', 1) == 0
+				setlocal nobuflisted
+			endif
 			exec has('nvim')? 'startinsert' : ''
 			if has_key(a:opts, 'hidden')
 				exec 'setlocal bufhidden=' . (hidden? 'hide' : '')
@@ -1177,17 +1210,16 @@ function! s:start_in_terminal(opts)
 	noautocmd call win_gotoid(uid)
 	if has('nvim') == 0
 		let cmd = 'term ++noclose ++norestore ++curwin '
-		if has('patch-8.2.2255') || v:version >= 802
-			exec cmd . ' ++shell ++kill=term ' . command
-		else
-			exec cmd . ' ++kill=term ' . command
-		endif
+		exec cmd . ' ' . shell . ' ++kill=term ' . command
 	else
 		exec 'term '. command
 	endif
 	if &bt == 'terminal'
 		setlocal nonumber signcolumn=no norelativenumber
 		let b:asyncrun_cmd = a:opts.command
+		if get(a:opts, 'listed', 1) == 0
+			setlocal nobuflisted
+		endif
 		exec has('nvim')? 'startinsert' : ''
 		if has_key(a:opts, 'hidden')
 			exec 'setlocal bufhidden=' . (hidden? 'hide' : '')
