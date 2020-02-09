@@ -240,6 +240,21 @@ if index(g:bundle_group, 'opt') >= 0
 			" Plug 'skywind3000/vim-gutentags'
 		endif
 	endif
+	if s:uname == 'windows' 
+		let g:python3_host_prog="python"
+	endif
+	if 1
+		" Echo translation in the cmdline
+		nmap <silent> <Leader>tt <Plug>Translate
+		vmap <silent> <Leader>tt <Plug>TranslateV
+		" Display translation in a window
+		nmap <silent> <Leader>tw <Plug>TranslateW
+		vmap <silent> <Leader>tw <Plug>TranslateWV
+		" Replace the text with translation
+		nmap <silent> <Leader>tr <Plug>TranslateR
+		vmap <silent> <Leader>tr <Plug>TranslateRV
+		let g:translator_window_enable_icon = v:true
+	endif
 endif
 
 
