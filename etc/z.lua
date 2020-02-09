@@ -4,7 +4,7 @@
 -- z.lua - a cd command that learns, by skywind 2018, 2019, 2020
 -- Licensed under MIT license.
 --
--- Version 1.8.3, Last Modified: 2020/02/09 23:57
+-- Version 1.8.3, Last Modified: 2020/02/10 00:03
 --
 -- * 10x faster than fasd and autojump, 3x faster than z.sh
 -- * available for posix shells: bash, zsh, sh, ash, dash, busybox
@@ -1853,7 +1853,7 @@ function cd_breadcrumbs(pwd, interactive)
 	if index == nil or index < 1 or index > #elements then
 		return nil
 	end
-	return retval
+	return elements[retval][2]
 end
 
 
