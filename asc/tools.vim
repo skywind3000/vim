@@ -483,6 +483,7 @@ function! Tools_SwitchLayout()
 	set number
 	set showtabline=2
 	set laststatus=2
+	set signcolumn=yes
 	if !has('gui_running')
 		set t_Co=256
 	endif
