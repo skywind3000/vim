@@ -2411,7 +2411,7 @@ function z_fish_init(opts)
 		print('set -x _ZL_MATCH_MODE 1')
 	end
 	if opts.echo then
-		print('set _ZL_ECHO 1')
+		print('set -g _ZL_ECHO 1')
 	end
 	if opts.nc then
 		print('set -x _ZL_NO_CHECK 1')
