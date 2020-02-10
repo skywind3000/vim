@@ -659,6 +659,30 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" compare version: 0 for equal, 1 for current > require, -1 for <
+"----------------------------------------------------------------------
+function! asynctasks#version_compare(current, require)
+	let current = split(a:current, '\.')
+	let require = split(a:require, '\.')
+	if len(require) < len(current)
+		let require += repeat(['.'], len(current) - len(require))
+	elseif len(require) > len(current)
+		let current += repeat(['.'], len(require) - len(current))
+	endif
+	for index in range(len(require))
+		let c = str2nr(current[index])
+		let r = str2nr(require[index])
+		if c > r
+			return 1
+		elseif c < r
+			return -1
+		endif
+	endfor
+	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
 " run task
 "----------------------------------------------------------------------
 function! asynctasks#start(bang, taskname, path)
@@ -675,8 +699,9 @@ function! asynctasks#start(bang, taskname, path)
 	let task = tasks.config[a:taskname]
 	let ininame = task.__name__
 	let source = 'task ['. a:taskname . '] from ' . ininame
-	if !has_key(task, 'command') || task.command == ''
-		call s:errmsg('not find command in ' . source)
+	let command = s:select_command(task, &ft)
+	if command == ''
+		call s:errmsg('no command defined in ' . source)
 		return -3
 	endif
 	if exists(':AsyncRun') == 0
@@ -684,12 +709,22 @@ function! asynctasks#start(bang, taskname, path)
 		call s:errmsg(t . '"skywind3000/asyncrun.vim"')
 		return -4
 	endif
+	if exists('*asyncrun#version') == 0
+		let t = 'asyncrun is too old, get the latest from '
+		call s:errmsg(t . '"skywind3000/asyncrun.vim"')
+		return -5
+	endif
+	let target = '2.3.0'
+	if asynctasks#version_compare(asyncrun#version(), target) < 0
+		let t = 'asyncrun ' . target . ' or above is required, update from '
+		call s:errmsg(t . '"skywind3000/asyncrun.vim"')
+		return -6
+	endif
 	let opts = s:task_option(task)
 	let skip = g:asyncrun_skip
 	if opts.mode == 'bang' || opts.mode == 2
 		" let g:asyncrun_skip = or(g:asyncrun_skip, 2)
 	endif
-	let command = s:select_command(task, &ft)
 	call asyncrun#run(a:bang, opts, command)
 	let g:asyncrun_skip = skip
 	return 0
@@ -767,7 +802,7 @@ let s:template = [
 	\ '[compile-file]',
 	\ '',
 	\ '# shell command, use quotation for filenames containing spaces',
-	\ '# run ":AsyncTaskMacro" to see available macros',
+	\ '# check ":AsyncTaskMacro" to see available macros',
 	\ 'command=gcc "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)"',
 	\ '',
 	\ '# working directory, can change to $(VIM_ROOT) for project root',
