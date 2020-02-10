@@ -726,6 +726,11 @@ function! asynctasks#start(bang, taskname, path)
 		call s:errmsg(t . '"skywind3000/asyncrun.vim"')
 		return -6
 	endif
+	if &bt != ''
+		let t = 'current buffer must be a normal file, '
+		call s:errmsg(t . "don't run it in a tool window")
+		return -7
+	endif
 	let opts = s:task_option(task)
 	let skip = g:asyncrun_skip
 	if opts.mode == 'bang' || opts.mode == 2
