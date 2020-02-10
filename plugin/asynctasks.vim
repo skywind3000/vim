@@ -78,6 +78,11 @@ if !exists('g:asynctasks_term_reuse')
 	let g:asynctasks_term_reuse = 0
 endif
 
+" set to 1 to confine running tasks only in a normal buffer (&bt is empty)
+if !exists('g:asynctasks_strict')
+	let g:asynctasks_strict = 1
+endif
+
 
 "----------------------------------------------------------------------
 " internal object
