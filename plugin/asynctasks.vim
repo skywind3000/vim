@@ -3,7 +3,7 @@
 " asynctasks.vim - 
 "
 " Created by skywind on 2020/01/16
-" Last Modified: 2020/02/10 21:47
+" Last Modified: 2020/02/10 23:08
 "
 "======================================================================
 
@@ -52,7 +52,7 @@ if !exists('g:asynctasks_init_tasks')
 	let g:asynctasks_init_tasks = 1
 endif
 
-" terminal mode: tab/curwin/top/bottom/left/right/external
+" terminal mode: tab/curwin/top/bottom/left/right/quickfix/external
 if !exists('g:asynctasks_term_pos')
 	let g:asynctasks_term_pos = 'bottom'
 endif
@@ -654,6 +654,7 @@ function! s:task_option(task)
 			let opts[key] = task[key]
 		endif
 	endfor
+	let opts.safe = 1
 	return opts
 endfunc
 
@@ -808,9 +809,8 @@ let s:template = [
 	\ '# working directory, can change to $(VIM_ROOT) for project root',
 	\ 'cwd=$(VIM_FILEDIR)',
 	\ '',
-	\ '# output mode, can be one of quickfix, raw and terminal',
+	\ '# output mode, can be one of quickfix and terminal',
 	\ '# - quickfix: output to quickfix window',
-	\ '# - raw: output to quickfix window without errorformat matching',
 	\ '# - terminal: run the command in the internal terminal',
 	\ 'output=quickfix',
 	\ '',
