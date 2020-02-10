@@ -2,8 +2,13 @@
 "
 " asynctasks.vim - 
 "
-" Created by skywind on 2020/01/16
-" Last Modified: 2020/02/10 23:08
+" Maintainer: skywind3000 (at) gmail.com, 2020
+"
+" Last Modified: 2020/02/06 15:23
+" Verision: 32
+"
+" for more information, please visit:
+" https://github.com/skywind3000/asynctasks.vim
 "
 "======================================================================
 
@@ -54,7 +59,7 @@ endif
 
 " terminal mode: tab/curwin/top/bottom/left/right/quickfix/external
 if !exists('g:asynctasks_term_pos')
-	let g:asynctasks_term_pos = 'bottom'
+	let g:asynctasks_term_pos = 'quickfix'
 endif
 
 if !exists('g:asynctasks_term_cols')
