@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/10 23:27
-" Verision: 1.0.32
+" Last Modified: 2020/02/11 02:17
+" Verision: 1.1.3
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -726,9 +726,9 @@ function! asynctasks#start(bang, taskname, path)
 		call s:errmsg(t . '"skywind3000/asyncrun.vim"')
 		return -6
 	endif
-	if &bt != ''
+	if (&bt != '') && get(g:, 'asynctasks_strict', 1) != 0
 		let t = 'current buffer must be a normal file, '
-		call s:errmsg(t . "don't run it in a tool window")
+		call s:errmsg(t . "tasks cannot run in a tool window")
 		return -7
 	endif
 	let opts = s:task_option(task)
