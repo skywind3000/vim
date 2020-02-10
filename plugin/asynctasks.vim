@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/11 02:17
-" Verision: 1.1.3
+" Last Modified: 2020/02/11 02:22
+" Verision: 1.1.4
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -72,6 +72,10 @@ endif
 
 if !exists('g:asynctasks_term_focus')
 	let g:asynctasks_term_focus = 1
+endif
+
+if !exists('g:asynctasks_term_reuse')
+	let g:asynctasks_term_reuse = 0
 endif
 
 
@@ -660,6 +664,7 @@ function! s:task_option(task)
 		endif
 	endfor
 	let opts.safe = 1
+	let opts.reuse = g:asynctasks_term_reuse
 	return opts
 endfunc
 
