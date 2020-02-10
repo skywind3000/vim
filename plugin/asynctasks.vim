@@ -433,9 +433,30 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" 
+" extract correct command
 "----------------------------------------------------------------------
-function! s:sort_item(i1, i2)
+function! s:select_command(config, ft)
+	let command = get(a:config, 'command', '')
+	for key in keys(a:config)
+		let pos = stridx(key, ':')
+		if pos < 0
+			continue
+		endif
+		let part = split(key, ':')
+		let head = substitute(part[0], '^\s*\(.\{-}\)\s*$', '\1', '')
+		if head != 'command'
+			continue
+		endif
+		let text = substitute(part[1], '^\s*\(.\{-}\)\s*$', '\1', '')
+		let check = 0
+		for ft in split(text, ',')
+			let ft = substitute(ft, '^\s*\(.\{-}\)\s*$', '\1', '')
+			if ft == a:ft
+				let command = a:config[key]
+			endif
+		endfor
+	endfor
+	return command
 endfunc
 
 
@@ -485,6 +506,8 @@ function! asynctasks#split(name)
 	let parts = split(name, ':')
 	let name = (len(parts) >= 1)? parts[0] : ''
 	let system = (len(parts) >= 2)? parts[1] : ''
+	let name = substitute(name, '^\s*\(.\{-}\)\s*$', '\1', '')
+	let system = substitute(system, '^\s*\(.\{-}\)\s*$', '\1', '')
 	return [name, system]
 endfunc
 
@@ -575,7 +598,9 @@ function! s:task_option(task)
 	if has_key(task, 'output')
 		let output = task.output
 		let opts.mode = 'async'
-		if output == 'term' || output == 'terminal'
+		if output == 'quickfix'
+			let opts.mode = 'async'
+		elseif output == 'term' || output == 'terminal'
 			let pos = g:asynctasks_term_pos
 			let gui = get(g:, 'asyncrun_gui', 0)
 			if pos == 'vim' || pos == 'bang'
@@ -654,9 +679,36 @@ function! asynctasks#start(bang, taskname, path)
 	if opts.mode == 'bang' || opts.mode == 2
 		" let g:asyncrun_skip = or(g:asyncrun_skip, 2)
 	endif
-	call asyncrun#run(a:bang, opts, task.command)
+	let command = s:select_command(task, &ft)
+	call asyncrun#run(a:bang, opts, command)
 	let g:asyncrun_skip = skip
 	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" list available tasks
+"----------------------------------------------------------------------
+function! asynctasks#list(path)
+	let path = (a:path == '')? expand('%:p') : a:path
+	if asynctasks#collect_config(path, 1) != 0
+		return -1
+	endif
+	let tasks = s:private.tasks
+	let rows = []
+	for task in tasks.avail
+		let item = tasks.config[task]
+		let command = get(item, 'command', '')
+		let ni = {}
+		let ni.name = task
+		let ni.command = s:select_command(item, &ft)
+		let ni.scope = item.__mode__
+		let ni.source = item.__name__
+		if ni.command != ''
+			let rows += [ni]
+		endif
+	endfor
+	return rows
 endfunc
 
 
@@ -674,12 +726,45 @@ function! s:task_list(path)
 	" let rows += [['----', '----', '------']]
 	for task in tasks.avail
 		let item = tasks.config[task]
-		let command = get(item, 'command', '')
-		let rows += [[task, item.__mode__, command]]
-		let rows += [['', '', item.__name__]]
+		let command = s:select_command(item, &ft)
+		if command != ''
+			let rows += [[task, item.__mode__, command]]
+			let rows += [['', '', item.__name__]]
+		endif
 	endfor
 	call s:print_table(rows, 1)
 endfunc
+
+
+"----------------------------------------------------------------------
+" 
+"----------------------------------------------------------------------
+let s:template = [
+	\ '# vim: set noet fenc=utf-8 sts=4 sw=4 ts=4 ft=dosini:',
+	\ '',
+	\ '# define a new task named "default"',
+	\ '[default]',
+	\ '',
+	\ '# shell command, use quotation for filenames containing spaces',
+	\ 'command=gcc "$(VIM_FILEPATH)" -o "$(VIM_FILENOEXT)"',
+	\ '',
+	\ '# working directory, can change to $(VIM_ROOT) for project root',
+	\ 'cwd=$(VIM_FILEDIR)',
+	\ '',
+	\ '# output mode, can be one of quickfix, raw and terminal',
+	\ '# - quickfix: output to quickfix window',
+	\ '# - raw: output to quickfix window without errorformat matching',
+	\ '# - terminal: run the command in the internal terminal',
+	\ 'output=quickfix',
+	\ '',
+	\ '# this is for output=quickfix only',
+	\ "# if it is omitted, vim's current errorformat will be used.",
+	\ 'errorformat=%f:%l:%m',
+	\ '',
+	\ '# save file before execute',
+	\ 'save=1',
+	\ '',
+	\ ]
 
 
 "----------------------------------------------------------------------
@@ -708,31 +793,10 @@ function! s:task_edit(mode, path)
 	let newfile = filereadable(name)? 0 : 1
 	exec "split " . fnameescape(name)
 	exec "setlocal ft=dosini sts=4 sw=4 ts=4 noet"
-	let textlist = [
-		\ '# vim: set noet fenc=utf-8 sts=4 sw=4 ts=4 ft=dosini:',
-		\ '',
-		\ '# define a new task named "default"',
-		\ '[default]',
-		\ '',
-		\ '# shell command, use quotation for filenames containing spaces',
-		\ 'command=gcc "$(VIM_FILEPATH)" -o "$(VIM_FILENOEXT)"',
-		\ '',
-		\ '# working directory, can change to $(VIM_ROOT) for project root',
-		\ 'cwd=$(VIM_FILEDIR)',
-		\ '',
-		\ '# output mode, can be either quickfix or terminal',
-		\ 'output=quickfix',
-		\ '',
-		\ '# this can be omitted (use the errorformat in vim)',
-		\ 'errorformat=%f:%l:%m',
-		\ '',
-		\ '# save file before execute',
-		\ 'save=1',
-		\ '',
-		\ ]
 	if newfile
 		exec "normal ggVGx"
-		call append(line('.') - 1, textlist)
+		call append(line('.') - 1, s:template)
+		setlocal nomodified
 	endif
 endfunc
 
