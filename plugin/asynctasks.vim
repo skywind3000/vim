@@ -5,7 +5,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
 " Last Modified: 2020/02/11 02:38
-" Verision: 1.1.5
+" Verision: 1.1.6
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -71,7 +71,7 @@ if !exists('g:asynctasks_term_rows')
 endif
 
 if !exists('g:asynctasks_term_focus')
-	let g:asynctasks_term_focus = 0
+	let g:asynctasks_term_focus = 1
 endif
 
 if !exists('g:asynctasks_term_reuse')
