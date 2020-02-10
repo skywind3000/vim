@@ -262,7 +262,8 @@ function! s:cache_load_ini(name)
 	let obj.name = name
 	let obj.config = config
 	let obj.keys = keys(config)
-	let home = fnamemodify(name, ':h')
+	let ininame = name
+	let inihome = fnamemodify(name, ':h')
 	let special = []
 	for sect in obj.keys
 		let section = obj.config[sect]
@@ -271,7 +272,8 @@ function! s:cache_load_ini(name)
 		endif
 		for key in keys(section)
 			let val = section[key]
-			let section[key] = s:replace(val, '$(CFGHOME)', home)
+			let section[key] = s:replace(val, '$(VIM_INIHOME)', inihome)
+			let section[key] = s:replace(val, '$(VIM_INIFILE)', ininame)
 		endfor
 	endfor
 	let sys = g:asynctasks_system
@@ -737,16 +739,16 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" 
+" config template
 "----------------------------------------------------------------------
 let s:template = [
 	\ '# vim: set noet fenc=utf-8 sts=4 sw=4 ts=4 ft=dosini:',
 	\ '',
-	\ '# define a new task named "default"',
-	\ '[default]',
+	\ '# define a new task named "build"',
+	\ '[build]',
 	\ '',
 	\ '# shell command, use quotation for filenames containing spaces',
-	\ 'command=gcc "$(VIM_FILEPATH)" -o "$(VIM_FILENOEXT)"',
+	\ 'command=gcc "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)"',
 	\ '',
 	\ '# working directory, can change to $(VIM_ROOT) for project root',
 	\ 'cwd=$(VIM_FILEDIR)',
@@ -802,6 +804,13 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" macro help 
+"----------------------------------------------------------------------
+let s:macro_help = [
+	\ ]
+
+
+"----------------------------------------------------------------------
 " command AsyncTask
 "----------------------------------------------------------------------
 function! asynctasks#cmd(bang, ...)
@@ -817,12 +826,15 @@ function! asynctasks#cmd(bang, ...)
 		echo '    :AsyncTask -h              - show this help'
 		echo '    :AsyncTask -e              - edit local task in project root'
 		echo '    :AsyncTask -E              - edit global task in ~/.vim'
+		echo '    :AsyncTask -m              - display command macros'
 		return 0
 	elseif taskname == '-l'
 		call s:task_list('')
 		return 0
 	elseif taskname ==# '-e' || taskname ==# '-E'
 		call s:task_edit(taskname, (a:0 >= 2)? (a:2) : '')
+		return 0
+	elseif taskname == '-m'
 		return 0
 	endif
 	call asynctasks#start(a:bang, taskname, '')
