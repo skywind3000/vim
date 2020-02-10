@@ -196,7 +196,7 @@ function! s:search_parent(name, cwd)
 	let output = []
 	for name in finding
 		let name = fnamemodify(name, ':p')
-		let output += [name]
+		let output += [s:abspath(name)]
 	endfor
 	return output
 endfunc
@@ -218,8 +218,11 @@ function! s:abspath(path)
 	let f = (f != '%')? f : expand('%')
 	let f = fnamemodify(f, ':p')
 	if s:windows != 0
-		let f = substitute(f, "\\", '/', 'g')
+		let f = substitute(f, '\/', '\\', 'g')
+	else
+		let f = substitute(f, '\\', '\/', 'g')
 	endif
+	let f = substitute(f, '\\', '\/', 'g')
 	if len(f) > 1
 		let size = len(f)
 		if f[size - 1] == '/'
@@ -760,10 +763,11 @@ endfunc
 let s:template = [
 	\ '# vim: set noet fenc=utf-8 sts=4 sw=4 ts=4 ft=dosini:',
 	\ '',
-	\ '# define a new task named "build"',
-	\ '[build]',
+	\ '# define a new task named "compile-file"',
+	\ '[compile-file]',
 	\ '',
 	\ '# shell command, use quotation for filenames containing spaces',
+	\ '# run ":AsyncTaskMacro" to see available macros',
 	\ 'command=gcc "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)"',
 	\ '',
 	\ '# working directory, can change to $(VIM_ROOT) for project root',
@@ -927,11 +931,24 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" commands
+" command
 "----------------------------------------------------------------------
 
 command! -bang -nargs=* AsyncTask
 			\ call asynctasks#cmd('<bang>', <q-args>)
+
+
+"----------------------------------------------------------------------
+" help commands
+"----------------------------------------------------------------------
+command! -bang -nargs=0 AsyncTaskEdit
+			\ call asynctasks#cmd('', ('<bang>' == '')? '-e' : '-E')
+
+command! -nargs=0 AsyncTaskList 
+			\ call asynctasks#cmd('', '-l')
+
+command! -nargs=0 AsyncTaskMacro
+			\ call asynctasks#cmd('', '-m')
 
 
 "----------------------------------------------------------------------
