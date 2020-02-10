@@ -3,7 +3,7 @@
 " asynctasks.vim - 
 "
 " Created by skywind on 2020/01/16
-" Last Modified: 2020/01/18 04:29
+" Last Modified: 2020/02/10 21:47
 "
 "======================================================================
 
@@ -538,7 +538,7 @@ function! asynctasks#tabulify(rows)
 			let newrow += repeat([''], ncols - len(newrow))
 		endif
 		for i in index
-			let size = len(newrow[i])
+			let size = strwidth(newrow[i])
 			let sizes[i] = (sizes[i] < size)? size : sizes[i]
 		endfor
 		let rows += [newrow]
@@ -547,14 +547,13 @@ function! asynctasks#tabulify(rows)
 		let ni = []
 		for i in index
 			let x = row[i]
-			let size = len(x)
-			if len(x) < sizes[i]
+			let size = strwidth(x)
+			if size < sizes[i]
 				let x = x . repeat(' ', sizes[i] - size)
 			endif
 			let ni += [x]
 		endfor
-		let text = join(ni, '  ')
-		let content += [text]
+		let content += [ni]
 	endfor
 	return content
 endfunc
@@ -563,19 +562,25 @@ endfunc
 "----------------------------------------------------------------------
 " display table
 "----------------------------------------------------------------------
-function! s:print_table(rows, highhead)
+function! s:print_table(rows, highmap)
 	let content = asynctasks#tabulify(a:rows)
 	let index = 0
 	for line in content
-		if index == 0 && a:highhead
-			let index += 1
-			echohl ModeMsg
-			echo ' '. line
-			echohl None
-		else
-			echo ' '. line
-		endif
+		let col = 0
+		echon (index == 0)? " " : "\n "
+		for cell in line
+			let key = index . ',' . col
+			if !has_key(a:highmap, key)
+				echohl None
+			else
+				exec 'echohl ' . a:highmap[key]
+			endif
+			echon cell . '  '
+			let col += 1
+		endfor
+		let index += 1
 	endfor
+	echohl None
 endfunc
 
 
@@ -725,6 +730,11 @@ function! s:task_list(path)
 	let tasks = s:private.tasks
 	let rows = []
 	let rows += [['Task', 'Type', 'Detail']]
+	let highmap = {}
+	let index = 0
+	let highmap['0,0'] = 'Title'
+	let highmap['0,1'] = 'Title'
+	let highmap['0,2'] = 'Title'
 	" let rows += [['----', '----', '------']]
 	for task in tasks.avail
 		let item = tasks.config[task]
@@ -733,8 +743,14 @@ function! s:task_list(path)
 			let rows += [[task, item.__mode__, command]]
 			let rows += [['', '', item.__name__]]
 		endif
+		let highmap[(index * 2 + 1) . ',0'] = 'Keyword'
+		let highmap[(index * 2 + 1) . ',1'] = 'Number'
+		let highmap[(index * 2 + 1) . ',2'] = 'Statement'
+		let highmap[(index * 2 + 2) . ',2'] = 'Comment'
+		let index += 1
 	endfor
-	call s:print_table(rows, 1)
+	call s:print_table(rows, highmap)
+	" echo highmap
 endfunc
 
 
@@ -806,8 +822,75 @@ endfunc
 "----------------------------------------------------------------------
 " macro help 
 "----------------------------------------------------------------------
-let s:macro_help = [
-	\ ]
+let s:macros = { 
+	\ 'VIM_FILEPATH': 'File name of current buffer with full path',
+	\ 'VIM_FILENAME': 'File name of current buffer without path',
+	\ 'VIM_FILEDIR': 'Full path of current buffer without the file name',
+	\ 'VIM_FILEEXT': 'File extension of current buffer',
+	\ 'VIM_FILENOEXT': 
+		\ 'File name of current buffer without path and extension',
+	\ 'VIM_PATHNOEXT':
+		\ 'Current file name with full path but without extension',
+	\ 'VIM_CWD': 'Current directory',
+	\ 'VIM_RELDIR': 'File path relativize to current directory',
+	\ 'VIM_RELNAME': 'File name relativize to current directory',
+	\ 'VIM_ROOT': 'Project root directory',
+	\ 'VIM_CWORD': 'Current word under cursor',
+	\ 'VIM_CFILE': 'Current filename under cursor',
+	\ 'VIM_GUI': 'Is running under gui ?',
+	\ 'VIM_VERSION': 'Value of v:version',
+	\ 'VIM_COLUMNS': "How many columns in vim's screen",
+	\ 'VIM_LINES': "How many lines in vim's screen", 
+	\ 'VIM_SVRNAME': 'Value of v:servername for +clientserver usage',
+	\ }
+
+
+"----------------------------------------------------------------------
+" macro list
+"----------------------------------------------------------------------
+function! s:task_macro()
+	let macros = {}
+	let macros['VIM_FILEPATH'] = expand("%:p")
+	let macros['VIM_FILENAME'] = expand("%:t")
+	let macros['VIM_FILEDIR'] = expand("%:p:h")
+	let macros['VIM_FILENOEXT'] = expand("%:t:r")
+	let macros['VIM_PATHNOEXT'] = expand("%:r")
+	let macros['VIM_FILEEXT'] = "." . expand("%:e")
+	let macros['VIM_CWD'] = getcwd()
+	let macros['VIM_RELDIR'] = expand("%:h:.")
+	let macros['VIM_RELNAME'] = expand("%:p:.")
+	let macros['VIM_CWORD'] = expand("<cword>")
+	let macros['VIM_CFILE'] = expand("<cfile>")
+	let macros['VIM_VERSION'] = ''.v:version
+	let macros['VIM_SVRNAME'] = v:servername
+	let macros['VIM_COLUMNS'] = ''.&columns
+	let macros['VIM_LINES'] = ''.&lines
+	let macros['VIM_GUI'] = has('gui_running')? 1 : 0
+	let macros['VIM_ROOT'] = asyncrun#get_root('%')
+    let macros['VIM_HOME'] = expand(split(&rtp, ',')[0])
+	let macros['<cwd>'] = macros['VIM_CWD']
+	let macros['<root>'] = macros['VIM_ROOT']
+	let names = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT', 'FILENOEXT']
+	let names += ['PATHNOEXT', 'CWD', 'RELDIR', 'RELNAME', 'CWORD', 'CFILE']
+	let names += ['VERSION', 'SVRNAME', 'COLUMNS', 'LINES', 'GUI', 'ROOT']
+	let rows = []
+	let rows += [['Macro', 'Detail', 'Value']]
+	let highmap = {}
+	let highmap['0,0'] = 'Title'
+	let highmap['0,1'] = 'Title'
+	let highmap['0,2'] = 'Title'
+	let index = 1
+	for nn in names
+		let name = 'VIM_' . nn
+		let rows += [['$(' . name . ')', s:macros[name], macros[name]]]
+		" let rows += [['', macros[name]]]
+		let highmap[index . ',0'] = 'Keyword'
+		let highmap[index . ',1'] = 'Statement'
+		let highmap[index . ',2'] = 'Comment'
+		let index += 1
+	endfor
+	call s:print_table(rows, highmap)
+endfunc
 
 
 "----------------------------------------------------------------------
@@ -815,8 +898,9 @@ let s:macro_help = [
 "----------------------------------------------------------------------
 function! asynctasks#cmd(bang, ...)
 	let taskname = (a:0 >= 1)? (a:1) : ''
+	let path = (a:0 >= 2)? (a:2) : ''
 	if taskname == ''
-		call s:errmsg('empty task name, use ":AsyncTask -h" for help')
+		call s:errmsg('require task name')
 		return -1
 	elseif taskname == '-h'
 		echo 'usage:  :AsyncTask <operation>'
@@ -832,9 +916,10 @@ function! asynctasks#cmd(bang, ...)
 		call s:task_list('')
 		return 0
 	elseif taskname ==# '-e' || taskname ==# '-E'
-		call s:task_edit(taskname, (a:0 >= 2)? (a:2) : '')
+		call s:task_edit(taskname, path)
 		return 0
 	elseif taskname == '-m'
+		call s:task_macro()
 		return 0
 	endif
 	call asynctasks#start(a:bang, taskname, '')
