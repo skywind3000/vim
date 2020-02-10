@@ -720,7 +720,7 @@ function! asynctasks#start(bang, taskname, path)
 		call s:errmsg(t . '"skywind3000/asyncrun.vim"')
 		return -5
 	endif
-	let target = '2.3.0'
+	let target = '2.4.0'
 	if asynctasks#version_compare(asyncrun#version(), target) < 0
 		let t = 'asyncrun ' . target . ' or above is required, update from '
 		call s:errmsg(t . '"skywind3000/asyncrun.vim"')
