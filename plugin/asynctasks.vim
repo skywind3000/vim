@@ -804,8 +804,8 @@ endfunc
 let s:template = [
 	\ '# vim: set noet fenc=utf-8 sts=4 sw=4 ts=4 ft=dosini:',
 	\ '',
-	\ '# define a new task named "compile-file"',
-	\ '[compile-file]',
+	\ '# define a new task named "file-compile"',
+	\ '[file-compile]',
 	\ '',
 	\ '# shell command, use quotation for filenames containing spaces',
 	\ '# check ":AsyncTaskMacro" to see available macros',
