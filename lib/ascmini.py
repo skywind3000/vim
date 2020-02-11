@@ -486,6 +486,7 @@ def http_request(url, timeout = 10, data = None, post = False, head = None):
     headers = []
     import urllib
     import ssl
+    status = -1
     if sys.version_info[0] >= 3:
         import urllib.parse
         import urllib.request
@@ -519,6 +520,7 @@ def http_request(url, timeout = 10, data = None, post = False, head = None):
         except ssl.SSLError:
             return -2, 'timeout', None
         content = res.read()
+        status = res.getcode()
     else:
         import urllib2
         if data is not None:
@@ -548,6 +550,7 @@ def http_request(url, timeout = 10, data = None, post = False, head = None):
         try:
             res = urllib2.urlopen(req, timeout = timeout)
             content = res.read()
+            status = res.getcode()
             if res.info().headers:
                 for line in res.info().headers:
                     line = line.rstrip('\r\n\t')
@@ -565,7 +568,7 @@ def http_request(url, timeout = 10, data = None, post = False, head = None):
             return -2, 'timeout', None
         except ssl.SSLError:
             return -2, 'timeout', None
-    return 200, content, headers
+    return status, content, headers
 
 
 #----------------------------------------------------------------------
@@ -1609,6 +1612,7 @@ if __name__ == '__main__':
         for k, v in headers:
             print('%s: %s'%(k, v))
         print(web.IsFastCGI())
+        print(code)
         return 0
     def test2():
         config = ConfigReader('e:/lab/casuald/conf/echoserver.ini')

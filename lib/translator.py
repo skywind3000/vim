@@ -12,61 +12,64 @@ from __future__ import print_function, unicode_literals
 import sys
 import time
 import os
+import re
 import random
 import copy
+import json
+import pprint
 
 
 #----------------------------------------------------------------------
 # 语言的别名
 #----------------------------------------------------------------------
 langmap = {
-        "arabic": "ar",
-        "bulgarian": "bg",
-        "catalan": "ca",
-        "chinese": "zh-CN",
-        "chinese simplified": "zh-CHS",
-        "chinese traditional": "zh-CHT",
-        "czech": "cs",
-        "danish": "da",	
-        "dutch": "nl",
-        "english": "en",
-        "estonian": "et",
-        "finnish": "fi",
-        "french": "fr",
-        "german": "de",
-        "greek": "el",
-        "haitian creole": "ht",
-        "hebrew": "he",
-        "hindi": "hi",
-        "hmong daw": "mww",
-        "hungarian": "hu",
-        "indonesian": "id",
-        "italian": "it",
-        "japanese": "ja",
-        "klingon": "tlh",
-        "klingon (piqad)":"tlh-Qaak",
-        "korean": "ko",
-        "latvian": "lv",
-        "lithuanian": "lt",
-        "malay": "ms",
-        "maltese": "mt",
-        "norwegian": "no",
-        "persian": "fa",
-        "polish": "pl",
-        "portuguese": "pt",
-        "romanian": "ro",
-        "russian": "ru",
-        "slovak": "sk",
-        "slovenian": "sl",
-        "spanish": "es",
-        "swedish": "sv",
-        "thai": "th",
-        "turkish": "tr",
-        "ukrainian": "uk",
-        "urdu": "ur",
-        "vietnamese": "vi",
-        "welsh": "cy"
-    }
+    "arabic": "ar",
+    "bulgarian": "bg",
+    "catalan": "ca",
+    "chinese": "zh-CN",
+    "chinese simplified": "zh-CHS",
+    "chinese traditional": "zh-CHT",
+    "czech": "cs",
+    "danish": "da",	
+    "dutch": "nl",
+    "english": "en",
+    "estonian": "et",
+    "finnish": "fi",
+    "french": "fr",
+    "german": "de",
+    "greek": "el",
+    "haitian creole": "ht",
+    "hebrew": "he",
+    "hindi": "hi",
+    "hmong daw": "mww",
+    "hungarian": "hu",
+    "indonesian": "id",
+    "italian": "it",
+    "japanese": "ja",
+    "klingon": "tlh",
+    "klingon (piqad)":"tlh-Qaak",
+    "korean": "ko",
+    "latvian": "lv",
+    "lithuanian": "lt",
+    "malay": "ms",
+    "maltese": "mt",
+    "norwegian": "no",
+    "persian": "fa",
+    "polish": "pl",
+    "portuguese": "pt",
+    "romanian": "ro",
+    "russian": "ru",
+    "slovak": "sk",
+    "slovenian": "sl",
+    "spanish": "es",
+    "swedish": "sv",
+    "thai": "th",
+    "turkish": "tr",
+    "ukrainian": "uk",
+    "urdu": "ur",
+    "vietnamese": "vi",
+    "welsh": "cy"
+}
 
 
 #----------------------------------------------------------------------
@@ -199,25 +202,30 @@ class BasicTranslator(object):
     def url_quote (self, text, plus = True):
         if sys.version_info[0] < 3:
             import urllib
+            if isinstance(text, unicode):    # noqa: F821
+                text = text.encode('utf-8', 'ignore')
             if plus:
                 return urllib.quote_plus(text)
-            return urlparse.quote(text)
+            return urlparse.quote(text)   # noqa: F821
         import urllib.parse
         if plus:
             return urllib.parse.quote_plus(text)
         return urllib.parse.quote(text)
 
+    def create_translation (self, sl = None, tl = None, text = None):
+        res = {}
+        res['engine'] = self._name
+        res['sl'] = sl              # 来源语言
+        res['tl'] = tl              # 目标语言
+        res['text'] = text          # 需要翻译的文本
+        res['phonetic'] = None      # 音标
+        res['definition'] = None    # 简单释义
+        res['explain'] = None       # 分行解释
+        return res
+
     # 翻译结果：需要填充如下字段
     def translate (self, sl, tl, text):
-        res = {}
-        res['sl'] = sl              # 来源语言
-        res['tl'] = sl              # 目标语言
-        res['text'] = text          # 需要翻译的文本
-        res['translation'] = None   # 翻译结果
-        res['html'] = None          # HTML 格式的翻译结果（如果有的话）
-        res['xterm'] = None         # ASCII 色彩输出（如果有的话）
-        res['info'] = None          # 原始网站的返回值
-        return res
+        return self.create_translation(sl, tl, text)
 
     # 是否是英文
     def check_english (self, text):
@@ -243,7 +251,7 @@ class BasicTranslator(object):
         import hashlib
         m = hashlib.md5()
         if sys.version_info[0] < 3:
-            if isinstance(text, unicode):
+            if isinstance(text, unicode):   # noqa: F821
                 text = text.encode('utf-8')
         else:
             if isinstance(text, str):
@@ -276,7 +284,7 @@ class AzureTranslator (BasicTranslator):
             'Content-type': 'application/json',
             'X-ClientTraceId': str(uuid.uuid4())
         }
-        body = [{'text' : text}]
+        body = [{'text': text}]
         import json
         resp = self.http_post(url, json.dumps(body), headers).json()
         # print(resp)
@@ -315,12 +323,11 @@ class GoogleTranslator (BasicTranslator):
         self._agent += ' Gecko/20100101 Firefox/59.0'
 
     def get_url (self, sl, tl, qry):
-        http_host = self._options.get('host', 'translate.googleapis.com')
-        http_host = 'translate.google.cn'
+        http_host = self._config.get('host', 'translate.googleapis.com')
         qry = self.url_quote(qry)
         url = 'https://{}/translate_a/single?client=gtx&sl={}&tl={}&dt=at&dt=bd&dt=ex&' \
               'dt=ld&dt=md&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&q={}'.format(
-                      http_host, sl, tl, qry)
+                      http_host, sl, tl, qry)    # noqa: E216
         return url
 
     def translate (self, sl, tl, text):
@@ -328,61 +335,66 @@ class GoogleTranslator (BasicTranslator):
         self.text = text
         url = self.get_url(sl, tl, text)
         r = self.http_get(url)
-        obj = r.json()
-        res = {}
-        res['sl'] = obj[2] and obj[2] or sl
-        res['tl'] = obj[1] and obj[1] or tl
-        res['info'] = obj
-        res['translation'] = self.render(obj)
-        res['html'] = None
+        if not r:
+            return None
+        try:
+            obj = r.json()
+        except:
+            return None
+        # pprint.pprint(obj)
+        res = self.create_translation(sl, tl, text)
+        res['phonetic'] = self.get_phonetic(obj)
+        res['definition'] = self.get_definition(obj)
+        res['explain'] = self.get_explain(obj)
+        res['detail'] = self.get_detail(obj)
+        res['alternative'] = self.get_alternative(obj)
         return res
 
-    def render (self, obj):
-        result = self.get_result('', obj) + '\n'
-        result = self.get_synonym(result, obj)
-        if len(obj) >= 13 and obj[12]:
-            result = self.get_definitions(result, obj)
-        if len(obj) >= 6 and obj[5]:
-            result = self.get_alternative(result, obj)
-        return result
+    def get_phonetic (self, obj):
+        for x in obj[0]:
+            if len(x) == 4:
+                return x[3]
+        return None
 
-    def get_result (self, result, obj):
+    def get_definition (self, obj):
+        paraphrase = ''
         for x in obj[0]:
             if x[0]:
-                result += x[0]
-        return result
+                paraphrase += x[0]
+        return paraphrase
 
-    def get_synonym (self, result, resp):
-        if resp[1]:
-            result += '\n-------------\n'
-            result += 'Translations\n'
-            for x in resp[1]:
-                result += '\n'
-                result += '[{}]\n'.format(x[0][0])
+    def get_explain (self, obj):
+        explain = []
+        if obj[1]:
+            for x in obj[1]:
+                expl = '[{}] '.format(x[0][0])
                 for i in x[2]:
-                    result += '{}: {}\n'.format(i[0], ", ".join(i[1]))
-        return result
+                    expl += i[0] + ';'
+                explain.append(expl)
+        return explain
 
-    def get_definitions (self, result, resp):
-        result += '\n-------------\n'
-        result += 'Definitions\n'
+    def get_detail (self, resp):
+        result = []
+        if len(resp) < 13:
+            return None
         for x in resp[12]:
-            result += '\n'
-            result += '[{}]\n'.format(x[0])
+            result.append('[{}]'.format(x[0]))
             for y in x[1]:
-                result += '- {}\n'.format(y[0])
-                result += '  * {}\n'.format(y[2]) if len(y) >= 3 else ''
+                result.append('- {}'.format(y[0]))
+                if len(y) >= 3:
+                    result.append('  * {}'.format(y[2]))
         return result
 
-    def get_alternative (self, result, resp):
-        if len(resp) < 6 or (not resp[5]):
-            return result
-        result += '\n-------------\n'
-        result += 'Alternatives\n'
+    def get_alternative (self, resp):
+        definition = self.get_definition(resp)
+        result = []
+        if len(resp) < 6:
+            return None
         for x in resp[5]:
-            result += '- {}\n'.format(x[0])
+            # result.append('- {}'.format(x[0]))
             for i in x[2]:
-                result += '  * {}\n'.format(i[0])
+                if i[0] != definition:
+                    result.append(' * {}'.format(i[0]))
         return result
 
 
@@ -396,6 +408,7 @@ class YoudaoTranslator (BasicTranslator):
         super(YoudaoTranslator, self).__init__('youdao', **argv)
         self.url = 'https://fanyi.youdao.com/translate_o?smartresult=dict&smartresult=rule'
         self.D = "ebSeFb%=XZ%T[KZ)c(sy!"
+        self.D = "97_3(jkMYg@T[KZQmqjTK"
 
     def get_md5 (self, value):
         import hashlib
@@ -433,20 +446,20 @@ class YoudaoTranslator (BasicTranslator):
             'typoResult': 'true'
         }
         r = self.http_post(self.url, data, header)
-        obj = r.json()
-        translation = ''
-        res = {}
-        res['text'] = text
-        res['sl'] = sl
-        res['tl'] = tl
-        res['translation'] = self.render(obj)
-        res['info'] = obj
-        res['html'] = None
-        res['xterm'] = None
+        if not r:
+            return None
+        try:
+            obj = r.json()
+        except:
+            return None
+        # pprint.pprint(obj)
+        res = self.create_translation(sl, tl, text)
+        res['definition'] = self.get_definition(obj)
+        res['explain'] = self.get_explain(obj)
         return res
 
-    def render (self, obj):
-        output = ''
+    def get_definition (self, obj):
+        translation = ''
         t = obj.get('translateResult')
         if t:
             for n in t:
@@ -456,15 +469,19 @@ class YoudaoTranslator (BasicTranslator):
                     if x:
                         part.append(x)
                 if part:
-                    output += ', '.join(part) + '\n'
+                    translation += ', '.join(part)
+        return translation
+
+    def get_explain (self, obj):
+        explain = []
         if 'smartResult' in obj:
-            output += '---------\n'
             smarts = obj['smartResult']['entries']
             for entry in smarts:
                 if entry:
                     entry = entry.replace('\r', '')
-                    output += entry
-        return output
+                    entry = entry.replace('\n', '')
+                    explain.append(entry)
+        return explain
 
 
 #----------------------------------------------------------------------
@@ -476,41 +493,48 @@ class BingDict (BasicTranslator):
         super(BingDict, self).__init__('bingdict', **argv)
         self._agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:50.0) Gecko/20100101'
         self._agent += ' Firefox/50.0'
-        self._url = 'http://cn.bing.com/dict/SerpHoverTrans'
+        self._url = 'http://bing.com/dict/SerpHoverTrans'
+        self._cnurl = 'http://cn.bing.com/dict/SerpHoverTrans'
 
     def translate (self, sl, tl, text):
-        url = self._url + '?q=' + self.url_quote(text)
+        url = ('zh' in tl) and self._cnurl or self._url
+        url = self._cnurl
+        url = url + '?q=' + self.url_quote(text)
         headers = {
-            'Host': 'cn.bing.com',
+            # 'Host': 'cn.bing.com',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.5',
-            'Accept-Encoding': 'gzip, deflate',
         }
         resp = self.http_get(url, None, headers)
-        res = {}
+        if not resp:
+            return None
+        resp = resp.text
+        res = self.create_translation(sl, tl, text)
         res['sl'] = 'auto'
         res['tl'] = 'auto'
         res['text'] = text
-        res['info'] = resp.text
-        res['translation'] = self.render(text, resp.text)
+        res['phonetic'] = self.get_phonetic(resp)
+        res['explain'] = self.get_explain(resp)
         return res
 
-    def render (self, word, html):
-        from bs4 import BeautifulSoup
+    def get_phonetic (self, html):
         if not html:
             return ''
-        soup = BeautifulSoup(html, 'lxml')
-        if soup.find('h4').text.strip() != word:
+        m = re.findall(
+            r'<span class="ht_attr" lang=".*?">\[(.*?)\] </span>', html)
+        if not m:
             return None
-        lis = soup.find_all('li')
-        trans = []
-        for item in lis:
-            t = item.get_text()
-            if t:
-                trans.append(t)
-        if not trans:
-            return None
-        return '\n'.join(trans)
+        return m[0].strip()
+
+    def get_explain (self, html):
+        if not html:
+            return []
+        m = re.findall(
+            r'<span class="ht_pos">(.*?)</span><span class="ht_trs">(.*?)</span>', html)
+        expls = []
+        for item in m:
+            expls.append('%s %s' % item)
+        return expls
 
 
 
@@ -530,13 +554,13 @@ class BaiduTranslator (BasicTranslator):
         self.apikey = self._config['apikey']
         self.secret = self._config['secret']
         langmap = {
-                'zh-cn': 'zh',
-                'zh-chs': 'zh',
-                'zh-cht': 'cht',
-                'en-us': 'en', 
-                'en-gb': 'en',
-                'ja': 'jp',
-            }
+            'zh-cn': 'zh',
+            'zh-chs': 'zh',
+            'zh-cht': 'cht',
+            'en-us': 'en', 
+            'en-gb': 'en',
+            'ja': 'jp',
+        }
         self.langmap = langmap
 
     def convert_lang (self, lang):
@@ -597,17 +621,24 @@ class CibaTranslator (BasicTranslator):
         req['t'] = tl
         req['w'] = text
         r = self.http_get(url, req, None)
+        if not r:
+            return None
+        try:
+            resp = r.json()
+        except:
+            return None
         resp = r.json()
-        res = {}
-        res['text'] = text
-        res['sl'] = sl
-        res['tl'] = tl
-        res['translation'] = None
-        res['html'] = None
-        res['xterm'] = None
+        if not resp:
+            return None
+        res = self.create_translation(sl, tl, text)
+        res['definition'] = ''
         if 'content' in resp:
             if 'out' in resp['content']:
-                res['translation'] = resp['content']['out']
+                res['definition'] = resp['content']['out'] or ''
+            if 'ph_en' in resp['content']:
+                res['phonetic'] = resp['content']['ph_en'] or ''
+            if 'word_mean' in resp['content']:
+                res['explain'] = resp['content']['word_mean'] or ''
         return res
 
 
@@ -643,13 +674,13 @@ def getopt (argv):
 # 引擎注册
 #----------------------------------------------------------------------
 ENGINES = {
-        'google': GoogleTranslator,
-        'azure': AzureTranslator,
-        'baidu': BaiduTranslator,
-        'youdao': YoudaoTranslator,
-        'bing': BingDict,
-        'ciba': CibaTranslator,
-    }
+    'google': GoogleTranslator,
+    'azure': AzureTranslator,
+    'baidu': BaiduTranslator,
+    'youdao': YoudaoTranslator,
+    'bing': BingDict,
+    'ciba': CibaTranslator,
+}
 
 
 #----------------------------------------------------------------------
@@ -670,7 +701,8 @@ def main(argv = None):
     if not tl:
         tl = 'auto'
     if not args:
-        print('usage: translator.py {--engine=xx} {--from=xx} {--to=xx} text')
+        msg = 'usage: translator.py {--engine=xx} {--from=xx} {--to=xx}'
+        print(msg + ' {-json} text')
         print('engines:', list(ENGINES.keys()))
         return 0
     text = ' '.join(args)
@@ -680,11 +712,30 @@ def main(argv = None):
         return -1
     translator = cls()
     res = translator.translate(sl, tl, text)
+    if 'json' in options:
+        text = json.dumps(res)
+        sys.stdout.write(str(text))
+        return 0
     if not res:
         return -2
-    if 'translation' not in res:
-        return -3
-    print(res['translation'])
+    if 'text' in res:
+        if res['text']:
+            print(res['text'])
+    if 'phonetic' in res:
+        if res['phonetic']:
+            print('[' + res['phonetic'] + ']')
+    if 'definition' in res:
+        if res['definition']:
+            print(res['definition'])
+    if 'explain' in res:
+        if res['explain']:
+            print('\n'.join(res['explain']))
+    elif 'translation' in res:
+        if res['translation']:
+            print(res['translation'])
+    if 'alternative' in res:
+        if res['alternative']:
+            print('\n'.join(res['alternative']))
     return 0
 
 
@@ -735,14 +786,26 @@ if __name__ == '__main__':
         # print(r['info'])
         # print()
         print(r['translation'])
+    def test7():
+        # t = CibaTranslator()
+        t = GoogleTranslator()
+        # t = YoudaoTranslator()
+        # t = BingDict()
+        # r = t.translate('zh', 'en', '吃饭了没有？')
+        # r = t.translate('', '', 'apple')
+        r = t.translate('', '', '正在测试翻译一段话')
+        pprint.pprint(r)
     def test9():
         argv = ['', '正在测试翻译一段话']
         main(argv)
         print('=====')
-        argv = ['', '--engine=youdao', '正在测试翻译一段话']
+        argv = ['', '--engine=bing', '--sl=zh', '--tl=en', '正在测试翻译一段话']
+        main(argv)
+        print('=====')
+        argv = ['', '--engine=bing', '--sl=zh', '--tl=en', '-json', '苹果']
         main(argv)
         return 0
-    # test6()
+    # test9()
     main()
 
 
