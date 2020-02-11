@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/11 03:19
-" Verision: 1.1.6
+" Last Modified: 2020/02/11 19:59
+" Verision: 1.1.7
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -625,7 +625,7 @@ function! s:task_option(task)
 		if output == 'quickfix'
 			let opts.mode = 'async'
 		elseif output == 'term' || output == 'terminal'
-			let pos = g:asynctasks_term_pos
+			let pos = get(a:task, 'pos', g:asynctasks_term_pos)
 			let gui = get(g:, 'asyncrun_gui', 0)
 			if pos == 'vim' || pos == 'bang'
 				let opts.mode = 'bang'
