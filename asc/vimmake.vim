@@ -347,13 +347,13 @@ function! vimmake#keymap()
 	noremap <silent><F5> :AsyncTask file-run<cr>
 	noremap <silent><F6> :AsyncTask make<cr>
 	noremap <silent><F7> :AsyncTask emake<cr>
-	noremap <silent><F8> :AsyncTask emake-run<cr>
+	noremap <silent><F8> :AsyncTask emake-exe<cr>
 	noremap <silent><F9> :AsyncTask file-build<cr>
 	noremap <silent><F10> :call asyncrun#quickfix_toggle(6)<cr>
 	inoremap <silent><F5> <ESC>:AsyncTask file-run<cr>
 	inoremap <silent><F6> <ESC>:AsyncTask make<cr>
 	inoremap <silent><F7> <ESC>:AsyncTask emake<cr>
-	inoremap <silent><F8> <ESC>:AsyncTask emake-run<cr>
+	inoremap <silent><F8> <ESC>:AsyncTask emake-exe<cr>
 	inoremap <silent><F9> <ESC>:AsyncTask file-build<cr>
 	inoremap <silent><F10> <ESC>:call asyncrun#quickfix_toggle(6)<cr>
 
