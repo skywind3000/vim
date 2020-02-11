@@ -16,7 +16,22 @@ import re
 import random
 import copy
 import json
+import codecs
 import pprint
+
+
+#----------------------------------------------------------------------
+# 编码兼容
+#----------------------------------------------------------------------
+if sys.version_info[0] < 3:
+    reload(sys)   # noqa: F821
+    sys.setdefaultencoding('utf-8')
+    # sys.stdout = codecs.getwriter('utf-8')(sys.stdout, 'ignore')
+    # sys.stderr = codecs.getwriter('utf-8')(sys.stderr, 'ignore')
+else:
+    # sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'ignore')
+    # sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'ignore')
+    pass
 
 
 #----------------------------------------------------------------------
@@ -722,7 +737,7 @@ def main(argv = None):
         if res['text']:
             print(res['text'])
     if 'phonetic' in res:
-        if res['phonetic']:
+        if res['phonetic'] and ('phonetic' in options):
             print('[' + res['phonetic'] + ']')
     if 'definition' in res:
         if res['definition']:
