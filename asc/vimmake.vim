@@ -3,7 +3,6 @@
 " Settings:
 "     g:vimmake_path - change the path of tools rather than ~/.vim/
 "     g:vimmake_mode - dictionary of invoke mode of each tool
-"     g:vimmake_open - open quickfix window at given height
 "
 " Setup mode for command: ~/.vim/vimmake.{name}
 "     let g:vimmake_mode["name"] = "{mode}"
@@ -31,11 +30,6 @@
 " default tool location is ~/.vim which could be changed by g:vimmake_path
 if !exists("g:vimmake_path")
 	let g:vimmake_path = "~/.vim"
-endif
-
-" default cc executable
-if !exists("g:vimmake_cc")
-	let g:vimmake_cc = "gcc"
 endif
 
 " tool modes
