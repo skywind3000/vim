@@ -38,39 +38,9 @@ if !exists("g:vimmake_cc")
 	let g:vimmake_cc = "gcc"
 endif
 
-" default gcc cflags
-if !exists("g:vimmake_cflags")
-	let g:vimmake_cflags = []
-endif
-
-" default VimMake mode
-if !exists("g:vimmake_default")
-	let g:vimmake_default = 0
-endif
-
 " tool modes
 if !exists("g:vimmake_mode")
 	let g:vimmake_mode = {}
-endif
-
-" save file
-if !exists("g:vimmake_save")
-	let g:vimmake_save = 0
-endif
-
-" build info
-if !exists('g:vimmake_text')
-	let g:vimmake_text = ''
-endif
-
-" main run
-if !exists('g:vimmake_run_guess')
-	let g:vimmake_run_guess = []
-endif
-
-" filetype -> VimMake sub command
-if !exists('g:vimmake_ftmake')
-	let g:vimmake_ftmake = {}
 endif
 
 
@@ -156,17 +126,6 @@ function! s:AutoCmd(name)
 	endif
 endfunc
 
-" change directory with right command
-function! s:chdir(path)
-	if has('nvim')
-		let cmd = haslocaldir()? 'lcd' : (haslocaldir(-1, 0)? 'tcd' : 'cd')
-	else
-		let cmd = haslocaldir()? ((haslocaldir() == 1)? 'lcd' : 'tcd') : 'cd'
-	endif
-	silent execute cmd . ' '. fnameescape(a:path)
-endfunc
-
-
 
 "----------------------------------------------------------------------
 "- Execute ~/.vim/vimmake.{command}
@@ -228,138 +187,6 @@ endfunc
 " command definition
 command! -bang -nargs=+ VimTool call s:Cmd_VimTool('<bang>', <f-args>)
 
-
-"----------------------------------------------------------------------
-"- Execute current file by mode or filetype
-"----------------------------------------------------------------------
-function! s:Cmd_VimExecute(bang, ...)
-	let mode = (a:0 >= 1)? a:1 : ''
-	let cwd = (a:0 >= 2)? a:2 : get(g:, 'vimmake_cwd', 0)
-	if a:bang != '!' | silent! wall | endif
-	call asyncrun#execute(mode, cwd, 0)
-endfunc
-
-
-" command definition
-command! -bang -nargs=* VimExecute call s:Cmd_VimExecute('<bang>', <f-args>)
-command! -bang -nargs=? VimRun call s:Cmd_VimExecute('<bang>', '?', <f-args>)
-
-
-
-"----------------------------------------------------------------------
-"- build via gcc/make/emake
-"----------------------------------------------------------------------
-function! s:Cmd_VimBuild(bang, ...)
-	if bufname('%') == '' | return | endif
-	if a:0 == 0
-		echohl ErrorMsg
-		echom "E471: Argument required"
-		echohl NONE
-		return
-	endif
-	if a:bang != '!'
-		silent! update
-	endif
-	let l:what = a:1
-	let l:conf = ""
-	if a:0 >= 2
-		let l:conf = a:2
-	endif
-	let vimmake = 'AsyncRun '
-	if g:vimmake_build_name != ''
-		let vimmake .= '-auto='.fnameescape(g:vimmake_build_name).' '
-	endif
-	if index(['0', 'gcc', 'cc'], l:what) >= 0
-		if has_key(g:vimmake_ftmake, &ft)
-			let command = g:vimmake_ftmake[&ft]
-			exec vimmake .command
-		else
-			let l:filename = expand("%")
-			let l:source = shellescape(l:filename)
-			let l:output = shellescape(fnamemodify(l:filename, ':r'))
-			let l:cc = (g:vimmake_cc == '')? 'gcc' : g:vimmake_cc
-			let l:flags = join(g:vimmake_cflags, ' ')
-			let l:extname = expand("%:e")
-			if index(['cpp', 'cc', 'cxx', 'mm'], l:extname) >= 0
-				let l:flags .= ' -lstdc++'
-			endif
-			let l:cmd = l:cc . ' -Wall '. l:source . ' -o ' . l:output
-			let l:cmd .= (l:conf == '')? '' : (' '. l:conf)
-			exec vimmake .l:cmd . ' ' . l:flags
-		endif
-	elseif index(['1', 'make'], l:what) >= 0
-		if l:conf == ''
-			exec vimmake .'@ make'
-		else
-			exec vimmake .'@ make '.shellescape(l:conf)
-		endif
-	elseif index(['2', 'emake'], l:what) >= 0
-		let l:source = shellescape(expand("%"))
-		if l:conf == ''
-			exec vimmake .'@ emake "$(VIM_FILEPATH)"'
-		else
-			exec vimmake .'@ emake --ini='.shellescape(l:conf).' '.l:source
-		endif
-	elseif index(['3', 'gnumake'], l:what) >= 0
-		let l:makeprg = get(g:, 'vimmake_mp_make', '')
-		let l:fname = shellescape(expand("%:t"))
-		if l:makeprg == ''
-			if executable('make')
-				let l:makeprg = 'make -f'
-			elseif executable('mingw32-make')
-				let l:makeprg = 'mingw32-make -f'
-			elseif executable('mingw64-make')
-				let l:makeprg = 'mingw64-make -f'
-			else
-				redraw
-				call s:ErrorMsg('cannot find make/mingw32-make')
-				return
-			endif
-		endif
-		let vimmake = vimmake . '-cwd=$(VIM_FILEDIR) @ '
-		if l:conf == ''
-			exec vimmake . l:makeprg. ' '.l:fname
-		else
-			exec vimmake . l:makeprg. ' '.l:fname . ' '.l:conf
-		endif
-	elseif index(['4', 'automake', 'auto'], l:what) >= 0
-		let ext = tolower(expand('%:e'))
-		let mode = 0
-		if index(['c', 'cc', 'cpp', 'h', 'mak', 'em', 'emk', 'm'], ext) >= 0
-			let mode = 0
-		elseif index(['mm', 'py', 'pyw', 'cxx', 'java', 'pyx'], ext) >= 0
-			let mode = 0
-		elseif index(['c', 'cpp', 'python', 'java', 'go'], &ft) >= 0
-			let mode = 0
-		elseif index(['javascript'], &ft) >= 0
-			let mode = 0
-		else
-			let mode = 1
-		endif
-		if mode == 0
-			if l:conf == ''
-				call s:Cmd_VimBuild(a:bang, '2')
-			else
-				call s:Cmd_VimBuild(a:bang, '2', l:conf)
-			endif
-		else
-			if l:conf == ''
-				call s:Cmd_VimBuild(a:bang, '3')
-			else
-				call s:Cmd_VimBuild(a:bang, '3', l:conf)
-			endif
-		endif
-	endif
-endfunc
-
-
-command! -bang -nargs=* VimBuild call s:Cmd_VimBuild('<bang>', <f-args>)
-
-
-
-"----------------------------------------------------------------------
-" get full filename, '' as current cwd, '%' as current buffer
-"----------------------------------------------------------------------
 
 
 "----------------------------------------------------------------------
@@ -523,17 +350,17 @@ command! -nargs=* -bang VimScope call s:Cmd_VimScope("<bang>", <f-args>)
 " Keymap Setup
 "----------------------------------------------------------------------
 function! vimmake#keymap()
-	noremap <silent><F5> :VimExecute run<cr>
-	noremap <silent><F6> :VimExecute filename<cr>
-	noremap <silent><F7> :VimBuild auto<cr>
-	noremap <silent><F8> :VimExecute auto<cr>
-	noremap <silent><F9> :VimBuild gcc<cr>
+	noremap <silent><F5> :AsyncTask file-run<cr>
+	noremap <silent><F6> :AsyncTask make<cr>
+	noremap <silent><F7> :AsyncTask emake<cr>
+	noremap <silent><F8> :AsyncTask emake-run<cr>
+	noremap <silent><F9> :AsyncTask file-build<cr>
 	noremap <silent><F10> :call asyncrun#quickfix_toggle(6)<cr>
-	inoremap <silent><F5> <ESC>:VimExecute run<cr>
-	inoremap <silent><F6> <ESC>:VimExecute filename<cr>
-	inoremap <silent><F7> <ESC>:VimBuild auto<cr>
-	inoremap <silent><F8> <ESC>:VimExecute auto<cr>
-	inoremap <silent><F9> <ESC>:VimBuild gcc<cr>
+	inoremap <silent><F5> <ESC>:AsyncTask file-run<cr>
+	inoremap <silent><F6> <ESC>:AsyncTask make<cr>
+	inoremap <silent><F7> <ESC>:AsyncTask emake<cr>
+	inoremap <silent><F8> <ESC>:AsyncTask emake-run<cr>
+	inoremap <silent><F9> <ESC>:AsyncTask file-build<cr>
 	inoremap <silent><F10> <ESC>:call asyncrun#quickfix_toggle(6)<cr>
 
 	" VimTool startup
@@ -585,70 +412,6 @@ command! -nargs=0 VimmakeKeymap call vimmake#keymap()
 function! vimmake#load()
 endfunc
 
-" toggle quickfix window
-function! vimmake#toggle_quickfix(size, ...)
-	let l:mode = (a:0 == 0)? 2 : (a:1)
-	function! s:WindowCheck(mode)
-		if &buftype == 'quickfix'
-			let s:quickfix_open = 1
-			return
-		endif
-		if a:mode == 0
-			let w:quickfix_save = winsaveview()
-		else
-			if exists('w:quickfix_save')
-				call winrestview(w:quickfix_save)
-				unlet w:quickfix_save
-			endif
-		endif
-	endfunc
-	let s:quickfix_open = 0
-	let l:winnr = winnr()
-	noautocmd windo call s:WindowCheck(0)
-	noautocmd silent! exec ''.l:winnr.'wincmd w'
-	if l:mode == 0
-		if s:quickfix_open != 0
-			silent! cclose
-		endif
-	elseif l:mode == 1
-		if s:quickfix_open == 0
-			exec 'botright copen '. ((a:size > 0)? a:size : ' ')
-			wincmd k
-		endif
-	elseif l:mode == 2
-		if s:quickfix_open == 0
-			exec 'botright copen '. ((a:size > 0)? a:size : ' ')
-			wincmd k
-		else
-			silent! cclose
-		endif
-	endif
-	noautocmd windo call s:WindowCheck(1)
-	noautocmd silent! exec ''.l:winnr.'wincmd w'
-endfunc
-
-
-" update filelist
-function! vimmake#update_filelist(outname)
-	let l:names = ['*.c', '*.cpp', '*.cc', '*.cxx']
-	let l:names += ['*.h', '*.hpp', '*.hh', '*.py', '*.pyw', '*.java', '*.js']
-	if has('win32') || has("win64") || has("win16")
-		silent! exec '!dir /b ' . join(l:names, ',') . ' > '.a:outname
-	else
-		let l:cmd = ''
-		let l:ccc = 1
-		for l:name in l:names
-			if l:ccc == 1
-				let l:cmd .= ' -name "'.l:name . '"'
-				let l:ccc = 0
-			else
-				let l:cmd .= ' -o -name "'.l:name. '"'
-			endif
-		endfor
-		silent! exec '!find . ' . l:cmd . ' > '.a:outname
-	endif
-	redraw!
-endfunc
 
 if !exists('g:vimmake_ctags_flags')
 	let g:vimmake_ctags_flags = '--fields=+niazS --extra=+q --c++-kinds=+px'
@@ -698,14 +461,6 @@ function! vimmake#update_tags(cwd, mode, outname)
 	endif
 endfunc
 
-
-" call python system to avoid window flicker on windows
-function! vimmake#python_system(command)
-	let text = g:vimmake_text
-	let content = asyncrun#run('', {'mode': 3}, '@ ' . a:command)
-	let g:vimmake_text = text
-	return content
-endfunc
 
 
 
