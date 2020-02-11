@@ -5,7 +5,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
 " Last Modified: 2020/02/11 19:59
-" Verision: 1.1.7
+" Verision: 1.1.8
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -817,7 +817,7 @@ endfunc
 " config template
 "----------------------------------------------------------------------
 let s:template = [
-	\ '# vim: set noet fenc=utf-8 sts=4 sw=4 ts=4 ft=dosini:',
+	\ '# vim: set fenc=utf-8 ft=dosini:',
 	\ '',
 	\ '# define a new task named "file-compile"',
 	\ '[file-compile]',
@@ -869,7 +869,7 @@ function! s:task_edit(mode, path)
 	endif
 	let newfile = filereadable(name)? 0 : 1
 	exec "split " . fnameescape(name)
-	exec "setlocal ft=dosini sts=4 sw=4 ts=4 noet"
+	setlocal ft=dosini
 	if newfile
 		exec "normal ggVGx"
 		call append(line('.') - 1, s:template)
