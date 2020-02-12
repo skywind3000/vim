@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/13 02:02
-" Verision: 1.3.0
+" Last Modified: 2020/02/13 02:56
+" Verision: 1.3.1
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -470,10 +470,11 @@ endfunc
 " fetch all config
 "----------------------------------------------------------------------
 function! asynctasks#collect_config(path, force)
+	let path = (a:path == '')? getcwd() : (a:path)
 	let s:index = 0
 	let s:error = ''
 	let c1 = s:compose_rtp_config(a:force)
-	let c2 = s:compose_local_config(a:path)
+	let c2 = s:compose_local_config(path)
 	let tasks = {'config':{}, 'names':{}, 'avail':[]}
 	for cc in [c1, c2]
 		for key in keys(cc)
@@ -790,6 +791,7 @@ endfunc
 "----------------------------------------------------------------------
 function! asynctasks#start(bang, taskname, path)
 	let path = (a:path == '')? expand('%:p') : a:path
+	let path = (path == '')? getcwd() : path
 	if asynctasks#collect_config(path, 1) != 0
 		return -1
 	endif
@@ -847,6 +849,7 @@ endfunc
 "----------------------------------------------------------------------
 function! asynctasks#list(path)
 	let path = (a:path == '')? expand('%:p') : a:path
+	let path = (path == '')? getcwd() : path
 	if asynctasks#collect_config(path, 1) != 0
 		return -1
 	endif
@@ -873,6 +876,7 @@ endfunc
 "----------------------------------------------------------------------
 function! s:task_list(path)
 	let path = (a:path == '')? expand('%:p') : a:path
+	let path = (path == '')? getcwd() : path
 	if asynctasks#collect_config(path, 1) != 0
 		return -1
 	endif
