@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/13 01:07
-" Verision: 1.2.4
+" Last Modified: 2020/02/13 02:02
+" Verision: 1.3.0
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -467,34 +467,6 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" extract correct command
-"----------------------------------------------------------------------
-function! s:select_command(config, ft)
-	let command = get(a:config, 'command', '')
-	for key in keys(a:config)
-		let pos = stridx(key, ':')
-		if pos < 0
-			continue
-		endif
-		let part = split(key, ':')
-		let head = substitute(part[0], '^\s*\(.\{-}\)\s*$', '\1', '')
-		if head != 'command'
-			continue
-		endif
-		let text = substitute(part[1], '^\s*\(.\{-}\)\s*$', '\1', '')
-		let check = 0
-		for ft in split(text, ',')
-			let ft = substitute(ft, '^\s*\(.\{-}\)\s*$', '\1', '')
-			if ft == a:ft
-				let command = a:config[key]
-			endif
-		endfor
-	endfor
-	return command
-endfunc
-
-
-"----------------------------------------------------------------------
 " fetch all config
 "----------------------------------------------------------------------
 function! asynctasks#collect_config(path, force)
@@ -617,6 +589,66 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" extract correct command
+"----------------------------------------------------------------------
+function! s:command_select(config, ft)
+	let command = get(a:config, 'command', '')
+	for key in keys(a:config)
+		let pos = stridx(key, ':')
+		if pos < 0
+			continue
+		endif
+		let part = split(key, ':')
+		let head = substitute(part[0], '^\s*\(.\{-}\)\s*$', '\1', '')
+		if head != 'command'
+			continue
+		endif
+		let text = substitute(part[1], '^\s*\(.\{-}\)\s*$', '\1', '')
+		let check = 0
+		for ft in split(text, ',')
+			let ft = substitute(ft, '^\s*\(.\{-}\)\s*$', '\1', '')
+			if ft == a:ft
+				let command = a:config[key]
+			endif
+		endfor
+	endfor
+	return command
+endfunc
+
+
+"----------------------------------------------------------------------
+" ask user what to do
+"----------------------------------------------------------------------
+function! s:command_input(command)
+	let command = a:command
+	let mark_open = '$(?'
+	let mark_close = ')'
+	let size_open = strlen(mark_open)
+	let size_close = strlen(mark_close)
+	while 1
+		let p1 = stridx(command, mark_open)
+		if p1 < 0
+			break
+		endif
+		let p2 = stridx(command, mark_close, p1)
+		if p2 < 0
+			break
+		endif
+		let name = strpart(command, p1 + size_open, p2 - p1 - size_open)
+		let mark = mark_open . name . mark_close
+		call inputsave()
+		let t = input('Input argument (' . name . '): ')
+		call inputrestore()
+		if t == ''
+			return ''
+		endif
+		let command = s:replace(command, mark, t)
+	endwhile
+	return command
+endfunc
+
+
+"----------------------------------------------------------------------
 " format parameter
 "----------------------------------------------------------------------
 function! s:task_option(task)
@@ -719,7 +751,7 @@ endfunc
 "----------------------------------------------------------------------
 " check tool window
 "----------------------------------------------------------------------
-function! s:check_command(command, cwd)
+function! s:command_check(command, cwd)
 	let disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT',
 				\ 'FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
 	if &bt != ''
@@ -770,7 +802,7 @@ function! asynctasks#start(bang, taskname, path)
 	let task = tasks.config[a:taskname]
 	let ininame = task.__name__
 	let source = 'task ['. a:taskname . '] from ' . ininame
-	let command = s:select_command(task, &ft)
+	let command = s:command_select(task, &ft)
 	if command == ''
 		call s:errmsg('no command defined in ' . source)
 		return -3
@@ -791,8 +823,13 @@ function! asynctasks#start(bang, taskname, path)
 		call s:errmsg(t . '"skywind3000/asyncrun.vim"')
 		return -6
 	endif
-	if s:check_command(command, get(task, 'cwd', '')) != 0
+	if s:command_check(command, get(task, 'cwd', '')) != 0
 		return -7
+	endif
+	let command = s:command_input(command)
+	if command == ''
+		echo "<quit>"
+		return 0
 	endif
 	let opts = s:task_option(task)
 	let skip = g:asyncrun_skip
@@ -820,7 +857,7 @@ function! asynctasks#list(path)
 		let command = get(item, 'command', '')
 		let ni = {}
 		let ni.name = task
-		let ni.command = s:select_command(item, &ft)
+		let ni.command = s:command_select(item, &ft)
 		let ni.scope = item.__mode__
 		let ni.source = item.__name__
 		if ni.command != ''
@@ -850,7 +887,7 @@ function! s:task_list(path)
 	" let rows += [['----', '----', '------']]
 	for task in tasks.avail
 		let item = tasks.config[task]
-		let command = s:select_command(item, &ft)
+		let command = s:command_select(item, &ft)
 		if command != ''
 			let rows += [[task, item.__mode__, command]]
 			let rows += [['', '', item.__name__]]

@@ -1,18 +1,8 @@
 " vimmake.vim - Enhenced Customize Make system for vim
 "
-" Settings:
-"     g:vimmake_path - change the path of tools rather than ~/.vim/
-"     g:vimmake_mode - dictionary of invoke mode of each tool
-"
-" Setup mode for command: ~/.vim/vimmake.{name}
-"     let g:vimmake_mode["name"] = "{mode}"
-"     {mode} can be:
-"		"normal"	- launch the tool and return to vim after exit (default)
-"		"quickfix"	- launch and redirect output to quickfix
-"		"bg"		- launch background and discard any output
-"		"async"		- run in async mode and redirect output to quickfix
-"
-"	  note: "g:vimmake_mode" must be initialized to "{}" at first
+" Implements:
+"   - GrepCode command
+"   - keymaps for AsyncTask
 "
 " Emake can be installed to /usr/local/bin to build C/C++ by:
 "     $ wget https://skywind3000.github.io/emake/emake.py
@@ -49,17 +39,6 @@ let s:vimmake_advance = 0	" internal usage, won't be modified by user
 let g:vimmake_advance = 0	" external reference, may be modified by user
 let s:vimmake_windows = 0	" internal usage, won't be modified by user
 let g:vimmake_windows = 0	" external reference, may be modified by user
-
-" check has advanced mode
-if v:version >= 800 || has('patch-7.4.1829') || has('nvim')
-	if has('job') && has('channel') && has('timers')
-		let s:vimmake_advance = 1
-		let g:vimmake_advance = 1
-	elseif has('nvim')
-		let s:vimmake_advance = 1
-		let g:vimmake_advance = 1
-	endif
-endif
 
 " check running in windows
 if has('win32') || has('win64') || has('win95') || has('win16')
@@ -106,81 +85,6 @@ function! s:ErrorMsg(msg)
 	echom 'ERROR: '. a:msg
 	echohl NONE
 endfunc
-
-" show not support message
-function! s:NotSupport()
-	let msg = "required: +timers +channel +job and vim >= 7.4.1829"
-	call s:ErrorMsg(msg)
-endfunc
-
-" run autocmd
-function! s:AutoCmd(name)
-	if has('autocmd') && ((g:vimmake_build_skip / 2) % 2) == 0
-		exec 'silent doautocmd User AsyncRun'.a:name
-	endif
-endfunc
-
-
-"----------------------------------------------------------------------
-"- Execute ~/.vim/vimmake.{command}
-"----------------------------------------------------------------------
-function! s:Cmd_VimTool(bang, ...)
-	if a:0 == 0
-		echohl ErrorMsg
-		echom "E471: Argument required"
-		echohl NONE
-		return
-	endif
-	let l:command = a:1
-	let l:target = ''
-	if a:0 >= 2
-		let l:target = a:2
-	endif
-	let l:home = expand(g:vimmake_path)
-	let l:fullname = "vimmake." . l:command
-	let l:fullname = s:PathJoin(l:home, l:fullname)
-	let l:value = get(g:vimmake_mode, l:command, '')
-	if a:bang != '!'
-		try | silent wall | catch | endtry
-	endif
-	if type(l:value) == 0
-		let l:mode = string(l:value)
-	else
-		let l:mode = l:value
-	endif
-	let l:pos = stridx(l:mode, '/')
-	let l:auto = ''
-	if l:pos >= 0
-		let l:size = len(l:mode)
-		let l:auto = strpart(l:mode, l:pos + 1)
-		let l:mode = strpart(l:mode, 0, l:pos)
-		if len(l:auto) > 0
-			let l:auto = '-auto='.escape(matchstr(l:auto, '\w*'), ' ')
-		endif
-	endif
-	let $VIM_TARGET = l:target
-	let $VIM_SCRIPT = g:vimmake_path
-	let l:fullname = shellescape(l:fullname)
-	if index(['', '0', 'normal', 'default'], l:mode) >= 0
-		exec 'AsyncRun -mode=4 '.l:auto.' @ '. l:fullname
-	elseif index(['1', 'quickfix', 'make', 'makeprg'], l:mode) >= 0
-		exec 'AsyncRun -mode=1 '.l:auto.' @ '. l:fullname
-	elseif index(['2', 'system', 'silent'], l:mode) >= 0
-		exec 'AsyncRun -mode=3 '.l:auto.' @ '. l:fullname
-	elseif index(['3', 'background', 'bg'], l:mode) >= 0
-		exec 'AsyncRun -mode=5 '.l:auto.' @ '. l:fullname
-	elseif index(['6', 'async', 'job', 'channel'], l:mode) >= 0
-		exec 'AsyncRun -mode=0 '.l:auto.' @ '. l:fullname
-	else
-		call s:ErrorMsg("invalid mode: ".l:mode)
-	endif
-	return l:fullname
-endfunc
-
-
-" command definition
-command! -bang -nargs=+ VimTool call s:Cmd_VimTool('<bang>', <f-args>)
-
 
 
 "----------------------------------------------------------------------
@@ -350,23 +254,32 @@ function! vimmake#keymap()
 	noremap <silent><F8> :AsyncTask emake-exe<cr>
 	noremap <silent><F9> :AsyncTask file-build<cr>
 	noremap <silent><F10> :call asyncrun#quickfix_toggle(6)<cr>
+	noremap <silent><s-f5> :AsyncTask project-run<cr>
+	noremap <silent><s-f6> :AsyncTask project-test<cr>
+	noremap <silent><s-f7> :AsyncTask make<cr>
+	noremap <silent><s-f8> :AsyncTask make-run<cr>
+	noremap <silent><s-f9> :AsyncTask project-build<cr>
+
 	inoremap <silent><F5> <ESC>:AsyncTask file-run<cr>
 	inoremap <silent><F6> <ESC>:AsyncTask make<cr>
 	inoremap <silent><F7> <ESC>:AsyncTask emake<cr>
 	inoremap <silent><F8> <ESC>:AsyncTask emake-exe<cr>
 	inoremap <silent><F9> <ESC>:AsyncTask file-build<cr>
 	inoremap <silent><F10> <ESC>:call asyncrun#quickfix_toggle(6)<cr>
+	inoremap <silent><s-f5> <ESC>:AsyncTask project-run<cr>
+	inoremap <silent><s-f6> <ESC>:AsyncTask project-test<cr>
+	inoremap <silent><s-f7> <ESC>:AsyncTask make<cr>
+	inoremap <silent><s-f8> <ESC>:AsyncTask make-run<cr>
+	inoremap <silent><s-f9> <ESC>:AsyncTask project-build<cr>
 
-	" VimTool startup
-	for l:index in range(10)
-		exec 'noremap <leader>c'.l:index.' :VimTool ' . l:index . '<cr>'
-		if has('gui_running')
-			let l:button = 'F'.l:index
-			if l:index == 0 | let l:button = 'F10' | endif
-			exec 'noremap <S-'.l:button.'> :VimTool '. l:index .'<cr>'
-			exec 'inoremap <S-'.l:button.'> <ESC>:VimTool '. l:index .'<cr>'
-		endif
-	endfor
+	noremap <silent><f1> :AsyncTask task-f1<cr>
+	noremap <silent><f2> :AsyncTask task-f2<cr>
+	noremap <silent><f3> :AsyncTask task-f3<cr>
+	noremap <silent><f4> :AsyncTask task-f4<cr>
+	inoremap <silent><f1> <ESC>:AsyncTask task-shift-f1<cr>
+	inoremap <silent><f2> <ESC>:AsyncTask task-shift-f2<cr>
+	inoremap <silent><f3> <ESC>:AsyncTask task-shift-f3<cr>
+	inoremap <silent><f4> <ESC>:AsyncTask task-shift-f4<cr>
 
 	" set keymap to GrepCode
 	noremap <silent><leader>cq :VimStop<cr>
@@ -393,12 +306,12 @@ function! vimmake#keymap()
 	endif
 
 	" cscope update
-	noremap <leader>cz1 :call vimmake#update_tags('', 'ctags', '.tags')<cr>
-	noremap <leader>cz2 :call vimmake#update_tags('', 'cs', '.cscope')<cr>
-	noremap <leader>cz3 :call vimmake#update_tags('!', 'ctags', '.tags')<cr>
-	noremap <leader>cz4 :call vimmake#update_tags('!', 'cs', '.cscope')<cr>
-	noremap <leader>cz5 :call vimmake#update_tags('', 'py', '.cscopy')<cr>
-	noremap <leader>cz6 :call vimmake#update_tags('!', 'py', '.cscopy')<cr>
+	noremap <leader>cb1 :call vimmake#update_tags('', 'ctags', '.tags')<cr>
+	noremap <leader>cb2 :call vimmake#update_tags('', 'cs', '.cscope')<cr>
+	noremap <leader>cb3 :call vimmake#update_tags('!', 'ctags', '.tags')<cr>
+	noremap <leader>cb4 :call vimmake#update_tags('!', 'cs', '.cscope')<cr>
+	noremap <leader>cb5 :call vimmake#update_tags('', 'py', '.cscopy')<cr>
+	noremap <leader>cb6 :call vimmake#update_tags('!', 'py', '.cscopy')<cr>
 endfunc
 
 command! -nargs=0 VimmakeKeymap call vimmake#keymap()

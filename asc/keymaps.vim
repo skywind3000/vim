@@ -19,16 +19,6 @@ for s:index in range(10)
 	endif
 endfor
 
-noremap <F1> :VimTool 1<cr>
-noremap <F2> :VimTool 2<cr>
-noremap <F3> :VimTool 3<cr>
-noremap <F4> :VimTool 4<cr>
-inoremap <F1> <ESC>:VimTool 1<cr>
-inoremap <F2> <ESC>:VimTool 2<cr>
-inoremap <F3> <ESC>:VimTool 3<cr>
-inoremap <F4> <ESC>:VimTool 4<cr>
-
-
 
 " keymap for VimTool
 if (has('gui_running') || has('nvim')) && (has('win32') || has('win64'))
