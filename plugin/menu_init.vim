@@ -164,7 +164,7 @@ let g:quickui_show_tip = 1
 let g:context_menu_opts = {'reduce':1, 'savepos':'k', 'index':0}
 let g:context_menu_k = [
 			\ ["&Peek Definition\tAlt+;", 'call quickui#tools#preview_tag("")'],
-			\ ["S&earch in Project\t\\cx", 'exec "GrepCode! " . expand("<cword>")'],
+			\ ["S&earch in Project\t\\cx", 'exec "silent! GrepCode! " . expand("<cword>")'],
 			\ [ "--", ],
 			\ [ "Find &Definition\t\\cg", 'call MenuHelp_Fscope("g")', 'GNU Global search g'],
 			\ [ "Find &Symbol\t\\cs", 'call MenuHelp_Fscope("s")', 'GNU Gloal search s'],
