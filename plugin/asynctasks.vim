@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/11 19:59
-" Verision: 1.1.9
+" Last Modified: 2020/02/12 13:57
+" Verision: 1.2.0
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -372,6 +372,10 @@ function! s:collect_rtp_config() abort
 				endif
 			endif
 		endfor
+		let t = expand('~/.vim/' + rtp_name)
+		if filereadable(path)
+			let names += [t]
+		endif
 	endif
 	for name in g:asynctasks_extra_config
 		let name = s:abspath(name)
