@@ -5,7 +5,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
 " Last Modified: 2020/02/13 03:10
-" Verision: 1.3.3
+" Verision: 1.3.4
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -837,7 +837,9 @@ function! asynctasks#start(bang, taskname, path)
 	endif
 	let command = s:command_input(command)
 	if command == ''
-		echo "<quit>"
+		redraw
+		echo ""
+		redraw
 		return 0
 	endif
 	let opts = s:task_option(task)
