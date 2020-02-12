@@ -75,7 +75,7 @@ call quickui#menu#install("&Build", [
 			\ ["File E&make\tF7", 'AsyncTask emake'],
 			\ ["File &Start\tF8", 'AsyncTask emake-exe'],
 			\ ['--', ''],
-			\ ["Project &Build\tShift+F9", 'AsyncTask project-build'],
+			\ ["&Project Build\tShift+F9", 'AsyncTask project-build'],
 			\ ["Project &Run\tShift+F5", 'AsyncTask project-run'],
 			\ ["Project &Test\tShift+F6", 'AsyncTask project-test'],
 			\ ['--', ''],
