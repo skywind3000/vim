@@ -33,6 +33,11 @@ if [ -d "$HOME/go" ]; then
 	fi
 fi
 
+# setup for /usr/local/app/bin if it exists
+if [ -d /usr/local/app/bin ]; then
+	export PATH="/usr/local/app/bin:$PATH"
+fi
+
 # setup for go if it exists
 if [ -d /usr/local/app/go ]; then
 	export GOROOT="/usr/local/app/go"
