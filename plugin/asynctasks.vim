@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/13 01:03
-" Verision: 1.2.3
+" Last Modified: 2020/02/13 01:07
+" Verision: 1.2.4
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -740,11 +740,11 @@ function! s:check_command(command, cwd)
 			let macro = '$(VIM_' . name . ')'
 			if stridx(a:command, macro) >= 0
 				let t = 'macro ' . macro . ' is empty'
-				call s:errmsg(t . ' in task command')
+				call s:errmsg(t . ' in current buffer')
 				return 3
 			elseif stridx(a:cwd, macro) >= 0
 				let t = 'macro ' . macro . ' is empty'
-				call s:errmsg(t . ' in task cwd')
+				call s:errmsg(t . ' in current buffer')
 				return 4
 			endif
 		endfor	
