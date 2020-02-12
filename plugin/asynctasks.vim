@@ -5,7 +5,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
 " Last Modified: 2020/02/13 03:10
-" Verision: 1.3.2
+" Verision: 1.3.3
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -638,9 +638,15 @@ function! s:command_input(command)
 		endif
 		let name = strpart(command, p1 + size_open, p2 - p1 - size_open)
 		let mark = mark_open . name . mark_close
+		echohl Type
 		call inputsave()
-		let t = input('Input argument (' . name . '): ')
+		try
+			let t = input('Input argument (' . name . '): ')
+		catch /^Vim:Interrupt$/
+			let t = ""
+		endtry
 		call inputrestore()
+		echohl None
 		if t == ''
 			return ''
 		endif

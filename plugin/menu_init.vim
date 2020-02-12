@@ -157,10 +157,20 @@ call quickui#menu#install('Help (&?)', [
 
 let g:quickui_show_tip = 1
 
+
+"----------------------------------------------------------------------
+" context menu
+"----------------------------------------------------------------------
+let g:context_menu_k = [
+			\ ["&Peek Definition\tAlt+;", 'call quickui#tools#preview_tag("")'],
+			\ ["&Search in Project\t\\cx", 'exec "GrepCode! " . expand("<cword>")'],
+			\ ]
+
+
 "----------------------------------------------------------------------
 " hotkey
 "----------------------------------------------------------------------
 nnoremap <silent><space><space> :call quickui#menu#open()<cr>
 
-
+nnoremap <silent>K :call quickui#context#open(g:context_menu_k, {'reduce':1, 'savepos':'k'})<cr>
 

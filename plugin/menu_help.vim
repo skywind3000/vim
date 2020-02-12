@@ -11,9 +11,39 @@ function! MenuHelp_FormatJson()
 	exec "%!python -m json.tool"
 endfunc
 
-function! MenuHelp_Gscope(scope)
+function! MenuHelp_Fscope(scope)
 	exec "GscopeFind ". a:scope . " " . fnameescape(expand('<cword>'))
 endfunc
+
+function! MenuHelp_Gscope(what)
+	let p = expand('%')
+	let t = ''
+	let m = {}
+	let m["s"] = "string symbol"
+	let m['g'] = 'definition'
+	let m['d'] = 'functions called by this'
+	let m['c'] = 'functions calling this'
+	let m['t'] = 'string'
+	let m['e'] = 'egrep pattern'
+	let m['f'] = 'file'
+	let m['i'] = 'files #including this file'
+	let m['a'] = 'places where this symbol is assigned'
+	let m['z'] = 'ctags database'
+	if a:what == 'f' || a:what == 'i'
+		" let t = expand('<cfile>')
+	endif
+	echohl Type
+	call inputsave()
+	let t = input('find '.m[a:what].' of ('. p.'): ', t)
+	call inputrestore()
+	echohl None
+	redraw | echo "" | redraw
+	if t == ''
+		return 0
+	endif
+	exec 'GscopeFind '. a:what. ' ' . fnameescape(t)
+endfunc
+
 
 function! MenuHelp_Proxy(enable)
 	let $HTTP_PROXY = (a:enable)? 'socks5://localhost:1080' : ''
