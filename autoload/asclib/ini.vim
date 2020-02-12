@@ -56,3 +56,23 @@ endfunc
 
 
 
+"----------------------------------------------------------------------
+" write to file
+"----------------------------------------------------------------------
+function! asclib#ini#save(filename, sections)
+	let content = []
+	let content += ['# vim: set ft=dosini:']
+	let content += ['']
+	for sect in keys(a:sections)
+		let section = a:sections[sect]
+		let content += ['[' . sect . ']']
+		for key in keys(section)
+			let content += [key . '=' . section[key]]
+		endfor
+		let content += ['']
+	endfor
+	call writefile(content, a:filename)
+endfunc
+
+
+
