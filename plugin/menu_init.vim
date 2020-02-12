@@ -56,7 +56,7 @@ call quickui#menu#install('&Symbol', [
 			\ [ "Find C&alling\t(GNU Global)", 'call MenuHelp_Gscope("c")', 'GNU Global search c'],
 			\ [ "Find &From Ctags\t(GNU Global)", 'call MenuHelp_Gscope("z")', 'GNU Global search c'],
 			\ [ "--", ],
-			\ [ "&Goto Definition\t(YCM)", 'YcmCompleter GoToDefinitionElseDeclaration'],
+			\ [ "Goto D&efinition\t(YCM)", 'YcmCompleter GoToDefinitionElseDeclaration'],
 			\ [ "Goto &References\t(YCM)", 'YcmCompleter GoToReferences'],
 			\ [ "Get D&oc\t(YCM)", 'YcmCompleter GetDoc'],
 			\ [ "Get &Type\t(YCM)", 'YcmCompleter GetTypeImprecise'],
