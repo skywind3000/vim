@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/13 00:38
-" Verision: 1.2.2
+" Last Modified: 2020/02/13 01:03
+" Verision: 1.2.3
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -720,9 +720,9 @@ endfunc
 " check tool window
 "----------------------------------------------------------------------
 function! s:check_command(command, cwd)
+	let disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT',
+				\ 'FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
 	if &bt != ''
-		let disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT',
-					\ 'FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
 		for name in disable
 			let macro = '$(VIM_' . name . ')'
 			if stridx(a:command, macro) >= 0
@@ -735,6 +735,19 @@ function! s:check_command(command, cwd)
 				return 2
 			endif
 		endfor
+	elseif expand('%:p') == ''
+		for name in disable
+			let macro = '$(VIM_' . name . ')'
+			if stridx(a:command, macro) >= 0
+				let t = 'macro ' . macro . ' is empty'
+				call s:errmsg(t . ' in task command')
+				return 3
+			elseif stridx(a:cwd, macro) >= 0
+				let t = 'macro ' . macro . ' is empty'
+				call s:errmsg(t . ' in task cwd')
+				return 4
+			endif
+		endfor	
 	endif
 	return 0
 endfunc
@@ -945,9 +958,9 @@ let s:macros = {
 
 
 "----------------------------------------------------------------------
-" macro list
+" expand macros
 "----------------------------------------------------------------------
-function! s:task_macro()
+function! s:expand_macros()
 	let macros = {}
 	let macros['VIM_FILEPATH'] = expand("%:p")
 	let macros['VIM_FILENAME'] = expand("%:t")
@@ -969,6 +982,18 @@ function! s:task_macro()
     let macros['VIM_HOME'] = expand(split(&rtp, ',')[0])
 	let macros['<cwd>'] = macros['VIM_CWD']
 	let macros['<root>'] = macros['VIM_ROOT']
+	if expand("%:e") == ''
+		let macros['VIM_FILEEXT'] = ''
+	endif
+	return macros
+endfunc
+
+
+"----------------------------------------------------------------------
+" macro list
+"----------------------------------------------------------------------
+function! s:task_macro()
+	let macros = s:expand_macros()
 	let names = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT', 'FILENOEXT']
 	let names += ['PATHNOEXT', 'CWD', 'RELDIR', 'RELNAME', 'CWORD', 'CFILE']
 	let names += ['VERSION', 'SVRNAME', 'COLUMNS', 'LINES', 'GUI', 'ROOT']
