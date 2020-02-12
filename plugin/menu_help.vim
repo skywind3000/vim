@@ -16,7 +16,7 @@ function! MenuHelp_Fscope(scope)
 endfunc
 
 function! MenuHelp_Gscope(what)
-	let p = expand('%')
+	let p = asyncrun#get_root('%')
 	let t = ''
 	let m = {}
 	let m["s"] = "string symbol"
@@ -34,7 +34,7 @@ function! MenuHelp_Gscope(what)
 	endif
 	echohl Type
 	call inputsave()
-	let t = input('find '.m[a:what].' of ('. p.'): ', t)
+	let t = input('Find '.m[a:what].' in (' . p . '): ', t)
 	call inputrestore()
 	echohl None
 	redraw | echo "" | redraw
@@ -44,6 +44,19 @@ function! MenuHelp_Gscope(what)
 	exec 'GscopeFind '. a:what. ' ' . fnameescape(t)
 endfunc
 
+function! MenuHelp_GrepCode()
+	let p = asyncrun#get_root('%')
+	echohl Type
+	call inputsave()
+	let t = input('Find word in ('. p.'): ', '')
+	call inputrestore()
+	echohl None
+	redraw | echo "" | redraw
+	if strlen(t) > 0
+		silent exec "GrepCode! ".fnameescape(t)
+		call asclib#quickfix_title('- searching "'. t. '"')
+	endif
+endfunc
 
 function! MenuHelp_Proxy(enable)
 	let $HTTP_PROXY = (a:enable)? 'socks5://localhost:1080' : ''

@@ -48,7 +48,7 @@ call quickui#menu#install("&Edit", [
 			\ ])
 
 call quickui#menu#install('&Symbol', [
-			\ [ "&Grep Word\t(In Project)", 'call menu#FindInProject()', 'Grep keyword in current project' ],
+			\ [ "&Grep Word\t(In Project)", 'call MenuHelp_GrepCode()', 'Grep keyword in current project' ],
 			\ [ "--", ],
 			\ [ "Find &Definition\t(GNU Global)", 'call MenuHelp_Gscope("g")', 'GNU Global search g'],
 			\ [ "Find &Symbol\t(GNU Global)", 'call MenuHelp_Gscope("s")', 'GNU Gloal search s'],
@@ -161,9 +161,17 @@ let g:quickui_show_tip = 1
 "----------------------------------------------------------------------
 " context menu
 "----------------------------------------------------------------------
+let g:context_menu_opts = {'reduce':1, 'savepos':'k', 'index':0}
 let g:context_menu_k = [
 			\ ["&Peek Definition\tAlt+;", 'call quickui#tools#preview_tag("")'],
-			\ ["&Search in Project\t\\cx", 'exec "GrepCode! " . expand("<cword>")'],
+			\ ["Se&arch in Project\t\\cx", 'exec "GrepCode! " . expand("<cword>")'],
+			\ [ "--", ],
+			\ [ "Find &Definition\t\\cg", 'call MenuHelp_Fscope("g")', 'GNU Global search g'],
+			\ [ "Find &Symbol\t\\cs", 'call MenuHelp_Fscope("s")', 'GNU Gloal search s'],
+			\ [ "Find &Called by\t\\cd", 'call MenuHelp_Fscope("d")', 'GNU Global search d'],
+			\ [ "Find C&alling\t\\cc", 'call MenuHelp_Fscope("c")', 'GNU Global search c'],
+			\ [ "Find &From Ctags\t\\cz", 'call MenuHelp_Fscope("z")', 'GNU Global search c'],
+			\ [ "--", ],
 			\ ]
 
 
@@ -172,5 +180,5 @@ let g:context_menu_k = [
 "----------------------------------------------------------------------
 nnoremap <silent><space><space> :call quickui#menu#open()<cr>
 
-nnoremap <silent>K :call quickui#context#open(g:context_menu_k, {'reduce':1, 'savepos':'k'})<cr>
+nnoremap <silent>K :call quickui#context#open(g:context_menu_k, g:context_menu_opts)<cr>
 
