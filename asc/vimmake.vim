@@ -1,14 +1,15 @@
-" vimmake.vim - Enhenced Customize Make system for vim
+"======================================================================
+"
+" vimmake.vim - 
+"
+" Created by skywind on 2020/02/13
+" Last Modified: 2020/02/13 04:17:51
 "
 " Implements:
 "   - GrepCode command
 "   - keymaps for AsyncTask
 "
-" Emake can be installed to /usr/local/bin to build C/C++ by:
-"     $ wget https://skywind3000.github.io/emake/emake.py
-"     $ sudo python emake.py -i
-"
-"
+"======================================================================
 
 " vim: set et fenc=utf-8 ff=unix sts=8 sw=4 ts=4 :
 
@@ -17,73 +18,21 @@
 "- Global Variables
 "----------------------------------------------------------------------
 
-" default tool location is ~/.vim which could be changed by g:vimmake_path
-if !exists("g:vimmake_path")
-	let g:vimmake_path = "~/.vim"
-endif
-
-" tool modes
-if !exists("g:vimmake_mode")
-	let g:vimmake_mode = {}
-endif
-
-
 "----------------------------------------------------------------------
 " Internal Definition
 "----------------------------------------------------------------------
 
 " path where vimmake.vim locates
-let s:vimmake_home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
-let g:vimmake_home = s:vimmake_home
-let s:vimmake_advance = 0	" internal usage, won't be modified by user
-let g:vimmake_advance = 0	" external reference, may be modified by user
 let s:vimmake_windows = 0	" internal usage, won't be modified by user
-let g:vimmake_windows = 0	" external reference, may be modified by user
 
 " check running in windows
 if has('win32') || has('win64') || has('win95') || has('win16')
 	let s:vimmake_windows = 1
-	let g:vimmake_windows = 1
 endif
 
 " join two path
 function! s:PathJoin(home, name)
-    let l:size = strlen(a:home)
-    if l:size == 0 | return a:name | endif
-    let l:last = strpart(a:home, l:size - 1, 1)
-    if has("win32") || has("win64") || has("win16") || has('win95')
-		let l:first = strpart(a:name, 0, 1)
-		if l:first == "/" || l:first == "\\"
-			let head = strpart(a:home, 1, 2)
-			if index([":\\", ":/"], head) >= 0
-				return strpart(a:home, 0, 2) . a:name
-			endif
-			return a:name
-		elseif index([":\\", ":/"], strpart(a:name, 1, 2)) >= 0
-			return a:name
-		endif
-        if l:last == "/" || l:last == "\\"
-            return a:home . a:name
-        else
-            return a:home . '/' . a:name
-        endif
-    else
-		if strpart(a:name, 0, 1) == "/"
-			return a:name
-		endif
-        if l:last == "/"
-            return a:home . a:name
-        else
-            return a:home . '/' . a:name
-        endif
-    endif
-endfunc
-
-" error message
-function! s:ErrorMsg(msg)
-	echohl ErrorMsg
-	echom 'ERROR: '. a:msg
-	echohl NONE
+	return asclib#path#join(a:home, a:name)
 endfunc
 
 
@@ -316,10 +265,10 @@ endfunc
 
 command! -nargs=0 VimmakeKeymap call vimmake#keymap()
 
-function! vimmake#load()
-endfunc
 
-
+"----------------------------------------------------------------------
+" tag generation
+"----------------------------------------------------------------------
 if !exists('g:vimmake_ctags_flags')
 	let g:vimmake_ctags_flags = '--fields=+niazS --extra=+q --c++-kinds=+px'
 	let g:vimmake_ctags_flags.= ' --c-kinds=+p -n'

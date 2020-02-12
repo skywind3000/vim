@@ -24,11 +24,6 @@ endif
 
 
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
-let s:tool_name = (g:asc_uname == 'windows')? 'win32': g:asc_uname
-let g:vimmake_path = expand(s:home . '/tools/' . s:tool_name)
-
-
-RefreshToolMode!
 
 
 "----------------------------------------------------------------------
@@ -102,33 +97,10 @@ endif
 
 
 "----------------------------------------------------------------------
-"- Vimmake
+"- miscs
 "----------------------------------------------------------------------
-let g:vimmake_run_guess = ['go']
-let g:asyncrun_encs = (g:asc_uname == 'windows')? 'gbk' : ''
-let g:asyncrun_ftrun = {}
-let g:asyncrun_ftrun['make'] = 'make -f'
-let g:asyncrun_ftrun['zsh'] = 'zsh'
-let g:asyncrun_ftrun['erlang'] = 'escript'
-let g:asyncrun_ftrun['csh'] = 'csh'
-let g:asyncrun_ftrun['tcsh'] = 'tcsh'
-let g:asyncrun_ftrun['fish'] = 'fish'
-let g:asyncrun_ftrun['bash'] = 'bash'
-let g:asyncrun_ftrun['ksh'] = 'ksh'
-let g:asyncrun_ftrun['markdown'] = 'markpress -u'
-let g:vimmake_ftmake = {}
 
-if has('win32') || has('win16') || has('win64') || has('win95')
-	let g:vimmake_ftmake['go'] = 'go build -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT).exe" "$(VIM_FILEPATH)" '
-else
-	let g:vimmake_ftmake['go'] = 'go build -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" "$(VIM_FILEPATH)" '
-endif
-
-
-if has('win32') || has('win64') || has('win16') || has('win95')
-	let g:vimmake_cflags = ['-O2', '-lwinmm', '-lstdc++', '-lgdi32', '-lws2_32', '-msse3', '-liphlpapi']
-else
-	let g:vimmake_cflags = ['-O2', '-lstdc++']
+if g:asc_uname != 'windows'
 	runtime ftplugin/man.vim
 	nnoremap K :Man <cword><CR>
 	let g:ft_man_open_mode = 'vert'
@@ -136,18 +108,8 @@ endif
 
 let g:cppman_open_mode = '<auto>'
 
-let g:vimmake_mode = {}
 
-for s:i in range(10)
-	if !has_key(g:vimmake_mode, s:i)
-		let g:vimmake_mode[s:i] = 'async'
-	endif
-	if !has_key(g:vimmake_mode, 'c'.s:i)
-		let g:vimmake_mode['c'.s:i] = 'async'
-	endif
-endfor
-
-command! -bang -nargs=* -complete=file Make VimMake -program=make @ <args>
+command! -bang -nargs=* -complete=file Make AsyncRun -program=make @ <args>
 
 
 "----------------------------------------------------------------------
