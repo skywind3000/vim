@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/13 02:56
-" Verision: 1.3.1
+" Last Modified: 2020/02/13 03:10
+" Verision: 1.3.2
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -294,8 +294,9 @@ function! s:cache_load_ini(name)
 		endif
 		for key in keys(section)
 			let val = section[key]
-			let section[key] = s:replace(val, '$(VIM_INIHOME)', inihome)
-			let section[key] = s:replace(val, '$(VIM_INIFILE)', ininame)
+			let val = s:replace(val, '$(VIM_INIHOME)', inihome)
+			let val = s:replace(val, '$(VIM_INIFILE)', ininame)
+			let section[key] = val
 		endfor
 	endfor
 	let sys = g:asynctasks_system
