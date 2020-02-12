@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/12 13:57
-" Verision: 1.2.1
+" Last Modified: 2020/02/13 00:34
+" Verision: 1.2.2
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -372,7 +372,7 @@ function! s:collect_rtp_config() abort
 				endif
 			endif
 		endfor
-		let t = expand('~/.vim/' . rtp_name)
+		let t = s:abspath(expand('~/.vim/' . rtp_name))
 		if filereadable(t)
 			let newname = []
 			for name in names
@@ -695,7 +695,7 @@ endfunc
 "----------------------------------------------------------------------
 " compare version: 0 for equal, 1 for current > require, -1 for <
 "----------------------------------------------------------------------
-function! asynctasks#version_compare(current, require)
+function! s:version_compare(current, require)
 	let current = split(a:current, '\.')
 	let require = split(a:require, '\.')
 	if len(require) < len(current)
@@ -712,6 +712,30 @@ function! asynctasks#version_compare(current, require)
 			return -1
 		endif
 	endfor
+	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" check tool window
+"----------------------------------------------------------------------
+function! s:check_command(command, cwd)
+	if &bt != ''
+		let disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT',
+					\ 'FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
+		for name in disable
+			let macro = '$(VIM_' . name . ')'
+			if stridx(a:command, macro) >= 0
+				let t = 'task command contains invalid macro'
+				call s:errmsg(t . ' in current buffer')
+				return 1
+			elseif stridx(a:cwd, macro) >= 0
+				let t = 'task cwd contains invalid macro'
+				call s:errmsg(t . ' in current buffer')
+				return 2
+			endif
+		endfor
+	endif
 	return 0
 endfunc
 
@@ -749,14 +773,12 @@ function! asynctasks#start(bang, taskname, path)
 		return -5
 	endif
 	let target = '2.4.0'
-	if asynctasks#version_compare(asyncrun#version(), target) < 0
+	if s:version_compare(asyncrun#version(), target) < 0
 		let t = 'asyncrun ' . target . ' or above is required, update from '
 		call s:errmsg(t . '"skywind3000/asyncrun.vim"')
 		return -6
 	endif
-	if (&bt != '') && get(g:, 'asynctasks_strict', 1) != 0
-		let t = 'current buffer must be a normal file, '
-		call s:errmsg(t . "tasks cannot run in a tool window")
+	if s:check_command(command, get(task, 'cwd', '')) != 0
 		return -7
 	endif
 	let opts = s:task_option(task)
@@ -957,6 +979,14 @@ function! s:task_macro()
 	let highmap['0,1'] = 'Title'
 	let highmap['0,2'] = 'Title'
 	let index = 1
+	if &bt != ''
+		let disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT',
+					\ 'FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
+		for nn in disable
+			let name = 'VIM_' . nn
+			let macros[name] = '<invalid>'
+		endfor
+	endif
 	for nn in names
 		let name = 'VIM_' . nn
 		let rows += [['$(' . name . ')', s:macros[name], macros[name]]]
