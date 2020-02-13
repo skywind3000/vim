@@ -26,11 +26,16 @@ endif
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 
 
+
 "----------------------------------------------------------------------
 "- Global Settings
 "----------------------------------------------------------------------
 
 let g:ycm_goto_buffer_command = 'new-or-existing-tab'
+
+if g:asc_uname == 'windows'
+	let g:asyncrun_encs = 'gbk'
+endif
 
 
 "----------------------------------------------------------------------
@@ -189,4 +194,15 @@ function! SkywindSwitchColor()
 	call asclib#color_switch(s:colors)
 endfunc
 
+
+"----------------------------------------------------------------------
+" quickui
+"----------------------------------------------------------------------
+let g:quickui_tags_list = {
+			\ 'python': '--python-kinds=fmc --language-force=Python',
+			\ }
+
+let g:quickui_tags_indent = {
+			\ 'm': '  ',
+			\ }
 

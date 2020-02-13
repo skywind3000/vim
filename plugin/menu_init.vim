@@ -65,8 +65,8 @@ call quickui#menu#install('&Symbol', [
 call quickui#menu#install('&Move', [
 			\ ["Quickfix &First\t:cfirst", 'cfirst', 'quickfix cursor rewind'],
 			\ ["Quickfix L&ast\t:clast", 'clast', 'quickfix cursor to the end'],
-			\ ["Quickfix &Next\t:cnext", 'quickfix cursor next'],
-			\ ["Quickfix &Previous\t:cprev", 'quickfix cursor previous'],
+			\ ["Quickfix &Next\t:cnext", 'cnext', 'cursor next'],
+			\ ["Quickfix &Previous\t:cprev", 'cprev', 'quickfix cursor previous'],
 			\ ])
 
 call quickui#menu#install("&Build", [
