@@ -172,6 +172,13 @@ let g:context_menu_k = [
 			\ [ "Find C&alling\t\\cc", 'call MenuHelp_Fscope("c")', 'GNU Global search c'],
 			\ [ "Find &From Ctags\t\\cz", 'call MenuHelp_Fscope("z")', 'GNU Global search c'],
 			\ [ "--", ],
+			\ [ "Goto D&efinition\t(YCM)", 'YcmCompleter GoToDefinitionElseDeclaration'],
+			\ [ "Goto &References\t(YCM)", 'YcmCompleter GoToReferences'],
+			\ [ "Get D&oc\t(YCM)", 'YcmCompleter GetDoc'],
+			\ [ "Get &Type\t(YCM)", 'YcmCompleter GetTypeImprecise'],
+			\ [ "--", ],
+			\ ['Dash &Help', 'call asclib#utils#dash_ft(&ft, expand("<cword>"))'],
+			\ ['Cpp&man', 'exec "Cppman " . expand("<cword>")', '', 'c,cpp'],
 			\ ]
 
 

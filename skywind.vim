@@ -48,6 +48,7 @@ augroup SkywindGroup
 	au FileType lisp setlocal ts=8 sts=2 sw=2 et
 	au FileType scala setlocal sts=4 sw=4 noet
 	au FileType haskell setlocal et
+	au FileType cpp setlocal commentstring=//\ %s
 augroup END
 
 

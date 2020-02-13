@@ -316,6 +316,7 @@ function! cppman#display(mods, section, page)
 	let uri = s:page_uri(a:section, a:page)
 	" redraw!
 	echo "Loading ..."
+	redraw
 	let bid = s:load_buffer(a:section, a:page, -1)
 	if bid < 0
 		return

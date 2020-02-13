@@ -47,111 +47,58 @@ endfunc
 "----------------------------------------------------------------------
 " persist config
 "----------------------------------------------------------------------
-let s:persist_loaded = 0
-let s:persist_config = {}
-let s:persist_dirty = 0
-let s:persist_name = expand('~/.vim/vim.cfg')
+let s:cfg_loaded = 0
+let s:cfg_config = {}
+let s:cfg_dirty = 0
+let s:cfg_name = expand('~/.vim/vim.cfg')
 
-function! s:persist_init()
-	if s:persist_loaded == 0
-		let items = {}
-		try
-			let items = asclib#setting#read_cfg(s:persist_name)
-		catch
-			let items = {}
-		endtry
-		let s:persist_config = items
-		let s:persist_loaded = 1
+function! s:cfg_init()
+	if s:cfg_loaded == 0
+		let items = asclib#ini#read(s:cfg_name)
+		if type(items) == type(0)
+			let s:cfg_config = {}
+		else
+			let s:cfg_config = items
+		endif
+		let s:cfg_loaded = 1
 	endif
 endfunc
 
-function! asclib#setting#persist_save()
-	call s:persist_init()
+function! asclib#setting#cfg_save()
+	call s:cfg_init()
 	try
-		call asclib#setting#write_cfg(s:persist_name, s:persist_config)
+		call asclib#ini#save(s:cfg_name, s:cfg_config)
 	catch
 	endtry
-	let s:persist_dirty = 0
+	let s:cfg_dirty = 0
 endfunc
 
-function! asclib#setting#persist_get(key, default)
-	call s:persist_init()
-	return get(s:persist_config, a:key, a:default)
+function! asclib#setting#cfg_get(section, key, ...)
+	call s:cfg_init()
+	if has_key(s:cfg_config, a:section)
+		let section = s:cfg_config[a:section]
+		if has_key(section, a:key)
+			return section[a:key]
+		endif
+	endif
+	return ((a:0) > 0)? (a:1) : ''
 endfunc
 
 
-function! asclib#setting#persist_set(key, value)
-	call s:persist_init()
-	let s:persist_config[a:key] = a:value
-	if s:persist_dirty == 0
+function! asclib#setting#cfg_set(section, key, value)
+	call s:cfg_init()
+	if !has_key(s:cfg_config, a:section)
+		let s:cfg_config[a:section] = {}
+	endif
+	let section = s:cfg_config[a:section]
+	let section[a:key] = a:value
+	if s:cfg_dirty == 0
 		augroup AsclibSettingPersist
 			au!
-			au VimLeave * call asclib#setting#persist_save()
+			au VimLeave * call asclib#setting#cfg_save()
 		augroup END
-		let s:persist_dirty = 1
+		let s:cfg_dirty = 1
 	endif
-endfunc
-
-
-
-"----------------------------------------------------------------------
-" internal functions
-"----------------------------------------------------------------------
-function! s:string_strip(text)
-	return substitute(a:text, '^\s*\(.\{-}\)\s*$', '\1', '')
-endfunc
-
-function! asclib#setting#read_cfg(filename)
-
-	function! s:decode_cfg(string) abort
-		let item = {}
-		if type(a:string) == type('')
-			let data = split(a:string, "\n")
-		else
-			let data = a:string
-		endif
-		for curline in data
-			let pos = stridx(curline, ':')
-			if pos <= 0
-				continue
-			endif
-			let name = s:string_strip(strpart(curline, 0, pos))
-			let data = s:string_strip(strpart(curline, pos + 1))
-			if name == ''
-				continue
-			endif
-			let item[name] = data
-		endfor
-		return item
-	endfunc
-
-	let filename = a:filename
-	if stridx(filename, '~') >= 0
-		let filename = expand(filename)
-	endif
-	let data = readfile(filename)
-	return s:decode_cfg(data)
-endfunc
-
-function! asclib#setting#write_cfg(filename, item) abort
-
-	function! s:encode_cfg(item) 
-		let output = []
-		for name in keys(a:item)
-			let data = a:item[name]
-			let name = substitute(name, '[\n\r]', '', 'g')
-			let data = substitute(data, '[\n\r]', '', 'g')
-			let output += [name . ': ' . data]
-		endfor
-		return join(output, "\n")
-	endfunc
-
-	let filename = a:filename
-	if stridx(filename, '~') >= 0
-		let filename = expand(filename)
-	endif
-	let data = s:encode_cfg(a:item)
-	call writefile(split(data, "\n"), filename)
 endfunc
 
 
