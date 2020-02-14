@@ -161,7 +161,6 @@ let g:quickui_show_tip = 1
 "----------------------------------------------------------------------
 " context menu
 "----------------------------------------------------------------------
-let g:context_menu_opts = {'reduce':1, 'savepos':'k', 'index':0}
 let g:context_menu_k = [
 			\ ["&Peek Definition\tAlt+;", 'call quickui#tools#preview_tag("")'],
 			\ ["S&earch in Project\t\\cx", 'exec "silent! GrepCode! " . expand("<cword>")'],
@@ -187,5 +186,5 @@ let g:context_menu_k = [
 "----------------------------------------------------------------------
 nnoremap <silent><space><space> :call quickui#menu#open()<cr>
 
-nnoremap <silent>K :call quickui#context#open(g:context_menu_k, g:context_menu_opts)<cr>
+nnoremap <silent>K :call quickui#tools#clever_context('k', g:context_menu_k, {})<cr>
 
