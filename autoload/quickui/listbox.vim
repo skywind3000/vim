@@ -3,7 +3,7 @@
 " listbox.vim - 
 "
 " Created by skywind on 2019/12/20
-" Last Modified: 2020/02/13 16:26
+" Last Modified: 2020/02/14 21:06
 "
 "======================================================================
 
@@ -194,9 +194,11 @@ function! s:vim_create_listbox(textlist, opts)
 		let opts.borderchars = quickui#core#border_vim(border)
 		let opts.border = [1,1,1,1,1,1,1,1,1]
 	endif
-	let opts.title = has_key(a:opts, 'title')? ' ' . a:opts.title . ' ' : ''
+	if has_key(a:opts, 'title') && (a:opts.title != '')
+		let opts.title = ' ' . a:opts.title . ' '
+	endif
 	let opts.padding = [0,1,0,1]
-	if has_key(a:opts, 'close')
+	if has_key(a:opts, 'close') && (a:opts.close != '')
 		let opts.close = a:opts.close
 	endif
 	let local = quickui#core#popup_local(winid)

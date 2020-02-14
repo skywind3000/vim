@@ -21,7 +21,10 @@ if 1
 	let opts = {'title':'Select', 'border':1, 'index':400, 'close':'button'}
 	let opts.context = 'asdfasdf'
 	let opts.callback = 'MyCallback'
-	" let opts.bordercolor = 'WildMenu'
+	let opts.border = 0
+	" let opts.title = ''
+	" let opts.close = 'none'
+	let opts.bordercolor = 'WildMenu'
 	let opts.keymap = {'=':'TAG:2', '-':'TAG:3'}
 	if 0
 		let inst = quickui#listbox#open(lines, opts)
