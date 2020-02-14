@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/13 03:10
-" Verision: 1.3.4
+" Last Modified: 2020/02/15 03:11
+" Verision: 1.3.5
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -922,8 +922,8 @@ endfunc
 let s:template = [
 	\ '# vim: set fenc=utf-8 ft=dosini:',
 	\ '',
-	\ '# define a new task named "file-compile"',
-	\ '[file-compile]',
+	\ '# define a new task named "file-build"',
+	\ '[file-build]',
 	\ '',
 	\ '# shell command, use quotation for filenames containing spaces',
 	\ '# check ":AsyncTaskMacro" to see available macros',
