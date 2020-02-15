@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/15 18:40
-" Verision: 1.3.7
+" Last Modified: 2020/02/16 01:02
+" Verision: 1.3.8
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -983,6 +983,7 @@ let s:macros = {
 	\ 'VIM_FILENAME': 'File name of current buffer without path',
 	\ 'VIM_FILEDIR': 'Full path of current buffer without the file name',
 	\ 'VIM_FILEEXT': 'File extension of current buffer',
+	\ 'VIM_FILETYPE': 'File type (value of &ft in vim)',
 	\ 'VIM_FILENOEXT': 
 		\ 'File name of current buffer without path and extension',
 	\ 'VIM_PATHNOEXT':
@@ -1012,6 +1013,7 @@ function! s:expand_macros()
 	let macros['VIM_FILENOEXT'] = expand("%:t:r")
 	let macros['VIM_PATHNOEXT'] = expand("%:r")
 	let macros['VIM_FILEEXT'] = "." . expand("%:e")
+	let macros['VIM_FILETYPE'] = (&filetype)
 	let macros['VIM_CWD'] = getcwd()
 	let macros['VIM_RELDIR'] = expand("%:h:.")
 	let macros['VIM_RELNAME'] = expand("%:p:.")
@@ -1038,9 +1040,10 @@ endfunc
 "----------------------------------------------------------------------
 function! s:task_macro()
 	let macros = s:expand_macros()
-	let names = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT', 'FILENOEXT']
-	let names += ['PATHNOEXT', 'CWD', 'RELDIR', 'RELNAME', 'CWORD', 'CFILE']
-	let names += ['VERSION', 'SVRNAME', 'COLUMNS', 'LINES', 'GUI', 'ROOT']
+	let names = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT', 'FILETYPE']
+	let names += ['FILENOEXT', 'PATHNOEXT', 'CWD', 'RELDIR', 'RELNAME']
+	let names += ['CWORD', 'CFILE', 'VERSION', 'SVRNAME', 'COLUMNS']
+	let names += ['LINES', 'GUI', 'ROOT']
 	let rows = []
 	let rows += [['Macro', 'Detail', 'Value']]
 	let highmap = {}
@@ -1076,7 +1079,7 @@ function! asynctasks#cmd(bang, ...)
 	let taskname = (a:0 >= 1)? (a:1) : ''
 	let path = (a:0 >= 2)? (a:2) : ''
 	if taskname == ''
-		call s:errmsg('require task name')
+		call s:errmsg('require task name, use :AsyncTask -h for help')
 		return -1
 	elseif taskname == '-h'
 		echo 'usage:  :AsyncTask <operation>'
