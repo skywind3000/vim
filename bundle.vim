@@ -224,6 +224,7 @@ if index(g:bundle_group, 'opt') >= 0
 	Plug 'tpope/vim-speeddating'
 	Plug 'chiel92/vim-autoformat'
 	Plug 'voldikss/vim-translator'
+	Plug 'benmills/vimux'
 	" Plug 'itchyny/vim-cursorword'
 	let g:gutentags_modules = []
 	if executable('ctags')
