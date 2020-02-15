@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/15 03:11
-" Verision: 1.3.5
+" Last Modified: 2020/02/15 17:30
+" Verision: 1.3.6
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -83,10 +83,6 @@ if !exists('g:asynctasks_term_hidden')
 	let g:asynctasks_term_hidden = 0
 endif
 
-" set to 1 to confine running tasks only in a normal buffer (&bt is empty)
-if !exists('g:asynctasks_strict')
-	let g:asynctasks_strict = 1
-endif
 
 
 "----------------------------------------------------------------------
