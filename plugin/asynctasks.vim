@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/15 17:38
-" Verision: 1.3.6
+" Last Modified: 2020/02/15 18:40
+" Verision: 1.3.7
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -872,7 +872,7 @@ endfunc
 "----------------------------------------------------------------------
 " list tasks
 "----------------------------------------------------------------------
-function! s:task_list(path)
+function! s:task_list(path, showall)
 	let path = (a:path == '')? expand('%:p') : a:path
 	let path = (path == '')? getcwd() : path
 	if asynctasks#collect_config(path, 1) != 0
@@ -888,6 +888,11 @@ function! s:task_list(path)
 	let highmap['0,2'] = 'Title'
 	" let rows += [['----', '----', '------']]
 	for task in tasks.avail
+		if a:showall == 0
+			if strpart(task, 0, 1) == '.'
+				continue
+			endif
+		endif
 		let item = tasks.config[task]
 		let command = s:command_select(item, &ft)
 		if command != ''
@@ -1083,8 +1088,11 @@ function! asynctasks#cmd(bang, ...)
 		echo '    :AsyncTask -E              - edit global task in ~/.vim'
 		echo '    :AsyncTask -m              - display command macros'
 		return 0
-	elseif taskname == '-l'
-		call s:task_list('')
+	elseif taskname ==# '-l'
+		call s:task_list('', 0)
+		return 0
+	elseif taskname ==# '-L'
+		call s:task_list('', 1)
 		return 0
 	elseif taskname ==# '-e' || taskname ==# '-E'
 		call s:task_edit(taskname, path)
@@ -1111,8 +1119,8 @@ command! -bang -nargs=* AsyncTask
 command! -bang -nargs=0 AsyncTaskEdit
 			\ call asynctasks#cmd('', ('<bang>' == '')? '-e' : '-E')
 
-command! -nargs=0 AsyncTaskList 
-			\ call asynctasks#cmd('', '-l')
+command! -bang -nargs=0 AsyncTaskList 
+			\ call asynctasks#cmd('', ('<bang>' == '')? '-l' : '-L')
 
 command! -nargs=0 AsyncTaskMacro
 			\ call asynctasks#cmd('', '-m')
