@@ -4,7 +4,7 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/15 17:30
+" Last Modified: 2020/02/15 17:38
 " Verision: 1.3.6
 "
 " for more information, please visit:
@@ -52,33 +52,32 @@ if !exists('g:asynctasks_tasks')
 	let g:asynctasks_tasks = {}
 endif
 
-" builtin
-if !exists('g:asynctasks_init_tasks')
-	let g:asynctasks_init_tasks = 1
-endif
-
 " terminal mode: tab/curwin/top/bottom/left/right/quickfix/external
 if !exists('g:asynctasks_term_pos')
 	let g:asynctasks_term_pos = 'quickfix'
 endif
 
+" width of vertical terminal split
 if !exists('g:asynctasks_term_cols')
 	let g:asynctasks_term_cols = ''
 endif
 
+" height of horizontal terminal split
 if !exists('g:asynctasks_term_rows')
 	let g:asynctasks_term_rows = ''
 endif
 
+" set to non-zero to keep focus when open a terminal in a split
 if !exists('g:asynctasks_term_focus')
 	let g:asynctasks_term_focus = 1
 endif
 
+" make internal terminal tab reusable
 if !exists('g:asynctasks_term_reuse')
 	let g:asynctasks_term_reuse = 0
 endif
 
-" whether set bufhidden in terminal window
+" whether set bufhidden to 'hide' in terminal window
 if !exists('g:asynctasks_term_hidden')
 	let g:asynctasks_term_hidden = 0
 endif
@@ -351,12 +350,6 @@ endfunc
 "----------------------------------------------------------------------
 function! s:collect_rtp_config() abort
 	let names = []
-	if g:asynctasks_init_tasks != 0
-		let name = s:abspath(s:scripthome . '/tools/default.ini')
-		if filereadable(name)
-			let names += [name]
-		endif
-	endif
 	if g:asynctasks_rtp_config != ''
 		let rtp_name = g:asynctasks_rtp_config
 		let rtp_name = s:replace(rtp_name, '$(system)', g:asynctasks_system)
