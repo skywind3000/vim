@@ -116,8 +116,8 @@ if index(g:bundle_group, 'basic') >= 0
 		noremap <m-n> :cclose<cr>:CtrlPBuffer<cr>
 	endif
 
-	noremap <space>ht :Startify<cr>
-	noremap <space>hy :tabnew<cr>:Startify<cr> 
+	" noremap <space>ht :Startify<cr>
+	" noremap <space>hy :tabnew<cr>:Startify<cr> 
 
 	let g:cpp_class_scope_highlight = 1
 	let g:cpp_member_variable_highlight = 1

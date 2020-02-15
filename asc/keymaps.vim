@@ -321,6 +321,8 @@ let s:asclib = fnamemodify(s:filename, ':h:h'). '/autoload/asclib.vim'
 exec 'nnoremap <space>hc :FileSwitch tabe '.fnameescape(s:asclib).'<cr>'
 let s:auxlib = fnamemodify(s:filename, ':h:h'). '/autoload/auxlib.vim'
 exec 'nnoremap <space>hu :FileSwitch tabe '.fnameescape(s:auxlib).'<cr>'
+let s:tasks = fnamemodify(s:filename, ':h:h'). '/tasks.ini'
+exec 'nnoremap <space>ht :FileSwitch tabe '.fnameescape(s:tasks).'<cr>'
 let s:nvimrc = expand("~/.config/nvim/init.vim")
 if has('win32') || has('win16') || has('win95') || has('win64')
 	let s:nvimrc = expand("~/AppData/Local/nvim/init.vim")
