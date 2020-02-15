@@ -117,6 +117,10 @@ let g:cppman_open_mode = '<auto>'
 
 command! -bang -nargs=* -complete=file Make AsyncRun -program=make @ <args>
 
+if executable('rg')
+	let g:vimmake_grep_mode = 'rg'
+endif
+
 
 "----------------------------------------------------------------------
 "- OptImport
