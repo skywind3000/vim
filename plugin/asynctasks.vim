@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/16 01:02
-" Verision: 1.3.8
+" Last Modified: 2020/02/16 02:40
+" Verision: 1.3.9
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1085,7 +1085,7 @@ function! asynctasks#cmd(bang, ...)
 		echo 'usage:  :AsyncTask <operation>'
 		echo 'operations:'
 		echo '    :AsyncTask {taskname}      - run specific task'
-		echo '    :AsyncTask -l              - list tasks'
+		echo '    :AsyncTask -l              - list tasks (use -L to list all)'
 		echo '    :AsyncTask -h              - show this help'
 		echo '    :AsyncTask -e              - edit local task in project root'
 		echo '    :AsyncTask -E              - edit global task in ~/.vim'
