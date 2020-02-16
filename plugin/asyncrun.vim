@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/02/16 14:00
+" Last Modified: 2020/02/16 15:20
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1533,6 +1533,11 @@ function! asyncrun#run(bang, opts, args, ...)
 	let l:macros['<root>'] = l:macros['VIM_ROOT']
 	let l:retval = ''
 
+	" handle: empty extension
+	if expand("%:e") == ''
+		let l:macros['VIM_FILEEXT'] = ''
+	endif
+
 	" extract options
 	let [l:command, l:opts] = s:ExtractOpt(s:StringStrip(a:args))
 
@@ -1651,7 +1656,7 @@ endfunc
 " asyncrun -version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.4.3'
+	return '2.4.4'
 endfunc
 
 
