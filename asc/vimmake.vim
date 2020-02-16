@@ -205,8 +205,8 @@ function! vimmake#keymap()
 	noremap <silent><F10> :call asyncrun#quickfix_toggle(6)<cr>
 	noremap <silent><s-f5> :AsyncTask project-run<cr>
 	noremap <silent><s-f6> :AsyncTask project-test<cr>
-	noremap <silent><s-f7> :AsyncTask make<cr>
-	noremap <silent><s-f8> :AsyncTask make-run<cr>
+	noremap <silent><s-f7> :AsyncTask project-init<cr>
+	noremap <silent><s-f8> :AsyncTask project-install<cr>
 	noremap <silent><s-f9> :AsyncTask project-build<cr>
 
 	inoremap <silent><F5> <ESC>:AsyncTask file-run<cr>
@@ -217,8 +217,8 @@ function! vimmake#keymap()
 	inoremap <silent><F10> <ESC>:call asyncrun#quickfix_toggle(6)<cr>
 	inoremap <silent><s-f5> <ESC>:AsyncTask project-run<cr>
 	inoremap <silent><s-f6> <ESC>:AsyncTask project-test<cr>
-	inoremap <silent><s-f7> <ESC>:AsyncTask make<cr>
-	inoremap <silent><s-f8> <ESC>:AsyncTask make-run<cr>
+	inoremap <silent><s-f7> <ESC>:AsyncTask project-ini<cr>
+	inoremap <silent><s-f8> <ESC>:AsyncTask project-install<cr>
 	inoremap <silent><s-f9> <ESC>:AsyncTask project-build<cr>
 
 	noremap <silent><f1> :AsyncTask task-f1<cr>

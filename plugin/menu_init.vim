@@ -78,6 +78,7 @@ call quickui#menu#install("&Build", [
 			\ ["&Project Build\tShift+F9", 'AsyncTask project-build'],
 			\ ["Project &Run\tShift+F5", 'AsyncTask project-run'],
 			\ ["Project &Test\tShift+F6", 'AsyncTask project-test'],
+			\ ["Project &Init\tShift+F7", 'AsyncTask project-init'],
 			\ ['--', ''],
 			\ ['E&dit Task', 'AsyncTask -e'],
 			\ ['Edit &Global Task', 'AsyncTask -E'],
