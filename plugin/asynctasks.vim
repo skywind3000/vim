@@ -5,7 +5,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
 " Last Modified: 2020/02/16 02:40
-" Verision: 1.3.9
+" Verision: 1.4.0
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -815,7 +815,7 @@ function! asynctasks#start(bang, taskname, path)
 		call s:errmsg(t . '"skywind3000/asyncrun.vim"')
 		return -5
 	endif
-	let target = '2.4.0'
+	let target = '2.4.3'
 	if s:version_compare(asyncrun#version(), target) < 0
 		let t = 'asyncrun ' . target . ' or above is required, update from '
 		call s:errmsg(t . '"skywind3000/asyncrun.vim"')
@@ -992,8 +992,11 @@ let s:macros = {
 	\ 'VIM_RELDIR': 'File path relativize to current directory',
 	\ 'VIM_RELNAME': 'File name relativize to current directory',
 	\ 'VIM_ROOT': 'Project root directory',
+	\ 'VIM_PRONAME': 'Name of current project root directory',
+	\ 'VIM_DIRNAME': "Name of current directory",
 	\ 'VIM_CWORD': 'Current word under cursor',
 	\ 'VIM_CFILE': 'Current filename under cursor',
+	\ 'VIM_CLINE': 'Cursor line number in current buffer',
 	\ 'VIM_GUI': 'Is running under gui ?',
 	\ 'VIM_VERSION': 'Value of v:version',
 	\ 'VIM_COLUMNS': "How many columns in vim's screen",
@@ -1019,6 +1022,7 @@ function! s:expand_macros()
 	let macros['VIM_RELNAME'] = expand("%:p:.")
 	let macros['VIM_CWORD'] = expand("<cword>")
 	let macros['VIM_CFILE'] = expand("<cfile>")
+	let macros['VIM_CLINE'] = line('.')
 	let macros['VIM_VERSION'] = ''.v:version
 	let macros['VIM_SVRNAME'] = v:servername
 	let macros['VIM_COLUMNS'] = ''.&columns
@@ -1026,6 +1030,8 @@ function! s:expand_macros()
 	let macros['VIM_GUI'] = has('gui_running')? 1 : 0
 	let macros['VIM_ROOT'] = asyncrun#get_root('%')
     let macros['VIM_HOME'] = expand(split(&rtp, ',')[0])
+	let macros['VIM_PRONAME'] = fnamemodify(macros['VIM_ROOT'], ':t')
+	let macros['VIM_DIRNAME'] = fnamemodify(macros['VIM_CWD'], ':t')
 	let macros['<cwd>'] = macros['VIM_CWD']
 	let macros['<root>'] = macros['VIM_ROOT']
 	if expand("%:e") == ''
@@ -1042,8 +1048,8 @@ function! s:task_macro()
 	let macros = s:expand_macros()
 	let names = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT', 'FILETYPE']
 	let names += ['FILENOEXT', 'PATHNOEXT', 'CWD', 'RELDIR', 'RELNAME']
-	let names += ['CWORD', 'CFILE', 'VERSION', 'SVRNAME', 'COLUMNS']
-	let names += ['LINES', 'GUI', 'ROOT']
+	let names += ['CWORD', 'CFILE', 'CLINE', 'VERSION', 'SVRNAME', 'COLUMNS']
+	let names += ['LINES', 'GUI', 'ROOT', 'DIRNAME', 'PRONAME']
 	let rows = []
 	let rows += [['Macro', 'Detail', 'Value']]
 	let highmap = {}
