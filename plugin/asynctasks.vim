@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/17 01:02
-" Verision: 1.4.3
+" Last Modified: 2020/02/17 04:22
+" Verision: 1.4.4
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -72,7 +72,7 @@ if !exists('g:asynctasks_term_rows')
 	let g:asynctasks_term_rows = ''
 endif
 
-" set to non-zero to keep focus when open a terminal in a split
+" set to non-zero to change focus when open a terminal in a split
 if !exists('g:asynctasks_term_focus')
 	let g:asynctasks_term_focus = 1
 endif

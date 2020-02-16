@@ -921,3 +921,6 @@ hi! link luaStatement Keyword
 " man
 hi! link manSectionHeading Keyword
 
+" cmake
+hi! link cmakeCommand Keyword
+
