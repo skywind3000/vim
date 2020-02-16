@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/02/16 15:20
+" Last Modified: 2020/02/16 21:32
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1086,6 +1086,9 @@ function! s:start_in_terminal(opts)
 	endif
 	if get(a:opts, 'safe', get(g:, 'asyncrun_term_safe', 0)) != 0
 		let command = s:ScriptWrite(a:opts.command, 0)
+		if stridx(command, ' ') >= 0
+			let command = shellescape(command)
+		endif
 		let shell = ''
 	endif
 	let avail = -1
