@@ -301,6 +301,7 @@ noremap <space>hq :FileSwitch tabe ~/.vim/quicknote.txt<cr>
 noremap <space>hg :FileSwitch tabe ~/.vim/scratch.txt<cr>
 noremap <space>hd :FileSwitch tabe ~/Dropbox/Documents/notes.txt<cr>
 noremap <space>ho :FileSwitch tabe ~/.vim/cloud/Documents/cloudnote.txt<cr>
+noremap <space>hi :FileSwitch tabe ~/.vim/tasks.ini<cr>
 noremap <space>h; :call asclib#nextcloud_sync()<cr>
 
 if (!has('nvim')) && (has('win32') || has('win64'))

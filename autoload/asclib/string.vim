@@ -25,3 +25,19 @@ function! asclib#string#strip(text)
 endfunc
 
 
+"----------------------------------------------------------------------
+" string partition 
+"----------------------------------------------------------------------
+function! asclib#string#partition(text, sep)
+	let pos = stridx(a:text, a:sep)
+	if pos < 0
+		return [a:text, '', '']
+	else
+		let size = strlen(a:sep)
+		let head = strpart(a:text, 0, pos)
+		let sep = strpart(a:text, pos, size)
+		let tail = strpart(a:text, pos + size)
+		return [head, sep, tail]
+	endif
+endfunc
+

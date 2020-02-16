@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/16 02:40
-" Verision: 1.4.0
+" Last Modified: 2020/02/16 23:52
+" Verision: 1.4.2
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -27,9 +27,14 @@ let s:scripthome = fnamemodify(s:scriptname, ':h:h')
 " default values
 "----------------------------------------------------------------------
 
-" system identifier
+" system
 if !exists('g:asynctasks_system')
-	let g:asynctasks_system = (s:windows)? 'win' : 'unix'
+	let g:asynctasks_system = (s:windows == 0)? 'unix' : 'win'
+endif
+
+" task profile
+if !exists('g:asynctasks_profile')
+	let g:asynctasks_profile = ''
 endif
 
 " local config
@@ -108,6 +113,20 @@ endfunc
 " trim leading & trailing spaces
 function! s:strip(text)
 	return substitute(a:text, '^\s*\(.\{-}\)\s*$', '\1', '')
+endfunc
+
+" partition
+function! s:partition(text, sep)
+	let pos = stridx(a:text, a:sep)
+	if pos < 0
+		return [a:text, '', '']
+	else
+		let size = strlen(a:sep)
+		let head = strpart(a:text, 0, pos)
+		let sep = strpart(a:text, pos, size)
+		let tail = strpart(a:text, pos + size)
+		return [head, sep, tail]
+	endif
 endfunc
 
 " replace string
@@ -281,32 +300,14 @@ function! s:cache_load_ini(name)
 	let obj.keys = keys(config)
 	let ininame = name
 	let inihome = fnamemodify(name, ':h')
-	let special = []
 	for sect in obj.keys
 		let section = obj.config[sect]
-		if stridx(sect, ':') >= 0
-			let special += [sect]
-		endif
 		for key in keys(section)
 			let val = section[key]
 			let val = s:replace(val, '$(VIM_INIHOME)', inihome)
 			let val = s:replace(val, '$(VIM_INIFILE)', ininame)
 			let section[key] = val
 		endfor
-	endfor
-	let sys = g:asynctasks_system
-	for key in special
-		let parts = split(key, ':')
-		let name = s:strip((len(parts) >= 1)? parts[0] : '')
-		let system = s:strip((len(parts) >= 2)? parts[1] : '')
-		if name == '' 
-			unlet obj.config[key]
-		elseif system == g:asynctasks_system || system == ''
-			let obj.config[name] = obj.config[key]
-			unlet obj.config[key]
-		else
-			unlet obj.config[key]
-		endif
 	endfor
 	return obj
 endfunc
@@ -328,19 +329,40 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" merge starry
+" merge two tasks
 "----------------------------------------------------------------------
-function! s:starry_merge(target, source)
-	let g1 = s:strip(get(a:target, 'grep', ''))
-	let g2 = s:strip(get(a:source, 'grep', ''))
-	if g1 != '' && g2 != ''
-		let gg = g1 . ',' . g2
-	elseif g1 != '' && g2 == ''
-		let gg = g1
-	else
-		let gg = g2
-	endif
-	let a:target['grep'] = gg
+function! s:config_merge(target, source, ininame, mode)
+	let special = []
+	for key in keys(a:source)
+		if stridx(key, ':') >= 0
+			let special += [key]
+		elseif key != '*'
+			let a:target[key] = a:source[key]
+			if a:ininame != ''
+				let a:target[key].__name__ = a:ininame
+			endif
+			if a:mode != ''
+				let a:target[key].__mode__ = a:mode
+			endif
+		else
+		endif
+	endfor
+	for key in special
+		let parts = s:partition(key, ':')
+		if parts[1] != ''
+			let profile = s:strip(parts[2])
+			if profile == g:asynctasks_profile
+				let name = s:strip(parts[0])
+				let a:target[name] = a:source[key]
+				if a:ininame != ''
+					let a:target[name].__name__ = a:ininame
+				endif
+				if a:mode != ''
+					let a:target[name].__mode__ = a:mode
+				endif
+			endif
+		endif
+	endfor
 	return a:target
 endfunc
 
@@ -352,8 +374,6 @@ function! s:collect_rtp_config() abort
 	let names = []
 	if g:asynctasks_rtp_config != ''
 		let rtp_name = g:asynctasks_rtp_config
-		let rtp_name = s:replace(rtp_name, '$(system)', g:asynctasks_system)
-		let rtp_name = s:replace(rtp_name, '<system>', g:asynctasks_system)
 		for rtp in split(&rtp, ',')
 			if rtp != ''
 				let path = s:abspath(rtp . '/' . rtp_name)
@@ -379,37 +399,21 @@ function! s:collect_rtp_config() abort
 			let names += [name]
 		endif
 	endfor
-	let s:private.rtp.ini = {'*':{'__name__':'', '__mode__':''}}
+	let s:private.rtp.ini = {}
 	let config = {}
 	let s:error = ''
-	let starry = s:private.rtp.ini['*']
 	for name in names
 		let obj = s:cache_load_ini(name)
 		if s:error == ''
-			for key in keys(obj.config)
-				if key != '*'
-					let s:private.rtp.ini[key] = obj.config[key]
-				else
-					call s:starry_merge(starry, obj.config['*'])
-				endif
-				let s:private.rtp.ini[key].__name__ = name
-				let s:private.rtp.ini[key].__mode__ = "global"
-			endfor
+			let mode = 'global'
+			call s:config_merge(s:private.rtp.ini, obj.config, name, mode)
 		else
 			call s:errmsg(s:error)
 			let s:error = ''
 		endif
 	endfor
 	let config = deepcopy(s:private.rtp.ini)
-	for key in keys(g:asynctasks_tasks)
-		if key != '*'
-			let config[key] = g:asynctasks_tasks[key]
-		else
-			call s:starry_merge(starry, g:asynctasks_tasks['*'])
-		endif
-		let config[key].__name__ = 'vimscript'
-		let config[key].__mode__ = 'vimscript'
-	endfor
+	call s:config_merge(config, g:asynctasks_tasks, '<script>', 'script')
 	let s:private.rtp.config = config
 	return s:private.rtp.config
 endfunc
@@ -431,21 +435,12 @@ endfunc
 "----------------------------------------------------------------------
 function! s:compose_local_config(path)
 	let names = s:search_parent(g:asynctasks_config_name, a:path)
-	let config = {'*':{'__name__':'', '__mode__':''}}
-	let starry = config['*']
+	let config = {}
 	for name in names
 		let s:error = ''
 		let obj = s:cache_load_ini(name)
 		if s:error == ''
-			for key in keys(obj.config)
-				if key != '*'
-					let config[key] = obj.config[key]
-				else
-					call s:starry_merge(starry, obj.config['*'])
-				endif
-				let config[key].__name__ = name
-				let config[key].__mode__ = 'local'
-			endfor
+			call s:config_merge(config, obj.config, name, 'local')
 		else
 			call s:errmsg(s:error)
 			let s:error = ''
@@ -467,12 +462,10 @@ function! asynctasks#collect_config(path, force)
 	let c2 = s:compose_local_config(path)
 	let tasks = {'config':{}, 'names':{}, 'avail':[]}
 	for cc in [c1, c2]
-		for key in keys(cc)
-			let tasks.config[key] = cc[key]
-		endfor
+		call s:config_merge(tasks.config, cc, '', '')
 	endfor
 	let avail = []
-	let modes = {'global':2, 'vimscript':1, 'local':0}
+	let modes = {'global':2, 'script':1, 'local':0}
 	for key in keys(tasks.config)
 		if key != '*'
 			let tasks.names[key] = 1
@@ -1109,6 +1102,15 @@ function! asynctasks#cmd(bang, ...)
 	elseif taskname == '-m'
 		call s:task_macro()
 		return 0
+	elseif taskname == '-p'
+		let profile = (a:0 >= 2)? (a:2) : ''
+		if profile != ''
+			let g:asynctasks_profile = profile
+		endif
+		echohl Number
+		echo 'Current profile: '. g:asynctasks_profile
+		echohl None
+		return 0
 	endif
 	call asynctasks#start(a:bang, taskname, '')
 endfunc
@@ -1119,7 +1121,7 @@ endfunc
 "----------------------------------------------------------------------
 
 command! -bang -nargs=* AsyncTask
-			\ call asynctasks#cmd('<bang>', <q-args>)
+			\ call asynctasks#cmd('<bang>', <f-args>)
 
 
 "----------------------------------------------------------------------
@@ -1133,6 +1135,9 @@ command! -bang -nargs=0 AsyncTaskList
 
 command! -nargs=0 AsyncTaskMacro
 			\ call asynctasks#cmd('', '-m')
+
+command! -nargs=? AsyncTaskProfile
+			\ call asynctasks#cmd('', '-p', <f-args>)
 
 
 "----------------------------------------------------------------------
