@@ -5,7 +5,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
 " Last Modified: 2020/02/17 01:02
-" Verision: 1.4.2
+" Verision: 1.4.3
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -34,7 +34,7 @@ endif
 
 " task profile
 if !exists('g:asynctasks_profile')
-	let g:asynctasks_profile = ''
+	let g:asynctasks_profile = 'debug'
 endif
 
 " local config
