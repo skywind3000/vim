@@ -4,7 +4,7 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/16 23:52
+" Last Modified: 2020/02/17 01:02
 " Verision: 1.4.2
 "
 " for more information, please visit:
@@ -1089,6 +1089,7 @@ function! asynctasks#cmd(bang, ...)
 		echo '    :AsyncTask -e              - edit local task in project root'
 		echo '    :AsyncTask -E              - edit global task in ~/.vim'
 		echo '    :AsyncTask -m              - display command macros'
+		echo '    :AsyncTask -p <profile>    - switch current profile'
 		return 0
 	elseif taskname ==# '-l'
 		call s:task_list('', 0)
