@@ -404,3 +404,14 @@ noremap <m-I> :call quickui#tools#list_function()<cr>
 noremap <m-y> :call quickui#tools#list_function()<cr>
 
 
+"----------------------------------------------------------------------
+" neovim system clipboard
+"----------------------------------------------------------------------
+if has('nvim') && (has('win32') || has('win64'))
+	nnoremap <s-insert> "*P
+	vnoremap <s-insert> "-d"*P
+	inoremap <s-insert> <c-r><c-o>*
+	vnoremap <c-insert> "*y
+endif
+
+
