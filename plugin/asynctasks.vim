@@ -29,7 +29,7 @@ let s:scripthome = fnamemodify(s:scriptname, ':h:h')
 
 " system
 if !exists('g:asynctasks_system')
-	let g:asynctasks_system = (s:windows == 0)? 'win32', 'linux'
+	let g:asynctasks_system = (s:windows == 0)? 'win32' : 'linux'
 endif
 
 " task profile
