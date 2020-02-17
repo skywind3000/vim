@@ -64,3 +64,28 @@ function! MenuHelp_Proxy(enable)
 	let $ALL_PROXY = $HTTP_PROXY
 endfunc
 
+function! MenuHelp_TaskList()
+	let keymaps = '123456789abcdefimnopqrstuvwxyz'
+	let items = asynctasks#list('')
+	let rows = []
+	let size = strlen(keymaps)
+	let index = 0
+	for item in items
+		if item.name =~ '^\.'
+			continue
+		endif
+		let cmd = strpart(item.command, 0, (&columns * 60) / 100)
+		let key = (index >= size)? ' ' : strpart(keymaps, index, 1)
+		let text = "[" . ((key != ' ')? ('&' . key) : ' ') . "]\t"
+		let text .= item.name . "\t[" . item.scope . "]\t" . cmd
+		let rows += [[text, 'AsyncTask ' . fnameescape(item.name)]]
+		let index += 1
+	endfor
+	let opts = {}
+	let opts.title = 'Task List'
+	" let opts.bordercolor = 'QuickTitle'
+	call quickui#tools#clever_listbox('tasks', rows, opts)
+endfunc
+
+
+
