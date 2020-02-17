@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/17 12:53
-" Verision: 1.4.6
+" Last Modified: 2020/02/17 21:38
+" Verision: 1.4.7
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1046,7 +1046,7 @@ function! s:expand_macros()
 	let macros['VIM_FILENAME'] = expand("%:t")
 	let macros['VIM_FILEDIR'] = expand("%:p:h")
 	let macros['VIM_FILENOEXT'] = expand("%:t:r")
-	let macros['VIM_PATHNOEXT'] = expand("%:r")
+	let macros['VIM_PATHNOEXT'] = expand("%:p:r")
 	let macros['VIM_FILEEXT'] = "." . expand("%:e")
 	let macros['VIM_FILETYPE'] = (&filetype)
 	let macros['VIM_CWD'] = getcwd()
