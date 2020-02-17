@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/17 04:28
-" Verision: 1.4.5
+" Last Modified: 2020/02/17 12:41
+" Verision: 1.4.6
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -29,7 +29,7 @@ let s:scripthome = fnamemodify(s:scriptname, ':h:h')
 
 " system
 if !exists('g:asynctasks_system')
-	let g:asynctasks_system = (s:windows == 0)? 'unix' : 'win'
+	let g:asynctasks_system = (s:windows == 0)? 'win32', 'linux'
 endif
 
 " task profile
@@ -573,28 +573,67 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" split command into: [command, fts, system]
+"----------------------------------------------------------------------
+function! s:command_split(command)
+	let command = a:command
+	let p1 = stridx(command, ':')
+	let p2 = stridx(command, '/')
+	if p1 < 0 && p2 < 0
+		return [command, '', '']
+	endif
+	let parts = split(command, '[:/]')
+	if p1 >= 0 && p2 >= 0
+		if p1 < p2
+			return [parts[0], parts[1], parts[2]]
+		else
+			return [parts[0], parts[2], parts[1]]
+		endif
+	elseif p1 >= 0 && p2 < 0
+		return [parts[0], parts[1], '']
+	elseif p1 < 0 && p2 >= 0
+		return [parts[0], '', parts[1]]
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " extract correct command
 "----------------------------------------------------------------------
 function! s:command_select(config, ft)
 	let command = get(a:config, 'command', '')
 	for key in keys(a:config)
-		let pos = stridx(key, ':')
-		if pos < 0
+		let p1 = stridx(key, ':')
+		let p2 = stridx(key, '/')
+		if p1 < 0 && p2 < 0
 			continue
 		endif
-		let part = split(key, ':')
-		let head = substitute(part[0], '^\s*\(.\{-}\)\s*$', '\1', '')
+		let part = s:command_split(key)
+		let head = s:strip(part[0])
 		if head != 'command'
 			continue
 		endif
-		let text = substitute(part[1], '^\s*\(.\{-}\)\s*$', '\1', '')
-		let check = 0
-		for ft in split(text, ',')
-			let ft = substitute(ft, '^\s*\(.\{-}\)\s*$', '\1', '')
-			if ft == a:ft
-				let command = a:config[key]
+		let text = s:strip(part[1])
+		if text != ''
+			let check = 0
+			for ft in split(text, ',')
+				let ft = substitute(ft, '^\s*\(.\{-}\)\s*$', '\1', '')
+				if ft == a:ft
+					let check = 1
+					break
+				endif
+			endfor
+			if check == 0
+				continue
 			endif
-		endfor
+		endif
+		let text = s:strip(part[2])
+		if text != ''
+			if text != g:asynctasks_system
+				continue
+			endif
+		endif
+		return a:config[key]
 	endfor
 	return command
 endfunc
