@@ -5,7 +5,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
 " Last Modified: 2020/02/17 21:38
-" Verision: 1.4.7
+" Verision: 1.4.8
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -29,7 +29,7 @@ let s:scripthome = fnamemodify(s:scriptname, ':h:h')
 
 " system
 if !exists('g:asynctasks_system')
-	let g:asynctasks_system = (s:windows == 0)? 'win32' : 'linux'
+	let g:asynctasks_system = (s:windows == 0)? 'linux' : 'win32'
 endif
 
 " task profile
