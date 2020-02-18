@@ -621,16 +621,16 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" split command into: [command, fts, system]
+" split command into: [command, fts, condition]
 "----------------------------------------------------------------------
-function! s:command_split(command)
-	let command = a:command
-	let p1 = stridx(command, ':')
-	let p2 = stridx(command, '/')
+function! s:trinity_split(text)
+	let text = a:text
+	let p1 = stridx(text, ':')
+	let p2 = stridx(text, '/')
 	if p1 < 0 && p2 < 0
-		return [command, '', '']
+		return [text, '', '']
 	endif
-	let parts = split(command, '[:/]')
+	let parts = split(text, '[:/]')
 	if p1 >= 0 && p2 >= 0
 		if p1 < p2
 			return [parts[0], parts[1], parts[2]]
@@ -656,7 +656,7 @@ function! s:command_select(config, ft)
 		if p1 < 0 && p2 < 0
 			continue
 		endif
-		let part = s:command_split(key)
+		let part = s:trinity_split(key)
 		let head = s:strip(part[0])
 		if head != 'command'
 			continue
