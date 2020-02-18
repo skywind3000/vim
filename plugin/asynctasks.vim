@@ -814,15 +814,28 @@ function! s:command_check(command, cwd)
 			endif
 		endfor	
 	endif
-	let name = '$(VIM_CWORD)'
-	if expand('<cword>') == '' && g:asynctasks_strict != 0
-		if stridx(a:command, name) >= 0
-			call s:errmsg('current word used in command is empty')
-			return 5
+	if g:asynctasks_strict != 0
+		let name = '$(VIM_CWORD)'
+		if expand('<cword>') == ''
+			if stridx(a:command, name) >= 0
+				call s:errmsg('current word used in command is empty')
+				return 5
+			endif
+			if stridx(a:cwd, name) >= 0
+				call s:errmsg('current word used in cwd is empty')
+				return 6
+			endif
 		endif
-		if stridx(a:cwd, macro) >= 0
-			call s:errmsg('current word used in cwd is empty')
-			return 6
+		let name = '$(VIM_CFILE)'
+		if expand('<cfile>') == ''
+			if stridx(a:command, name) >= 0
+				call s:errmsg('current filename used in command is empty')
+				return 5
+			endif
+			if stridx(a:cwd, name) >= 0
+				call s:errmsg('current filename used in cwd is empty')
+				return 6
+			endif
 		endif
 	endif
 	return 0
