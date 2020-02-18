@@ -114,6 +114,9 @@ elseif g:asyncrun_timer < 100
 	let g:asyncrun_timer = 100
 endif
 
+" disable autocmd for each update
+let g:asyncrun_skip = 1
+
 
 "----------------------------------------------------------------------
 " internal object
@@ -840,6 +843,9 @@ function! s:task_option(task)
 	endfor
 	if has_key(task, 'program')
 		let opts.program = task.program
+	endif
+	if has_key(task, 'auto')
+		let opts.auto = task.auto
 	endif
 	let opts.safe = 1
 	let opts.reuse = g:asynctasks_term_reuse
