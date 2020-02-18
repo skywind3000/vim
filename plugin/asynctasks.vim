@@ -865,30 +865,34 @@ function! s:command_check(command, cwd)
 				\ 'FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
 	if &bt != ''
 		for name in disable
-			let macro = '$(VIM_' . name . ')'
-			if stridx(a:command, macro) >= 0
-				let t = 'task command contains invalid macro'
-				call s:warning(t . ' in current buffer')
-				return 1
-			elseif stridx(a:cwd, macro) >= 0
-				let t = 'task cwd contains invalid macro'
-				call s:warning(t . ' in current buffer')
-				return 2
-			endif
+			for mode in ['$(VIM_', '$(WSL_']
+				let macro = mode . name . ')'
+				if stridx(a:command, macro) >= 0
+					let t = 'task command contains invalid macro'
+					call s:warning(t . ' in current buffer')
+					return 1
+				elseif stridx(a:cwd, macro) >= 0
+					let t = 'task cwd contains invalid macro'
+					call s:warning(t . ' in current buffer')
+					return 2
+				endif
+			endfor
 		endfor
 	elseif expand('%:p') == ''
 		for name in disable
-			let macro = '$(VIM_' . name . ')'
-			if stridx(a:command, macro) >= 0
-				let t = 'macro ' . macro . ' is empty'
-				call s:warning(t . ' in current buffer')
-				return 3
-			elseif stridx(a:cwd, macro) >= 0
-				let t = 'macro ' . macro . ' is empty'
-				call s:warning(t . ' in current buffer')
-				return 4
-			endif
-		endfor	
+			for mode in ['$(VIM_', '$(WSL_']
+				let macro = mode . name . ')'
+				if stridx(a:command, macro) >= 0
+					let t = 'macro ' . macro . ' is empty'
+					call s:warning(t . ' in current buffer')
+					return 3
+				elseif stridx(a:cwd, macro) >= 0
+					let t = 'macro ' . macro . ' is empty'
+					call s:warning(t . ' in current buffer')
+					return 4
+				endif
+			endfor	
+		endfor
 	endif
 	if g:asynctasks_strict != 0
 		let name = '$(VIM_CWORD)'
@@ -902,17 +906,19 @@ function! s:command_check(command, cwd)
 				return 6
 			endif
 		endif
-		let name = '$(VIM_CFILE)'
-		if expand('<cfile>') == ''
-			if stridx(a:command, name) >= 0
-				call s:warning('current filename used in command is empty')
-				return 5
+		for name in ['$(VIM_CFILE)', '$(WSL_CFILE)']
+			if expand('<cfile>') == ''
+				if stridx(a:command, name) >= 0
+					let t = 'current filename used in command is empty'
+					call s:warning(t)
+					return 5
+				endif
+				if stridx(a:cwd, name) >= 0
+					call s:warning('current filename used in cwd is empty')
+					return 6
+				endif
 			endif
-			if stridx(a:cwd, name) >= 0
-				call s:warning('current filename used in cwd is empty')
-				return 6
-			endif
-		endif
+		endfor
 	endif
 	return 0
 endfunc
@@ -1146,6 +1152,19 @@ let s:macros = {
 	\ 'VIM_COLUMNS': "How many columns in vim's screen",
 	\ 'VIM_LINES': "How many lines in vim's screen", 
 	\ 'VIM_SVRNAME': 'Value of v:servername for +clientserver usage',
+	\ 'WSL_FILEPATH': '(WSL) File name of current buffer with full path',
+	\ 'WSL_FILENAME': '(WSL) File name of current buffer without path',
+	\ 'WSL_FILEDIR': 
+		\ '(WSL) Full path of current buffer without the file name',
+	\ 'WSL_FILEEXT': '(WSL) File extension of current buffer',
+	\ 'WSL_FILENOEXT': 
+		\ '(WSL) File name of current buffer without path and extension',
+	\ 'WSL_PATHNOEXT':
+		\ '(WSL) Current file name with full path but without extension',
+	\ 'WSL_CWD': '(WSL) Current directory',
+	\ 'WSL_RELDIR': '(WSL) File path relativize to current directory',
+	\ 'WSL_RELNAME': '(WSL) File name relativize to current directory',
+	\ 'WSL_ROOT': '(WSL) Project root directory',
 	\ }
 
 
@@ -1181,6 +1200,15 @@ function! s:expand_macros()
 	if expand("%:e") == ''
 		let macros['VIM_FILEEXT'] = ''
 	endif
+	if s:windows != 0
+		let wslnames = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILENOEXT']
+		let wslnames += ['PATHNOEXT', 'FILEEXT', 'FILETYPE', 'RELDIR']
+		let wslnames += ['RELNAME', 'CFILE', 'ROOT', 'HOME', 'CWD']
+		for name in wslnames
+			let src = macros['VIM_' . name]
+			let macros['WSL_' . name] = asyncrun#path_win2unix(src, '/mnt')
+		endfor
+	endif
 	return macros
 endfunc
 
@@ -1188,7 +1216,7 @@ endfunc
 "----------------------------------------------------------------------
 " macro list
 "----------------------------------------------------------------------
-function! s:task_macro()
+function! s:task_macro(wsl)
 	let macros = s:expand_macros()
 	let names = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT', 'FILETYPE']
 	let names += ['FILENOEXT', 'PATHNOEXT', 'CWD', 'RELDIR', 'RELNAME']
@@ -1205,12 +1233,15 @@ function! s:task_macro()
 		let disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT',
 					\ 'FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
 		for nn in disable
-			let name = 'VIM_' . nn
-			let macros[name] = '<invalid>'
+			let macros['VIM_' . nn] = '<invalid>'
+			let macros['WSL_' . nn] = '<invalid>'
 		endfor
 	endif
 	for nn in names
-		let name = 'VIM_' . nn
+		let name = ((a:wsl == 0)? 'VIM_' : 'WSL_') . nn
+		if has_key(s:macros, name) == 0 || has_key(macros, name) == 0
+			continue
+		endif
 		let rows += [['$(' . name . ')', s:macros[name], macros[name]]]
 		" let rows += [['', macros[name]]]
 		let highmap[index . ',0'] = 'Keyword'
@@ -1252,8 +1283,11 @@ function! asynctasks#cmd(bang, args, ...)
 	elseif args ==# '-e' || args ==# '-E'
 		call s:task_edit(args, path)
 		return 0
-	elseif args == '-m'
-		call s:task_macro()
+	elseif args ==# '-m'
+		call s:task_macro(0)
+		return 0
+	elseif args ==# '-M'
+		call s:task_macro(1)
 		return 0
 	endif
 	let [args, opts] = s:ExtractOpt(args)
@@ -1297,8 +1331,8 @@ command! -bang -nargs=0 AsyncTaskEdit
 command! -bang -nargs=0 AsyncTaskList 
 			\ call asynctasks#cmd('', ('<bang>' == '')? '-l' : '-L')
 
-command! -nargs=0 AsyncTaskMacro
-			\ call asynctasks#cmd('', '-m')
+command! -bang -nargs=0 AsyncTaskMacro
+			\ call asynctasks#cmd('', ('<bang>' == '')? '-m' : '-M')
 
 command! -nargs=? AsyncTaskProfile
 			\ call asynctasks#cmd('', '-p', <f-args>)
