@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/17 21:38
-" Verision: 1.4.8
+" Last Modified: 2020/02/18 13:45
+" Verision: 1.4.9
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -87,6 +87,10 @@ if !exists('g:asynctasks_term_hidden')
 	let g:asynctasks_term_hidden = 0
 endif
 
+" strict to detect $(VIM_CWORD) to avoid empty string
+if !exists('g:asynctasks_strict')
+	let g:asynctasks_strict = 1
+endif
 
 
 "----------------------------------------------------------------------
@@ -809,6 +813,17 @@ function! s:command_check(command, cwd)
 				return 4
 			endif
 		endfor	
+	endif
+	let name = '$(VIM_CWORD)'
+	if expand('<cword>') == '' && g:asynctasks_strict != 0
+		if stridx(a:command, name) >= 0
+			call s:errmsg('current word used in command is empty')
+			return 5
+		endif
+		if stridx(a:cwd, macro) >= 0
+			call s:errmsg('current word used in cwd is empty')
+			return 6
+		endif
 	endif
 	return 0
 endfunc
