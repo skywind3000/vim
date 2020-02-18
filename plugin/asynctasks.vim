@@ -442,7 +442,6 @@ function! s:config_merge(target, source, ininame, mode)
 				continue
 			endif
 		endif
-		let name = s:strip(parts[0])
 		let a:target[name] = a:source[key]
 		if a:ininame != ''
 			let a:target[name].__name__ = a:ininame
