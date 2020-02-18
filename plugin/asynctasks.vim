@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/19 02:46
-" Verision: 1.5.5
+" Last Modified: 2020/02/19 03:25
+" Verision: 1.5.6
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
