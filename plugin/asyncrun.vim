@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/02/17 21:36
+" Last Modified: 2020/02/18 21:04
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1066,6 +1066,26 @@ function! asyncrun#path_join(home, name)
 	return s:path_join(a:home, a:name)
 endfunc
 
+" change to unix
+function! asyncrun#path_win2unix(winpath, prefix)
+	let prefix = a:prefix
+	let path = a:winpath
+	if path =~ '^\a:[/\\]'
+		let drive = tolower(strpart(path, 0, 1))
+		let name = strpart(path, 3)
+		let p = s:path_join(prefix, drive)
+		let p = s:path_join(p, name)
+		return tr(p, '\', '/')
+	elseif path =~ '^[/\\]'
+		let drive = tolower(strpart(getcwd(), 0, 1))
+		let name = strpart(path, 1)
+		let p = s:path_join(prefix, drive)
+		let p = s:path_join(p, name)
+		return tr(p, '\', '/')
+	else
+		return tr(a:winpath, '\', '/')
+	endif
+endfunc
 
 
 "----------------------------------------------------------------------
@@ -1591,6 +1611,17 @@ function! asyncrun#run(bang, opts, args, ...)
 		let l:macros['<cwd>'] = l:macros['VIM_CWD']
 	endif
 
+	" windows can use $(WSL_XXX)
+	if s:asyncrun_windows != 0
+		let wslnames = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILENOEXT']
+		let wslnames += ['PATHNOEXT', 'FILEEXT', 'FILETYPE', 'RELDIR']
+		let wslnames += ['RELNAME', 'CFILE', 'ROOT', 'HOME', 'CWD']
+		for name in wslnames
+			let src = l:macros['VIM_' . name]
+			let l:macros['WSL_' . name] = asyncrun#path_win2unix(src, '/mnt')
+		endfor
+	endif
+
 	" replace macros and setup environment variables
 	for [l:key, l:val] in items(l:macros)
 		let l:replace = (l:key[0] != '<')? '$('.l:key.')' : l:key
@@ -1659,7 +1690,7 @@ endfunc
 " asyncrun - version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.4.5'
+	return '2.4.6'
 endfunc
 
 
