@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/18 22:25
-" Verision: 1.5.3
+" Last Modified: 2020/02/18 23:18
+" Verision: 1.5.4
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1168,6 +1168,7 @@ let s:macros = {
 	\ 'WSL_RELDIR': '(WSL) File path relativize to current directory',
 	\ 'WSL_RELNAME': '(WSL) File name relativize to current directory',
 	\ 'WSL_ROOT': '(WSL) Project root directory',
+	\ 'WSL_CFILE': '(WSL) Current filename under cursor',
 	\ }
 
 
