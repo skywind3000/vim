@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/18 14:09
-" Verision: 1.5.1
+" Last Modified: 2020/02/18 19:41
+" Verision: 1.5.2
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -55,6 +55,11 @@ endif
 " config by vimrc
 if !exists('g:asynctasks_tasks')
 	let g:asynctasks_tasks = {}
+endif
+
+" task environment variables
+if !exists('g:asynctasks_environ')
+	let g:asynctasks_environ = {}
 endif
 
 " terminal mode: tab/curwin/top/bottom/left/right/quickfix/external
@@ -288,6 +293,24 @@ function! s:abspath(path)
 		endif
 	endif
 	return f
+endfunc
+
+
+" extract: [cmd, options]
+function! s:ExtractOpt(command)
+	let cmd = a:command
+	let opts = {}
+	while cmd =~# '^-\%(\w\+\)\%([= ]\|$\)'
+		let opt = matchstr(cmd, '^-\zs\w\+')
+		if cmd =~ '^-\w\+='
+			let val = matchstr(cmd, '^-\w\+=\zs\%(\\.\|\S\)*')
+		else
+			let val = (opt == 'cwd')? '' : 1
+		endif
+		let opts[opt] = substitute(val, '\\\(\s\)', '\1', 'g')
+		let cmd = substitute(cmd, '^-\w\+\%(=\%(\\.\|\S\)*\)\=\s*', '', '')
+	endwhile
+	return [cmd, opts]
 endfunc
 
 
@@ -866,7 +889,7 @@ endfunc
 "----------------------------------------------------------------------
 " run task
 "----------------------------------------------------------------------
-function! asynctasks#start(bang, taskname, path)
+function! asynctasks#start(bang, taskname, path, ...)
 	let path = (a:path == '')? expand('%:p') : a:path
 	let path = (path == '')? getcwd() : path
 	if asynctasks#collect_config(path, 1) != 0
@@ -917,7 +940,11 @@ function! asynctasks#start(bang, taskname, path)
 	if opts.mode == 'bang' || opts.mode == 2
 		" let g:asyncrun_skip = or(g:asyncrun_skip, 2)
 	endif
-	call asyncrun#run(a:bang, opts, command)
+	if a:0 < 3 || (a:0 >= 3 && a:1 <= 0)
+		call asyncrun#run(a:bang, opts, command)
+	else
+		call asyncrun#run(a:bang, opts, command, a:1, a:2, a:3)
+	endif
 	let g:asyncrun_skip = skip
 	return 0
 endfunc
@@ -1162,13 +1189,14 @@ endfunc
 "----------------------------------------------------------------------
 " command AsyncTask
 "----------------------------------------------------------------------
-function! asynctasks#cmd(bang, ...)
-	let taskname = (a:0 >= 1)? (a:1) : ''
-	let path = (a:0 >= 2)? (a:2) : ''
-	if taskname == ''
+function! asynctasks#cmd(bang, args, ...)
+	let args = s:strip(a:args)
+	let path = ''
+	if args == ''
 		call s:errmsg('require task name, use :AsyncTask -h for help')
 		return -1
-	elseif taskname == '-h'
+	endif
+	if args == '-h'
 		echo 'usage:  :AsyncTask <operation>'
 		echo 'operations:'
 		echo '    :AsyncTask {taskname}      - run specific task'
@@ -1179,20 +1207,23 @@ function! asynctasks#cmd(bang, ...)
 		echo '    :AsyncTask -m              - display command macros'
 		echo '    :AsyncTask -p <profile>    - switch current profile'
 		return 0
-	elseif taskname ==# '-l'
+	elseif args ==# '-l'
 		call s:task_list('', 0)
 		return 0
-	elseif taskname ==# '-L'
+	elseif args ==# '-L'
 		call s:task_list('', 1)
 		return 0
-	elseif taskname ==# '-e' || taskname ==# '-E'
-		call s:task_edit(taskname, path)
+	elseif args ==# '-e' || args ==# '-E'
+		call s:task_edit(args, path)
 		return 0
-	elseif taskname == '-m'
+	elseif args == '-m'
 		call s:task_macro()
 		return 0
-	elseif taskname == '-p'
-		let profile = (a:0 >= 2)? (a:2) : ''
+	endif
+	let [args, opts] = s:ExtractOpt(args)
+	let args = s:strip(args)
+	if has_key(opts, 'p')
+		let profile = args
 		if profile != ''
 			let g:asynctasks_profile = profile
 		endif
@@ -1201,7 +1232,15 @@ function! asynctasks#cmd(bang, ...)
 		echohl None
 		return 0
 	endif
-	call asynctasks#start(a:bang, taskname, '')
+	if args == ''
+		call s:errmsg('require task name, use :AsyncTask -h for help')
+		return -1
+	endif
+	if (a:0 < 3) || (a:0 >= 3 && a:1 <= 0)
+		call asynctasks#start(a:bang, args, '')
+	else
+		call asynctasks#start(a:bang, args, '', a:1, a:2, a:3)
+	endif
 endfunc
 
 
@@ -1209,8 +1248,8 @@ endfunc
 " command
 "----------------------------------------------------------------------
 
-command! -bang -nargs=* AsyncTask
-			\ call asynctasks#cmd('<bang>', <f-args>)
+command! -bang -nargs=* -range=0 AsyncTask
+		\ call asynctasks#cmd('<bang>', <q-args>, <count>, <line1>, <line2>)
 
 
 "----------------------------------------------------------------------
