@@ -1626,7 +1626,9 @@ function! asyncrun#run(bang, opts, args, ...)
 	for [l:key, l:val] in items(l:macros)
 		let l:replace = (l:key[0] != '<')? '$('.l:key.')' : l:key
 		if l:key[0] != '<'
-			exec 'let $'.l:key.' = l:val'
+			if strpart(l:key, 0, 4) != 'WSL_'
+				exec 'let $'.l:key.' = l:val'
+			endif
 		endif
 		let l:command = s:StringReplace(l:command, l:replace, l:val)
 		let l:opts.text = s:StringReplace(l:opts.text, l:replace, l:val)
