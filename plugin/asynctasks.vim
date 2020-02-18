@@ -104,9 +104,9 @@ endif
 
 " increase asyncrun speed
 if exists('g:asyncrun_timer') == 0
-	let g:asyncrun_timer = 50
-elseif g:asyncrun_timer < 50
-	let g:asyncrun_timer = 50
+	let g:asyncrun_timer = 100
+elseif g:asyncrun_timer < 100
+	let g:asyncrun_timer = 100
 endif
 
 
@@ -726,6 +726,38 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" internal environment replace
+"----------------------------------------------------------------------
+function! s:command_environ(command)
+	let command = a:command
+	let mark_open = '$(VIM:'
+	let mark_close = ')'
+	let size_open = strlen(mark_open)
+	let size_close = strlen(mark_close)
+	while 1
+		let p1 = stridx(command, mark_open)
+		if p1 < 0
+			break
+		endif
+		let p2 = stridx(command, mark_close, p1)
+		if p2 < 0
+			break
+		endif
+		let name = strpart(command, p1 + size_open, p2 - p1 - size_open)
+		let mark = mark_open . name . mark_close
+		let key = s:strip(name)
+		if has_key(g:asynctasks_environ, key) == 0
+			call s:warning('Internal Variable "' . mark . '" is undefined')
+			return ''
+		endif
+		let t = g:asynctasks_environ[key]
+		let command = s:replace(command, mark, t)
+	endwhile
+	return command
+endfunc
+
+
+"----------------------------------------------------------------------
 " format parameter
 "----------------------------------------------------------------------
 function! s:task_option(task)
@@ -933,6 +965,10 @@ function! asynctasks#start(bang, taskname, path, ...)
 		redraw
 		echo ""
 		redraw
+		return 0
+	endif
+	let command = s:command_environ(command)
+	if command == ''
 		return 0
 	endif
 	let opts = s:task_option(task)
