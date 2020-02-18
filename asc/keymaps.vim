@@ -70,6 +70,10 @@ noremap <silent><space>ha :GuiSignRemove
 noremap <space>p viw"0p
 noremap <space>y yiw
 
+" fast save
+noremap <C-S> :w<cr>
+inoremap <C-S> <ESC>:w<cr>
+
 
 "----------------------------------------------------------------------
 " space + e : vim control
@@ -133,8 +137,6 @@ if has('gui_running') || (has('nvim') && (has('win32') || has('win64')))
 	inoremap <silent><A-o> <ESC>:call Open_Browse(2)<cr>
 	noremap <S-cr> o<ESC>
 	noremap <c-cr> O<esc>
-	noremap <C-S> :w<cr>
-	inoremap <C-S> <ESC>:w<cr>
 	noremap <M-Left> :call Tab_MoveLeft()<cr>
 	noremap <M-Right> :call Tab_MoveRight()<cr>
 	inoremap <M-Left> <ESC>:call Tab_MoveLeft()<cr>
