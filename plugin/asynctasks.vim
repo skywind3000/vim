@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/18 13:56
-" Verision: 1.5.0
+" Last Modified: 2020/02/18 14:09
+" Verision: 1.5.1
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -90,6 +90,18 @@ endif
 " strict to detect $(VIM_CWORD) to avoid empty string
 if !exists('g:asynctasks_strict')
 	let g:asynctasks_strict = 1
+endif
+
+
+"----------------------------------------------------------------------
+" tuning
+"----------------------------------------------------------------------
+
+" increase asyncrun speed
+if exists('g:asyncrun_timer') == 0
+	let g:asyncrun_timer = 50
+elseif g:asyncrun_timer < 50
+	let g:asyncrun_timer = 50
 endif
 
 
