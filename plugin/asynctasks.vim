@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/18 23:18
-" Verision: 1.5.4
+" Last Modified: 2020/02/19 02:46
+" Verision: 1.5.5
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -60,6 +60,11 @@ endif
 " task environment variables
 if !exists('g:asynctasks_environ')
 	let g:asynctasks_environ = {}
+endif
+
+" features
+if !exists('g:asynctasks_feature')
+	let g:asynctasks_feature = {}
 endif
 
 " terminal mode: tab/curwin/top/bottom/left/right/quickfix/external
@@ -377,12 +382,39 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" split 'text:colon/slash' into: [text, colon, slash]
+"----------------------------------------------------------------------
+function! s:trinity_split(text)
+	let text = a:text
+	let p1 = stridx(text, ':')
+	let p2 = stridx(text, '/')
+	if p1 < 0 && p2 < 0
+		return [text, '', '']
+	endif
+	let parts = split(text, '[:/]')
+	if p1 >= 0 && p2 >= 0
+		if p1 < p2
+			return [parts[0], parts[1], parts[2]]
+		else
+			return [parts[0], parts[2], parts[1]]
+		endif
+	elseif p1 >= 0 && p2 < 0
+		return [parts[0], parts[1], '']
+	elseif p1 < 0 && p2 >= 0
+		return [parts[0], '', parts[1]]
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " merge two tasks
 "----------------------------------------------------------------------
 function! s:config_merge(target, source, ininame, mode)
 	let special = []
 	for key in keys(a:source)
 		if stridx(key, ':') >= 0
+			let special += [key]
+		elseif stridx(key, '/') >= 0
 			let special += [key]
 		elseif key != '*'
 			let a:target[key] = a:source[key]
@@ -396,19 +428,27 @@ function! s:config_merge(target, source, ininame, mode)
 		endif
 	endfor
 	for key in special
-		let parts = s:partition(key, ':')
+		let parts = s:trinity_split(key)
+		let name = parts[0]
 		if parts[1] != ''
-			let profile = s:strip(parts[2])
-			if profile == g:asynctasks_profile
-				let name = s:strip(parts[0])
-				let a:target[name] = a:source[key]
-				if a:ininame != ''
-					let a:target[name].__name__ = a:ininame
-				endif
-				if a:mode != ''
-					let a:target[name].__mode__ = a:mode
-				endif
+			let profile = parts[1]
+			if profile != g:asynctasks_profile
+				continue
 			endif
+		endif
+		if parts[2] != ''
+			let feature = get(g:asynctasks_feature, parts[2], 0)
+			if feature == 0
+				continue
+			endif
+		endif
+		let name = s:strip(parts[0])
+		let a:target[name] = a:source[key]
+		if a:ininame != ''
+			let a:target[name].__name__ = a:ininame
+		endif
+		if a:mode != ''
+			let a:target[name].__mode__ = a:mode
 		endif
 	endfor
 	return a:target
@@ -617,31 +657,6 @@ function! s:print_table(rows, highmap)
 		let index += 1
 	endfor
 	echohl None
-endfunc
-
-
-"----------------------------------------------------------------------
-" split command into: [command, fts, condition]
-"----------------------------------------------------------------------
-function! s:trinity_split(text)
-	let text = a:text
-	let p1 = stridx(text, ':')
-	let p2 = stridx(text, '/')
-	if p1 < 0 && p2 < 0
-		return [text, '', '']
-	endif
-	let parts = split(text, '[:/]')
-	if p1 >= 0 && p2 >= 0
-		if p1 < p2
-			return [parts[0], parts[1], parts[2]]
-		else
-			return [parts[0], parts[2], parts[1]]
-		endif
-	elseif p1 >= 0 && p2 < 0
-		return [parts[0], parts[1], '']
-	elseif p1 < 0 && p2 >= 0
-		return [parts[0], '', parts[1]]
-	endif
 endfunc
 
 
