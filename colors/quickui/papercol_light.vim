@@ -8,3 +8,4 @@ hi! QuickDefaultHelp ctermfg=247 guifg=#959173
 " hi! QuickDefaultBorder ctermfg=31 ctermbg=252 guifg=#0087af guibg=#d0d0d0
 " hi! QuickDefaultBorder ctermfg=31 ctermbg=252 guifg=#222222 guibg=#d0d0d0
 hi! QuickDefaultBorder ctermfg=24 ctermbg=252 guifg=#005f87 guibg=#d0d0d0
+" hi! QuickDefaultBorder ctermfg=24 ctermbg=252 guifg=#d70087 guibg=#d0d0d0
