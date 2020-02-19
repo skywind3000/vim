@@ -57,9 +57,86 @@ PALETTE = [
 ]
 
 
+
+#----------------------------------------------------------------------
+# extract color tuple
+#----------------------------------------------------------------------
+def color_extract(rgb):
+    if isinstance(rgb, str):
+        if rgb.startswith('#'):
+            ic = int(rgb[1:], 16)
+        else:
+            return (0, 0, 0)
+    elif isinstance(rgb, int):
+        ic = rgb
+    elif isinstance(rgb, tuple) or isinstance(rgb, list):
+        return tuple(rgb[:3])
+    else:
+        return (0, 0, 0)
+    r = (ic >> 16) & 0xff
+    g = (ic >> 8) & 0xff
+    b = (ic >> 0) & 0xff
+    return (r, g, b)
+
+
 #----------------------------------------------------------------------
 # color fit
 #----------------------------------------------------------------------
+def color_fit(color):
+    r, g, b = color_extract(color)
+    nearest_index = -1
+    nearest_dist = 0xff * 0xff * 64 * 4
+    for index in range(256):
+        color = PALETTE[index]
+        G = (color >> 8) & 0xff
+        dist = (((g - G) * 59) ** 2) 
+        if dist >= nearest_dist:
+            continue
+        R = (color >> 16) & 0xff
+        dist += (((r - R) * 30) ** 2)
+        if dist >= nearest_dist:
+            continue
+        B = (color >> 0) & 0xff
+        dist += (((b - B) * 11) ** 2)
+        if dist < nearest_dist:
+            nearest_dist = dist
+            nearest_index = index
+    return nearest_index
+
+
+#----------------------------------------------------------------------
+# main
+#----------------------------------------------------------------------
+def main(args = None):
+    args = (args is not None) and args or sys.argv
+    if len(args) < 2:
+        name = os.path.split(__file__)[1]
+        print('usage: python {} <color>'.format(name))
+        return 0
+    color = args[1].strip()
+    if color.startswith('#'):
+        index = color_fit(color)
+    else:
+        try:
+            index = int(color)
+        except:
+            index = -1
+    if index < 0 or index > 255:
+        print('color error')
+        return 1
+    linux = (sys.platform[:3] != 'win')
+    if sys.stdout.isatty() and linux:
+        sys.stdout.write('\x1b[0m')
+    name = '#' + hex(PALETTE[index])[2:]
+    sys.stdout.write('[{}]: {} '.format(index, name))
+    if sys.stdout.isatty() and linux:
+        sys.stdout.write('\x1b[38;5;{}m'.format(index)) 
+        sys.stdout.write(' TEST')
+        # printf "\x1b[38;5;${i}mcolour%-5i\x1b[0m" $i 
+    if sys.stdout.isatty() and linux:
+        sys.stdout.write('\x1b[0m')
+    sys.stdout.write('\n')
+    return 0
 
 
 #----------------------------------------------------------------------
@@ -68,7 +145,11 @@ PALETTE = [
 if __name__ == '__main__':
     def test1():
         print(len(PALETTE))
+        print(color_fit(0xff00ff))
         return 0
-
-    test1()
+    def test2():
+        args = ['', '#ff00ff']
+        main(args)
+    # test2()
+    main()
 
