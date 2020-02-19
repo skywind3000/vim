@@ -11,3 +11,5 @@ tags
 *.exe
 *.wav
 *.pyc
+.tasks
+tools/scratch
