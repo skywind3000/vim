@@ -71,6 +71,11 @@ def color_extract(rgb):
         ic = rgb
     elif isinstance(rgb, tuple) or isinstance(rgb, list):
         return tuple(rgb[:3])
+    elif sys.version_info[0] < 3:
+        if isinstance(rgb, unicode):  # noqa: F821
+            ic = int(rgb[1:], 16)
+        else:
+            return (0, 0, 0)
     else:
         return (0, 0, 0)
     r = (ic >> 16) & 0xff
@@ -116,6 +121,8 @@ def main(args = None):
     color = args[1].strip()
     if color.startswith('#'):
         index = color_fit(color)
+    elif len(color) == 6:
+        index = color_fit('#' + color)
     else:
         try:
             index = int(color)
@@ -148,7 +155,7 @@ if __name__ == '__main__':
         print(color_fit(0xff00ff))
         return 0
     def test2():
-        args = ['', '#ff00ff']
+        args = ['', '00ff00']
         main(args)
     # test2()
     main()
