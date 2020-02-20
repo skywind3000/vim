@@ -574,14 +574,6 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" 
-"----------------------------------------------------------------------
-function! TagFind(tagname)
-	return s:signature(a:tagname, 0, &ft)
-endfunc
-
-
-"----------------------------------------------------------------------
 " find tags
 "----------------------------------------------------------------------
 function! s:FindTags(bang, tagname, ...)
@@ -632,6 +624,7 @@ function! s:FindTags(bang, tagname, ...)
 	return 1
 endfunc
 
+
 "----------------------------------------------------------------------
 " setup keymaps
 "----------------------------------------------------------------------
@@ -658,15 +651,15 @@ nnoremap <silent> <expr> <Plug>GscopeFindAssign     <SID>FindCwordCmd('GscopeFin
 nnoremap <silent> <expr> <Plug>GscopeFindCtag       <SID>FindCwordCmd('GscopeFind z', 0)
 
 if get(g:, 'gutentags_plus_nomap', 0) == 0
-	noremap <silent> <leader>cs <Plug>GscopeFindSymbol
-	noremap <silent> <leader>cg <Plug>GscopeFindDefinition
-	noremap <silent> <leader>cc <Plug>GscopeFindCallingFunc
-	noremap <silent> <leader>ct <Plug>GscopeFindText
-	noremap <silent> <leader>ce <Plug>GscopeFindEgrep
-	noremap <silent> <leader>cf <Plug>GscopeFindFile
-	noremap <silent> <leader>ci <Plug>GscopeFindInclude
-	noremap <silent> <leader>cd <Plug>GscopeFindCalledFunc
-	noremap <silent> <leader>ca <Plug>GscopeFindAssign
-	noremap <silent> <leader>cz <Plug>GscopeFindCtag
-	noremap <silent> <leader>ck :GscopeKill<cr>
+	nmap <silent> <leader>cs <Plug>GscopeFindSymbol
+	nmap <silent> <leader>cg <Plug>GscopeFindDefinition
+	nmap <silent> <leader>cc <Plug>GscopeFindCallingFunc
+	nmap <silent> <leader>ct <Plug>GscopeFindText
+	nmap <silent> <leader>ce <Plug>GscopeFindEgrep
+	nmap <silent> <leader>cf <Plug>GscopeFindFile
+	nmap <silent> <leader>ci <Plug>GscopeFindInclude
+	nmap <silent> <leader>cd <Plug>GscopeFindCalledFunc
+	nmap <silent> <leader>ca <Plug>GscopeFindAssign
+	nmap <silent> <leader>cz <Plug>GscopeFindCtag
+	nmap <silent> <leader>ck :GscopeKill<cr>
 endif
