@@ -20,6 +20,8 @@ call quickui#menu#install("&File", [
 			\ [ "LeaderF &File", 'Leaderf file', 'Open file with leaderf'],
 			\ [ "LeaderF &Mru", 'Leaderf mru --regexMode', 'Open recently accessed files'],
 			\ [ "LeaderF &Buffer", 'Leaderf buffer', 'List current buffers in leaderf'],
+			\ [ "--", ],
+			\ [ "J&unk File", 'JunkFile', ''],
 			\ ])
 
 if has('win32') || has('win64') || has('win16')
@@ -157,7 +159,7 @@ call quickui#menu#install('Help (&?)', [
 			\ ['&Dash Help', 'call asclib#utils#dash_ft(&ft, expand("<cword>"))'],
 			\ ], 10000)
 
-let g:quickui_show_tip = 1
+" let g:quickui_show_tip = 1
 
 
 "----------------------------------------------------------------------
@@ -193,4 +195,5 @@ nnoremap <silent>K :call quickui#tools#clever_context('k', g:context_menu_k, {})
 if has('gui_running') || has('nvim')
 	noremap <c-f10> :call MenuHelp_TaskList()<cr>
 endif
+
 

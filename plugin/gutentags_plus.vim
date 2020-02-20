@@ -632,23 +632,41 @@ function! s:FindTags(bang, tagname, ...)
 	return 1
 endfunc
 
-
 "----------------------------------------------------------------------
 " setup keymaps
 "----------------------------------------------------------------------
+func! s:FindCwordCmd(cmd, is_file)
+    let cmd = ":\<C-U>" . a:cmd
+    if a:is_file == 1
+        let cmd .= " " . expand('<cfile>')
+    else
+        let cmd .= " " . expand('<cword>')
+    endif
+    let cmd .= "\<CR>"
+    return cmd
+endf
+
+nnoremap <silent> <expr> <Plug>GscopeFindSymbol     <SID>FindCwordCmd('GscopeFind s', 0)
+nnoremap <silent> <expr> <Plug>GscopeFindDefinition <SID>FindCwordCmd('GscopeFind g', 0)
+nnoremap <silent> <expr> <Plug>GscopeFindCalledFunc <SID>FindCwordCmd('GscopeFind d', 0)
+nnoremap <silent> <expr> <Plug>GscopeFindCallingFunc <SID>FindCwordCmd('GscopeFind c', 0)
+nnoremap <silent> <expr> <Plug>GscopeFindText       <SID>FindCwordCmd('GscopeFind t', 0)
+nnoremap <silent> <expr> <Plug>GscopeFindEgrep      <SID>FindCwordCmd('GscopeFind e', 0)
+nnoremap <silent> <expr> <Plug>GscopeFindFile       <SID>FindCwordCmd('GscopeFind f', 1)
+nnoremap <silent> <expr> <Plug>GscopeFindInclude    <SID>FindCwordCmd('GscopeFind i', 1)
+nnoremap <silent> <expr> <Plug>GscopeFindAssign     <SID>FindCwordCmd('GscopeFind a', 0)
+nnoremap <silent> <expr> <Plug>GscopeFindCtag       <SID>FindCwordCmd('GscopeFind z', 0)
+
 if get(g:, 'gutentags_plus_nomap', 0) == 0
-	noremap <silent> <leader>cs :GscopeFind s <C-R><C-W><cr>
-	noremap <silent> <leader>cg :GscopeFind g <C-R><C-W><cr>
-	noremap <silent> <leader>cc :GscopeFind c <C-R><C-W><cr>
-	noremap <silent> <leader>ct :GscopeFind t <C-R><C-W><cr>
-	noremap <silent> <leader>ce :GscopeFind e <C-R><C-W><cr>
-	noremap <silent> <leader>cf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
-	noremap <silent> <leader>ci :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
-	noremap <silent> <leader>cd :GscopeFind d <C-R><C-W><cr>
-	noremap <silent> <leader>ca :GscopeFind a <C-R><C-W><cr>
-	noremap <silent> <leader>cz :GscopeFind z <C-R><C-W><cr>
+	noremap <silent> <leader>cs <Plug>GscopeFindSymbol
+	noremap <silent> <leader>cg <Plug>GscopeFindDefinition
+	noremap <silent> <leader>cc <Plug>GscopeFindCallingFunc
+	noremap <silent> <leader>ct <Plug>GscopeFindText
+	noremap <silent> <leader>ce <Plug>GscopeFindEgrep
+	noremap <silent> <leader>cf <Plug>GscopeFindFile
+	noremap <silent> <leader>ci <Plug>GscopeFindInclude
+	noremap <silent> <leader>cd <Plug>GscopeFindCalledFunc
+	noremap <silent> <leader>ca <Plug>GscopeFindAssign
+	noremap <silent> <leader>cz <Plug>GscopeFindCtag
 	noremap <silent> <leader>ck :GscopeKill<cr>
 endif
-
-
-
