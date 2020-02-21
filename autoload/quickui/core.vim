@@ -235,8 +235,8 @@ function! quickui#core#object(bid)
 	endif
 	let obj = getbufvar(bid, name)
 	if type(obj) != v:t_dict
-		call setbufvar(a:bid, name, {})
-		let obj = getbufvar(a:bid, name)
+		call setbufvar(bid, name, {})
+		let obj = getbufvar(bid, name)
 	endif
 	return obj
 endfunc
