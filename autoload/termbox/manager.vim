@@ -116,6 +116,48 @@ function! termbox#manager#prev()
 endfunc
 
 
+"----------------------------------------------------------------------
+" get active
+"----------------------------------------------------------------------
+function! termbox#manager#cursor()
+	return s:active
+endfunc
+
+
+"----------------------------------------------------------------------
+" active index
+"----------------------------------------------------------------------
+function! termbox#manager#active(i)
+	let size = len(s:term_list)
+	if i >= 0 && i < size
+		let s:active = i
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" get size
+"----------------------------------------------------------------------
+function! termbox#manager#term_size(a:opts)
+	let ww = get(g:, 'termbox_w', 0.6)
+	let hh = get(g:, 'termbox_h', 0.6)
+	let ww = get(a:opts, 'w', ww)
+	let hh = get(a:opts, 'h', hh)
+	if type(ww) == v:t_float && ww <= 1
+		let w = float2nr(&columns * ww)
+	else
+		let w = float2nr(ww)
+	endif
+	if type(hh) == v:t_float && hh <= 1
+		let h = float2nr(&lines * hh)
+	else
+		let h = float2nr(hh)
+	endif
+	return [w, h]
+endfunc
+
+
+
 
 "----------------------------------------------------------------------
 " testing suit
