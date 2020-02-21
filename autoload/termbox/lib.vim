@@ -95,3 +95,26 @@ endfunc
 
 
 
+"----------------------------------------------------------------------
+" error msg
+"----------------------------------------------------------------------
+function! termbox#lib#errmsg(what)
+	redraw
+	echohl ErrorMsg
+	echom 'Error: ' .a:what
+	echohl None
+endfunc
+
+
+"----------------------------------------------------------------------
+" warning
+"----------------------------------------------------------------------
+function! termbox#lib#warning(what)
+	redraw
+	echohl ErrorMsg
+	echom 'Warning: ' .a:what
+	echohl None
+endfunc
+
+
+
