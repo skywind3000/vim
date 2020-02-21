@@ -18,14 +18,10 @@ function! termbox#term#buf_new(cmd, opts)
 		let opts.term_kill = get(g:, 'termbox_kill', 'term')
 		let opts.norestore = 1
 		let opts.exit_cb = function('s:term_exit_vim')
-		let savedir = getcwd()
 		if has_key(a:opts, 'cwd')
-			call termbox#lib#chdir(a:opts.cwd)
+			let opts.cwd = a:opts.cwd
 		endif
 		let bid = term_start(a:cmd, opts)
-		if has_key(a:opts, 'cwd')
-			call termbox#lib#chdir(savedir)
-		endif
 	else
 		let bid = nvim_create_buf(v:false, v:true)
 	endif
