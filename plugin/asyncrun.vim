@@ -1378,7 +1378,7 @@ function! s:run(opts)
 	let t = s:StringStrip(l:command)
 
 	if strpart(t, 0, 1) == ':'
-		exec t
+		exec strpart(t, 1)
 		return ''
 	elseif l:runner != ''
 		let F = g:asyncrun_runner[l:runner]
