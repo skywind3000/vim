@@ -12,22 +12,23 @@
 " internal status
 "----------------------------------------------------------------------
 let s:term_list = []
-let s:current = -1
+let s:active = -1
 
 
 "----------------------------------------------------------------------
-" get index
+" get bid by index
 "----------------------------------------------------------------------
 function! termbox#manager#get(index)
-	if a:index < 0 || a:index >= len(s:term_list)
+	if a:index >= 0 && a:index < len(s:term_list)
+		return s:term_list[a:index]
+	else
 		return -1
 	endif
-	return s:term_list[a:index]
 endfunc
 
 
 "----------------------------------------------------------------------
-" index bid
+" get index by bid
 "----------------------------------------------------------------------
 function! termbox#manager#index(bid)
 	let index = 0
@@ -43,17 +44,25 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" get list
+"----------------------------------------------------------------------
+function! termbox#manager#array()
+	return s:term_list
+endfunc
+
+
+"----------------------------------------------------------------------
 " new bid
 "----------------------------------------------------------------------
-function! termbox#manager#new(bid)
+function! termbox#manager#insert(bid)
 	let index = termbox#manager#index(a:bid)
 	if index >= 0
 		call termbox#lib#error('duplicated bid')
 		return v:null
 	endif
 	let s:term_list += [a:bid]
-	if s:current < 0
-		let s:current = 0
+	if s:active < 0
+		let s:active = 0
 	endif
 endfunc
 
@@ -73,8 +82,8 @@ function! termbox#manager#remove(bid)
 		endfor
 		let s:term_list = newlist
 	endif
-	if s:current >= len(s:term_list)
-		let s:current = len(s:term_list) - 1
+	if s:active >= len(s:term_list)
+		let s:active = len(s:term_list) - 1
 	endif
 endfunc
 
@@ -82,37 +91,51 @@ endfunc
 "----------------------------------------------------------------------
 " next item
 "----------------------------------------------------------------------
-function! termbox#manager#next(bid)
-	let index = termbox#manager#index(a:bid)
+function! termbox#manager#next()
 	let size = len(s:term_list)
-	if index < 0
-		return -1
-	elseif index  + 1 < size
-		return s:item_list[index + 1]
-	elseif size > 0
-		return s:item_list[0]	
+	if size == 0
+		let s:active = -1
 	else
-		return -1
+		let s:active = (s:active + 1 < size)? (s:active + 1) : 0
 	endif
+	return s:active
 endfunc
 
 
 "----------------------------------------------------------------------
 " prev item
 "----------------------------------------------------------------------
-function! termbox#manager#prev(bid)
-	let index = termbox#manager#index(a:bid)
+function! termbox#manager#prev()
 	let size = len(s:term_list)
-	if index < 0
-		return -1
-	elseif index > 0
-		return s:item_list[index - 1]
-	elseif size > 0
-		return s:item_list[size - 1]	
+	if size == 0
+		let s:active = -1
 	else
-		return -1
+		let s:active = (s:active > 0)? (s:active - 1) : (size - 1)
 	endif
+	return s:active
 endfunc
 
+
+
+"----------------------------------------------------------------------
+" testing suit
+"----------------------------------------------------------------------
+if 0
+	let x = termbox#manager#prev()
+	call termbox#manager#insert(10)
+	call termbox#manager#insert(11)
+	call termbox#manager#insert(20)
+	call termbox#manager#insert(50)
+	call termbox#manager#insert(40)
+	echo termbox#manager#array()
+	call termbox#manager#remove(11)
+	echo termbox#manager#array()
+	call termbox#manager#insert(11)
+	echo termbox#manager#array()
+	echo s:active
+	for i in range(20)
+		echo termbox#manager#next()
+	endfor
+endif
 
 
