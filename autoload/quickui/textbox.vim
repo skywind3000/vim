@@ -205,9 +205,9 @@ endfunc
 "----------------------------------------------------------------------
 function! s:nvim_create_textbox(textlist, opts)
 	if type(a:textlist) == v:t_list
-		let bid = quickui#core#named_buffer('textbox', a:textlist)
+		let bid = quickui#core#scratch_buffer('textbox', a:textlist)
 	elseif type(a:textlist) == v:t_string
-		let bid = quickui#core#named_buffer('textbox', [a:textlist])
+		let bid = quickui#core#scratch_buffer('textbox', [a:textlist])
 	elseif type(a:textlist) == v:t_number
 		let bid = a:textlist
 	endif
@@ -236,7 +236,7 @@ function! s:nvim_create_textbox(textlist, opts)
 		let w = opts.w
 		let h = opts.h
 		let back = quickui#utils#make_border(w, h, border, title, button)
-		let nbid = quickui#core#named_buffer('textboxborder', back)
+		let nbid = quickui#core#scratch_buffer('textboxborder', back)
 		let op = {'relative':'editor', 'focusable':1, 'style':'minimal'}
 		let op.width = opts.w + 2
 		let op.height = opts.h + 2

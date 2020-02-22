@@ -338,7 +338,7 @@ endfunc
 "----------------------------------------------------------------------
 " get a named buffer
 "----------------------------------------------------------------------
-function! quickui#core#named_buffer(name, textlist)
+function! quickui#core#scratch_buffer(name, textlist)
 	if !exists('s:buffer_cache')
 		let s:buffer_cache = {}
 	endif
