@@ -344,15 +344,20 @@ function! quickui#core#named_buffer(name, textlist)
 	endif
 	let bid = get(s:buffer_cache, a:name, -1)
 	if bid < 0
-		let bid = bufadd()
-		call setbufvar(bid, '&buflisted', 0)
+		if g:quickui#core#has_nvim == 0
+			let bid = bufadd('')
+			call bufload(bid)
+			call setbufvar(bid, '&buflisted', 0)
+			call setbufvar(bid, '&bufhidden', 'hide')
+		else
+			let bid = nvim_create_buf(v:false, v:true)
+		endif
 		let s:buffer_cache[a:name] = bid
 	endif
 	call setbufvar(bid, '&modifiable', 1)
 	call deletebufline(bid, 1, '$')
-	if type(a:textlist) != v:t_none
-		call setbufline(bid, 1, a:textlist)
-	endif
+	call setbufline(bid, 1, a:textlist)
+	call setbufvar(bid, '&modified', 0)
 	call setbufvar(bid, 'current_syntax', '')
 	call setbufvar(bid, '&filetype', '')
 	return bid
