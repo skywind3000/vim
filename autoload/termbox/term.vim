@@ -38,7 +38,6 @@ function! termbox#term#buf_new(cmd, opts)
 	let obj.h = h
 	let obj.init = 0
 	let obj.winid = -1
-	call termbox#manager#insert(bid)
 	return bid
 endfunc
 
@@ -71,6 +70,8 @@ function! termbox#term#buf_init(bid)
 			return -3
 		endtry
 	endif
+	call termbox#manager#insert(obj.bid)
 	let obj.init = 1
 	return 0
 endfunc
+

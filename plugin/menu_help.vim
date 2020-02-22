@@ -65,7 +65,7 @@ function! MenuHelp_Proxy(enable)
 endfunc
 
 function! MenuHelp_TaskList()
-	let keymaps = '123456789abcdefimnopqrstuvwxyz'
+	let keymaps = '123456789abcdefimopqrstuvwxyz'
 	let items = asynctasks#list('')
 	let rows = []
 	let size = strlen(keymaps)
