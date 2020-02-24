@@ -199,7 +199,7 @@ endfunction
 command! -nargs=0 JunkList call s:open_junk_list()
 function! s:open_junk_list()
 	let junk_dir = get(g:, 'asc_junk', '~/.vim/junk')
-	let junk_dir = expand(junk_dir) . strftime('/%Y/%m')
+	" let junk_dir = expand(junk_dir) . strftime('/%Y/%m')
 	let junk_dir = tr(junk_dir, '\', '/')
 	exec "Leaderf file " . fnameescape(junk_dir)
 endfunction
