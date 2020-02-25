@@ -432,7 +432,9 @@ function! s:config_merge(target, source, ininame, mode)
 	endfor
 	for key in special
 		let parts = s:trinity_split(key)
-		let name = parts[0]
+		let name = s:strip(parts[0])
+		let parts[1] = s:strip(parts[1])
+		let parts[2] = s:strip(parts[2])
 		if parts[1] != ''
 			let profile = parts[1]
 			if profile != g:asynctasks_profile
