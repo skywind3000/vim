@@ -188,7 +188,7 @@ class configure (object):
                 self.mark = mark
         mark = [ n.strip() for n in self.mark.split(',') ]
         self.root = self.find_root(self.home, mark, True)
-        self.task = {}
+        self.tasks = {}
         self.feature = {}
         self.environ = {}
         self._load_config()
@@ -226,7 +226,7 @@ class configure (object):
                 test = os.path.join(base, marker)
                 if os.path.exists(test):
                     return base
-            if parent == base:
+            if os.path.normcase(parent) == os.path.normcase(base):
                 break
             base = parent
         if fallback:
@@ -328,7 +328,7 @@ class configure (object):
                 names.append(os.path.abspath(path))
         for name in names:
             obj = self.read_ini(name)
-            self.config_merge(self.task, obj, name, 'global')        
+            self.config_merge(self.tasks, obj, name, 'global')        
         return 0
 
     # search parent
@@ -338,7 +338,7 @@ class configure (object):
         while True:
             parent = os.path.normpath(os.path.join(path, '..'))
             output.append(path)
-            if path == parent:
+            if os.path.normcase(path) == os.path.normcase(parent):
                 break
             path = parent
         return output
@@ -351,16 +351,28 @@ class configure (object):
             if not os.path.exists(t):
                 continue
             obj = self.read_ini(t)
-            self.config_merge(self.task, obj, t, 'local')
+            self.config_merge(self.tasks, obj, t, 'local')
         return 0
 
     # merge global and local config
     def compose_config (self):
-        self.task = {}
+        self.tasks = {}
         self.collect_rtp_config()
         self.collect_local_config()
         return 0
         
+
+#----------------------------------------------------------------------
+# manager
+#----------------------------------------------------------------------
+class TaskManager (object):
+
+    def __init__ (self, path):
+        self.config = configure(path)
+
+    def task_run (self, name):
+        return 0
+
 
 #----------------------------------------------------------------------
 # testing suit
@@ -376,9 +388,12 @@ if __name__ == '__main__':
         print(c.trinity_split('command/win32'))
         print(c.trinity_split('command:vim'))
         print(c.trinity_split('command'))
-        pprint.pprint(c.task)
+        pprint.pprint(c.tasks)
         # print(c.search_parent('d:/acm/github/vim/autoload/quickui'))
         return 0
-
-    test1()
+    def test2():
+        tm = TaskManager('d:/acm/github/vim/autoload/quickui/generic.vim')
+        print(tm.config.root)
+        pprint.pprint(tm.config.tasks)
+    test2()
 
