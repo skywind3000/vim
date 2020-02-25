@@ -73,7 +73,10 @@ noremap <space>y yiw
 " fast save
 noremap <C-S> :w<cr>
 inoremap <C-S> <ESC>:w<cr>
-nnoremap Q :confirm qall<cr>
+
+if !has('gui_running')
+	nnoremap Q :confirm qall<cr>
+endif
 
 
 "----------------------------------------------------------------------
