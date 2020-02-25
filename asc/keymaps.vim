@@ -73,6 +73,7 @@ noremap <space>y yiw
 " fast save
 noremap <C-S> :w<cr>
 inoremap <C-S> <ESC>:w<cr>
+noremap Q :confirm qall<cr>
 
 
 "----------------------------------------------------------------------
