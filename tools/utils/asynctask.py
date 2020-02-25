@@ -192,6 +192,7 @@ class configure (object):
         self.feature = {}
         self.environ = {}
         self._load_config()
+        self.compose_config()
 
     def read_ini (self, ininame, codec = None):
         ininame = os.path.abspath(ininame)
@@ -221,12 +222,12 @@ class configure (object):
         base = path
         while True:
             parent = os.path.normpath(os.path.join(base, '..'))
-            if parent == base:
-                break
             for marker in markers:
                 test = os.path.join(base, marker)
                 if os.path.exists(test):
                     return base
+            if parent == base:
+                break
             base = parent
         if fallback:
             return path
@@ -309,24 +310,55 @@ class configure (object):
                 feature = self.feature.get(parts[2], False)
                 if not feature:
                     continue
-            target[name] = source[name]
+            target[name] = source[key]
             if ininame:
                 target[name]['__name__'] = ininame
             if mode:
                 target[name]['__mode__'] = mode
         return 0
 
+    # search for global configs
     def collect_rtp_config (self):
         names = []
         t = os.path.join(os.path.expanduser('~/.vim'), self.rtp_name)
         if os.path.exists(t):
-            names.append(t)
+            names.append(os.path.abspath(t))
         for path in self.extra_config:
             if os.path.exists(path):
                 names.append(os.path.abspath(path))
         for name in names:
             obj = self.read_ini(name)
             self.config_merge(self.task, obj, name, 'global')        
+        return 0
+
+    # search parent
+    def search_parent (self, path):
+        output = []
+        path = os.path.abspath(path)
+        while True:
+            parent = os.path.normpath(os.path.join(path, '..'))
+            output.append(path)
+            if path == parent:
+                break
+            path = parent
+        return output
+
+    # search for local configs
+    def collect_local_config (self):
+        names = self.search_parent(self.home)
+        for name in names:
+            t = os.path.abspath(os.path.join(name, self.cfg_name))
+            if not os.path.exists(t):
+                continue
+            obj = self.read_ini(t)
+            self.config_merge(self.task, obj, t, 'local')
+        return 0
+
+    # merge global and local config
+    def compose_config (self):
+        self.task = {}
+        self.collect_rtp_config()
+        self.collect_local_config()
         return 0
         
 
@@ -344,6 +376,8 @@ if __name__ == '__main__':
         print(c.trinity_split('command/win32'))
         print(c.trinity_split('command:vim'))
         print(c.trinity_split('command'))
+        pprint.pprint(c.task)
+        # print(c.search_parent('d:/acm/github/vim/autoload/quickui'))
         return 0
 
     test1()

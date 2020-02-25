@@ -1129,12 +1129,12 @@ class ShellUtils (object):
         base = path
         while True:
             parent = os.path.normpath(os.path.join(base, '..'))
-            if parent == base:
-                break
             for marker in markers:
                 test = os.path.join(base, marker)
                 if os.path.exists(test):
                     return base
+            if os.path.normcase(parent) == os.path.normcase(base):
+                break
             base = parent
         if fallback:
             return path
