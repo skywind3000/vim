@@ -163,6 +163,144 @@ class OBJECT (object):
 
 
 #----------------------------------------------------------------------
+# Terminal Output
+#----------------------------------------------------------------------
+class PrettyText (object):
+
+    def __init__ (self):
+        self.isatty = sys.stdout.isatty()
+        self.__init_win32()
+        self.names = self.__init_names()
+
+    def __init_win32 (self):
+        if sys.platform[:3] != 'win':
+            return -1
+        self.handle = None
+        try: import ctypes
+        except: return 0
+        kernel32 = ctypes.windll.LoadLibrary('kernel32.dll')
+        self.kernel32 = kernel32
+        GetStdHandle = kernel32.GetStdHandle
+        SetConsoleTextAttribute = kernel32.SetConsoleTextAttribute
+        GetStdHandle.argtypes = [ ctypes.c_uint32 ]
+        GetStdHandle.restype = ctypes.c_size_t
+        SetConsoleTextAttribute.argtypes = [ ctypes.c_size_t, ctypes.c_uint16 ]
+        SetConsoleTextAttribute.restype = ctypes.c_long
+        self.handle = GetStdHandle(0xfffffff5)
+        self.GetStdHandle = GetStdHandle
+        self.SetConsoleTextAttribute = SetConsoleTextAttribute
+        self.GetStdHandle = GetStdHandle
+        return 0
+
+    # init names
+    def __init_names (self):
+        ansi_names = ['black', 'red', 'green', 'yellow', 'blue', 'purple']
+        ansi_names += ['cyan', 'white']
+        names = {}
+        for i, name in enumerate(ansi_names):
+            names[name] = i
+            names[name.upper()] = i + 8
+        names['reset'] = -1
+        names['RESET'] = -1
+        return names
+
+    # set color
+    def set_color (self, color):
+        if not self.isatty:
+            return 0
+        if isinstance(color, str):
+            color = self.names.get(color, -1)
+        elif sys.version_info[0] < 3:
+            if isinstance(color, unicode):
+                color = self.names.get(color, -1)
+        if sys.platform[:3] == 'win':
+            if color < 0: color = 7
+            result = 0
+            if (color & 1): result |= 4
+            if (color & 2): result |= 2
+            if (color & 4): result |= 1
+            if (color & 8): result |= 8
+            if (color & 16): result |= 64
+            if (color & 32): result |= 32
+            if (color & 64): result |= 16
+            if (color & 128): result |= 128
+            self.SetConsoleTextAttribute(self.handle, result)
+        else:
+            if color >= 0:
+                foreground = color & 7
+                background = (color >> 4) & 7
+                bold = color & 8
+                t = bold and "01;" or ""
+                x = background
+                if background:
+                    sys.stdout.write("\033[%s3%d;4%dm"%(t, foreground, x))
+                else:
+                    sys.stdout.write("\033[%s3%dm"%(t, foreground))
+                sys.stdout.flush()
+            else:
+                sys.stdout.write("\033[0m")
+                sys.stdout.flush()
+        return 0
+
+    def echo (self, color, text):
+        self.set_color(color)
+        sys.stdout.write(text)
+        self.set_color(-1)
+        return 0
+
+    def print (self, color, text):
+        return self.echo(color, text + '\n')
+
+    def tabulify (self, rows):
+        colsize = {}
+        maxcol = 0
+        if not rows:
+            return -1
+        for row in rows:
+            maxcol = max(len(row), maxcol)
+            for col, item in enumerate(row):
+                if isinstance(item, list) or isinstance(item, tuple):
+                    text = str(item[1])
+                else:
+                    text = str(item)
+                size = len(text)
+                if col not in colsize:
+                    colsize[col] = size
+                else:
+                    colsize[col] = max(size, colsize[col])
+        if maxcol <= 0:
+            return ''
+        last_color = -100
+        for row in rows:
+            for col in range(maxcol):
+                csize = colsize[col]
+                color = -1
+                item = '' if (col >= len(row)) else row[col]
+                if isinstance(item, list) or isinstance(item, tuple):
+                    color = item[0]
+                    text = str(item[1])
+                else:
+                    text = str(item)
+                padding = 2 + csize - len(text)
+                pad1 = 1
+                pad2 = padding - pad1
+                output = (' ' * pad1) + text + (' ' * pad2)
+                if last_color != color:
+                    self.set_color(color)
+                    last_color = color
+                sys.stdout.write(output)
+            sys.stdout.write('\n')
+        self.set_color(-1)
+        return 0
+
+
+#----------------------------------------------------------------------
+# internal
+#----------------------------------------------------------------------
+pretty = PrettyText()
+
+
+#----------------------------------------------------------------------
 # configure
 #----------------------------------------------------------------------
 class configure (object):
@@ -392,8 +530,15 @@ if __name__ == '__main__':
         # print(c.search_parent('d:/acm/github/vim/autoload/quickui'))
         return 0
     def test2():
-        tm = TaskManager('d:/acm/github/vim/autoload/quickui/generic.vim')
+        # tm = TaskManager('d:/acm/github/vim/autoload/quickui/generic.vim')
+        tm = TaskManager('')
         print(tm.config.root)
         pprint.pprint(tm.config.tasks)
-    test2()
+    def test3():
+        pretty.print('cyan', 'hello')
+        # print('fuck you')
+        print('hahahah')
+        return 0
+    test3()
+
 
