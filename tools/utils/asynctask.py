@@ -202,23 +202,27 @@ def load_ini_file (ininame, codec = None):
                 pass
         if text is None:
             text = content.decode('utf-8', 'ignore')
-    if sys.version_info[0] < 3:
-        import StringIO
-        import ConfigParser
-        sio = StringIO.StringIO(text)
-        cp = ConfigParser.ConfigParser()
-        cp.readfp(sio)
-    else:
-        import configparser
-        cp = configparser.ConfigParser(interpolation = None,
-                strict = False)
-        cp.read_string(text)
     config = {}
-    for sect in cp.sections():
-        section = sect.strip()
-        config[section] = {}
-        for key, val in cp.items(sect):
-            config[section][key.strip()] = val.strip()
+    sect = 'default'
+    for line in text.split('\n'):
+        line = line.strip('\r\n\t ')
+        if not line:
+            continue
+        elif line[:1] in ('#', ';'):
+            continue
+        elif line.startswith('['):
+            if line.endswith(']'):
+                sect = line[1:-1].strip('\r\n\t ')
+                if sect not in config:
+                    config[sect] = {}
+        else:
+            pos = line.find('=')
+            if pos >= 0:
+                key = line[:pos].rstrip('\r\n\t ')
+                val = line[pos + 1:].lstrip('\r\n\t ')
+                if sect not in config:
+                    config[sect] = {}
+                config[sect][key] = val
     return config
 
 
@@ -719,9 +723,12 @@ class TaskManager (object):
 
     def __init__ (self, path):
         self.config = configure(path)
+        self.code = 0
+        self.verbose = False
 
     def task_option (self, task):
         opts = OBJECT()
+        opts.command = task.get('command', '')
         opts.cwd = task.get('cwd')
         opts.macros = self.config.macros_expand()
         if opts.cwd:
@@ -757,19 +764,47 @@ class TaskManager (object):
     def command_check (self, command, cwd):
         return 0
 
+    def execute (self, opts):
+        command = opts.command
+        macros = opts.macros
+        macros['VIM_CWD'] = os.getcwd()
+        macros['VIM_DIRNAME'] = os.path.basename(macros['VIM_CWD'])
+        if self.config.target == 'file':
+            macros['VIM_RELDIR'] = os.path.relpath(macros['VIM_FILEDIR'])
+            macros['VIM_RELNAME'] = os.path.relpath(macros['VIM_FILEPATH'])
+        if self.config.win32:
+            macros['WSL_CWD'] = self.config.path_win2unix(macros['VIM_CWD'])
+            if self.config.target == 'file':
+                x = macros['VIM_RELDIR']
+                y = macros['VIM_RELNAME']
+                macros['WSL_RELDIR'] = self.config.path_win2unix(x)
+                macros['WSL_RELNAME'] = self.config.path_win2unix(y)
+        command = self.config.macros_replace(command, macros)
+        self.code = os.system(command)
+        # print(command)
+        return 0
+
     def task_run (self, taskname):
+        self.config.load_tasks()
         if taskname not in self.config.tasks:
             pretty.error('not find task [' + taskname + ']')
             return -2
         task = self.config.tasks[taskname]
         ininame = task.get('__ininame__', '<unknow>')
         source = 'task [' + taskname + '] from ' + ininame
-        filetype = ''
-        command = self.command_select(task, filetype)
+        command = self.command_select(task, self.config.filetype)
         if not command:
             pretty.error('no command defined in ' + source)
             return -3
-        os.system(command)
+        # os.system(command)
+        opts = self.task_option(task)
+        save = os.getcwd()
+        opts.command = command
+        if opts.cwd:
+            os.chdir(opts.cwd)
+        self.execute(opts)
+        if opts.cwd:
+            os.chdir(save)
         return 0
 
 
@@ -794,6 +829,7 @@ if __name__ == '__main__':
         # tm = TaskManager('d:/acm/github/vim/autoload/quickui/generic.vim')
         tm = TaskManager('')
         print(tm.config.root)
+        tm.config.load_tasks()
         pprint.pprint(tm.config.tasks)
     def test3():
         # pretty.print('cyan', 'hello')
@@ -812,6 +848,10 @@ if __name__ == '__main__':
         pprint.pprint(tm.config.macros_expand())
         print(tm.config.path_win2unix('d:/ACM/github'))
         # tm.task_run('task2')
-    test4()
+    def test5():
+        tm = TaskManager('d:/acm/github/vim/autoload/quickui/core.vim')
+        tm.task_run('p1')
+        # print(tm.config.filetype)
+    test5()
 
 
