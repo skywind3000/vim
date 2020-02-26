@@ -656,13 +656,15 @@ class configure (object):
         return None
 
     def path_win2unix (self, path, prefix = '/mnt'):
-        path = os.path.abspath(path).replace('\\', '/')
+        path = path.replace('\\', '/')
         if path[1:3] == ':/':
             t = os.path.join(prefix, path[:1])
             path = os.path.join(t, path[3:])
         elif path[:1] == '/':
             t = os.path.join(prefix, os.getcwd()[:1])
             path = os.path.join(t, path[2:])
+        else:
+            path = path.replace('\\', '/')
         return path.replace('\\', '/')
 
     def macros_expand (self):
@@ -676,6 +678,8 @@ class configure (object):
             macros['VIM_FILEEXT'] = t[-1]
             macros['VIM_FILENOEXT'] = t[0]
             macros['VIM_PATHNOEXT'] = os.path.splitext(self.path)[0]
+            macros['VIM_RELDIR'] = os.path.relpath(macros['VIM_FILEDIR'])
+            macros['VIM_RELNAME'] = os.path.relpath(macros['VIM_FILEPATH'])
         else:
             macros['VIM_FILEPATH'] = None
             macros['VIM_FILENAME'] = None
@@ -684,6 +688,8 @@ class configure (object):
             macros['VIM_FILEEXT'] = None
             macros['VIM_FILENOEXT'] = None
             macros['VIM_PATHNOEXT'] = None
+            macros['VIM_RELDIR'] = None
+            macros['VIM_RELNAME'] = None
         macros['VIM_CWD'] = os.getcwd()
         macros['VIM_ROOT'] = self.root
         macros['VIM_DIRNAME'] = os.path.basename(macros['VIM_CWD'])
@@ -713,6 +719,14 @@ class TaskManager (object):
 
     def __init__ (self, path):
         self.config = configure(path)
+
+    def task_option (self, task):
+        opts = OBJECT()
+        opts.cwd = task.get('cwd')
+        opts.macros = self.config.macros_expand()
+        if opts.cwd:
+            opts.cwd = self.config.macros_replace(opts.cwd, opts.macros)
+        return opts
 
     def command_select (self, task, filetype):
         command = task.get('command', '')
@@ -793,7 +807,7 @@ if __name__ == '__main__':
         pretty.error('something error')
         return 0
     def test4():
-        tm = TaskManager('d:/acm/github/kcp/test.cpp')
+        tm = TaskManager('d:/ACM/github/kcp/test.cpp')
         print(tm.config.filetype)
         pprint.pprint(tm.config.macros_expand())
         print(tm.config.path_win2unix('d:/ACM/github'))
