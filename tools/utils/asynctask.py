@@ -12,6 +12,7 @@ from __future__ import print_function, unicode_literals
 import sys
 import os
 import copy
+import fnmatch
 import pprint
 
 
@@ -24,6 +25,89 @@ if sys.version_info[0] >= 3:
 
 
 UNIX = (sys.platform[:3] != 'win') and True or False
+
+
+#----------------------------------------------------------------------
+# macros
+#----------------------------------------------------------------------
+MACROS_HELP = { 
+	'VIM_FILEPATH': 'File name of current buffer with full path',
+	'VIM_FILENAME': 'File name of current buffer without path',
+	'VIM_FILEDIR': 'Full path of current buffer without the file name',
+	'VIM_FILEEXT': 'File extension of current buffer',
+	'VIM_FILETYPE': 'File type (value of &ft in vim)',
+    'VIM_FILENOEXT': # noqa: E261
+      'File name of current buffer without path and extension',
+	'VIM_PATHNOEXT':
+      'Current file name with full path but without extension',
+	'VIM_CWD': 'Current directory',
+	'VIM_RELDIR': 'File path relativize to current directory',
+	'VIM_RELNAME': 'File name relativize to current directory',
+	'VIM_ROOT': 'Project root directory',
+	'VIM_PRONAME': 'Name of current project root directory',
+	'VIM_DIRNAME': "Name of current directory",
+	'VIM_CWORD': 'Current word under cursor',
+	'VIM_CFILE': 'Current filename under cursor',
+	'VIM_CLINE': 'Cursor line number in current buffer',
+	'VIM_GUI': 'Is running under gui ?',
+	'VIM_VERSION': 'Value of v:version',
+	'VIM_COLUMNS': "How many columns in vim's screen",
+	'VIM_LINES': "How many lines in vim's screen", 
+	'VIM_SVRNAME': 'Value of v:servername for +clientserver usage',
+	'WSL_FILEPATH': '(WSL) File name of current buffer with full path',
+	'WSL_FILENAME': '(WSL) File name of current buffer without path',
+	'WSL_FILEDIR': '(WSL) Full path of current buffer without the file name',
+	'WSL_FILEEXT': '(WSL) File extension of current buffer',
+    'WSL_FILENOEXT':  # noqa: E261
+      '(WSL) File name of current buffer without path and extension', 
+	'WSL_PATHNOEXT':
+	  '(WSL) Current file name with full path but without extension',
+	'WSL_CWD': '(WSL) Current directory',
+	'WSL_RELDIR': '(WSL) File path relativize to current directory',
+	'WSL_RELNAME': '(WSL) File name relativize to current directory',
+	'WSL_ROOT': '(WSL) Project root directory',
+	'WSL_CFILE': '(WSL) Current filename under cursor',
+}
+
+
+
+#----------------------------------------------------------------------
+# file type detection (as filetype in vim)
+#----------------------------------------------------------------------
+FILE_TYPES = {
+    'text': '*.txt',
+    'c': '*.[cChH],.[cChH].in',
+    'cpp': '*.[cChH]pp,*.hh,*.[ch]xx,*.cc,*.cc.in,*.cpp.in,*.hh.in,*.cxx.in',
+    'python': '*.py,*.pyw',
+    'vim': '*.vim',
+    'asm': '*.asm,*.s,*.S',
+    'java': '*.java,*.jsp,*.jspx',
+    'javascript': '*.js',
+    'json': '*.json',
+    'perl': '*.pl',
+    'go': '*.go',
+    'haskell': '*.hs',
+    'sh': '*.sh',
+    'lua': '*.lua',
+    'bash': '*.bash',
+    'make': '*.mk,*.mak,[Mm]akefile,[Gg][Nn][Uu]makefile,[Mm]akefile.in',
+    'cmake': 'CMakeLists.txt',
+    'zsh': '*.zsh',
+    'fish': '*.fish',
+    'ruby': '*.rb',
+    'php': '*.php,*.php4,*.php5',
+    'ps1': '*.ps1',
+    'cs': '*.cs',
+    'erlang': '*.erl,*.hrl',
+    'html': '*.html,*.htm',
+    'kotlin': '*.kt,*.kts',
+    'markdown': '*.md,*.markdown,*.mdown,*.mkdn',
+    'rust': '*.rs',
+    'scala': '*.scala',
+    'swift': '*.swift',
+    'dosini': '*.ini',
+    'yaml': '*.yaml,*.yml',
+}
 
 
 #----------------------------------------------------------------------
@@ -320,48 +404,6 @@ class PrettyText (object):
 pretty = PrettyText()
 
 
-#----------------------------------------------------------------------
-# macros
-#----------------------------------------------------------------------
-macros_help = { 
-	'VIM_FILEPATH': 'File name of current buffer with full path',
-	'VIM_FILENAME': 'File name of current buffer without path',
-	'VIM_FILEDIR': 'Full path of current buffer without the file name',
-	'VIM_FILEEXT': 'File extension of current buffer',
-	'VIM_FILETYPE': 'File type (value of &ft in vim)',
-    'VIM_FILENOEXT': # noqa: E261
-      'File name of current buffer without path and extension',
-	'VIM_PATHNOEXT':
-      'Current file name with full path but without extension',
-	'VIM_CWD': 'Current directory',
-	'VIM_RELDIR': 'File path relativize to current directory',
-	'VIM_RELNAME': 'File name relativize to current directory',
-	'VIM_ROOT': 'Project root directory',
-	'VIM_PRONAME': 'Name of current project root directory',
-	'VIM_DIRNAME': "Name of current directory",
-	'VIM_CWORD': 'Current word under cursor',
-	'VIM_CFILE': 'Current filename under cursor',
-	'VIM_CLINE': 'Cursor line number in current buffer',
-	'VIM_GUI': 'Is running under gui ?',
-	'VIM_VERSION': 'Value of v:version',
-	'VIM_COLUMNS': "How many columns in vim's screen",
-	'VIM_LINES': "How many lines in vim's screen", 
-	'VIM_SVRNAME': 'Value of v:servername for +clientserver usage',
-	'WSL_FILEPATH': '(WSL) File name of current buffer with full path',
-	'WSL_FILENAME': '(WSL) File name of current buffer without path',
-	'WSL_FILEDIR': '(WSL) Full path of current buffer without the file name',
-	'WSL_FILEEXT': '(WSL) File extension of current buffer',
-    'WSL_FILENOEXT':  # noqa: E261
-      '(WSL) File name of current buffer without path and extension', 
-	'WSL_PATHNOEXT':
-	  '(WSL) Current file name with full path but without extension',
-	'WSL_CWD': '(WSL) Current directory',
-	'WSL_RELDIR': '(WSL) File path relativize to current directory',
-	'WSL_RELNAME': '(WSL) File name relativize to current directory',
-	'WSL_ROOT': '(WSL) Project root directory',
-	'WSL_CFILE': '(WSL) Current filename under cursor',
-}
-
 
 #----------------------------------------------------------------------
 # configure
@@ -379,9 +421,12 @@ class configure (object):
             raise IOError('invalid path: %s'%path)
         if os.path.isdir(path):
             self.home = path
+            self.target = 'dir'
         else:
             self.home = os.path.dirname(path)
+            self.target = 'file'
         self.path = path
+        self.filetype = None
         self.mark = '.git,.svn,.project,.hg,.root'
         if 'VIM_TASK_ROOTMARK' in os.environ:
             mark = os.environ['VIM_TASK_ROOTMARK'].strip()
@@ -390,10 +435,12 @@ class configure (object):
         mark = [ n.strip() for n in self.mark.split(',') ]
         self.root = self.find_root(self.home, mark, True)
         self.tasks = {}
-        self.feature = {}
         self.environ = {}
+        self.config = {}
         self._load_config()
-        self.compose_config()
+        if self.target == 'file':
+            self.filetype = self.match_ft(self.path)
+        self.feature = {}
 
     def read_ini (self, ininame, codec = None):
         ininame = os.path.abspath(ininame)
@@ -449,12 +496,38 @@ class configure (object):
             items.append(item)
         return items
 
+    def option (self, section, key, default):
+        if section not in self.config:
+            return default
+        sect = self.config[section]
+        return sect.get(key, default).strip()
+
     def _load_config (self):
         self.system = self.win32 and 'win32' or 'linux'
         self.profile = 'debug'
         self.cfg_name = '.tasks'
         self.rtp_name = 'tasks.ini'
         self.extra_config = []
+        self.config = {}
+        # load ~/.config
+        name = os.path.expanduser('~/.config')
+        if self.check_environ('XDG_CONFIG_HOME'):
+            name = os.environ['XDG_CONFIG_HOME']
+        name = os.path.join(name, 'asynctask/asynctask.ini')
+        name = os.path.abspath(name)
+        if os.path.exists(name):
+            self.config = self.read_ini(name)
+        if 'default' not in self.config:
+            self.config['default'] = {}
+        setting = self.config['default']
+        self.system = setting.get('system', self.system).strip()
+        self.cfg_name = setting.get('cfgname', self.cfg_name).strip()
+        self.rtp_name = setting.get('rtpname', self.rtp_name).strip()
+        if 'extras' in setting:
+            for path in self.extract_list(setting['extra']):
+                if os.path.exists(path):
+                    self.extra_config.append(os.path.abspath(path))
+        # load from environment
         if self.check_environ('VIM_TASK_SYSTEM'):
             self.system = os.environ['VIM_TASK_SYSTEM']
         if self.check_environ('VIM_TASK_PROFILE'):
@@ -556,11 +629,31 @@ class configure (object):
         return 0
 
     # merge global and local config
-    def compose_config (self):
+    def load_tasks (self):
         self.tasks = {}
         self.collect_rtp_config()
         self.collect_local_config()
         return 0
+
+    # extract file type
+    def match_ft (self, name):
+        name = os.path.abspath(name)
+        name = os.path.split(name)[-1]
+        detect = {}
+        for n in FILE_TYPES:
+            detect[n] = FILE_TYPES[n]
+        if 'filetypes' in self.config:
+            filetypes = self.config['filetypes']
+            for n in filetypes:
+                detect[n] = filetypes[n]
+        for ft in detect:
+            rules = [ n.strip() for n in detect[ft].split(',') ]
+            for rule in rules:
+                if not rule:
+                    continue
+                if fnmatch.fnmatch(name, rule):
+                    return ft
+        return None
 
     def expand_macros (self):
         macros = {}
@@ -632,9 +725,9 @@ if __name__ == '__main__':
         pretty.error('something error')
         return 0
     def test4():
-        tm = TaskManager('.')
+        tm = TaskManager('d:/acm/github/kcp/test.cpp')
+        print(tm.config.filetype)
         tm.task_run('task2')
-
     test4()
 
 
