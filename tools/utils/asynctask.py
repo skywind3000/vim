@@ -670,6 +670,28 @@ class TaskManager (object):
 
     def command_select (self, task, filetype):
         command = task.get('command', '')
+        for key in task:
+            p1 = key.find(':')
+            p2 = key.find('/')
+            if p1 < 0 and p2 < 0:
+                continue
+            parts = self.config.trinity_split(key)
+            parts = [ n.strip('\r\n\t ') for n in parts ]
+            if parts[0] != 'command':
+                continue
+            if parts[1]:
+                check = 0
+                for ft in parts[1].split(','):
+                    ft = ft.strip()
+                    if ft == filetype:
+                        check = 1
+                        break
+                if check == 0:
+                    continue
+            if parts[2]:
+                if parts[2] != self.config.system:
+                    continue
+            return task[key]
         return command
 
     def command_check (self, command, cwd):
