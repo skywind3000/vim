@@ -245,6 +245,7 @@ class PrettyText (object):
     def echo (self, color, text):
         self.set_color(color)
         sys.stdout.write(text)
+        sys.stdout.flush()
         self.set_color(-1)
         return 0
 
@@ -272,15 +273,15 @@ class PrettyText (object):
             return ''
         last_color = -100
         for row in rows:
-            for col in range(maxcol):
+            for col, item in enumerate(row):
                 csize = colsize[col]
                 color = -1
-                item = '' if (col >= len(row)) else row[col]
                 if isinstance(item, list) or isinstance(item, tuple):
                     color = item[0]
                     text = str(item[1])
                 else:
                     text = str(item)
+                text = str(text)
                 padding = 2 + csize - len(text)
                 pad1 = 1
                 pad2 = padding - pad1
@@ -289,9 +290,24 @@ class PrettyText (object):
                     self.set_color(color)
                     last_color = color
                 sys.stdout.write(output)
+                sys.stdout.flush()
             sys.stdout.write('\n')
         self.set_color(-1)
         return 0
+
+    def error (self, text, code = -1):
+        self.echo('RED', 'Error: ')
+        self.print(-1, text)
+        self.print(-1, '')
+        sys.exit(code)
+        return 0
+
+    def warning (self, text):
+        self.echo('red', 'Warning: ')
+        self.print(-1, text)
+        self.print(-1, '')
+        return 0
+
 
 
 #----------------------------------------------------------------------
@@ -535,9 +551,15 @@ if __name__ == '__main__':
         print(tm.config.root)
         pprint.pprint(tm.config.tasks)
     def test3():
-        pretty.print('cyan', 'hello')
+        # pretty.print('cyan', 'hello')
+        rows = []
+        rows.append(['Name', 'Gender'])
+        rows.append([('red', 'Zhang Jia'), 'male'])
+        rows.append(['Lin Ting Ting', 'female'])
         # print('fuck you')
         print('hahahah')
+        pretty.tabulify(rows)
+        pretty.error('something error')
         return 0
     test3()
 
