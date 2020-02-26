@@ -11,6 +11,7 @@
 from __future__ import print_function, unicode_literals
 import sys
 import os
+import copy
 import pprint
 
 
@@ -169,8 +170,8 @@ class PrettyText (object):
 
     def __init__ (self):
         self.isatty = sys.stdout.isatty()
-        self.__init_win32()
         self.names = self.__init_names()
+        self.handle = None
 
     def __init_win32 (self):
         if sys.platform[:3] != 'win':
@@ -214,6 +215,8 @@ class PrettyText (object):
             if isinstance(color, unicode):
                 color = self.names.get(color, -1)
         if sys.platform[:3] == 'win':
+            if self.handle is None:
+                self.__init_win32()
             if color < 0: color = 7
             result = 0
             if (color & 1): result |= 4
@@ -315,6 +318,49 @@ class PrettyText (object):
 # internal
 #----------------------------------------------------------------------
 pretty = PrettyText()
+
+
+#----------------------------------------------------------------------
+# macros
+#----------------------------------------------------------------------
+macros_help = { 
+	'VIM_FILEPATH': 'File name of current buffer with full path',
+	'VIM_FILENAME': 'File name of current buffer without path',
+	'VIM_FILEDIR': 'Full path of current buffer without the file name',
+	'VIM_FILEEXT': 'File extension of current buffer',
+	'VIM_FILETYPE': 'File type (value of &ft in vim)',
+    'VIM_FILENOEXT': # noqa: E261
+      'File name of current buffer without path and extension',
+	'VIM_PATHNOEXT':
+      'Current file name with full path but without extension',
+	'VIM_CWD': 'Current directory',
+	'VIM_RELDIR': 'File path relativize to current directory',
+	'VIM_RELNAME': 'File name relativize to current directory',
+	'VIM_ROOT': 'Project root directory',
+	'VIM_PRONAME': 'Name of current project root directory',
+	'VIM_DIRNAME': "Name of current directory",
+	'VIM_CWORD': 'Current word under cursor',
+	'VIM_CFILE': 'Current filename under cursor',
+	'VIM_CLINE': 'Cursor line number in current buffer',
+	'VIM_GUI': 'Is running under gui ?',
+	'VIM_VERSION': 'Value of v:version',
+	'VIM_COLUMNS': "How many columns in vim's screen",
+	'VIM_LINES': "How many lines in vim's screen", 
+	'VIM_SVRNAME': 'Value of v:servername for +clientserver usage',
+	'WSL_FILEPATH': '(WSL) File name of current buffer with full path',
+	'WSL_FILENAME': '(WSL) File name of current buffer without path',
+	'WSL_FILEDIR': '(WSL) Full path of current buffer without the file name',
+	'WSL_FILEEXT': '(WSL) File extension of current buffer',
+    'WSL_FILENOEXT':  # noqa: E261
+      '(WSL) File name of current buffer without path and extension', 
+	'WSL_PATHNOEXT':
+	  '(WSL) Current file name with full path but without extension',
+	'WSL_CWD': '(WSL) Current directory',
+	'WSL_RELDIR': '(WSL) File path relativize to current directory',
+	'WSL_RELNAME': '(WSL) File name relativize to current directory',
+	'WSL_ROOT': '(WSL) Project root directory',
+	'WSL_CFILE': '(WSL) Current filename under cursor',
+}
 
 
 #----------------------------------------------------------------------
@@ -515,6 +561,10 @@ class configure (object):
         self.collect_rtp_config()
         self.collect_local_config()
         return 0
+
+    def expand_macros (self):
+        macros = {}
+        return macros
         
 
 #----------------------------------------------------------------------
@@ -525,7 +575,26 @@ class TaskManager (object):
     def __init__ (self, path):
         self.config = configure(path)
 
-    def task_run (self, name):
+    def command_select (self, task, filetype):
+        command = task.get('command', '')
+        return command
+
+    def command_check (self, command, cwd):
+        return 0
+
+    def task_run (self, taskname):
+        if taskname not in self.config.tasks:
+            pretty.error('not find task [' + taskname + ']')
+            return -2
+        task = self.config.tasks[taskname]
+        ininame = task.get('__ininame__', '<unknow>')
+        source = 'task [' + taskname + '] from ' + ininame
+        filetype = ''
+        command = self.command_select(task, filetype)
+        if not command:
+            pretty.error('no command defined in ' + source)
+            return -3
+        os.system(command)
         return 0
 
 
@@ -562,6 +631,10 @@ if __name__ == '__main__':
         pretty.tabulify(rows)
         pretty.error('something error')
         return 0
-    test3()
+    def test4():
+        tm = TaskManager('.')
+        tm.task_run('task2')
+
+    test4()
 
 
