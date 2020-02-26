@@ -205,7 +205,7 @@ class PrettyText (object):
         return names
 
     # set color
-    def set_color (self, color):
+    def set_color (self, color, stderr = False):
         if not self.isatty:
             return 0
         if isinstance(color, str):
@@ -226,27 +226,30 @@ class PrettyText (object):
             if (color & 128): result |= 128
             self.SetConsoleTextAttribute(self.handle, result)
         else:
+            fp = (not stderr) and sys.stdout or sys.stderr
             if color >= 0:
                 foreground = color & 7
                 background = (color >> 4) & 7
                 bold = color & 8
                 t = bold and "01;" or ""
-                x = background
                 if background:
-                    sys.stdout.write("\033[%s3%d;4%dm"%(t, foreground, x))
+                    fp.write("\033[%s3%d;4%dm"%(t, foreground, background))
                 else:
-                    sys.stdout.write("\033[%s3%dm"%(t, foreground))
-                sys.stdout.flush()
+                    fp.write("\033[%s3%dm"%(t, foreground))
             else:
-                sys.stdout.write("\033[0m")
-                sys.stdout.flush()
+                fp.write("\033[0m")
+            fp.flush()
         return 0
 
-    def echo (self, color, text):
-        self.set_color(color)
-        sys.stdout.write(text)
-        sys.stdout.flush()
-        self.set_color(-1)
+    def echo (self, color, text, stderr = False):
+        self.set_color(color, stderr)
+        if stderr:
+            sys.stderr.write(text)
+            sys.stderr.flush()
+        else:
+            sys.stdout.write(text)
+            sys.stdout.flush()
+        self.set_color(-1, stderr)
         return 0
 
     def print (self, color, text):
@@ -296,16 +299,14 @@ class PrettyText (object):
         return 0
 
     def error (self, text, code = -1):
-        self.echo('RED', 'Error: ')
-        self.print(-1, text)
-        self.print(-1, '')
+        self.echo('RED', 'Error: ', True)
+        self.echo(-1, text + '\n', True)
         sys.exit(code)
         return 0
 
     def warning (self, text):
-        self.echo('red', 'Warning: ')
-        self.print(-1, text)
-        self.print(-1, '')
+        self.echo('red', 'Warning: ', True)
+        self.echo(-1, text + '\n', True)
         return 0
 
 
