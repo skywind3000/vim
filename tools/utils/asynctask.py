@@ -655,9 +655,55 @@ class configure (object):
                     return ft
         return None
 
-    def expand_macros (self):
+    def path_win2unix (self, path, prefix = '/mnt'):
+        path = os.path.abspath(path).replace('\\', '/')
+        if path[1:3] == ':/':
+            t = os.path.join(prefix, path[:1])
+            path = os.path.join(t, path[3:])
+        elif path[:1] == '/':
+            t = os.path.join(prefix, os.getcwd()[:1])
+            path = os.path.join(t, path[2:])
+        return path.replace('\\', '/')
+
+    def macros_expand (self):
         macros = {}
+        if self.target == 'file':
+            t = os.path.splitext(os.path.basename(self.path))
+            macros['VIM_FILEPATH'] = self.path
+            macros['VIM_FILENAME'] = os.path.basename(self.path)
+            macros['VIM_FILEDIR'] = os.path.abspath(self.home)
+            macros['VIM_FILETYPE'] = self.filetype
+            macros['VIM_FILEEXT'] = t[-1]
+            macros['VIM_FILENOEXT'] = t[0]
+            macros['VIM_PATHNOEXT'] = os.path.splitext(self.path)[0]
+        else:
+            macros['VIM_FILEPATH'] = None
+            macros['VIM_FILENAME'] = None
+            macros['VIM_FILEDIR'] = None
+            macros['VIM_FILETYPE'] = None
+            macros['VIM_FILEEXT'] = None
+            macros['VIM_FILENOEXT'] = None
+            macros['VIM_PATHNOEXT'] = None
+        macros['VIM_CWD'] = os.getcwd()
+        macros['VIM_ROOT'] = self.root
+        macros['VIM_DIRNAME'] = os.path.basename(macros['VIM_CWD'])
+        macros['VIM_PRONAME'] = os.path.basename(macros['VIM_ROOT'])
+        if sys.platform[:3] == 'win':
+            t = ['FILEPATH', 'FILEDIR', 'FILENAME', 'FILEEXT', 'FILENOEXT']
+            t += ['PATHNOEXT', 'CWD', 'RELDIR', 'RELNAME', 'ROOT']
+            for name in t:
+                dst = 'WSL_' + name
+                src = 'VIM_' + name
+                if src in macros:
+                    macros[dst] = self.path_win2unix(macros[src], '/mnt')
         return macros
+
+    def macros_replace (self, text, macros):
+        for name in macros:
+            text = text.replace('$(' + name + ')', macros[name])
+        text = text.replace('<root>', macros.get('VIM_ROOT', ''))
+        text = text.replace('<cwd>', macros.get('VIM_CWD', ''))
+        return text
         
 
 #----------------------------------------------------------------------
@@ -749,7 +795,9 @@ if __name__ == '__main__':
     def test4():
         tm = TaskManager('d:/acm/github/kcp/test.cpp')
         print(tm.config.filetype)
-        tm.task_run('task2')
+        pprint.pprint(tm.config.macros_expand())
+        print(tm.config.path_win2unix('d:/ACM/github'))
+        # tm.task_run('task2')
     test4()
 
 
