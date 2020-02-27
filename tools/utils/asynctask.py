@@ -21,6 +21,7 @@ import fnmatch
 import pprint
 import tempfile
 import codecs
+import shutil
 
 
 #----------------------------------------------------------------------
@@ -1000,7 +1001,7 @@ class TaskManager (object):
             fzf = os.environ.get('VIM_TASK_FZF', 'fzf')
             cmd = '--nth 1.. --reverse --inline-info --tac '
             flag = os.environ.get('VIM_TASK_FZF_FLAG', '')
-            flag = (not flag) and '+s -e' or flag
+            flag = (not flag) and '+s ' or flag
             cmd = (fzf and fzf or 'fzf') + ' ' + cmd + ' ' + flag
             if sys.platform[:3] != 'win':
                 height = '35%'
@@ -1021,7 +1022,7 @@ class TaskManager (object):
                 os.remove(tmprecv)
             with codecs.open(tmpname, 'w', encoding = 'utf-8') as fp:
                 for row in rows:
-                    fp.write('%s %s\r\n'%(row[0], row[1]))
+                    fp.write('%s: %s\r\n'%(row[0], row[1]))
             if sys.platform[:3] != 'win':
                 cmd = cmd + ' < "' + tmpname + '"'
             else:
@@ -1033,7 +1034,16 @@ class TaskManager (object):
             text = ''
             with codecs.open(tmprecv, 'r', encoding = 'utf-8') as fp:
                 text = fp.read()
-            return self.task_run(text)
+            if tmpdir:
+                shutil.rmtree(tmpdir)
+            text = text.strip('\r\n\t ')
+            p1 = text.find(':')
+            if p1 < 0:
+                return 0
+            text = text[:p1].rstrip('\r\n\t ')
+            if not text:
+                return 0
+            self.task_run(text)
         return 0
 
 
