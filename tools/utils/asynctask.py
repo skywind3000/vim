@@ -334,14 +334,10 @@ class PrettyText (object):
                 pad1 = 1
                 pad2 = padding - pad1
                 output = (' ' * pad1) + text + (' ' * pad2)
-                if last_color != color:
-                    self.set_color(color)
-                    last_color = color
                 if avail <= 0:
                     break
                 size = len(output)
-                sys.stdout.write(output[:avail])
-                self.set_color(-1)
+                pretty.echo(color, output[:avail])
                 avail -= size
             sys.stdout.write('\n')
         self.set_color(-1)
