@@ -1087,7 +1087,8 @@ def usage_help(prog):
     print('    %s -l                - list tasks (use -L for all)'%prog)
     print('    %s -h                - show this help'%prog)
     print('    %s -m                - display command macros'%prog)
-    print('    %s -i                - interactive mode (use -I for fzf)'%prog)
+    print('    %s -i                - interactive mode'%prog)
+    print('    %s -f                - interactive mode with fzf'%prog)
     # print('')
     return 0
 
@@ -1123,7 +1124,7 @@ def main(args = None):
         else:
             tm.task_macros('M' in opts)
             return 0
-    if 'i' in opts or 'I' in opts:
+    if 'i' in opts or 'f' in opts:
         path = '' if not args else args[0]
         if path and (not os.path.exists(path)):
             pretty.error('path not exists: %s'%path)
