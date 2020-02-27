@@ -785,9 +785,7 @@ class TaskManager (object):
         command = task.get('command', '')
         filetype = self.config.filetype
         for key in task:
-            p1 = key.find(':')
-            p2 = key.find('/')
-            if p1 < 0 and p2 < 0:
+            if (':' not in key) and ('/' not in key):
                 continue
             parts = self.config.trinity_split(key)
             parts = [ n.strip('\r\n\t ') for n in parts ]
@@ -873,6 +871,10 @@ class TaskManager (object):
                 macros['WSL_RELDIR'] = self.config.path_win2unix(x)
                 macros['WSL_RELNAME'] = self.config.path_win2unix(y)
         command = self.config.macros_replace(command, macros)
+        for name in macros:
+            value = macros.get(name, None)
+            if value is not None:
+                os.environ[name] = value
         self.code = os.system(command)
         return 0
 
@@ -893,7 +895,6 @@ class TaskManager (object):
         hr = self.command_check(command, task)
         if hr != 0:
             return -4
-        # os.system(command)
         opts = self.task_option(task)
         opts.command = command
         save = os.getcwd()
@@ -923,6 +924,27 @@ class TaskManager (object):
             rows.append([(c1, name), (c2, mode), (c3, command)])
             if ini:
                 rows.append(['', '', (c4, ini)])
+        pretty.tabulify(rows)
+        return 0
+
+    def task_macros (self, wsl = False):
+        macros = self.config.macros_expand()
+        names = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT', 'FILETYPE']
+        names += ['FILENOEXT', 'PATHNOEXT', 'CWD', 'RELDIR', 'RELNAME']
+        names += ['ROOT', 'DIRNAME', 'PRONAME']
+        rows = []
+        c0 = 'YELLOW'
+        c1 = 'RED'
+        c3 = 'white'
+        c4 = 'BLACK'
+        rows.append([(c0, 'Macro'), (c0, 'Detail'), (c0, 'Value')])
+        for nn in names:
+            name = ((not wsl) and 'VIM_' or 'WSL_') + nn
+            if (name not in macros) or (name not in MACROS_HELP):
+                continue
+            help = MACROS_HELP[name]
+            text = macros[name]
+            rows.append([(c1, name), (c3, help), (c4, text)])
         pretty.tabulify(rows)
         return 0
 
@@ -969,11 +991,12 @@ if __name__ == '__main__':
         # tm.task_run('task2')
     def test5():
         tm = TaskManager('d:/ACM/github/vim/autoload/quickui')
-        tm.task_run('p1')
+        tm.task_run('p2')
         # print(tm.config.filetype)
     def test6():
-        tm = TaskManager('d:/ACM/github/vim/autoload/quickui')
+        tm = TaskManager('d:/ACM/github/vim/autoload/quickui/context.vim')
         tm.task_list()
+        # tm.task_macros(True)
         # size = pretty.get_term_size()
         # print('terminal size:', size)
     test6()
