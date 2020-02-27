@@ -6,8 +6,8 @@
 #
 # Maintainer: skywind3000 (at) gmail.com, 2020
 #
-# Last Modified: 2020/02/26 02:42
-# Verision: 1.0.3
+# Last Modified: 2020/02/28 02:04
+# Verision: 1.0.4
 #
 # for more information, please visit:
 # https://github.com/skywind3000/asynctasks.vim
@@ -850,12 +850,15 @@ class TaskManager (object):
                 macros['WSL_RELDIR'] = self.config.path_win2unix(x)
                 macros['WSL_RELNAME'] = self.config.path_win2unix(y)
         command = self.config.macros_replace(command, macros)
+        command = command.strip()
         for name in macros:
             value = macros.get(name, None)
             if value is not None:
                 os.environ[name] = value
         if self.verbose:
             pretty.echo('white', '+ ' + command + '\n')
+        if not command:
+            return 0
         self.code = os.system(command)
         return 0
 
@@ -868,6 +871,7 @@ class TaskManager (object):
         ininame = task.get('__name__', '<unknow>')
         source = 'task [' + taskname + ']'
         command = self.command_select(task)
+        command = command.strip()
         if not command:
             pretty.error('no command defined in ' + source)
             if ininame:
@@ -876,6 +880,11 @@ class TaskManager (object):
         hr = self.command_check(command, task)
         if hr != 0:
             return -4
+        command = self.command_input(command)
+        command = command.strip()
+        if not command:
+            pretty.error('command is empty')
+            return 0
         opts = self.task_option(task)
         opts.command = command
         save = os.getcwd()
