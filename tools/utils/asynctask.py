@@ -257,7 +257,7 @@ class OBJECT (object):
 class PrettyText (object):
 
     def __init__ (self):
-        self.isatty = sys.stdout.isatty()
+        self.isatty = sys.__stdout__.isatty()
         self.names = self.__init_names()
         self.handle = None
 
@@ -279,6 +279,7 @@ class PrettyText (object):
         self.GetStdHandle = GetStdHandle
         self.SetConsoleTextAttribute = SetConsoleTextAttribute
         self.GetStdHandle = GetStdHandle
+        self.StringBuffer = ctypes.create_string_buffer(22)
         return 0
 
     # init names
@@ -346,9 +347,16 @@ class PrettyText (object):
     def print (self, color, text):
         return self.echo(color, text + '\n')
 
+    def perror (self, color, text):
+        return self.echo(color, text + '\n', True)
+
     def tabulify (self, rows):
         colsize = {}
         maxcol = 0
+        maxwidth = 1024
+        if self.isatty:
+            tsize = self.get_term_size()
+            maxwidth = max(2, tsize[0] - 2)
         if not rows:
             return -1
         for row in rows:
@@ -367,6 +375,7 @@ class PrettyText (object):
             return ''
         last_color = -100
         for row in rows:
+            avail = maxwidth
             for col, item in enumerate(row):
                 csize = colsize[col]
                 color = -1
@@ -383,15 +392,19 @@ class PrettyText (object):
                 if last_color != color:
                     self.set_color(color)
                     last_color = color
-                sys.stdout.write(output)
+                if avail <= 0:
+                    break
+                size = len(output)
+                sys.stdout.write(output[:avail])
                 sys.stdout.flush()
+                avail -= size
             sys.stdout.write('\n')
         self.set_color(-1)
         return 0
 
     def error (self, text):
         self.echo('RED', 'Error: ', True)
-        self.echo(-1, text + '\n', True)
+        self.echo('WHITE', text + '\n', True)
         return 0
 
     def warning (self, text):
@@ -399,6 +412,44 @@ class PrettyText (object):
         self.echo(-1, text + '\n', True)
         return 0
 
+    def get_term_size (self):
+        if sys.version_info[0] >= 30:
+            import shutil
+            if 'get_terminal_size' in shutil.__dict__:
+                x = shutil.get_terminal_size()
+                return (x[0], x[1])
+        if sys.platform[:3] == 'win':
+            if self.handle is None:
+                self.__init_win32()
+            csbi = self.StringBuffer
+            res = self.kernel32.GetConsoleScreenBufferInfo(self.handle, csbi)
+            if res:
+                import struct
+                res = struct.unpack("hhhhHhhhhhh", csbi.raw)
+                left, top, right, bottom = res[5:9]
+                columns = right - left + 1
+                lines = bottom - top + 1
+                return (columns, lines)
+        if 'COLUMNS' in os.environ and 'LINES' in os.environ:
+            try:
+                columns = int(os.environ['COLUMNS'])
+                lines = int(os.environ['LINES'])
+                return (columns, lines)
+            except:
+                pass
+        if sys.platform[:3] != 'win':
+            try:
+                import fcntl, termios, struct
+                if sys.__stdout__.isatty():
+                    fd = sys.__stdout__.fileno()
+                elif sys.__stderr__.isatty():
+                    fd = sys.__stderr__.fileno()
+                res = fcntl.ioctl(fd, termios.TIOCGWINSZ, b"\x00" * 4)
+                lines, columns = struct.unpack("hh", res)
+                return (columns, lines)
+            except:
+                pass
+        return (80, 24)
 
 
 #----------------------------------------------------------------------
@@ -524,10 +575,12 @@ class configure (object):
             self.config['default'] = {}
         setting = self.config['default']
         self.system = setting.get('system', self.system).strip()
-        self.cfg_name = setting.get('cfgname', self.cfg_name).strip()
-        self.rtp_name = setting.get('rtpname', self.rtp_name).strip()
-        if 'extras' in setting:
-            for path in self.extract_list(setting['extra']):
+        self.cfg_name = setting.get('cfg_name', self.cfg_name).strip()
+        self.rtp_name = setting.get('rtp_name', self.rtp_name).strip()
+        if 'extra_config' in setting:
+            for path in self.extract_list(setting['extra_config']):
+                if '~' in path:
+                    path = os.path.expanduser(path)
                 if os.path.exists(path):
                     self.extra_config.append(os.path.abspath(path))
         # load from environment
@@ -659,6 +712,8 @@ class configure (object):
         return None
 
     def path_win2unix (self, path, prefix = '/mnt'):
+        if path is None:
+            return None
         path = path.replace('\\', '/')
         if path[1:3] == ':/':
             t = os.path.join(prefix, path[:1])
@@ -709,7 +764,8 @@ class configure (object):
 
     def macros_replace (self, text, macros):
         for name in macros:
-            text = text.replace('$(' + name + ')', macros[name])
+            t = macros[name] and macros[name] or ''
+            text = text.replace('$(' + name + ')', t)
         text = text.replace('<root>', macros.get('VIM_ROOT', ''))
         text = text.replace('<cwd>', macros.get('VIM_CWD', ''))
         return text
@@ -725,8 +781,9 @@ class TaskManager (object):
         self.code = 0
         self.verbose = False
 
-    def command_select (self, task, filetype):
+    def command_select (self, task):
         command = task.get('command', '')
+        filetype = self.config.filetype
         for key in task:
             p1 = key.find(':')
             p2 = key.find('/')
@@ -751,22 +808,24 @@ class TaskManager (object):
             return task[key]
         return command
 
-    def command_check (self, command, cwd):
+    def command_check (self, command, task):
         disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT']
         disable += ['FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
+        cwd = task.get('cwd', '')
+        ini = task.get('__name__', '')
         if self.config.target != 'file':
             for name in disable:
                 for head in ['$(VIM_', '$(WSL_']:
                     macro = head + name + ')'
                     if macro in command:
-                        t = 'task command requires a file name for %s'%macro
-                        pretty.error(t)
-                        print('command=' + command)
+                        pretty.error('task command requires a file name')
+                        if ini: print('from %s:'%ini)
+                        pretty.perror('BLACK', 'command=' + command)
                         return 1
                     if macro in cwd: 
-                        t = 'task cwd requires a file name for %s'%macro
-                        pretty.error(t)
-                        print('cwd=' + cwd)
+                        pretty.error('task cwd requires a file name')
+                        if ini: print('from %s:'%ini)
+                        pretty.perror('BLACK', 'cwd=' + cwd)
                         return 2
         disable = ['CFILE', 'CLINE', 'GUI', 'VERSION', 'COLUMNS', 'LINES']
         disable += ['SVRNAME', 'WSL_CFILE']
@@ -778,12 +837,14 @@ class TaskManager (object):
             if name in command:
                 t = '%s is invalid in command line'%macro
                 pretty.error(t)
-                print('command=' + command)
+                if ini: print('from %s:'%ini)
+                pretty.perror('BLACK', 'command=' + command)
                 return 3
             if name in cwd:
                 t = '%s is invalid in command line'%macro
                 pretty.error(t)
-                print('cwd=' + cwd)
+                if ini: print('from %s:'%ini)
+                pretty.perror('BLACK', 'cwd=' + cwd)
                 return 4
         return 0
 
@@ -813,7 +874,6 @@ class TaskManager (object):
                 macros['WSL_RELNAME'] = self.config.path_win2unix(y)
         command = self.config.macros_replace(command, macros)
         self.code = os.system(command)
-        # print(command)
         return 0
 
     def task_run (self, taskname):
@@ -822,13 +882,15 @@ class TaskManager (object):
             pretty.error('not find task [' + taskname + ']')
             return -2
         task = self.config.tasks[taskname]
-        ininame = task.get('__ininame__', '<unknow>')
-        source = 'task [' + taskname + '] from ' + ininame
-        command = self.command_select(task, self.config.filetype)
+        ininame = task.get('__name__', '<unknow>')
+        source = 'task [' + taskname + ']'
+        command = self.command_select(task)
         if not command:
             pretty.error('no command defined in ' + source)
+            if ininame:
+                pretty.perror('white', 'from ' + ininame)
             return -3
-        hr = self.command_check(command, task.get('cwd', ''))
+        hr = self.command_check(command, task)
         if hr != 0:
             return -4
         # os.system(command)
@@ -840,6 +902,28 @@ class TaskManager (object):
         self.execute(opts)
         if opts.cwd:
             os.chdir(save)
+        return 0
+
+    def task_list (self, all = False):
+        self.config.load_tasks()
+        rows = []
+        c0 = 'YELLOW'
+        c1 = 'RED'
+        c2 = 'cyan'
+        c3 = 'white'
+        c4 = 'BLACK'
+        rows.append([(c0, 'Task'), (c0, 'Type'), (c0, 'Detail')])
+        for name in self.config.tasks:
+            if (not all) and name.startswith('.'):
+                continue
+            task = self.config.tasks[name]
+            command = self.command_select(task)
+            mode = task.get('__mode__')
+            ini = task.get('__name__', '')
+            rows.append([(c1, name), (c2, mode), (c3, command)])
+            if ini:
+                rows.append(['', '', (c4, ini)])
+        pretty.tabulify(rows)
         return 0
 
 
@@ -884,9 +968,14 @@ if __name__ == '__main__':
         print(tm.config.path_win2unix('d:/ACM/github'))
         # tm.task_run('task2')
     def test5():
-        tm = TaskManager('d:/acm/github/vim/autoload/quickui/core.vim')
+        tm = TaskManager('d:/ACM/github/vim/autoload/quickui')
         tm.task_run('p1')
         # print(tm.config.filetype)
-    test5()
+    def test6():
+        tm = TaskManager('d:/ACM/github/vim/autoload/quickui')
+        tm.task_list()
+        # size = pretty.get_term_size()
+        # print('terminal size:', size)
+    test6()
 
 
