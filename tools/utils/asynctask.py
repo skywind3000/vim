@@ -389,10 +389,9 @@ class PrettyText (object):
         self.set_color(-1)
         return 0
 
-    def error (self, text, code = -1):
+    def error (self, text):
         self.echo('RED', 'Error: ', True)
         self.echo(-1, text + '\n', True)
-        sys.exit(code)
         return 0
 
     def warning (self, text):
@@ -726,15 +725,6 @@ class TaskManager (object):
         self.code = 0
         self.verbose = False
 
-    def task_option (self, task):
-        opts = OBJECT()
-        opts.command = task.get('command', '')
-        opts.cwd = task.get('cwd')
-        opts.macros = self.config.macros_expand()
-        if opts.cwd:
-            opts.cwd = self.config.macros_replace(opts.cwd, opts.macros)
-        return opts
-
     def command_select (self, task, filetype):
         command = task.get('command', '')
         for key in task:
@@ -762,7 +752,49 @@ class TaskManager (object):
         return command
 
     def command_check (self, command, cwd):
+        disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT']
+        disable += ['FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
+        if self.config.target != 'file':
+            for name in disable:
+                for head in ['$(VIM_', '$(WSL_']:
+                    macro = head + name + ')'
+                    if macro in command:
+                        t = 'task command requires a file name for %s'%macro
+                        pretty.error(t)
+                        print('command=' + command)
+                        return 1
+                    if macro in cwd: 
+                        t = 'task cwd requires a file name for %s'%macro
+                        pretty.error(t)
+                        print('cwd=' + cwd)
+                        return 2
+        disable = ['CFILE', 'CLINE', 'GUI', 'VERSION', 'COLUMNS', 'LINES']
+        disable += ['SVRNAME', 'WSL_CFILE']
+        for name in disable:
+            if name == 'WSL_CFILE':
+                macro = '$(WSL_CFILE)'
+            else:
+                macro = '$(VIM_' + name + ')'
+            if name in command:
+                t = '%s is invalid in command line'%macro
+                pretty.error(t)
+                print('command=' + command)
+                return 3
+            if name in cwd:
+                t = '%s is invalid in command line'%macro
+                pretty.error(t)
+                print('cwd=' + cwd)
+                return 4
         return 0
+
+    def task_option (self, task):
+        opts = OBJECT()
+        opts.command = task.get('command', '')
+        opts.cwd = task.get('cwd')
+        opts.macros = self.config.macros_expand()
+        if opts.cwd:
+            opts.cwd = self.config.macros_replace(opts.cwd, opts.macros)
+        return opts
 
     def execute (self, opts):
         command = opts.command
@@ -796,10 +828,13 @@ class TaskManager (object):
         if not command:
             pretty.error('no command defined in ' + source)
             return -3
+        hr = self.command_check(command, task.get('cwd', ''))
+        if hr != 0:
+            return -4
         # os.system(command)
         opts = self.task_option(task)
-        save = os.getcwd()
         opts.command = command
+        save = os.getcwd()
         if opts.cwd:
             os.chdir(opts.cwd)
         self.execute(opts)
