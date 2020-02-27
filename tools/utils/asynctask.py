@@ -78,6 +78,7 @@ MACROS_HELP = {
 
 #----------------------------------------------------------------------
 # file type detection (as filetype in vim)
+# can be overrided in ~/.config/asynctask/asynctask.ini
 #----------------------------------------------------------------------
 FILE_TYPES = {
     'text': '*.txt',
@@ -116,72 +117,7 @@ FILE_TYPES = {
 
 
 #----------------------------------------------------------------------
-# call program and returns output (combination of stdout and stderr)
-#----------------------------------------------------------------------
-def execute(args, shell = False, capture = False):
-    import sys, os  # noqa: F811
-    parameters = []
-    cmd = None
-    if not isinstance(args, list):
-        import shlex
-        cmd = args
-        if sys.platform[:3] == 'win':
-            ucs = False
-            if sys.version_info[0] < 3:
-                if not isinstance(cmd, str):
-                    cmd = cmd.encode('utf-8')
-                    ucs = True
-            args = shlex.split(cmd.replace('\\', '\x00'))
-            args = [ n.replace('\x00', '\\') for n in args ]
-            if ucs:
-                args = [ n.decode('utf-8') for n in args ]
-        else:
-            args = shlex.split(cmd)
-    for n in args:
-        if sys.platform[:3] != 'win':
-            replace = { ' ':'\\ ', '\\':'\\\\', '\"':'\\\"', '\t':'\\t',
-                '\n':'\\n', '\r':'\\r' }
-            text = ''.join([ replace.get(ch, ch) for ch in n ])
-            parameters.append(text)
-        else:
-            if (' ' in n) or ('\t' in n) or ('"' in n): 
-                parameters.append('"%s"'%(n.replace('"', ' ')))
-            else:
-                parameters.append(n)
-    if cmd is None:
-        cmd = ' '.join(parameters)
-    if sys.platform[:3] == 'win' and len(cmd) > 255:
-        shell = False
-    if shell and (not capture):
-        os.system(cmd)
-        return b''
-    elif (not shell) and (not capture):
-        import subprocess
-        if 'call' in subprocess.__dict__:
-            subprocess.call(args)
-            return b''
-    import subprocess
-    if 'Popen' in subprocess.__dict__:
-        p = subprocess.Popen(args, shell = shell,
-                stdin = subprocess.PIPE, stdout = subprocess.PIPE, 
-                stderr = subprocess.STDOUT)
-        stdin, stdouterr = (p.stdin, p.stdout)
-    else:
-        p = None
-        stdin, stdouterr = os.popen4(cmd)
-    stdin.close()
-    text = stdouterr.read()
-    stdouterr.close()
-    if p: p.wait()
-    if not capture:
-        sys.stdout.write(text)
-        sys.stdout.flush()
-        return b''
-    return text
-
-
-#----------------------------------------------------------------------
-# read_ini
+# read_ini, configparser has problems in parsing key with colon
 #----------------------------------------------------------------------
 def load_ini_file (ininame, codec = None):
     if not ininame:
@@ -232,37 +168,13 @@ def load_ini_file (ininame, codec = None):
 
 
 #----------------------------------------------------------------------
-# OBJECT：enchanced object
-#----------------------------------------------------------------------
-class OBJECT (object):
-    def __init__ (self, **argv):
-        for x in argv: self.__dict__[x] = argv[x]
-    def __getitem__ (self, x):
-        return self.__dict__[x]
-    def __setitem__ (self, x, y):
-        self.__dict__[x] = y
-    def __delitem__ (self, x):
-        del self.__dict__[x]
-    def __contains__ (self, x):
-        return self.__dict__.__contains__(x)
-    def __len__ (self):
-        return self.__dict__.__len__()
-    def __repr__ (self):
-        line = [ '%s=%s'%(k, repr(v)) for k, v in self.__dict__.items() ]
-        return 'OBJECT(' + ', '.join(line) + ')'
-    def __str__ (self):
-        return self.__repr__()
-    def __iter__ (self):
-        return self.__dict__.__iter__()
-
-
-#----------------------------------------------------------------------
-# Terminal Output
+# Prettify Terminal Text
 #----------------------------------------------------------------------
 class PrettyText (object):
 
     def __init__ (self):
         self.isatty = sys.__stdout__.isatty()
+        self.term256 = False
         self.names = self.__init_names()
         self.handle = None
 
@@ -297,6 +209,9 @@ class PrettyText (object):
             names[name.upper()] = i + 8
         names['reset'] = -1
         names['RESET'] = -1
+        if sys.platform[:3] != 'win':
+            if '256' in os.environ.get('TERM', ''):
+                self.term256 = True
         return names
 
     # set color
@@ -486,17 +401,11 @@ class configure (object):
             self.target = 'file'
         self.path = path
         self.filetype = None
-        self.mark = '.git,.svn,.project,.hg,.root'
-        if 'VIM_TASK_ROOTMARK' in os.environ:
-            mark = os.environ['VIM_TASK_ROOTMARK'].strip()
-            if mark:
-                self.mark = mark
-        mark = [ n.strip() for n in self.mark.split(',') ]
-        self.root = self.find_root(self.home, mark, True)
         self.tasks = {}
         self.environ = {}
         self.config = {}
         self._load_config()
+        self._root_detect()
         if self.target == 'file':
             self.filetype = self.match_ft(self.path)
         self.feature = {}
@@ -530,6 +439,8 @@ class configure (object):
         while True:
             parent = os.path.normpath(os.path.join(base, '..'))
             for marker in markers:
+                if not marker:
+                    continue
                 test = os.path.join(base, marker)
                 if os.path.exists(test):
                     return base
@@ -602,6 +513,18 @@ class configure (object):
             for path in self.extract_list(extras):
                 if os.path.exists(path):
                     self.extra_config.append(os.path.abspath(path))
+        return 0
+
+    def _root_detect (self):
+        self.mark = '.git,.svn,.project,.hg,.root'
+        if 'root_marker' in self.config['default']:
+            self.mark = self.config['default']['root_marker']
+        if 'VIM_TASK_ROOTMARK' in os.environ:
+            mark = os.environ['VIM_TASK_ROOTMARK'].strip()
+            if mark:
+                self.mark = mark
+        mark = [ n.strip() for n in self.mark.split(',') ]
+        self.root = self.find_root(self.home, mark, True)
         return 0
 
     def trinity_split (self, text):
@@ -955,6 +878,74 @@ class TaskManager (object):
 
 
 #----------------------------------------------------------------------
+# getopt: returns (options, args)
+#----------------------------------------------------------------------
+def getopt (argv):
+    args = []
+    options = {}
+    if argv is None:
+        argv = sys.argv[1:]
+    index = 0
+    count = len(argv)
+    while index < count:
+        arg = argv[index]
+        if arg != '':
+            head = arg[:1]
+            if head != '-':
+                break
+            if arg == '-':
+                break
+            name = arg.lstrip('-')
+            key, _, val = name.partition('=')
+            options[key.strip()] = val.strip()
+        index += 1
+    while index < count:
+        args.append(argv[index])
+        index += 1
+    return options, args
+
+
+#----------------------------------------------------------------------
+# main entry
+#----------------------------------------------------------------------
+def main(args = None):
+    args = args if args is not None else sys.argv
+    args = [ n for n in args ]
+    prog = 'asynctask.py' if not args else args[0]
+    prog = prog and prog or 'asynctask.py'
+    if len(args) <= 1:
+        pretty.error('require task name, use %s -h for help'%prog)
+        return 1
+    opts, args = getopt(args)
+    if 'h' in opts:
+        print('usage: %s <operation>'%prog)
+        print('operations:')
+        print('    %s {taskname}        - run task'%prog)
+        print('    %s {taskname} <file> - run task with a file'%prog)
+        print('    %s {taskname} <path> - run task in dest directory'%prog)
+        print('    %s -l                - list tasks (use -L for all)'%prog)
+        print('    %s -h                - show this help'%prog)
+        print('    %s -m                - display command macros'%prog)
+        print('')
+        return 0
+    if ('l' in opts) or ('L' in opts) or ('m' in opts) or ('M' in opts):
+        path = '' if not args else args[0]
+        if path and (not os.path.exists(path)):
+            pretty.error('path not exists: %s'%path)
+            return 2
+        tm = TaskManager(path)
+        if ('l' in opts) or ('L' in opts):
+            tm.task_list('L' in opts)
+            return 0
+        else:
+            tm.task_macros('M' in opts)
+            return 0
+    if 'p' in opts:
+        profile = opts['p']
+    return 0
+
+
+#----------------------------------------------------------------------
 # testing suit
 #----------------------------------------------------------------------
 if __name__ == '__main__':
@@ -1004,6 +995,9 @@ if __name__ == '__main__':
         # tm.task_macros(True)
         # size = pretty.get_term_size()
         # print('terminal size:', size)
-    test6()
+    def test7():
+        args = ['', '-m']
+        main(args)
+    test7()
 
 
