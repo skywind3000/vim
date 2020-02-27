@@ -809,7 +809,7 @@ class TaskManager (object):
             p2 = command.find(mark_close, p1)
             if p2 < 0:
                 break
-            name = command[p1 + size_open:p2 - p1 - size_open]
+            name = command[p1 + size_open:p2]
             mark = mark_open + name + mark_close
             prompt = 'Input argument (%s): '%name
             try:
@@ -883,7 +883,6 @@ class TaskManager (object):
         command = self.command_input(command)
         command = command.strip()
         if not command:
-            pretty.error('command is empty')
             return 0
         opts = self.task_option(task)
         opts.command = command
