@@ -341,7 +341,7 @@ class PrettyText (object):
                     break
                 size = len(output)
                 sys.stdout.write(output[:avail])
-                sys.stdout.flush()
+                self.set_color(-1)
                 avail -= size
             sys.stdout.write('\n')
         self.set_color(-1)
@@ -764,6 +764,7 @@ class TaskManager (object):
         disable += ['FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
         cwd = task.get('cwd', '')
         ini = task.get('__name__', '')
+        cc = 'cyan'
         if self.config.target != 'file':
             for name in disable:
                 for head in ['$(VIM_', '$(WSL_']:
@@ -771,12 +772,12 @@ class TaskManager (object):
                     if macro in command:
                         pretty.error('task command requires a file name')
                         if ini: print('from %s:'%ini)
-                        pretty.perror('BLACK', 'command=' + command)
+                        pretty.perror(cc, 'command=' + command)
                         return 1
                     if macro in cwd: 
                         pretty.error('task cwd requires a file name')
                         if ini: print('from %s:'%ini)
-                        pretty.perror('BLACK', 'cwd=' + cwd)
+                        pretty.perror(cc, 'cwd=' + cwd)
                         return 2
         disable = ['CFILE', 'CLINE', 'GUI', 'VERSION', 'COLUMNS', 'LINES']
         disable += ['SVRNAME', 'WSL_CFILE']
@@ -789,13 +790,13 @@ class TaskManager (object):
                 t = '%s is invalid in command line'%macro
                 pretty.error(t)
                 if ini: print('from %s:'%ini)
-                pretty.perror('BLACK', 'command=' + command)
+                pretty.perror(cc, 'command=' + command)
                 return 3
             if name in cwd:
                 t = '%s is invalid in command line'%macro
                 pretty.error(t)
                 if ini: print('from %s:'%ini)
-                pretty.perror('BLACK', 'cwd=' + cwd)
+                pretty.perror(cc, 'cwd=' + cwd)
                 return 4
         return 0
 
@@ -828,6 +829,8 @@ class TaskManager (object):
             value = macros.get(name, None)
             if value is not None:
                 os.environ[name] = value
+        if self.verbose:
+            pretty.echo('white', '+ ' + command + '\n')
         self.code = os.system(command)
         return 0
 
@@ -861,7 +864,7 @@ class TaskManager (object):
     def task_list (self, all = False):
         self.config.load_tasks()
         rows = []
-        c0 = 'YELLOW'
+        c0 = 'yellow'
         c1 = 'RED'
         c2 = 'cyan'
         c3 = 'white'
@@ -989,6 +992,8 @@ def main(args = None):
         profile = opts['profile']
         if profile:
             tm.config.profile = profile
+    if 'v' in opts or 'verbose' in opts:
+        tm.verbose = True
     tm.task_run(taskname)
     return 0
 
