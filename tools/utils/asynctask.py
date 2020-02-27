@@ -796,6 +796,35 @@ class TaskManager (object):
                 return 4
         return 0
 
+    def command_input (self, command):
+        mark_open = '$(?'
+        mark_close = ')'
+        size_open = len(mark_open)
+        if '$(VIM_CWORD)' in command:
+            command = command.replace('$(VIM_CWORD)', '$(?CWORD)')
+        while True:
+            p1 = command.find(mark_open)
+            if p1 < 0:
+                break
+            p2 = command.find(mark_close, p1)
+            if p2 < 0:
+                break
+            name = command[p1 + size_open:p2 - p1 - size_open]
+            mark = mark_open + name + mark_close
+            prompt = 'Input argument (%s): '%name
+            try:
+                if sys.version_info[0] < 3:
+                    text = raw_input(prompt)  # noqa: F821
+                else:
+                    text = input(prompt)
+            except KeyboardInterrupt:
+                text = ''
+            text = text.strip()
+            if not text:
+                return ''
+            command = command.replace(mark, text)
+        return command
+
     def task_option (self, task):
         opts = OBJECT()
         opts.command = task.get('command', '')
