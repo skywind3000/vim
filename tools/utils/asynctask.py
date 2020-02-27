@@ -117,6 +117,31 @@ FILE_TYPES = {
 
 
 #----------------------------------------------------------------------
+# OBJECT：enchanced object
+#----------------------------------------------------------------------
+class OBJECT (object):
+    def __init__ (self, **argv):
+        for x in argv: self.__dict__[x] = argv[x]
+    def __getitem__ (self, x):
+        return self.__dict__[x]
+    def __setitem__ (self, x, y):
+        self.__dict__[x] = y
+    def __delitem__ (self, x):
+        del self.__dict__[x]
+    def __contains__ (self, x):
+        return self.__dict__.__contains__(x)
+    def __len__ (self):
+        return self.__dict__.__len__()
+    def __repr__ (self):
+        line = [ '%s=%s'%(k, repr(v)) for k, v in self.__dict__.items() ]
+        return 'OBJECT(' + ', '.join(line) + ')'
+    def __str__ (self):
+        return self.__repr__()
+    def __iter__ (self):
+        return self.__dict__.__iter__()
+
+
+#----------------------------------------------------------------------
 # read_ini, configparser has problems in parsing key with colon
 #----------------------------------------------------------------------
 def load_ini_file (ininame, codec = None):
@@ -735,7 +760,7 @@ class TaskManager (object):
         return command
 
     def command_check (self, command, task):
-        disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT']
+        disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT', 'FILETYPE']
         disable += ['FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
         cwd = task.get('cwd', '')
         ini = task.get('__name__', '')
@@ -917,7 +942,7 @@ def usage_help(prog):
     print('    %s -l                - list tasks (use -L for all)'%prog)
     print('    %s -h                - show this help'%prog)
     print('    %s -m                - display command macros'%prog)
-    print('')
+    # print('')
     return 0
 
 
@@ -928,7 +953,8 @@ def main(args = None):
     args = args if args is not None else sys.argv
     args = [ n for n in args ]
     prog = 'asynctask.py' if not args else args[0]
-    prog = prog and prog or 'asynctask.py'
+    prog = os.path.basename(prog and prog or 'asynctask.py')
+    prog = 'asynctask'
     if len(args) <= 1:
         pretty.error('require task name, use %s -h for help'%prog)
         return 1
