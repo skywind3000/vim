@@ -4,8 +4,13 @@
 #
 # asynctask.py - 
 #
-# Created by skywind on 2020/02/25
-# Last Modified: 2020/02/25 21:55:54
+# Maintainer: skywind3000 (at) gmail.com, 2020
+#
+# Last Modified: 2020/02/26 02:42
+# Verision: 1.0.3
+#
+# for more information, please visit:
+# https://github.com/skywind3000/asynctasks.vim
 #
 #======================================================================
 from __future__ import print_function, unicode_literals
