@@ -19,6 +19,8 @@ import os
 import copy
 import fnmatch
 import pprint
+import tempfile
+import codecs
 
 
 #----------------------------------------------------------------------
@@ -894,7 +896,7 @@ class TaskManager (object):
             os.chdir(save)
         return 0
 
-    def task_list (self, all = False):
+    def task_list (self, all = False, raw = False):
         self.config.load_tasks()
         rows = []
         c0 = 'yellow'
@@ -902,8 +904,20 @@ class TaskManager (object):
         c2 = 'cyan'
         c3 = 'white'
         c4 = 'BLACK'
+        names = list(self.config.tasks.keys())
+        names.sort()
+        if raw:
+            for name in names:
+                if (not all) and name.startswith('.'):
+                    continue
+                task = self.config.tasks[name]
+                command = self.command_select(task)
+                mode = task.get('__mode__')
+                rows.append([(c1, name), (c2, mode), (c3, command)])
+            pretty.tabulify(rows)
+            return 0
         rows.append([(c0, 'Task'), (c0, 'Type'), (c0, 'Detail')])
-        for name in self.config.tasks:
+        for name in names:
             if (not all) and name.startswith('.'):
                 continue
             task = self.config.tasks[name]
@@ -911,8 +925,7 @@ class TaskManager (object):
             mode = task.get('__mode__')
             ini = task.get('__name__', '')
             rows.append([(c1, name), (c2, mode), (c3, command)])
-            if ini:
-                rows.append(['', '', (c4, ini)])
+            if ini: rows.append(['', '', (c4, ini)])
         pretty.tabulify(rows)
         return 0
 
@@ -935,6 +948,92 @@ class TaskManager (object):
             text = macros[name]
             rows.append([(c1, name), (c3, help), (c4, text)])
         pretty.tabulify(rows)
+        return 0
+
+    def setup (self, opts):
+        if 'profile' in opts:
+            profile = opts['profile']
+            if profile:
+                self.config.profile = profile
+        if 'v' in opts or 'verbose' in opts:
+            self.verbose = True
+        return 0
+
+    def interactive (self, way):
+        # self.config
+        self.config.load_tasks()
+        names = []
+        for name in self.config.tasks:
+            if not name.startswith('.'):
+                names.append(name)
+        if len(names) == 0:
+            return 0
+        names.sort()
+        tasks = {}
+        for name in names:
+            task = self.config.tasks[name]
+            command = self.command_select(task)
+            mode = task.get('__mode__')
+            tasks[name] = (mode, command)
+        if way == 0:
+            rows = []
+            for index, name in enumerate(names):
+                mode, command = tasks[name]
+                ii = ('WHITE', str(index + 1) + ':')
+                rows.append([ii, ('RED', name), command])
+            rows.reverse()
+            pretty.tabulify(rows)
+            if sys.version_info[0] >= 3:
+                text = input('> ')
+            else:
+                text = raw_input('> ')    # noqa: F821
+            text = text.strip()
+            if not text:
+                return 0
+            if not text.isdigit():
+                return 0
+            i = int(text)
+            if i < 1 or i > len(names):
+                return 0
+            return self.task_run(names[i - 1])
+        else:
+            fzf = os.environ.get('VIM_TASK_FZF', 'fzf')
+            cmd = '--nth 1.. --reverse --inline-info --tac '
+            flag = os.environ.get('VIM_TASK_FZF_FLAG', '')
+            flag = (not flag) and '+s -e' or flag
+            cmd = (fzf and fzf or 'fzf') + ' ' + cmd + ' ' + flag
+            if sys.platform[:3] != 'win':
+                height = '35%'
+                cmd += ' --height ' + height
+            rows = []
+            width = 0
+            for index, name in enumerate(names):
+                mode, command = tasks[name]
+                rows.append([name, command])
+                if len(name) > width:
+                    width = len(name)
+            for row in rows:
+                row[0] = row[0] + ' ' * (width - len(row[0]) + 2)
+            tmpdir = tempfile.mkdtemp('asynctask')
+            tmpname = os.path.join(tmpdir, 'fzf.txt')
+            tmprecv = os.path.join(tmpdir, 'output.txt')
+            if os.path.exists(tmprecv):
+                os.remove(tmprecv)
+            with codecs.open(tmpname, 'w', encoding = 'utf-8') as fp:
+                for row in rows:
+                    fp.write('%s %s\r\n'%(row[0], row[1]))
+            if sys.platform[:3] != 'win':
+                cmd = cmd + ' < "' + tmpname + '"'
+            else:
+                cmd = 'type "' + tmpname + '" | ' + cmd
+            cmd += ' > "'  + tmprecv + '"'
+            code = os.system(cmd)
+            if code != 0:
+                return 0
+            text = ''
+            with codecs.open(tmprecv, 'r', encoding = 'utf-8') as fp:
+                text = fp.read()
+            return self.task_run(text)
         return 0
 
 
@@ -978,6 +1077,7 @@ def usage_help(prog):
     print('    %s -l                - list tasks (use -L for all)'%prog)
     print('    %s -h                - show this help'%prog)
     print('    %s -m                - display command macros'%prog)
+    print('    %s -i                - interactive mode (use -I for fzf)'%prog)
     # print('')
     return 0
 
@@ -1004,12 +1104,25 @@ def main(args = None):
             pretty.error('path not exists: %s'%path)
             return 2
         tm = TaskManager(path)
-        if ('l' in opts) or ('L' in opts):
+        if 'raw' in opts:
+            tm.task_list('L' in opts, True)
+            return 0
+        elif ('l' in opts) or ('L' in opts):
             tm.task_list('L' in opts)
             return 0
         else:
             tm.task_macros('M' in opts)
             return 0
+    if 'i' in opts or 'I' in opts:
+        path = '' if not args else args[0]
+        if path and (not os.path.exists(path)):
+            pretty.error('path not exists: %s'%path)
+            return 2
+        tm = TaskManager(path)
+        tm.setup(opts)
+        mode = 0 if 'i' in opts else 1
+        tm.interactive(mode)
+        return 0
     if len(args) == 0:
         pretty.error('require task name, use %s -h for help'%prog)
         return 1
@@ -1021,12 +1134,7 @@ def main(args = None):
         pretty.error('path not exists: %s'%path)
         return 2
     tm = TaskManager(path)
-    if 'profile' in opts:
-        profile = opts['profile']
-        if profile:
-            tm.config.profile = profile
-    if 'v' in opts or 'verbose' in opts:
-        tm.verbose = True
+    tm.setup(opts)
     tm.task_run(taskname)
     return 0
 
