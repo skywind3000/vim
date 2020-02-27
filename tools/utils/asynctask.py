@@ -6,8 +6,8 @@
 #
 # Maintainer: skywind3000 (at) gmail.com, 2020
 #
-# Last Modified: 2020/02/28 02:04
-# Verision: 1.0.4
+# Last Modified: 2020/02/28 05:36
+# Verision: 1.0.5
 #
 # for more information, please visit:
 # https://github.com/skywind3000/asynctasks.vim
@@ -1044,7 +1044,7 @@ class TaskManager (object):
             text = text[:p1].rstrip('\r\n\t ')
             if not text:
                 return 0
-            self.task_run(text)
+            return self.task_run(text)
         return 0
 
 
@@ -1147,8 +1147,8 @@ def main(args = None):
         return 2
     tm = TaskManager(path)
     tm.setup(opts)
-    tm.task_run(taskname)
-    return 0
+    hr = tm.task_run(taskname)
+    return hr
 
 
 #----------------------------------------------------------------------
