@@ -906,6 +906,22 @@ def getopt (argv):
 
 
 #----------------------------------------------------------------------
+# display help text
+#----------------------------------------------------------------------
+def usage_help(prog):
+    print('usage: %s <operation>'%prog)
+    print('operations:')
+    print('    %s {taskname}        - run task'%prog)
+    print('    %s {taskname} <file> - run task with a file'%prog)
+    print('    %s {taskname} <path> - run task in dest directory'%prog)
+    print('    %s -l                - list tasks (use -L for all)'%prog)
+    print('    %s -h                - show this help'%prog)
+    print('    %s -m                - display command macros'%prog)
+    print('')
+    return 0
+
+
+#----------------------------------------------------------------------
 # main entry
 #----------------------------------------------------------------------
 def main(args = None):
@@ -916,17 +932,9 @@ def main(args = None):
     if len(args) <= 1:
         pretty.error('require task name, use %s -h for help'%prog)
         return 1
-    opts, args = getopt(args)
+    opts, args = getopt(args[1:])
     if 'h' in opts:
-        print('usage: %s <operation>'%prog)
-        print('operations:')
-        print('    %s {taskname}        - run task'%prog)
-        print('    %s {taskname} <file> - run task with a file'%prog)
-        print('    %s {taskname} <path> - run task in dest directory'%prog)
-        print('    %s -l                - list tasks (use -L for all)'%prog)
-        print('    %s -h                - show this help'%prog)
-        print('    %s -m                - display command macros'%prog)
-        print('')
+        usage_help(prog)
         return 0
     if ('l' in opts) or ('L' in opts) or ('m' in opts) or ('M' in opts):
         path = '' if not args else args[0]
@@ -940,8 +948,22 @@ def main(args = None):
         else:
             tm.task_macros('M' in opts)
             return 0
-    if 'p' in opts:
-        profile = opts['p']
+    if len(args) == 0:
+        pretty.error('require task name, use %s -h for help'%prog)
+        return 1
+    taskname = args[0]
+    path = ''
+    if len(args) >= 2:
+        path = args[1]
+    if path and (not os.path.exists(path)):
+        pretty.error('path not exists: %s'%path)
+        return 2
+    tm = TaskManager(path)
+    if 'profile' in opts:
+        profile = opts['profile']
+        if profile:
+            tm.config.profile = profile
+    tm.task_run(taskname)
     return 0
 
 
@@ -998,6 +1020,7 @@ if __name__ == '__main__':
     def test7():
         args = ['', '-m']
         main(args)
-    test7()
+    # test7()
+    exit(main())
 
 
