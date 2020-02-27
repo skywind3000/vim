@@ -999,7 +999,7 @@ class TaskManager (object):
             return self.task_run(names[i - 1])
         else:
             fzf = os.environ.get('VIM_TASK_FZF', 'fzf')
-            cmd = '--nth 1.. --inline-info --tac '
+            cmd = '--nth 1.. --reverse --inline-info --tac '
             flag = os.environ.get('VIM_TASK_FZF_FLAG', '')
             flag = (not flag) and '+s ' or flag
             cmd = (fzf and fzf or 'fzf') + ' ' + cmd + ' ' + flag
@@ -1008,6 +1008,7 @@ class TaskManager (object):
                 cmd += ' --height ' + height
             rows = []
             width = 0
+            names.reverse()
             for index, name in enumerate(names):
                 mode, command = tasks[name]
                 rows.append([name, command])
