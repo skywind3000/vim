@@ -64,7 +64,7 @@ endif
 
 " features
 if !exists('g:asynctasks_feature')
-	let g:asynctasks_feature = {}
+	let g:asynctasks_feature = {'vim':1}
 endif
 
 " terminal mode: tab/curwin/top/bottom/left/right/quickfix/external

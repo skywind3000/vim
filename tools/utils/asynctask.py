@@ -6,8 +6,8 @@
 #
 # Maintainer: skywind3000 (at) gmail.com, 2020
 #
-# Last Modified: 2020/02/28 05:36
-# Verision: 1.0.5
+# Last Modified: 2020/02/28 21:01
+# Verision: 1.0.6
 #
 # for more information, please visit:
 # https://github.com/skywind3000/asynctasks.vim
@@ -321,7 +321,6 @@ class PrettyText (object):
                     colsize[col] = max(size, colsize[col])
         if maxcol <= 0:
             return ''
-        last_color = -100
         for row in rows:
             avail = maxwidth
             for col, item in enumerate(row):
@@ -429,10 +428,9 @@ class configure (object):
         self.environ = {}
         self.config = {}
         self._load_config()
-        self._root_detect()
         if self.target == 'file':
             self.filetype = self.match_ft(self.path)
-        self.feature = {}
+        self._root_detect()
 
     def read_ini (self, ininame, codec = None):
         ininame = os.path.abspath(ininame)
@@ -503,6 +501,7 @@ class configure (object):
         self.rtp_name = 'tasks.ini'
         self.extra_config = []
         self.config = {}
+        self.feature = {'shell':True}
         # load ~/.config
         name = os.path.expanduser('~/.config')
         if self.check_environ('XDG_CONFIG_HOME'):
@@ -523,6 +522,11 @@ class configure (object):
                     path = os.path.expanduser(path)
                 if os.path.exists(path):
                     self.extra_config.append(os.path.abspath(path))
+        if 'feature' in setting:
+            for feat in self.extract_list(setting['feature']):
+                feat = feat.strip()
+                if feat:
+                    self.feature[feat] = True
         # load from environment
         if self.check_environ('VIM_TASK_SYSTEM'):
             self.system = os.environ['VIM_TASK_SYSTEM']
@@ -797,6 +801,9 @@ class TaskManager (object):
                 if ini: print('from %s:'%ini)
                 pretty.perror(cc, 'cwd=' + cwd)
                 return 4
+        if command.lstrip().startswith(':'):
+            pretty.error('command starting with colon is not allowed here')
+            return 5
         return 0
 
     def command_input (self, command):
