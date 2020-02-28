@@ -1005,9 +1005,10 @@ class TaskManager (object):
                 return 0
             return self.task_run(names[i - 1])
         else:
-            fzf = os.environ.get('VIM_TASK_FZF', 'fzf')
-            cmd = '--nth 1.. --reverse --inline-info --tac '
-            flag = os.environ.get('VIM_TASK_FZF_FLAG', '')
+            setting = self.config.config['default']
+            fzf = setting.get('fzf', 'fzf')
+            cmd = '--nth 1 --reverse --inline-info --tac '
+            flag = setting.get('fzf_flag', '')
             flag = (not flag) and '+s ' or flag
             cmd = (fzf and fzf or 'fzf') + ' ' + cmd + ' ' + flag
             if sys.platform[:3] != 'win':
