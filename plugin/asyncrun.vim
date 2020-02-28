@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/02/29 02:38
+" Last Modified: 2020/02/29 02:43
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -195,8 +195,6 @@ let g:asyncrun_script = get(g:, 'asyncrun_script', '')
 " strict to execute vim script
 let g:asyncrun_strict = get(g:, 'asyncrun_strict', 0)
 
-" file types for asyncrun#execute
-let g:asyncrun_ftrun = get(g:, 'asyncrun_ftrun', {})
 
 
 "----------------------------------------------------------------------
