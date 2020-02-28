@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/02/21 17:06
+" Last Modified: 2020/02/29 00:13
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -168,6 +168,9 @@ let g:asyncrun_shellflag = get(g:, 'asyncrun_shellflag', '')
 
 " external runners for '-mode=terminal'
 let g:asyncrun_runner = get(g:, 'asyncrun_runner', {})
+
+" command modifier for '-program=xxx'
+let g:asyncrun_program = get(g:, 'asyncrun_program', {})
 
 " silent the autocmds ?
 let g:asyncrun_silent = get(g:, 'asyncrun_silent', 1)
@@ -1311,8 +1314,16 @@ function! s:run(opts)
 			let l:command = cmd . ' ' . l:command
 		else
 			call s:ErrorMsg("only available for Windows")
-			return
+			return ''
 		endif
+	else
+		let name = l:opts.program
+		if has_key(g:asyncrun_program, name) == 0
+			call s:ErrorMsg(name . " not found in g:asyncrun_program")
+			return ''
+		endif
+		let F = g:asyncrun_program[name]
+		let l:command = F(l:opts)
 	endif
 
 	if l:program != ''
@@ -1693,7 +1704,7 @@ endfunc
 " asyncrun - version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.4.9'
+	return '2.5.0'
 endfunc
 
 
