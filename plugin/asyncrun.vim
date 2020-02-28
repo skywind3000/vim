@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/02/29 00:13
+" Last Modified: 2020/02/29 02:38
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1320,15 +1320,15 @@ function! s:run(opts)
 	elseif l:opts.program != ''
 		let name = l:opts.program
 		let test = ['cygwin', 'msys', 'mingw32', 'mingw64']
-		if index(text, name) >= 0
-			let l:command = s:program_msys(l:opts)
+		if index(test, name) >= 0
+			unsilent let l:command = s:program_msys(l:opts)
 		else
 			if has_key(g:asyncrun_program, name) == 0
 				call s:ErrorMsg(name . " not found in g:asyncrun_program")
 				return ''
 			endif
 			let F = g:asyncrun_program[name]
-			let l:command = F(l:opts)
+			unsilent let l:command = F(l:opts)
 		endif
 		if l:command == ''
 			return ''
@@ -1733,7 +1733,7 @@ command! -bar -bang -nargs=0 AsyncStop call asyncrun#stop('<bang>')
 function! s:program_msys(opts)
 	let tmpname = fnamemodify(tempname(), ':h') . '\asyncruz.cmd'
 	let script = fnamemodify(tempname(), ':h') . '\asyncrun.sh'
-	let program = opts.program
+	let program = a:opts.program
 	if s:asyncrun_windows == 0
 		call s:ErrorMsg('program ' . program . ' is only for windows')
 		return ''
@@ -1772,17 +1772,33 @@ function! s:program_msys(opts)
 			call s:ErrorMsg('invalid path in g:asyncrun_msys')
 			return ''
 		endif
-		let lines += ["set MSYSTEM=" . upper(program) . "\r"]
+		let lines += ["set MSYSTEM=" . toupper(program) . "\r"]
 		let mount = '/'
 		let prefix = 'MSYS_'
 	endif
 	let bash = s:StringReplace(bash, '/', "\\")
 	let path = asyncrun#path_win2unix(fnamemodify(script, ':p'), mount)
-	let text = shellescape(bash) + ' --login -i -c "' . path . '"'
-	let lines += ['call ' + text + "\r"]
+	let flag = ' --login ' . (get(a:opts, 'inter', '')? '-i' : '')
+	let text = shellescape(bash) . flag . ' "' . path . '"'
+	let lines += ['call ' . text . "\r"]
 	call writefile(lines, tmpname)
+	let command = a:opts.cmd
+	let names = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILENOEXT']
+	let names += ['PATHNOEXT', 'FILEEXT', 'FILETYPE', 'RELDIR']
+	let names += ['RELNAME', 'CFILE', 'ROOT', 'HOME', 'CWD']
 	let lines = ['#! /bin/sh']
-	let lines += [opts.cmd]
+	for name in names
+		let src = a:opts.macros['VIM_' . name]
+		let dst = asyncrun#path_win2unix(src, mount)
+		let target = '$(' . prefix . name . ')'
+		let command = s:StringReplace(command, target, dst)
+		let lines += ['export '. prefix . name . "='" . dst . "'"]
+	endfor
+	let lines += ['unset VIM']
+	let lines += ['unset VIMRUNTIME']
+	let cwd = asyncrun#path_win2unix(getcwd(), mount)
+	let lines += ["cd '" . cwd . "'"]
+	let lines += [command]
 	call writefile(lines, script)
 	return tmpname
 endfunc
@@ -1831,7 +1847,6 @@ function! asyncrun#quickfix_toggle(size, ...)
 	keepalt noautocmd windo call s:WindowCheck(1)
 	keepalt noautocmd silent! exec ''.l:winnr.'wincmd w'
 endfunc
-
 
 
 
