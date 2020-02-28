@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/26 02:42
-" Verision: 1.5.7
+" Last Modified: 2020/02/28 17:28
+" Verision: 1.5.8
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1361,7 +1361,7 @@ command! -bang -nargs=0 AsyncTaskMacro
 			\ call asynctasks#cmd('', ('<bang>' == '')? '-m' : '-M')
 
 command! -nargs=? AsyncTaskProfile
-			\ call asynctasks#cmd('', '-p', <f-args>)
+			\ AsyncTask -p <args>
 
 
 "----------------------------------------------------------------------
