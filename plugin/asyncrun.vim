@@ -1081,7 +1081,7 @@ endfunc
 " run in a terminal
 "----------------------------------------------------------------------
 function! s:start_in_terminal(opts)
-	let command = a:opts.command
+	let command = a:opts.cmd
 	let pos = get(a:opts, 'pos', 'bottom')
 	let hidden = get(a:opts, 'hidden', 0)
 	if has('patch-8.1.1') == 0 && has('nvim-0.3') == 0
@@ -1094,7 +1094,7 @@ function! s:start_in_terminal(opts)
 		let shell = ''
 	endif
 	if get(a:opts, 'safe', get(g:, 'asyncrun_term_safe', 0)) != 0
-		let command = s:ScriptWrite(a:opts.command, 0)
+		let command = s:ScriptWrite(a:opts.cmd, 0)
 		if stridx(command, ' ') >= 0
 			let command = shellescape(command)
 		endif
@@ -1159,7 +1159,7 @@ function! s:start_in_terminal(opts)
 		endif
 		if &bt == 'terminal'
 			setlocal nonumber signcolumn=no norelativenumber
-			let b:asyncrun_cmd = a:opts.command
+			let b:asyncrun_cmd = a:opts.cmd
 			if get(a:opts, 'listed', 1) == 0
 				setlocal nobuflisted
 			endif
@@ -1178,7 +1178,7 @@ function! s:start_in_terminal(opts)
 		endif
 		if &bt == 'terminal'
 			setlocal nonumber signcolumn=no norelativenumber
-			let b:asyncrun_cmd = a:opts.command
+			let b:asyncrun_cmd = a:opts.cmd
 			if get(a:opts, 'listed', 1) == 0
 				setlocal nobuflisted
 			endif
@@ -1225,7 +1225,7 @@ function! s:start_in_terminal(opts)
 	endif
 	if &bt == 'terminal'
 		setlocal nonumber signcolumn=no norelativenumber
-		let b:asyncrun_cmd = a:opts.command
+		let b:asyncrun_cmd = a:opts.cmd
 		if get(a:opts, 'listed', 1) == 0
 			setlocal nobuflisted
 		endif
@@ -1251,6 +1251,7 @@ function! s:run(opts)
 	let l:retval = ''
 	let l:mode = g:asyncrun_mode
 	let l:runner = ''
+	let l:opts.origin = l:opts.cmd
 
 	if a:opts.mode != ''
 		let l:mode = a:opts.mode
@@ -1316,14 +1317,23 @@ function! s:run(opts)
 			call s:ErrorMsg("only available for Windows")
 			return ''
 		endif
-	else
+	elseif l:opts.program != ''
 		let name = l:opts.program
-		if has_key(g:asyncrun_program, name) == 0
-			call s:ErrorMsg(name . " not found in g:asyncrun_program")
+		let test = ['cygwin', 'msys', 'mingw32', 'mingw64']
+		if index(text, name) >= 0
+			let l:command = s:program_msys(l:opts)
+		else
+			if has_key(g:asyncrun_program, name) == 0
+				call s:ErrorMsg(name . " not found in g:asyncrun_program")
+				return ''
+			endif
+			let F = g:asyncrun_program[name]
+			let l:command = F(l:opts)
+		endif
+		if l:command == ''
 			return ''
 		endif
-		let F = g:asyncrun_program[name]
-		let l:command = F(l:opts)
+		let l:opts.cmd = l:command
 	endif
 
 	if l:program != ''
@@ -1529,7 +1539,7 @@ function! s:run(opts)
 			exec opts.post
 		endif
 	elseif l:mode == 6
-		let opts.command = l:command
+		let opts.cmd = l:command
 		call s:start_in_terminal(opts)
 	endif
 
@@ -1717,6 +1727,66 @@ command! -bang -nargs=+ -range=0 -complete=file AsyncRun
 command! -bar -bang -nargs=0 AsyncStop call asyncrun#stop('<bang>')
 
 
+"----------------------------------------------------------------------
+" run command in msys
+"----------------------------------------------------------------------
+function! s:program_msys(opts)
+	let tmpname = fnamemodify(tempname(), ':h') . '\asyncruz.cmd'
+	let script = fnamemodify(tempname(), ':h') . '\asyncrun.sh'
+	let program = opts.program
+	if s:asyncrun_windows == 0
+		call s:ErrorMsg('program ' . program . ' is only for windows')
+		return ''
+	endif
+	let lines = ["@echo off\r"]
+	let lines += ["set CHERE_INVOKING=enabled_from_arguments\r"]
+	if program == 'cygwin'
+		let home = get(g:, 'asyncrun_cygwin', '')
+		if home == ''
+			call s:ErrorMsg('g:asyncrun_cygwin needs to set to cygwin root')
+			return ''
+		endif
+		if !isdirectory(home)
+			call s:Errormsg('path not find in g:asyncrun_cygwin')
+			return ''
+		endif
+		let bash = s:path_join(home, 'bin/bash.exe')
+		if !executable(bash)
+			call s:ErrorMsg('invalid path in g:asyncrun_cygwin')
+			return ''
+		endif
+		let mount = '/cygdrive'
+		let prefix = 'CYGWIN_'
+	elseif program == 'msys' || program == 'mingw32' || program == 'mingw64'
+		let home = get(g:, 'asyncrun_msys', '')
+		if home == ''
+			call s:ErrorMsg('g:asyncrun_msys needs to set to msys root')
+			return ''
+		endif
+		if !isdirectory(home)
+			call s:ErrorMsg('path not find in g:asyncrun_msys')
+			return ''
+		endif
+		let bash = s:path_join(home, 'usr/bin/bash.exe')
+		if !executable(bash)
+			call s:ErrorMsg('invalid path in g:asyncrun_msys')
+			return ''
+		endif
+		let lines += ["set MSYSTEM=" . upper(program) . "\r"]
+		let mount = '/'
+		let prefix = 'MSYS_'
+	endif
+	let bash = s:StringReplace(bash, '/', "\\")
+	let path = asyncrun#path_win2unix(fnamemodify(script, ':p'), mount)
+	let text = shellescape(bash) + ' --login -i -c "' . path . '"'
+	let lines += ['call ' + text + "\r"]
+	call writefile(lines, tmpname)
+	let lines = ['#! /bin/sh']
+	let lines += [opts.cmd]
+	call writefile(lines, script)
+	return tmpname
+endfunc
+
 
 "----------------------------------------------------------------------
 " Fast command to toggle quickfix
@@ -1764,193 +1834,10 @@ endfunc
 
 
 
-"----------------------------------------------------------------------
-" debug
-"----------------------------------------------------------------------
-function! s:execute(mode)
-	if a:mode == 0		" Execute current filename
-		let l:fname = shellescape(expand("%:p"))
-		if (has('gui_running') || has('nvim')) && (s:asyncrun_windows != 0)
-			if !has('nvim')
-				silent exec '!start cmd /C '. l:fname .' & pause'
-			else
-				call asyncrun#run('', {'mode':7}, l:fname)
-			endif
-		else
-			exec '!' . l:fname
-		endif
-	elseif a:mode == 1	" Execute current filename without extname
-		let l:fname = shellescape(expand("%:p:r"))
-		if (has('gui_running') || has('nvim')) && (s:asyncrun_windows != 0)
-			if !has('nvim')
-				silent exec '!start cmd /C '. l:fname .' & pause'
-			else
-				call asyncrun#run('', {'mode':7}, l:fname)
-			endif
-		else
-			exec '!' . l:fname
-		endif
-	elseif a:mode == 2
-		let l:fname = shellescape(expand("%"))
-		if (has('gui_running') || has('nvim')) && (s:asyncrun_windows != 0)
-			if !has('nvim')
-				silent exec '!start cmd /C emake -e '. l:fname .' & pause'
-			else
-				call asyncrun#run('', {'mode':7}, "emake -e ". l:fname)
-			endif
-		else
-			exec '!emake -e ' . l:fname
-		endif
-	elseif a:mode == 3
-		let l:makeprg = get(g:, 'asyncrun_mp_run', '')
-		let l:fname = shellescape(expand("%"))
-		if l:makeprg == ''
-			if executable('make')
-				let l:makeprg = 'make run -f'
-			elseif executable('mingw32-make')
-				let l:makeprg = 'mingw32-make run -f'
-			elseif executable('mingw64-make')
-				let l:makeprg = 'mingw64-make run -f'
-			else
-				redraw
-				call s:ErrorMsg('cannot find make/mingw32-make')
-				return
-			endif
-		endif
-		if (has('gui_running') || has('nvim')) && (s:asyncrun_windows != 0)
-			let l:cmdline = l:makeprg. ' '.l:fname
-			if !has('nvim')
-				silent exec '!start cmd /C '.l:cmdline . ' & pause'
-			else
-				call asyncrun#run('', {'mode':7}, l:cmdline)
-			endif
-		else
-			exec '!'.l:makeprg.' '.l:fname
-		endif
-	elseif a:mode == 4
-		let ext = tolower(expand("%:e"))
-		if index(['c', 'cc', 'cpp', 'h', 'mak', 'em', 'emk', 'm'], ext) >= 0
-			call s:execute(2)
-		elseif index(['mm', 'py', 'pyw', 'cxx', 'java', 'pyx'], ext) >= 0
-			call s:execute(2)
-		elseif index(['c', 'cpp', 'python', 'java', 'go'], &ft) >= 0
-			call s:execute(2)
-		elseif index(['javascript'], &ft) >= 0
-			call s:execute(2)
-		else
-			call s:execute(3)
-		endif
-	endif
-endfunc
-
 
 "----------------------------------------------------------------------
-" asyncrun - execute
-"----------------------------------------------------------------------
-function! asyncrun#execute(mode, cwd, save)
-	let savecwd = getcwd()
-	let l:ext = tolower(expand("%:e"))
-	if a:save | silent! wall | endif
-	if bufname('%') == '' | return | endif
-	let l:dest = ''
-	if a:cwd == 1
-		let l:dest = expand('%:p:h')
-	elseif a:cwd == 2
-		let l:dest = asyncrun#get_root('%')
-	endif
-	if l:dest != ''
-		silent! call s:chdir(l:dest)
-	endif
-	if a:mode == '0' || a:mode == 'filename' || a:mode == 'file'
-		call s:execute(0)
-	elseif a:mode == '1' || a:mode == 'main' || a:mode == 'exe'
-		call s:execute(1)
-	elseif a:mode == '2' || a:mode == 'emake'
-		call s:execute(2)
-	elseif a:mode == '3' || a:mode == 'make'
-		call s:execute(3)
-	elseif a:mode == '4' || a:mode == 'auto' || a:mode == 'automake'
-		call s:execute(4)
-	elseif &ft == 'cpp' || &ft == 'c'
-		call s:execute(1)
-	elseif index(['c', 'cpp', 'cc', 'm', 'mm', 'cxx'], l:ext) >= 0
-		call s:execute(1)
-	elseif index(['h', 'hh', 'hpp'], l:ext) >= 0
-		call s:execute(1)
-	elseif index(['mak', 'emake', 'em', 'emk'], l:ext) >= 0
-		call s:execute(2)
-	elseif l:ext == 'mk'
-		call s:execute(3)
-	elseif &ft == 'vim'
-		exec 'source '. fnameescape(expand('%'))
-	elseif s:asyncrun_windows && s:asyncrun_gui
-		let cmd = get(g:asyncrun_ftrun, &ft, '')
-		let fname = shellescape(expand('%'))
-		if cmd == ''
-			if &ft == 'python'
-				let cmd = 'python'
-			elseif &ft == 'javascript'
-				let cmd = 'node'
-			elseif &ft == 'sh'
-				let cmd = 'sh'
-			elseif &ft == 'lua'
-				let cmd = 'lua'
-			elseif &ft == 'perl'
-				let cmd = 'perl'
-			elseif &ft == 'ruby'
-				let cmd = 'ruby'
-			elseif &ft == 'php'
-				let cmd = 'php'
-			elseif l:ext == 'vbs'
-				let l:cmd = 'cscript -nologo'
-			elseif l:ext == 'ps1'
-				let cmd = 'powershell -file'
-			elseif l:ext == 'zsh'
-				let cmd = 'zsh'
-			elseif index(['osa', 'scpt', 'applescript'], l:ext) >= 0
-				let cmd = 'osascript'
-			endif
-		endif
-		if l:cmd == ''
-			call s:execute(0)
-		elseif !has('nvim')
-			silent exec '!start cmd /C '. cmd . ' ' . fname . ' & pause'
-		else
-			call asyncrun#run('', {'mode':7}, cmd . ' ' . fname)
-		endif
-	else
-		let cmd = get(g:asyncrun_ftrun, &ft, '')
-		if cmd != ''
-			exec '!'. cmd . ' ' . shellescape(expand("%"))
-		elseif &ft == 'python'
-			exec '!python ' . shellescape(expand("%"))
-		elseif &ft == 'javascript'
-			exec '!node ' . shellescape(expand("%"))
-		elseif &ft == 'sh'
-			exec '!sh ' . shellescape(expand("%"))
-		elseif &ft == 'lua'
-			exec '!lua ' . shellescape(expand("%"))
-		elseif &ft == 'perl'
-			exec '!perl ' . shellescape(expand("%"))
-		elseif &ft == 'ruby'
-			exec '!ruby ' . shellescape(expand("%"))
-		elseif &ft == 'php'
-			exec '!php ' . shellescape(expand("%"))
-		elseif &ft == 'zsh'
-			exec '!zsh ' . shellescape(expand("%"))
-		elseif index(['osa', 'scpt', 'applescript'], l:ext) >= 0
-			exec '!osascript '. shellescape(expand('%'))
-		else
-			call s:execute(0)
-		endif
-	endif
-	if l:dest != ''
-		call s:chdir(savecwd)
-	endif
-endfunc
-
-
 " auto open quickfix window
+"----------------------------------------------------------------------
 if has("autocmd")
 	function! s:check_quickfix()
 		let height = get(g:, "asyncrun_open", 0)
