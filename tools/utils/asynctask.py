@@ -501,7 +501,7 @@ class configure (object):
         self.rtp_name = 'tasks.ini'
         self.extra_config = []
         self.config = {}
-        self.feature = {'shell':True}
+        self.feature = {}
         # load ~/.config
         name = os.path.expanduser('~/.config')
         if self.check_environ('XDG_CONFIG_HOME'):
