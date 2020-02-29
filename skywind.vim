@@ -33,6 +33,8 @@ let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 
 let g:ycm_goto_buffer_command = 'new-or-existing-tab'
 
+let g:asyncrun_open = 6
+
 if g:asc_uname == 'windows'
 	let g:asyncrun_encs = 'gbk'
 endif

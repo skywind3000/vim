@@ -74,7 +74,6 @@ call Backup_Directory()
 augroup AscUnixGroup
 	au!
 	au FileType * call s:language_setup()
-	au User AsyncRunStart call asyncrun#quickfix_toggle(6, 1)
 	au User VimScope,VimMakeStart call vimmake#toggle_quickfix(6, 1)
 	au BufNewFile,BufRead *.as setlocal filetype=actionscript
 	au BufNewFile,BufRead *.pro setlocal filetype=prolog
