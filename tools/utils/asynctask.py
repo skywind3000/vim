@@ -516,6 +516,9 @@ class configure (object):
         self.system = setting.get('system', self.system).strip()
         self.cfg_name = setting.get('cfg_name', self.cfg_name).strip()
         self.rtp_name = setting.get('rtp_name', self.rtp_name).strip()
+        self.extra_config.append('~/.vim/tasks.ini')
+        self.extra_config.append('~/.config/nvim/tasks.ini')
+        self.extra_config.append('~/.config/asynctask/tasks.ini')
         if 'extra_config' in setting:
             for path in self.extract_list(setting['extra_config']):
                 if '~' in path:
@@ -606,10 +609,9 @@ class configure (object):
     # search for global configs
     def collect_rtp_config (self):
         names = []
-        t = os.path.join(os.path.expanduser('~/.vim'), self.rtp_name)
-        if os.path.exists(t):
-            names.append(os.path.abspath(t))
         for path in self.extra_config:
+            if '~' in path:
+                path = os.path.expanduser(path)
             if os.path.exists(path):
                 names.append(os.path.abspath(path))
         for name in names:
