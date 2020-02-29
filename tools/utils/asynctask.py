@@ -499,7 +499,7 @@ class configure (object):
         self.profile = 'debug'
         self.cfg_name = '.tasks'
         self.rtp_name = 'tasks.ini'
-        self.extra_config = []
+        self.global_config = []
         self.config = {}
         self.feature = {}
         # load ~/.config
@@ -516,15 +516,21 @@ class configure (object):
         self.system = setting.get('system', self.system).strip()
         self.cfg_name = setting.get('cfg_name', self.cfg_name).strip()
         self.rtp_name = setting.get('rtp_name', self.rtp_name).strip()
-        self.extra_config.append('~/.vim/tasks.ini')
-        self.extra_config.append('~/.config/nvim/tasks.ini')
-        self.extra_config.append('~/.config/asynctask/tasks.ini')
+        self.global_config.append('~/.vim/tasks.ini')
+        self.global_config.append('~/.config/nvim/tasks.ini')
+        self.global_config.append('~/.config/asynctask/tasks.ini')
+        if 'global_config' in setting:
+            for path in self.extract_list(setting['global_config']):
+                if '~' in path:
+                    path = os.path.expanduser(path)
+                if os.path.exists(path):
+                    self.global_config.append(os.path.abspath(path))
         if 'extra_config' in setting:
             for path in self.extract_list(setting['extra_config']):
                 if '~' in path:
                     path = os.path.expanduser(path)
                 if os.path.exists(path):
-                    self.extra_config.append(os.path.abspath(path))
+                    self.global_config.append(os.path.abspath(path))
         if 'feature' in setting:
             for feat in self.extract_list(setting['feature']):
                 feat = feat.strip()
@@ -543,7 +549,7 @@ class configure (object):
             extras = os.environ['VIM_TASK_EXTRA_CONFIG']
             for path in self.extract_list(extras):
                 if os.path.exists(path):
-                    self.extra_config.append(os.path.abspath(path))
+                    self.global_config.append(os.path.abspath(path))
         return 0
 
     def _root_detect (self):
@@ -609,7 +615,7 @@ class configure (object):
     # search for global configs
     def collect_rtp_config (self):
         names = []
-        for path in self.extra_config:
+        for path in self.global_config:
             if '~' in path:
                 path = os.path.expanduser(path)
             if os.path.exists(path):
