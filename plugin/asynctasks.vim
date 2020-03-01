@@ -5,7 +5,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
 " Last Modified: 2020/02/28 17:28
-" Verision: 1.5.8
+" Verision: 1.5.9
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1356,10 +1356,33 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" complete
+"----------------------------------------------------------------------
+function! s:complete(ArgLead, CmdLine, CursorPos)
+	let candidate = []
+	if asynctasks#collect_config('', 1) != 0
+		return -1
+	endif
+	let tasks = s:private.tasks
+	let rows = []
+	let size = len(a:ArgLead)
+	for task in tasks.avail
+		if stridx(task, '.') == 0
+			continue
+		endif
+		if stridx(task, a:ArgLead) == 0
+			let candidate += [task]
+		endif
+	endfor
+	return candidate
+endfunc
+
+
+"----------------------------------------------------------------------
 " command
 "----------------------------------------------------------------------
 
-command! -bang -nargs=* -range=0 AsyncTask
+command! -bang -nargs=* -range=0 -complete=customlist,s:complete AsyncTask
 		\ call asynctasks#cmd('<bang>', <q-args>, <count>, <line1>, <line2>)
 
 
