@@ -867,7 +867,7 @@ function! s:task_option(task)
 		let notify = task.notify
 	endif
 	if notify != ''
-		let opts.post = 'call asynctasks#finish("'.notify.'")'
+		let opts.post = "call asynctasks#finish('".notify."')"
 	endif
 	return opts
 endfunc
