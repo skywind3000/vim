@@ -1402,6 +1402,9 @@ function! asynctasks#finish(what)
 				endif
 			endif
 			let name = s:strip(name)
+			if stridx(name, '~') >= 0
+				let name = expand(name)
+			endif
 			if name != '' && filereadable(name)
 				let s:sound_id = sound_playfile(name)
 			endif
