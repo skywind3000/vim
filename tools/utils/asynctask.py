@@ -6,8 +6,8 @@
 #
 # Maintainer: skywind3000 (at) gmail.com, 2020
 #
-# Last Modified: 2020/02/28 21:01
-# Verision: 1.0.6
+# Last Modified: 2020/03/01 21:59
+# Verision: 1.0.7
 #
 # for more information, please visit:
 # https://github.com/skywind3000/asynctasks.vim
@@ -503,10 +503,10 @@ class configure (object):
         self.config = {}
         self.feature = {}
         # load ~/.config
-        name = os.path.expanduser('~/.config')
+        xdg = os.path.expanduser('~/.config')
         if self.check_environ('XDG_CONFIG_HOME'):
-            name = os.environ['XDG_CONFIG_HOME']
-        name = os.path.join(name, 'asynctask/asynctask.ini')
+            xdg = os.environ['XDG_CONFIG_HOME']
+        name = os.path.join(xdg, 'asynctask/asynctask.ini')
         name = os.path.abspath(name)
         if os.path.exists(name):
             self.config = self.read_ini(name)
@@ -516,9 +516,9 @@ class configure (object):
         self.system = setting.get('system', self.system).strip()
         self.cfg_name = setting.get('cfg_name', self.cfg_name).strip()
         self.rtp_name = setting.get('rtp_name', self.rtp_name).strip()
-        self.global_config.append('~/.vim/tasks.ini')
-        self.global_config.append('~/.config/nvim/tasks.ini')
-        self.global_config.append('~/.config/asynctask/tasks.ini')
+        self.global_config.append('~/.vim/' + self.rtp_name)
+        self.global_config.append(os.path.join(xdg, 'nvim', self.rtp_name))
+        self.global_config.append('~/.config/asynctask/' + self.rtp_name)
         if 'global_config' in setting:
             for path in self.extract_list(setting['global_config']):
                 if '~' in path:
@@ -620,6 +620,16 @@ class configure (object):
                 path = os.path.expanduser(path)
             if os.path.exists(path):
                 names.append(os.path.abspath(path))
+        newname = []
+        checker = {}
+        names.reverse()
+        for name in names:
+            key = os.path.normcase(name)
+            if key not in checker:
+                newname.append(name)
+                checker[key] = 1
+        newname.reverse()
+        names = newname
         for name in names:
             obj = self.read_ini(name)
             self.config_merge(self.tasks, obj, name, 'global')        
