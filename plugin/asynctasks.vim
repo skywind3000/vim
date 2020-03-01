@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/02/28 17:28
-" Verision: 1.5.9
+" Last Modified: 2020/03/01 20:33
+" Verision: 1.5.10
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1360,6 +1360,15 @@ endfunc
 "----------------------------------------------------------------------
 function! s:complete(ArgLead, CmdLine, CursorPos)
 	let candidate = []
+	if a:ArgLead =~ '^-'
+		let flags = ['-l', '-h', '-e', '-E', '-m', '-p']
+		for flag in flags
+			if stridx(flag, a:ArgLead) == 0
+				let candidate += [flag]
+			endif
+		endfor
+		return candidate
+	endif
 	if asynctasks#collect_config('', 1) != 0
 		return -1
 	endif
@@ -1367,7 +1376,7 @@ function! s:complete(ArgLead, CmdLine, CursorPos)
 	let rows = []
 	let size = len(a:ArgLead)
 	for task in tasks.avail
-		if stridx(task, '.') == 0
+		if task =~ '^\.'
 			continue
 		endif
 		if stridx(task, a:ArgLead) == 0
