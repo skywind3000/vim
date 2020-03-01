@@ -862,6 +862,13 @@ function! s:task_option(task)
 	if g:asynctasks_term_hidden != 0
 		let opts.hidden = 1
 	endif
+	let notify = g:asynctasks_notify
+	if has_key(task, 'notify')
+		let notify = task.notify
+	endif
+	if notify != ''
+		let opts.post = 'call asynctasks#finish("'.notify.'")'
+	endif
 	return opts
 endfunc
 
@@ -1359,6 +1366,46 @@ function! asynctasks#cmd(bang, args, ...)
 		call asynctasks#start(a:bang, args, '')
 	else
 		call asynctasks#start(a:bang, args, '', a:1, a:2, a:3)
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" called when task finished
+"----------------------------------------------------------------------
+function! asynctasks#finish(what)
+	if a:what == ''
+		return
+	elseif a:what == 'bell'
+		exec "norm! \<esc>"
+	elseif a:what == 'echo'
+		redraw
+		echohl ModeMsg
+		echon "Task finished: " . g:asyncrun_status
+		echohl None
+	elseif a:what =~ '^sound:'
+		if exists('*sound_playfile')
+			let previous = get(s:, 'sound_id', '')	
+			if previous
+				silent! call sound_stop(previous)
+			endif
+			let part = split(s:strip(strpart(a:what, 6)), ',')
+			if g:asyncrun_code == 0
+				let name = (len(part) > 0)? part[0] : ''
+			else
+				if len(part) > 1
+					let name = part[1]
+				else
+					let name = (len(part) > 0)? part[0] : ''
+				endif
+			endif
+			let name = s:strip(name)
+			if name != '' && filereadable(name)
+				let s:sound_id = sound_playfile(name)
+			endif
+		else
+			call s:errmsg('unable to play sound, need +sound feature')
+		endif
 	endif
 endfunc
 
