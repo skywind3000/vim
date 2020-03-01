@@ -5,7 +5,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
 " Last Modified: 2020/03/01 20:33
-" Verision: 1.5.11
+" Verision: 1.6.0
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -33,74 +33,49 @@ if !exists('g:asynctasks_system')
 endif
 
 " task profile
-if !exists('g:asynctasks_profile')
-	let g:asynctasks_profile = 'debug'
-endif
+let g:asynctasks_profile = get(g:, 'asynctasks_profile', 'debug')
 
 " local config
-if !exists('g:asynctasks_config_name')
-	let g:asynctasks_config_name = '.tasks'
-endif
+let g:asynctasks_config_name = get(g:, 'asynctasks_config_name', '.tasks')
 
 " global config in every runtimepath
-if !exists('g:asynctasks_rtp_config')
-	let g:asynctasks_rtp_config = 'tasks.ini'
-endif
+let g:asynctasks_rtp_config = get(g:, 'asynctasks_rtp_config', 'tasks.ini')
 
-" global config
-if !exists('g:asynctasks_extra_config')
-	let g:asynctasks_extra_config = []
-endif
+" additional global configs
+let g:asynctasks_extra_config = get(g:, 'asynctasks_extra_config', [])
 
 " config by vimrc
-if !exists('g:asynctasks_tasks')
-	let g:asynctasks_tasks = {}
-endif
+let g:asynctasks_tasks = get(g:, 'asynctasks_tasks', {})
 
 " task environment variables
-if !exists('g:asynctasks_environ')
-	let g:asynctasks_environ = {}
-endif
+let g:asynctasks_environ = get(g:, 'asynctasks_environ', {})
 
 " features
-if !exists('g:asynctasks_feature')
-	let g:asynctasks_feature = {}
-endif
+let g:asynctasks_feature = get(g:, 'asynctasks_feature', {})
 
 " terminal mode: tab/curwin/top/bottom/left/right/quickfix/external
-if !exists('g:asynctasks_term_pos')
-	let g:asynctasks_term_pos = 'quickfix'
-endif
+let g:asynctasks_term_pos = get(g:, 'asynctasks_term_pos', 'quickfix')
 
 " width of vertical terminal split
-if !exists('g:asynctasks_term_cols')
-	let g:asynctasks_term_cols = ''
-endif
+let g:asynctasks_term_cols = get(g:, 'asynctasks_term_cols', '')
 
 " height of horizontal terminal split
-if !exists('g:asynctasks_term_rows')
-	let g:asynctasks_term_rows = ''
-endif
+let g:asynctasks_term_rows = get(g:, 'asynctasks_term_rows', '')
 
 " set to zero to keep focus when open a terminal in a split
-if !exists('g:asynctasks_term_focus')
-	let g:asynctasks_term_focus = 1
-endif
+let g:asynctasks_term_focus = get(g:, 'asynctasks_term_focus', 1)
 
 " make internal terminal tab reusable
-if !exists('g:asynctasks_term_reuse')
-	let g:asynctasks_term_reuse = 0
-endif
+let g:asynctasks_term_reuse = get(g:, 'asynctasks_term_reuse', 0)
 
 " whether set bufhidden to 'hide' in terminal window
-if !exists('g:asynctasks_term_hidden')
-	let g:asynctasks_term_hidden = 0
-endif
+let g:asynctasks_term_hidden = get(g:, 'asynctasks_term_hidden', 0)
 
 " strict to detect $(VIM_CWORD) to avoid empty string
-if !exists('g:asynctasks_strict')
-	let g:asynctasks_strict = 1
-endif
+let g:asynctasks_strict = get(g:, 'asynctasks_strict', 1)
+
+" notify when finished (output=quickfix), can be: '', 'echo', 'bell'
+let g:asynctasks_notify = get(g:, 'asynctasks_notify', '')
 
 
 "----------------------------------------------------------------------
@@ -858,6 +833,9 @@ function! s:task_option(task)
 		elseif output == 'vim'
 			let opts.mode = 'bang'
 		endif
+	endif
+	if has_key(task, 'silent') && task.silent
+		let opts.silent = 1
 	endif
 	if has_key(task, 'errorformat')
 		let opts.errorformat = task.errorformat
