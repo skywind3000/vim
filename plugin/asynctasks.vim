@@ -5,7 +5,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
 " Last Modified: 2020/03/01 20:33
-" Verision: 1.5.10
+" Verision: 1.5.11
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -488,13 +488,15 @@ function! s:collect_rtp_config() abort
 		endfor
 		let t = s:abspath(expand('~/.vim/' . rtp_name))
 		if filereadable(t)
-			let newname = []
-			for name in names
-				if name != t
-					let newname += [name]
-				endif
-			endfor
-			let names = newname + [t]
+			let names += [t]
+		endif
+		if $XDG_CONFIG_HOME != ''
+			let t = $XDG_CONFIG_HOME . '/' . rtp_name
+		else
+			let t = expand('~/.config/nvim') . '/' . rtp_name
+		endif
+		if filereadable(t)
+			let names += [t]
 		endif
 	endif
 	for name in g:asynctasks_extra_config
@@ -503,6 +505,22 @@ function! s:collect_rtp_config() abort
 			let names += [name]
 		endif
 	endfor
+	let newname = []
+	let checker = {}
+	call reverse(names)
+	for name in names
+		let key = name
+		if s:windows || has('win32unix')
+			let key = fnamemodify(key, ':p')
+			let key = tr(tolower(key), "\\", '/')
+		endif
+		if has_key(checker, key) == 0
+			let newname += [tr(name, "\\", '/')]
+			let checker[key] = 1
+		endif
+	endfor
+	call reverse(newname)
+	let names = newname
 	let s:private.rtp.ini = {}
 	let config = {}
 	let s:error = ''
@@ -1140,24 +1158,36 @@ function! s:task_edit(mode, path)
 		if a:mode ==# '-e'
 			let name = asyncrun#get_root('%')
 			let name = name . '/' . g:asynctasks_config_name
-			let name = fnamemodify(expand(name), ':p')
+		elseif has('nvim')
+			if $XDG_CONFIG_HOME != ''
+				let name = $XDG_CONFIG_HOME . '/' . g:asynctasks_rtp_config
+			else
+				let name = '~/.config/nvim/' . g:asynctasks_rtp_config
+			endif
 		else
-			let name = expand('~/.vim/' . g:asynctasks_rtp_config)
+			let name = '~/.vim/' . g:asynctasks_rtp_config
 		endif
 	endif
+	let name = fnamemodify(expand(name), ':p')
 	call inputsave()
 	let r = input('(Edit task config): ', name)
 	call inputrestore()
 	if r == ''
 		return -1
 	endif
+	let name = r
 	let newfile = filereadable(name)? 0 : 1
+	let filedir = fnamemodify(name, ':p:h')
+	if isdirectory(filedir) == 0 && filedir != ''
+		silent! call mkdir(filedir, 'p')
+	endif
 	exec "split " . fnameescape(name)
 	setlocal ft=dosini
 	if newfile
 		exec "normal ggVGx"
 		call append(line('.') - 1, s:template)
 		setlocal nomodified
+		exec "normal gg"
 	endif
 endfunc
 
