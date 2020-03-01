@@ -379,6 +379,18 @@ function! s:requirement(what)
 			call s:errmsg(t . '"skywind3000/asyncrun.vim"')
 			return 0
 		endif
+		silent! exec "AsyncRun -mode=load"
+		if exists('*asyncrun#version') == 0
+			let t = 'asyncrun is not loaded correctly '
+			call s:errmsg(t . 'try to avoid lazy load on asyncrun')
+			return 0
+		endif
+		let target = '2.4.3'
+		if s:version_compare(asyncrun#version(), target) < 0
+			let t = 'asyncrun ' . target . ' or above is required, '
+			call s:errmsg(t . 'update from "skywind3000/asyncrun.vim"')
+			return 0
+		endif
 	endif
 	return 1
 endfunc
@@ -1283,6 +1295,9 @@ endfunc
 " command AsyncTask
 "----------------------------------------------------------------------
 function! asynctasks#cmd(bang, args, ...)
+	if s:requirement('asyncrun') == 0
+		return -1
+	endif
 	let args = s:strip(a:args)
 	let path = ''
 	if args == ''
