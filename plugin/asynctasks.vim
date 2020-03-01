@@ -866,7 +866,9 @@ function! s:task_option(task)
 	if has_key(task, 'notify')
 		let notify = task.notify
 	endif
+	let notify = s:strip(notify)
 	if notify != ''
+		let notify = s:replace(notify, "'", "''")
 		let opts.post = "call asynctasks#finish('".notify."')"
 	endif
 	return opts
