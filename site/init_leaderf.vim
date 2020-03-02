@@ -43,12 +43,15 @@ let g:Lf_Extensions.test = {
 
 
 function! s:lf_task_source(...)
+	let rows = asynctasks#source()
+	let source = []
 	for row in rows
-		let name = row[0] . repeat(' ', maxsize - len(row[0]))	
+		let name = row[0]
 		let source += [name . '  ' . row[1] . '  : ' . row[2]]
 	endfor
 	return source
 endfunc
+
 
 function! s:lf_task_accept(line, arg)
 	let pos = stridx(a:line, '<')
