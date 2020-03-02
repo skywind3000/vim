@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/01 20:33
-" Verision: 1.6.0
+" Last Modified: 2020/03/02 13:56
+" Verision: 1.6.1
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -76,6 +76,10 @@ let g:asynctasks_strict = get(g:, 'asynctasks_strict', 1)
 
 " notify when finished (output=quickfix), can be: '', 'echo', 'bell'
 let g:asynctasks_notify = get(g:, 'asynctasks_notify', '')
+
+" set to zero to create .tasks without template
+let g:asynctasks_template = get(g:, 'asynctasks_template', 1)
+
 
 
 "----------------------------------------------------------------------
@@ -1170,9 +1174,13 @@ function! s:task_edit(mode, path)
 	endif
 	exec "split " . fnameescape(name)
 	setlocal ft=dosini
+	let template = s:template
+	if g:asynctasks_template == 0
+		let template = ['# vim: set fenc=utf-8 ft=dosini:', '']
+	endif
 	if newfile
 		exec "normal ggVGx"
-		call append(line('.') - 1, s:template)
+		call append(line('.') - 1, template)
 		setlocal nomodified
 		exec "normal gg"
 	endif

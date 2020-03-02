@@ -174,6 +174,7 @@ function! quickui#tools#list_function()
 	if opts.w < maxsize
 		let opts.w = (opts.w < 60)? 60 : opts.w
 	endif
+	let opts.syntax = 'qui_func'
 	if exists('g:quickui_tools_width')
 		let opts.w = quickui#utils#tools_width()
 	endif
