@@ -43,7 +43,7 @@ let g:Lf_Extensions.test = {
 
 
 function! s:lf_task_source(...)
-	let rows = asynctasks#source()
+	let rows = asynctasks#source(&columns * 48 / 100)
 	let source = []
 	for row in rows
 		let name = row[0]
@@ -91,7 +91,6 @@ let g:Lf_Extensions.task = {
 			\ 'highlights_cmd': [
 			\     "hi def link Lf_task_name ModeMsg",
 			\ ],
-			\ 'after_enter': string(function('s:lf_win_init'))[10:-3],
 		\ }
 
 " let g:Lf_WindowPosition='bottom'
