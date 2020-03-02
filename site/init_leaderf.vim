@@ -43,36 +43,6 @@ let g:Lf_Extensions.test = {
 
 
 function! s:lf_task_source(...)
-	let tasks = asynctasks#list('')
-	let rows = []
-	let maxsize = -1
-	let limit = &columns * 50 / 100
-	let source = []
-	if len(tasks) == 0
-		return []
-	endif
-	for task in tasks
-		let name = task.name
-		if name =~ '^\.'
-			continue
-		endif
-		if len(name) > maxsize
-			let maxsize = len(name)
-		endif
-		let cmd = task.command
-		if len(cmd) > limit
-			let cmd = strpart(task.command, 0, limit) . ' ..'
-		endif
-		let scope = task.scope
-		if scope == 'global'
-			let scope = '<global>'
-		elseif scope == 'local'
-			let scope = '<local> '
-		else
-			let scope = '<script>'
-		endif
-		let rows += [[name, scope, cmd]]
-	endfor
 	for row in rows
 		let name = row[0] . repeat(' ', maxsize - len(row[0]))	
 		let source += [name . '  ' . row[1] . '  : ' . row[2]]
@@ -112,7 +82,8 @@ let g:Lf_Extensions.task = {
 			\ 'accept': string(function('s:lf_task_accept'))[10:-3],
 			\ 'get_digest': string(function('s:lf_task_digest'))[10:-3],
 			\ 'highlights_def': {
-			\     'Lf_task_name': '^\S\+',
+			\     'Lf_hl_funcScope': '^\S\+',
+			\     'Lf_hl_funcDirname': '^\S\+\s*\zs<.*>\ze\s*:',
 			\ },
 			\ 'highlights_cmd': [
 			\     "hi def link Lf_task_name ModeMsg",
@@ -120,7 +91,7 @@ let g:Lf_Extensions.task = {
 			\ 'after_enter': string(function('s:lf_win_init'))[10:-3],
 		\ }
 
-let g:Lf_WindowPosition='bottom'
+" let g:Lf_WindowPosition='bottom'
 " echo s:lf_task_source()
 
 

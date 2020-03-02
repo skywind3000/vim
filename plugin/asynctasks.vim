@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/02 13:56
-" Verision: 1.6.1
+" Last Modified: 2020/03/02 14:05
+" Verision: 1.6.2
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1477,6 +1477,44 @@ command! -bang -nargs=0 AsyncTaskMacro
 
 command! -nargs=? AsyncTaskProfile
 			\ AsyncTask -p <args>
+
+
+"----------------------------------------------------------------------
+" list source
+"----------------------------------------------------------------------
+function! asynctasks#source()
+	let tasks = asynctasks#list('')
+	let rows = []
+	let maxsize = -1
+	let limit = &columns * 50 / 100
+	let source = []
+	if len(tasks) == 0
+		return []
+	endif
+	for task in tasks
+		let name = task.name
+		if name =~ '^\.'
+			continue
+		endif
+		if len(name) > maxsize
+			let maxsize = len(name)
+		endif
+		let cmd = task.command
+		if len(cmd) > limit
+			let cmd = strpart(task.command, 0, limit) . ' ..'
+		endif
+		let scope = task.scope
+		if scope == 'global'
+			let scope = '<global>'
+		elseif scope == 'local'
+			let scope = '<local> '
+		else
+			let scope = '<script>'
+		endif
+		let rows += [[name, scope, cmd]]
+	endfor
+	return rows
+endfunc
 
 
 "----------------------------------------------------------------------
