@@ -1482,11 +1482,11 @@ command! -nargs=? AsyncTaskProfile
 "----------------------------------------------------------------------
 " list source
 "----------------------------------------------------------------------
-function! asynctasks#source()
+function! asynctasks#source(maxwidth)
 	let tasks = asynctasks#list('')
 	let rows = []
 	let maxsize = -1
-	let limit = &columns * 50 / 100
+	let limit = a:maxwidth
 	let source = []
 	if len(tasks) == 0
 		return []
