@@ -8,40 +8,6 @@
 "======================================================================
 
 
-function! s:test_source(...)
-	let lines = [
-				\ "name1     detail1 a",
-				\ "name2     detail2 b",
-				\ "name3     detail3 c",
-				\ "name4     detail4 d",
-				\ "name5     detail5 e",
-				\ ]
-	return lines
-endfunc
-
-function! s:test_accept(line, arg)
-	echo "accept: ". a:line
-endfunc
-
-function! s:test_digest(line, mode)
-	try
-		let p = split(a:line)
-		" unsilent echom p
-	catch /^.*/
-		unsilent echom "exception"
-	endtry
-	return [p[0], 0]
-endfunc
-
-
-let g:Lf_Extensions = get(g:, 'Lf_Extensions', {})
-let g:Lf_Extensions.test = {
-			\ 'source': string(function('s:test_source'))[10:-3],
-			\ 'accept': string(function('s:test_accept'))[10:-3],
-			\ 'get_digest': string(function('s:test_digest'))[10:-3],
-			\ }
-
-
 function! s:lf_task_source(...)
 	let rows = asynctasks#source(&columns * 48 / 100)
 	let source = []
@@ -80,6 +46,7 @@ function! s:lf_win_init(...)
 endfunc
 
 
+let g:Lf_Extensions = get(g:, 'Lf_Extensions', {})
 let g:Lf_Extensions.task = {
 			\ 'source': string(function('s:lf_task_source'))[10:-3],
 			\ 'accept': string(function('s:lf_task_accept'))[10:-3],
@@ -88,9 +55,6 @@ let g:Lf_Extensions.task = {
 			\     'Lf_hl_funcScope': '^\S\+',
 			\     'Lf_hl_funcDirname': '^\S\+\s*\zs<.*>\ze\s*:',
 			\ },
-			\ 'highlights_cmd': [
-			\     "hi def link Lf_task_name ModeMsg",
-			\ ],
 		\ }
 
 " let g:Lf_WindowPosition='bottom'
