@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/02 14:08
-" Verision: 1.6.2
+" Last Modified: 2020/03/03 12:42
+" Verision: 1.6.3
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -70,6 +70,9 @@ let g:asynctasks_term_reuse = get(g:, 'asynctasks_term_reuse', 0)
 
 " whether set bufhidden to 'hide' in terminal window
 let g:asynctasks_term_hidden = get(g:, 'asynctasks_term_hidden', 0)
+
+" set nolisted to terminal buffer ?
+let g:asynctasks_term_listed = get(g:, 'asynctasks_term_listed', 1)
 
 " strict to detect $(VIM_CWORD) to avoid empty string
 let g:asynctasks_strict = get(g:, 'asynctasks_strict', 1)
@@ -865,6 +868,13 @@ function! s:task_option(task)
 	let opts.reuse = g:asynctasks_term_reuse
 	if g:asynctasks_term_hidden != 0
 		let opts.hidden = 1
+	endif
+	let listed = g:asynctasks_term_listed
+	if has_key(task, 'listed')
+		let listed = task.listed
+	endif
+	if listed == 0
+		let opts.listed = 0
 	endif
 	let notify = g:asynctasks_notify
 	if has_key(task, 'notify')
