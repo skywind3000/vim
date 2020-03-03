@@ -35,7 +35,10 @@ let g:apc_min_length = get(g:, 'apc_min_length', 2)
 let g:apc_key_ignore = get(g:, 'apc_key_ignore', [])
 
 " reset cpt
-let g:apc_reset_cpt = get(g:, 'apc_reset_cpt', 'k,.,w,b,t,i')
+let g:apc_reset_cpt = get(g:, 'apc_reset_cpt', 'k,.,w,b')
+
+" bs close
+let g:apc_bs_close = get(g:, 'apc_bs_close', 1) 
 
 
 "----------------------------------------------------------------------
@@ -93,6 +96,12 @@ function! s:feed_popup()
 		let b:apc_lastx = x
 		let b:apc_lasty = y
 		let b:apc_tick = b:changedtick
+	else
+		if pumvisible()
+			if g:apc_bs_close != 0
+				call feedkeys("\<c-y>", 'n')
+			endif
+		endif
 	endif
 	return 0
 endfunc
