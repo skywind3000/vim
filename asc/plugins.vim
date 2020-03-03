@@ -253,6 +253,16 @@ let g:asynctasks_extra_config = [s:home . '/'. s:config]
 let g:asynctasks_term_pos = (s:windows && s:gui)? 'external' : 'tab'
 " let g:asynctasks_rtp_config = 'etc/tasks.ini'
 
+
+"----------------------------------------------------------------------
+" text
+"----------------------------------------------------------------------
+let g:vim_dict_config = { 
+			\ "text" : ['wordmax'],
+			\ "markdown" : ['wordmax'],
+			\ }
+
+
 "----------------------------------------------------------------------
 " delimitmate
 "----------------------------------------------------------------------
