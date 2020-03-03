@@ -80,7 +80,7 @@ function! s:feed_popup()
 	let x = col('.') - 1
 	let y = line('.') - 1
 	if lastx == x && lasty == y
-		return -2
+		" return -2
 	endif
 	let context = s:get_context()
 	if s:meets_keyword(context)
