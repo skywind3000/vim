@@ -217,7 +217,7 @@ if index(g:bundle_group, 'opt') >= 0
 	Plug 'junegunn/fzf'
 	Plug 'junegunn/fzf.vim'
 	Plug 'mhartington/oceanic-next'
-	Plug 'asins/vim-dict'
+	Plug 'skywind3000/vim-dict'
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
 	Plug 'soft-aesthetic/soft-era-vim'
 	Plug 'dyng/ctrlsf.vim'
