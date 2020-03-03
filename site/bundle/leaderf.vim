@@ -21,8 +21,8 @@ noremap <m-m> :cclose<cr>:Leaderf --nowrap tag<cr>
 let g:Lf_MruMaxFiles = 2048
 let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
 
-noremap <m-r> :Leaderf task<cr>
-inoremap <m-r> <esc>:Leaderf task<cr>
+noremap <m-r> :Leaderf --nowrap task<cr>
+inoremap <m-r> <esc>:Leaderf --nowrap task<cr>
 
 
 "----------------------------------------------------------------------
