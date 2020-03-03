@@ -74,19 +74,24 @@ function! s:feed_popup()
 	let enable = get(b:, 'apc_enable', 0)
 	let lastx = get(b:, 'apc_lastx', -1)
 	let lasty = get(b:, 'apc_lasty', -1)
+	let tick = get(b:, 'apc_tick', -1)
 	if pumvisible() || &bt != '' || enable == 0
 		return -1
 	endif
 	let x = col('.') - 1
 	let y = line('.') - 1
 	if lastx == x && lasty == y
-		" return -2
+		return -2
+	endif
+	if b:changedtick == tick
+		return -3
 	endif
 	let context = s:get_context()
 	if s:meets_keyword(context)
 		call feedkeys("\<c-n>", 'n')
 		let b:apc_lastx = x
 		let b:apc_lasty = y
+		let b:apc_tick = b:changedtick
 	endif
 	return 0
 endfunc
