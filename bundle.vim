@@ -100,11 +100,11 @@ if index(g:bundle_group, 'basic') >= 0
 		Plug 'Yggdroot/LeaderF'
 		let g:Lf_ShortcutF = '<c-p>'
 		let g:Lf_ShortcutB = '<m-n>'
-		noremap <c-n> :cclose<cr>:Leaderf mru --regexMode<cr>
-		noremap <m-p> :cclose<cr>:LeaderfFunction!<cr>
-		noremap <m-P> :cclose<cr>:LeaderfBufTag!<cr>
-		noremap <m-n> :cclose<cr>:LeaderfBuffer<cr>
-		noremap <m-m> :cclose<cr>:LeaderfTag<cr>
+		noremap <c-n> :cclose<cr>:Leaderf --nowrap mru --regexMode<cr>
+		noremap <m-p> :cclose<cr>:Leaderf! --nowrap function<cr>
+		noremap <m-P> :cclose<cr>:Leaderf! --nowrap buftag<cr>
+		noremap <m-n> :cclose<cr>:Leaderf! --nowrap buffer<cr>
+		noremap <m-m> :cclose<cr>:Leaderf --nowrap tag<cr>
 		let g:Lf_MruMaxFiles = 2048
 		let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
 	else
