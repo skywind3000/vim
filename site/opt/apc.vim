@@ -79,7 +79,7 @@ function! s:feed_popup()
 	let lastx = get(b:, 'apc_lastx', -1)
 	let lasty = get(b:, 'apc_lasty', -1)
 	let tick = get(b:, 'apc_tick', -1)
-	if &bt != '' || enable == 0
+	if &bt != '' || enable == 0 || &paste
 		return -1
 	endif
 	let x = col('.') - 1
@@ -127,7 +127,7 @@ function! s:apc_enable()
 	call s:apc_disable()
 	augroup ApcEventGroup
 		au!
-		au CursorMovedI <buffer> call s:feed_popup()
+		au CursorMovedI <buffer> nested call s:feed_popup()
 		" au TextChangedI <buffer> call s:feed_popup()
 	augroup END
 	let b:apc_init_autocmd = 1
