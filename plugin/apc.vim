@@ -113,6 +113,8 @@ function! s:apc_enable()
 		let b:apc_save_cpt = &cpt
 		let &l:cpt = g:apc_reset_cpt
 	endif
+	let b:apc_save_infer = &infercase
+	setlocal infercase
 	let b:apc_enable = 1
 endfunc
 
@@ -124,6 +126,7 @@ function! s:apc_disable()
 	let init_autocmd = get(b:, 'apc_init_autocmd', 0)
 	let init_tab = get(b:, 'apc_init_tab', 0)
 	let save_cpt = get(b:, 'apc_save_cpt', '')
+	let save_infer = get(b:, 'apc_save_infer, '')
 	if init_autocmd
 		augroup ApcEventGroup
 			au! 
@@ -137,6 +140,10 @@ function! s:apc_disable()
 	if save_cpt != ''
 		let &l:cpt = save_cpt
 		let b:apc_save_cpt = ''
+	endif
+	if save_infer != ''
+		let &l:infercase = save_infer
+		let b:apc_save_infer = ''
 	endif
 	let b:apc_enable = 0
 endfunc
