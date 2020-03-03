@@ -21,11 +21,26 @@ else
 endif
 
 
+let g:bundle#uname = s:uname
+let g:bundle#windows = (s:uname == 'windows')? 1 : 0
+
+
+"----------------------------------------------------------------------
+" include script
+"----------------------------------------------------------------------
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 
-function! s:path(path)
+if !exists(':IncScript')
+	command! IncScript -nargs=1 exec 'so ' . fnameescape(s:home .'/<args>')
+endif
+
+function! bundle#path(path)
 	let path = expand(s:home . '/' . a:path )
 	return substitute(path, '\\', '/', 'g')
+endfunc
+
+function! s:path(path)
+	return bundle#path(a:path)
 endfunc
 
 
@@ -68,12 +83,7 @@ if index(g:bundle_group, 'simple') >= 0
 	map gz <Plug>Sneak_s
 	map gZ <Plug>Sneak_S
 
-	noremap <silent> <Plug>CycleFallbackNext <C-A>
-	noremap <silent> <Plug>CycleFallbackPrev <C-X>
-	nmap <silent> <c-a> <Plug>CycleNext
-	vmap <silent> <c-a> <Plug>CycleNext
-	nmap <silent> <c-x> <Plug>CyclePrev
-	vmap <silent> <c-x> <Plug>CyclePrev
+	IncScript site/bundle/cycle.vim
 endif
 
 
@@ -98,15 +108,7 @@ if index(g:bundle_group, 'basic') >= 0
 	
 	if has('python') || has('python3')
 		Plug 'Yggdroot/LeaderF'
-		let g:Lf_ShortcutF = '<c-p>'
-		let g:Lf_ShortcutB = '<m-n>'
-		noremap <c-n> :cclose<cr>:Leaderf --nowrap mru --regexMode<cr>
-		noremap <m-p> :cclose<cr>:Leaderf! --nowrap function<cr>
-		noremap <m-P> :cclose<cr>:Leaderf! --nowrap buftag<cr>
-		noremap <m-n> :cclose<cr>:Leaderf! --nowrap buffer<cr>
-		noremap <m-m> :cclose<cr>:Leaderf --nowrap tag<cr>
-		let g:Lf_MruMaxFiles = 2048
-		let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
+		IncScript site/bundle/leaderf.vim
 	else
 		Plug 'ctrlpvim/ctrlp.vim'
 		Plug 'tacahiroy/ctrlp-funky'
@@ -165,20 +167,7 @@ if index(g:bundle_group, 'inter') >= 0
 		silent! call mkdir(expand('~/.vim/notes'), 'p')
 	endif
 
-	if 0
-		imap <expr> <m-e> pumvisible() ? '<c-g>u<Plug>snipMateTrigger' : '<Plug>snipMateTrigger'
-		imap <expr> <m-n> pumvisible() ? '<c-g>u<Plug>snipMateNextOrTrigger' : '<Plug>snipMateNextOrTrigger'
-		smap <m-n> <Plug>snipMateNextOrTrigger
-		imap <expr> <m-p> pumvisible() ? '<c-g>u<Plug>snipMateBack' : '<Plug>snipMateBack'
-		smap <m-p> <Plug>snipMateBack
-		imap <expr> <m-m> pumvisible() ? '<c-g>u<Plug>snipMateShow' : '<Plug>snipMateShow'
-	elseif 1
-		imap <expr> <m-e> pumvisible() ? '<c-g>u<Plug>snipMateNextOrTrigger' : '<Plug>snipMateNextOrTrigger'
-		smap <m-e> <Plug>snipMateNextOrTrigger
-		imap <expr> <m-E> pumvisible() ? '<c-g>u<Plug>snipMateBack' : '<Plug>snipMateBack'
-		smap <m-E> <Plug>snipMateBack
-		imap <expr> <m-m> pumvisible() ? '<c-g>u<Plug>snipMateShow' : '<Plug>snipMateShow'
-	endif
+	IncScript site/bundle/snipmate.vim
 endif
 
 
@@ -242,6 +231,7 @@ if index(g:bundle_group, 'opt') >= 0
 			" Plug 'skywind3000/vim-gutentags'
 		endif
 	endif
+
 	if s:uname == 'windows' 
 		let g:python3_host_prog="python"
 	endif
@@ -273,37 +263,9 @@ if index(g:bundle_group, 'deoplete') >= 0
 		Plug 'roxma/nvim-yarp'
 		Plug 'roxma/vim-hug-neovim-rpc'
 	endif
-
 	" Plug 'zchee/deoplete-clang'
 	Plug 'zchee/deoplete-jedi'
-
-	let g:deoplete#enable_at_startup = 1
-	let g:deoplete#enable_smart_case = 1
-	let g:deoplete#enable_refresh_always = 1
-
-	inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<tab>"
-	inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-	inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-	inoremap <expr><BS> deoplete#smart_close_popup()."\<bs>"
-	inoremap <expr> <cr> pumvisible() ? "\<C-y>\<cr>" : "\<cr>"
-
-	if 0
-		let g:deoplete#sources = {}
-		let g:deoplete#sources._ = ['buffer', 'dictionary']
-		" let g:deoplete#sources.cpp = ['clang']
-		let g:deoplete#sources.python = ['jedi']
-		let g:deoplete#sources.cpp = ['omni']
-	endif
-
-	set shortmess+=c
-	let g:echodoc#enable_at_startup = 1
-
-	if exists('g:python_host_prog')
-		let g:deoplete#sources#jedi#python_path = g:python_host_prog
-	endif
-
-	let g:deoplete#sources#jedi#enable_cache = 1
-
+	IncScript site/bundle/deoplete.vim
 endif
 
 " echodoc
@@ -317,21 +279,13 @@ endif
 if index(g:bundle_group, 'airline') >= 0
 	Plug 'vim-airline/vim-airline'
 	Plug 'vim-airline/vim-airline-themes'
-	let g:airline_left_sep = ''
-	let g:airline_left_alt_sep = ''
-	let g:airline_right_sep = ''
-	let g:airline_right_alt_sep = ''
-	let g:airline_powerline_fonts = 0
-	let g:airline_exclude_preview = 1
-	let g:airline_section_b = '%n'
-	" let g:airline_section_z = '%P %l/%L%{g:airline_symbols.maxlinenr} : %v'
-	" let g:airline_section_z = '%{AirlineLineNumber()}'
-	" let g:airline_theme='bubblegum'
+	IncScript site/bundle/airline.vim
 endif
 
 " lightline
 if index(g:bundle_group, 'lightline') >= 0
 	Plug 'itchyny/lightline.vim'
+	IncScript site/bundle/lightline.vim
 endif
 
 if index(g:bundle_group, 'nerdtree') >= 0
@@ -365,41 +319,7 @@ endif
 
 if index(g:bundle_group, 'ale') >= 0
 	Plug 'w0rp/ale'
-
-	let g:airline#extensions#ale#enabled = 1
-	let g:ale_linters = {
-				\ 'c': ['gcc', 'cppcheck'], 
-				\ 'cpp': ['gcc', 'cppcheck'], 
-				\ 'python': ['flake8', 'pylint'], 
-				\ 'lua': ['luac'], 
-				\ 'go': ['go build', 'gofmt'],
-				\ 'java': ['javac'],
-				\ 'javascript': ['eslint'], 
-				\ }
-
-	function! s:lintcfg(name)
-		let conf = s:path('tools/conf/')
-		let path1 = conf . a:name
-		let path2 = expand('~/.vim/linter/'. a:name)
-		return shellescape(filereadable(path2)? path2 : path1)
-	endfunc
-
-	let g:ale_python_flake8_options = '--conf='.s:lintcfg('flake8.conf')
-	let g:ale_python_pylint_options = '--rcfile='.s:lintcfg('pylint.conf')
-	let g:ale_python_pylint_options .= ' --disable=W'
-	let g:ale_c_gcc_options = '-Wall -O2 -std=c99'
-	let g:ale_cpp_gcc_options = '-Wall -O2 -std=c++14'
-	let g:ale_c_cppcheck_options = ''
-	let g:ale_cpp_cppcheck_options = ''
-	let g:ale_lua_luacheck_options = '-d'
-
-	" let g:ale_linters.text = ['textlint', 'write-good', 'languagetool']
-	" let g:ale_linters.lua += ['luacheck']
-	
-	if executable('gcc') == 0 && executable('clang')
-		let g:ale_linters.c += ['clang']
-		let g:ale_linters.cpp += ['clang']
-	endif
+	IncScript site/bundle/ale.vim
 endif
 
 if index(g:bundle_group, 'neomake') >= 0
@@ -455,22 +375,7 @@ endif
 
 if index(g:bundle_group, 'lsp') >= 0
 	Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next' }
-	let g:LanguageClient_loadSettings = 1
-	let g:LanguageClient_diagnosticsEnable = 0
-	let g:LanguageClient_settingsPath = expand('~/.vim/languageclient.json')
-	let g:LanguageClient_selectionUI = 'quickfix'
-	let g:LanguageClient_diagnosticsList = v:null
-	let g:LanguageClient_hoverPreview = 'Never'
-	" let g:LanguageClient_loggingLevel = 'DEBUG'
-	if !exists('g:LanguageClient_serverCommands')
-		let g:LanguageClient_serverCommands = {}
-		let g:LanguageClient_serverCommands.c = ['cquery']
-		let g:LanguageClient_serverCommands.cpp = ['cquery']
-	endif
-	noremap <leader>rd :call LanguageClient#textDocument_definition({'gotoCmd':'FileSwitch tabe'})<cr>
-	noremap <leader>re :call LanguageClient#textDocument_definition({'gotoCmd':'PreviewFile'})<cr>
-	noremap <leader>rr :call LanguageClient#textDocument_references()<cr>
-	noremap <leader>rv :call LanguageClient#textDocument_hover()<cr>
+	IncScript site/bundle/lcn.vim
 endif
 
 if index(g:bundle_group, 'keysound') >= 0

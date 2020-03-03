@@ -144,31 +144,6 @@ augroup END
 
 
 
-"-----------------------------------------------------
-" YouCompleteMe
-"-----------------------------------------------------
-let g:ycm_add_preview_to_completeopt = 0
-let g:ycm_show_diagnostics_ui = 0
-let g:ycm_server_log_level = 'info'
-let g:ycm_min_num_identifier_candidate_chars = 2
-let g:ycm_collect_identifiers_from_comments_and_strings = 1
-let g:ycm_complete_in_strings=1
-let g:ycm_key_invoke_completion = '<c-z>'
-let g:ycm_disable_signature_help = 1
-set completeopt=menu,menuone
-
-if has('patch-8.0.1000')
-	set completeopt=menu,menuone,noselect
-endif
-
-" noremap <c-z> <NOP>
-
-let g:ycm_semantic_triggers =  {
-			\ 'c,cpp,python,java,go,erlang,perl': ['re!\w{2}'],
-			\ 'cs,lua,javascript': ['re!\w{2}'],
-			\ }
-
-
 "----------------------------------------------------------------------
 "- Tagbar
 "----------------------------------------------------------------------
@@ -217,42 +192,6 @@ let g:ctrlp_root_markers = ['.project', '.root', '.svn', '.git']
 let g:ctrlp_working_path = 0
 
 
-"----------------------------------------------------------------------
-" LeaderF
-"----------------------------------------------------------------------
-let g:Lf_RootMarkers = ['.project', '.root', '.svn', '.git']
-let g:Lf_WorkingDirectoryMode = 'Ac'
-let g:Lf_WindowHeight = 0.30
-let g:Lf_CacheDirectory = expand('~/.vim/cache')
-let g:Lf_ShowRelativePath = 1
-let g:Lf_HideHelp = 1
-
-let g:Lf_WildIgnore = {
-            \ 'dir': ['.svn','.git','.hg'],
-            \ 'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]']
-			\ }
-
-let g:Lf_MruFileExclude = ['*.so', '*.exe', '*.py[co]', '*.sw?', '~$*', '*.bak', '*.tmp', '*.dll']
-let g:Lf_MruMaxFiles = 2048
-let g:Lf_StlColorscheme = 'powerline'
-let g:Lf_ShortcutF = '<c-p>'
-let g:Lf_ShortcutB = '<m-n>'
-let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
-let g:Lf_PreviewResult = {'Function':0, 'BufTag':0}
-
-let g:Lf_NormalMap = {
-        \ "File":   [["<ESC>", ':exec g:Lf_py "fileExplManager.quit()"<CR>']],
-		\ "Buffer": [["<ESC>", ':exec g:Lf_py "bufExplManager.quit()"<cr>']],
-		\ "Mru": [["<ESC>", ':exec g:Lf_py "mruExplManager.quit()"<cr>']],
-		\ "Tag": [["<ESC>", ':exec g:Lf_py "tagExplManager.quit()"<cr>']],
-		\ "BufTag": [["<ESC>", ':exec g:Lf_py "bufTagExplManager.quit()"<cr>']],
-		\ "Function": [["<ESC>", ':exec g:Lf_py "functionExplManager.quit()"<cr>']],
-		\ }
-
-if (exists('*popup_create') && has('patch-8.1.2000')) || has('nvim-0.4')
-	let g:Lf_WindowPosition = 'popup'
-endif
-
 
 "----------------------------------------------------------------------
 " vim-notes
@@ -299,21 +238,15 @@ let g:startify_session_dir = '~/.vim/session'
 
 
 "----------------------------------------------------------------------
-" vimmake / asyncrun
+" asyncrun / vimmake 
 "----------------------------------------------------------------------
-let g:vimmake_cwd = 1
-let g:asyncrun_timer = 50
-let g:vimmake_build_timer = 50
-let g:vimmake_build_name = 'make'
-let g:vimmake_save = 1
-let s:python = executable('python2')? 'python2' : 'python'
+let g:asyncrun_timer = 64
+let s:python = executable('python3')? 'python3' : 'python'
 let s:script = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
 let s:launch = s:script . '/lib/launch.py'
 
 if filereadable(s:launch)
-	let s:hz = g:vimmake_build_timer * 10 * 80 / 100
-	let g:vimmake_build_shell_bak = s:python
-	let g:vimmake_build_shellflag = s:launch
+	let s:hz = g:asyncrun_timer * 10 * 80 / 100
 	let g:asyncrun_shell_bak = s:python
 	let g:asyncrun_shellflag = s:launch
 	let $VIM_LAUNCH_HZ = ''. s:hz
@@ -364,134 +297,5 @@ endif
 
 let g:gutentags_plus_switch = 0
 
-
-"----------------------------------------------------------------------
-" ale
-"----------------------------------------------------------------------
-let g:ale_linters_explicit = 1
-let g:ale_completion_delay = 500
-let g:ale_echo_delay = 20
-let g:ale_lint_delay = 1000
-let g:ale_echo_msg_format = '[%linter%] %code: %%s'
-let g:ale_lint_on_text_changed = 'normal'
-let g:ale_lint_on_insert_leave = 1
-
-if s:windows == 0 && has('win32unix') == 0
-	let g:ale_command_wrapper = 'nice -n5'
-endif
-
-
-"----------------------------------------------------------------------
-" fzf 
-"----------------------------------------------------------------------
-let g:fzf_layout={'window': {'width':0.9, 'height':0.6}}
-
-
-"----------------------------------------------------------------------
-" https://github.com/bootleq/vim-cycle
-"----------------------------------------------------------------------
-let g:cycle_default_groups = [
-			\   [['true', 'false']],
-			\   [['yes', 'no']],
-			\   [['on', 'off']],
-			\   [['+', '-']],
-			\   [['>', '<']],
-			\   [['"', "'"]],
-			\   [['==', '!=']],
-			\   [['and', 'or']],
-			\   [["in", "out"]],
-			\   [["up", "down"]],
-			\   [["min", "max"]],
-			\   [["get", "set"]],
-			\   [["add", "remove"]],
-			\   [["to", "from"]],
-			\   [["read", "write"]],
-			\   [["only", "except"]],
-			\   [['without', 'with']],
-			\   [["exclude", "include"]],
-			\   [["asc", "desc"]],
-			\   [["begin", "end"]],
-			\   [["first", "last"]],
-			\   [["slow", "fast"]],
-			\   [["small", "large"]],
-			\   [["push", "pull"]],
-			\   [["before", "after"]],
-			\   [["new", "delete"]],
-			\   [["while", "until"]],
-			\   [["up", "down"]],
-			\   [["left", "right"]],
-			\   [["top", "bottom"]],
-			\   [["one", "two", "three", "four", "five", "six", "seven",
-			\     "eight", "nine", "ten"]],
-			\   [['是', '否']],
-			\   [['void', 'int', 'char']],
-			\   [['{:}', '[:]', '(:)'], 'sub_pairs'],
-			\   [['（:）', '「:」', '『:』'], 'sub_pairs'],
-			\   [['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-			\     'Friday', 'Saturday'], 'hard_case', {'name': 'Days'}],
-			\   [['January', 'February', 'March', 'April', 'May', 'June', 
-			\     'July', 'August', 'September', 'October', 'November', 
-			\     'December'], 'hard_case', {'name': 'Months'}],
-			\ ]
-
-
-
-"----------------------------------------------------------------------
-" Ycm White List
-"----------------------------------------------------------------------
-let g:ycm_filetype_whitelist = { 
-			\ "c":1,
-			\ "cpp":1, 
-			\ "objc":1,
-			\ "objcpp":1,
-			\ "python":1,
-			\ "java":1,
-			\ "javascript":1,
-			\ "coffee":1,
-			\ "vim":1, 
-			\ "go":1,
-			\ "cs":1,
-			\ "lua":1,
-			\ "perl":1,
-			\ "perl6":1,
-			\ "php":1,
-			\ "ruby":1,
-			\ "rust":1,
-			\ "erlang":1,
-			\ "asm":1,
-			\ "nasm":1,
-			\ "masm":1,
-			\ "tasm":1,
-			\ "asm68k":1,
-			\ "asmh8300":1,
-			\ "asciidoc":1,
-			\ "basic":1,
-			\ "vb":1,
-			\ "make":1,
-			\ "cmake":1,
-			\ "html":1,
-			\ "css":1,
-			\ "less":1,
-			\ "json":1,
-			\ "cson":1,
-			\ "typedscript":1,
-			\ "haskell":1,
-			\ "lhaskell":1,
-			\ "lisp":1,
-			\ "scheme":1,
-			\ "sdl":1,
-			\ "sh":1,
-			\ "zsh":1,
-			\ "bash":1,
-			\ "man":1,
-			\ "markdown":1,
-			\ "matlab":1,
-			\ "maxima":1,
-			\ "dosini":1,
-			\ "conf":1,
-			\ "config":1,
-			\ "zimbu":1,
-			\ "ps1":1,
-			\ }
 
 
