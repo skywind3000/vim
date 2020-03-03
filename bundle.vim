@@ -105,6 +105,7 @@ if index(g:bundle_group, 'basic') >= 0
 	" Plug 'pboettch/vim-cmake-syntax', { 'for': ['cmake'] }
 	Plug 'tpope/vim-eunuch'
 	Plug 'dag/vim-fish'
+	Plug 'skywind3000/vim-dict'
 	
 	if has('python') || has('python3')
 		Plug 'Yggdroot/LeaderF'
@@ -208,7 +209,6 @@ if index(g:bundle_group, 'opt') >= 0
 	Plug 'junegunn/fzf'
 	Plug 'junegunn/fzf.vim'
 	Plug 'mhartington/oceanic-next'
-	Plug 'skywind3000/vim-dict'
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
 	Plug 'soft-aesthetic/soft-era-vim'
 	Plug 'dyng/ctrlsf.vim'
