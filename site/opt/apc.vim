@@ -35,7 +35,7 @@ let g:apc_min_length = get(g:, 'apc_min_length', 2)
 let g:apc_key_ignore = get(g:, 'apc_key_ignore', [])
 
 " reset cpt
-let g:apc_reset_cpt = get(g:, 'apc_reset_cpt', 'k,.,w,b')
+let g:apc_reset_cpt = get(g:, 'apc_reset_cpt', 'k,.')
 
 " bs close
 let g:apc_bs_close = get(g:, 'apc_bs_close', 1) 
