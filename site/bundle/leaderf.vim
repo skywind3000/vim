@@ -24,6 +24,11 @@ let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
 noremap <m-r> :Leaderf --nowrap task<cr>
 inoremap <m-r> <esc>:Leaderf --nowrap task<cr>
 
+if has('gui_running')
+	noremap <c-f12> :Leaderf --nowrap task<cr>
+	inoremap <c-f12> <esc>:Leaderf --nowrap task<cr>
+endif
+
 
 "----------------------------------------------------------------------
 " LeaderF
