@@ -82,6 +82,8 @@ function! s:feed_popup()
 	if &bt != '' || enable == 0
 		return -1
 	endif
+	let x = col('.') - 1
+	let y = line('.') - 1
 	if pumvisible()
 		let context = s:get_context()
 		if s:meets_keyword(context) == 0
@@ -91,12 +93,12 @@ function! s:feed_popup()
 		let b:apc_lasty = y
 		return 0
 	endif
-	let x = col('.') - 1
-	let y = line('.') - 1
 	if lastx == x && lasty == y
 		return -2
 	endif
 	if b:changedtick == tick
+		let lastx = x
+		let lasty = y
 		return -3
 	endif
 	let context = s:get_context()
@@ -126,6 +128,7 @@ function! s:apc_enable()
 	augroup ApcEventGroup
 		au!
 		au CursorMovedI <buffer> call s:feed_popup()
+		" au TextChangedI <buffer> call s:feed_popup()
 	augroup END
 	let b:apc_init_autocmd = 1
 	if g:apc_enable_tab
