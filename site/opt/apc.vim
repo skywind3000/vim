@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/03 16:26
-" Verision: 0.0.2
+" Last Modified: 2020/03/04 06:36
+" Verision: 1.0.1
 "
 " Usage:
 "
@@ -35,7 +35,7 @@ let g:apc_min_length = get(g:, 'apc_min_length', 2)
 let g:apc_key_ignore = get(g:, 'apc_key_ignore', [])
 
 " reset cpt
-let g:apc_reset_cpt = get(g:, 'apc_reset_cpt', 'k,.')
+let g:apc_reset_cpt = get(g:, 'apc_reset_cpt', 'k,.,b,w')
 
 " bs close
 let g:apc_bs_close = get(g:, 'apc_bs_close', 1) 
@@ -120,47 +120,35 @@ function! s:feed_popup()
 	if &bt != '' || enable == 0 || &paste
 		return -1
 	endif
-	call s:log("s:feed_popup()")
 	let x = col('.') - 1
 	let y = line('.') - 1
 	if pumvisible()
 		let context = s:get_context()
-		call s:log('step1')
 		if s:meets_keyword(context) == 0
-			call s:log('step2')
 			call feedkeys("\<c-e>", 'n')
 		endif
-		call s:log('exit1')
 		let b:apc_lastx = x
 		let b:apc_lasty = y
 		let b:apc_tick = b:changedtick
 		return 0
 	endif
-	call s:log('step4')
 	if lastx == x && lasty == y
-		call s:log('exit2')
 		return -2
 	endif
-	call s:log('step5')
 	if b:changedtick == tick
 		let lastx = x
 		let lasty = y
-		call s:log('exit3')
 		return -3
 	endif
-	call s:log('step6')
 	let context = s:get_context()
 	if s:meets_keyword(context)
-		call s:log('feedkey')
 		silent! call feedkeys("\<c-n>", 'n')
 		let b:apc_lastx = x
 		let b:apc_lasty = y
 		let b:apc_tick = b:changedtick
 	else
-		call s:log('not match')
 		if g:apc_bs_close != 0
 			if pumvisible()
-				call s:log('try close')
 				call feedkeys("\<c-e>", 'n')
 				let b:apc_lastx = x
 				let b:apc_lasty = y
@@ -168,8 +156,6 @@ function! s:feed_popup()
 			endif
 		endif
 	endif
-	call s:log('end')
-	call s:log('')
 	return 0
 endfunc
 
@@ -178,7 +164,6 @@ endfunc
 " event
 "----------------------------------------------------------------------
 function! s:complete_done()
-	call s:log('complete done')
 	let x = col('.') - 1
 	let y = line('.') - 1
 	let b:apc_lastx = x
