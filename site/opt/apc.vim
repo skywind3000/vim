@@ -70,6 +70,44 @@ function! s:check_back_space() abort
 	  return !col || getline('.')[col - 1]  =~# '\s'
 endfunc
 
+function! s:on_backspace()
+	if pumvisible() == 0
+		return "\<BS>"
+	endif
+	let text = matchstr(s:get_context(), '.*\ze.')
+	if s:meets_keyword(text)
+		return "\<BS>"
+	endif
+	return "\<c-e>\<bs>"
+endfunc
+
+
+"----------------------------------------------------------------------
+" log file
+"----------------------------------------------------------------------
+function! s:log_append(filename, text)
+	let l:ts = strftime("[%Y-%m-%d %H:%M:%S] ")
+	if 1
+		call writefile([l:ts . a:text], a:filename, 'a')
+	else
+		exec "redir >> ".fnameescape(a:filename)
+		silent echon l:ts.a:text."\n"
+		silent exec "redir END"
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" write log for debug
+"----------------------------------------------------------------------
+function! s:log(text)
+	if 0
+		call s:log_append('d:/output.log', a:text)
+	endif
+endfunc
+
+
+
 
 "----------------------------------------------------------------------
 " feed popup
@@ -82,41 +120,70 @@ function! s:feed_popup()
 	if &bt != '' || enable == 0 || &paste
 		return -1
 	endif
+	call s:log("s:feed_popup()")
 	let x = col('.') - 1
 	let y = line('.') - 1
 	if pumvisible()
 		let context = s:get_context()
+		call s:log('step1')
 		if s:meets_keyword(context) == 0
+			call s:log('step2')
 			call feedkeys("\<c-e>", 'n')
 		endif
+		call s:log('exit1')
 		let b:apc_lastx = x
 		let b:apc_lasty = y
+		let b:apc_tick = b:changedtick
 		return 0
 	endif
+	call s:log('step4')
 	if lastx == x && lasty == y
+		call s:log('exit2')
 		return -2
 	endif
+	call s:log('step5')
 	if b:changedtick == tick
 		let lastx = x
 		let lasty = y
+		call s:log('exit3')
 		return -3
 	endif
+	call s:log('step6')
 	let context = s:get_context()
 	if s:meets_keyword(context)
+		call s:log('feedkey')
 		silent! call feedkeys("\<c-n>", 'n')
 		let b:apc_lastx = x
 		let b:apc_lasty = y
 		let b:apc_tick = b:changedtick
 	else
+		call s:log('not match')
 		if g:apc_bs_close != 0
 			if pumvisible()
+				call s:log('try close')
 				call feedkeys("\<c-e>", 'n')
 				let b:apc_lastx = x
 				let b:apc_lasty = y
+				let b:apc_tick = b:changedtick
 			endif
 		endif
 	endif
+	call s:log('end')
+	call s:log('')
 	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" event
+"----------------------------------------------------------------------
+function! s:complete_done()
+	call s:log('complete done')
+	let x = col('.') - 1
+	let y = line('.') - 1
+	let b:apc_lastx = x
+	let b:apc_lasty = y
+	let b:apc_tick = b:changedtick
 endfunc
 
 
@@ -129,6 +196,7 @@ function! s:apc_enable()
 		au!
 		au CursorMovedI <buffer> nested call s:feed_popup()
 		" au TextChangedI <buffer> call s:feed_popup()
+		au CompleteDone <buffer> call s:complete_done()
 	augroup END
 	let b:apc_init_autocmd = 1
 	if g:apc_enable_tab
@@ -137,6 +205,8 @@ function! s:apc_enable()
 					\ <SID>check_back_space() ? "\<tab>" : "\<c-n>"
 		let b:apc_init_tab = 1
 	endif
+	inoremap <silent><buffer><expr> <bs> <SID>on_backspace()
+	let b:apc_init_bs = 1
 	let b:apc_save_cpt = ''
 	if g:apc_reset_cpt != ''
 		let b:apc_save_cpt = &cpt
@@ -154,6 +224,7 @@ endfunc
 function! s:apc_disable()
 	let init_autocmd = get(b:, 'apc_init_autocmd', 0)
 	let init_tab = get(b:, 'apc_init_tab', 0)
+	let init_bs = get(b:, 'apc_init_bs', 0)
 	let save_cpt = get(b:, 'apc_save_cpt', '')
 	let save_infer = get(b:, 'apc_save_infer', '')
 	if init_autocmd
@@ -165,6 +236,10 @@ function! s:apc_disable()
 	if init_tab
 		silent! iunmap <buffer><expr> <tab>
 		let b:apc_init_tab = 0
+	endif
+	if init_bs
+		silent! iunmap <buffer><expr> <bs>
+		let b:apc_init_bs = 0
 	endif
 	if save_cpt != ''
 		let &l:cpt = save_cpt
