@@ -9,7 +9,8 @@
 "
 " Usage:
 "
-" set cpt=.,w,b,k
+" set cpt=.,w,b,k,t
+" set completeopt=menu,menuone,noselect
 " let g:apc_enable_ft = {'text':1, 'markdown':1, 'php':1}
 " 
 "======================================================================
