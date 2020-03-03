@@ -126,7 +126,7 @@ function! s:apc_disable()
 	let init_autocmd = get(b:, 'apc_init_autocmd', 0)
 	let init_tab = get(b:, 'apc_init_tab', 0)
 	let save_cpt = get(b:, 'apc_save_cpt', '')
-	let save_infer = get(b:, 'apc_save_infer, '')
+	let save_infer = get(b:, 'apc_save_infer', '')
 	if init_autocmd
 		augroup ApcEventGroup
 			au! 
