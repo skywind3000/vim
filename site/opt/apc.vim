@@ -79,8 +79,17 @@ function! s:feed_popup()
 	let lastx = get(b:, 'apc_lastx', -1)
 	let lasty = get(b:, 'apc_lasty', -1)
 	let tick = get(b:, 'apc_tick', -1)
-	if pumvisible() || &bt != '' || enable == 0
+	if &bt != '' || enable == 0
 		return -1
+	endif
+	if pumvisible()
+		let context = s:get_context()
+		if s:meets_keyword(context) == 0
+			call feedkeys("\<c-e>", 'n')
+		endif
+		let b:apc_lastx = x
+		let b:apc_lasty = y
+		return 0
 	endif
 	let x = col('.') - 1
 	let y = line('.') - 1
@@ -92,14 +101,16 @@ function! s:feed_popup()
 	endif
 	let context = s:get_context()
 	if s:meets_keyword(context)
-		call feedkeys("\<c-n>", 'n')
+		silent! call feedkeys("\<c-n>", 'n')
 		let b:apc_lastx = x
 		let b:apc_lasty = y
 		let b:apc_tick = b:changedtick
 	else
-		if pumvisible()
-			if g:apc_bs_close != 0
-				call feedkeys("\<c-y>", 'n')
+		if g:apc_bs_close != 0
+			if pumvisible()
+				call feedkeys("\<c-e>", 'n')
+				let b:apc_lastx = x
+				let b:apc_lasty = y
 			endif
 		endif
 	endif
