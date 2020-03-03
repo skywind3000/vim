@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/03 14:50
-" Verision: 0.0.1
+" Last Modified: 2020/03/03 16:26
+" Verision: 0.0.2
 "
 " Usage:
 "
@@ -177,6 +177,5 @@ augroup ApcInitGroup
 	au!
 	au FileType * call s:apc_check_init()
 augroup END
-
 
 
