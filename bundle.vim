@@ -108,6 +108,7 @@ if index(g:bundle_group, 'basic') >= 0
 	
 	if has('python') || has('python3')
 		Plug 'Yggdroot/LeaderF'
+		Plug 'tamago324/LeaderF-filer'
 		IncScript site/bundle/leaderf.vim
 	else
 		Plug 'ctrlpvim/ctrlp.vim'
@@ -157,6 +158,7 @@ if index(g:bundle_group, 'inter') >= 0
 	Plug 'mattn/webapi-vim'
 	Plug 'mattn/gist-vim'
 	Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
+	Plug 'lifepillar/vim-cheat40',
 	" Plug 'Yggdroot/indentLine'
 
 	if has('python3') || has('python')
@@ -288,19 +290,20 @@ if index(g:bundle_group, 'lightline') >= 0
 	IncScript site/bundle/lightline.vim
 endif
 
+if index(g:bundle_group, 'coc') >= 0
+	Plug 'neoclide/coc.nvim', {'branch': 'release'}
+	IncScript site/bundle/coc.vim
+endif
+
+if index(g:bundle_group, 'vim-doge') >= 0
+	Plug 'kkoomen/vim-doge'
+	IncScript site/bundle/doge.vim
+endif
+
 if index(g:bundle_group, 'nerdtree') >= 0
 	Plug 'scrooloose/nerdtree', {'on': ['NERDTree', 'NERDTreeFocus', 'NERDTreeToggle', 'NERDTreeCWD', 'NERDTreeFind'] }
 	Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-	let g:NERDTreeMinimalUI = 1
-	let g:NERDTreeDirArrows = 1
-	let g:NERDTreeHijackNetrw = 0
-	" let g:NERDTreeFileExtensionHighlightFullName = 1
-	" let g:NERDTreeExactMatchHighlightFullName = 1
-	" let g:NERDTreePatternMatchHighlightFullName = 1
-	noremap <space>tn :NERDTree<cr>
-	noremap <space>to :NERDTreeFocus<cr>
-	noremap <space>tm :NERDTreeMirror<cr>
-	noremap <space>tt :NERDTreeToggle<cr>
+	IncScript site/bundle/nerdtree.vim
 endif
 
 if index(g:bundle_group, 'grammer') >= 0

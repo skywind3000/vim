@@ -30,15 +30,8 @@ let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 "----------------------------------------------------------------------
 "- Global Settings
 "----------------------------------------------------------------------
-
-let g:ycm_goto_buffer_command = 'new-or-existing-tab'
-
-let g:asyncrun_open = 6
 let g:asyncrun_msys = 'd:/software/msys32'
 
-if g:asc_uname == 'windows'
-	let g:asyncrun_encs = 'gbk'
-endif
 
 
 "----------------------------------------------------------------------
@@ -47,7 +40,7 @@ endif
 augroup SkywindGroup
 	au!
 	" au FileType python setlocal shiftwidth=4 tabstop=4 noexpandtab omnifunc=pythoncomplete#Complete
-	au FileType python setlocal shiftwidth=4 tabstop=4 et omnifunc=pythoncomplete#Complete
+	au FileType python setlocal shiftwidth=4 tabstop=4 et omnifunc=python3complete#Complete
 	au FileType lisp setlocal ts=8 sts=2 sw=2 et
 	au FileType scala setlocal sts=4 sw=4 noet
 	au FileType haskell setlocal et
@@ -108,21 +101,9 @@ endif
 "----------------------------------------------------------------------
 "- miscs
 "----------------------------------------------------------------------
-
-if g:asc_uname != 'windows'
-	runtime ftplugin/man.vim
-	nnoremap K :Man <cword><CR>
-	let g:ft_man_open_mode = 'vert'
-endif
-
 let g:cppman_open_mode = '<auto>'
 
-
 command! -bang -nargs=* -complete=file Make AsyncRun -program=make @ <args>
-
-if executable('rg')
-	let g:vimmake_grep_mode = 'rg'
-endif
 
 
 "----------------------------------------------------------------------

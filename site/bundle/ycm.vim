@@ -23,6 +23,8 @@ let g:ycm_semantic_triggers =  {
 			\ 'cs,lua,javascript': ['re!\w{2}'],
 			\ }
 
+let g:ycm_goto_buffer_command = 'new-or-existing-tab'
+
 
 "----------------------------------------------------------------------
 " Ycm White List

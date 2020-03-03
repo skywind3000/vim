@@ -20,13 +20,6 @@ if has('nvim')
 endif
 
 
-"----------------------------------------------------------------------
-" asynctasks
-"----------------------------------------------------------------------
-let s:config = (s:windows)? 'tasks.win32.ini' : 'tasks.linux.ini'
-let g:asynctasks_extra_config = [s:home . '/'. s:config]
-let g:asynctasks_term_pos = (s:windows && s:gui)? 'external' : 'tab'
-" let g:asynctasks_rtp_config = 'etc/tasks.ini'
 
 
 "-----------------------------------------------------
@@ -55,6 +48,7 @@ endif
 let s:ignore = ['.obj', '.so', '.a', '~', '.tmp', '.egg', '.class', '.jar']
 let s:ignore += ['.tar.gz', '.zip', '.7z', '.bz2', '.rar', '.jpg', '.png']
 let s:ignore += ['.chm', '.docx', '.xlsx', '.pptx', '.pdf', '.dll', '.pyd']
+let s:ignore += ['.xls', '.mobi', '.mp4', '.mp3']
 
 for s:extname in s:ignore
 	let s:pattern = escape(s:extname, '.~') . '\($\|\t\),'
@@ -80,19 +74,6 @@ endif
 let g:ft_man_open_mode = 'vert'
 
 
-"----------------------------------------------------------------------
-" NERDTree
-"----------------------------------------------------------------------
-let NERDTreeIgnore = ['\~$', '\$.*$', '\.swp$', '\.pyc$', '#.\{-\}#$']
-let s:ignore += ['.xls', '.mobi', '.mp4', '.mp3']
-
-for s:extname in s:ignore
-	let NERDTreeIgnore += [escape(s:extname, '.~$')]
-endfor
-
-let NERDTreeRespectWildIgnore = 1
-
-" let g:vinegar_nerdtree_as_netrw = 1
 
 
 "----------------------------------------------------------------------
@@ -252,6 +233,25 @@ if filereadable(s:launch)
 	let $VIM_LAUNCH_HZ = ''. s:hz
 endif
 
+if s:windows != 0
+	let g:asyncrun_encs = 'gbk'
+endif
+
+let g:asyncrun_open = 6
+
+if executable('rg')
+	let g:vimmake_grep_mode = 'rg'
+endif
+
+
+
+"----------------------------------------------------------------------
+" asynctasks
+"----------------------------------------------------------------------
+let s:config = (s:windows)? 'tasks.win32.ini' : 'tasks.linux.ini'
+let g:asynctasks_extra_config = [s:home . '/'. s:config]
+let g:asynctasks_term_pos = (s:windows && s:gui)? 'external' : 'tab'
+" let g:asynctasks_rtp_config = 'etc/tasks.ini'
 
 "----------------------------------------------------------------------
 " delimitmate
