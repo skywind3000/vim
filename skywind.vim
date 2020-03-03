@@ -128,14 +128,12 @@ endif
 "----------------------------------------------------------------------
 "- OptImport
 "----------------------------------------------------------------------
-" VimImport site/echofunc.vim
-VimImport site/argtextobj.vim
-VimImport site/indent-object.vim
-" VimImport site/calendar.vim
-"VimImport site/hilinks.vim
+VimImport site/opt/argtextobj.vim
+VimImport site/opt/indent-object.vim
+VimImport site/opt/apc.vim
 
 if has('gui_running')
-	VimImport site/hexhigh.vim
+	VimImport site/opt/hexhigh.vim
 endif
 
 runtime! macros/matchit.vim
