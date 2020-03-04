@@ -27,19 +27,50 @@ endif
 
 noremap <tab>/ :emenu <C-Z>
 
+
+"----------------------------------------------------------------------
+" Include Scripts
+"----------------------------------------------------------------------
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
 
-" VimImport / VimLoad
-command! -nargs=1 VimImport exec 'so '.s:home.'/'.'<args>'
-command! -nargs=1 VimLoad exec 'set rtp+='.s:home.'/'.'<args>'
+" IncScript / IncRtp
+if !exists(':IncScript')
+	command! IncScript -nargs=1 exec 'so ' . fnameescape(s:home .'/<args>')
+endif
 
+if !exists(':IncRtp')
+	command! -nargs=1 IncRtp exec 'set rtp+='.s:home.'/'.'<args>'
+endif
+
+
+"----------------------------------------------------------------------
+" turn latest features
+"----------------------------------------------------------------------
+
+" Enable vim-diff-enhanced (Christian Brabandt)
+if has('patch-8.1.0388')
+	set diffopt+=internal,algorithm:patience
+	set diffopt+=indent-heuristic
+endif
+
+" complete option
+if has('patch-8.0.1000')
+	set completeopt=menu,menuone,noselect
+else
+	set completeopt=menu,menuone
+endif
+
+" new blowfish2 
 if has('patch-7.4.500') || v:version >= 800
 	if !has('nvim')
 		set cryptmethod=blowfish2
 	endif
 endif
 
+
+"----------------------------------------------------------------------
 " fixed cursor shaping compatible issues for some terminals
+"----------------------------------------------------------------------
 if has('nvim')
 	set guicursor=
 elseif (!has('gui_running')) && has('terminal') && has('patch-8.0.1200')
@@ -80,6 +111,9 @@ augroup AscUnixGroup
 	au BufNewFile,BufRead *.es setlocal filetype=erlang
 	au BufNewFile,BufRead *.asc setlocal filetype=asciidoc
 	au BufNewFile,BufRead *.vl setlocal filetype=verilog
+	au FileType lisp setlocal ts=8 sts=2 sw=2 et
+	au FileType scala setlocal sts=4 sw=4 noet
+	au FileType haskell setlocal et
 augroup END
 
 
@@ -98,8 +132,12 @@ function! s:language_setup()
 	endif
 	let tags = expand("~/.vim/tags/") . &ft . '.tags'
 	let dict = expand("~/.vim/dict/") . &ft . '.dict'
-	exec "setlocal tags+=" . fnameescape(tags)
-	exec "setlocal dict+=" . fnameescape(dict)
+	if filereadable(tags)
+		exec "setlocal tags+=" . fnameescape(tags)
+	endif
+	if filereadable(dict)
+		exec "setlocal dict+=" . fnameescape(dict)
+	endif
 endfunc
 
 
@@ -131,7 +169,6 @@ if has('terminal') && exists(':terminal') == 2
 	endif
 endif
 
-
 " setup shell 
 if &shell =~# 'fish'
 	set shell=sh
@@ -139,18 +176,8 @@ endif
 
 
 "----------------------------------------------------------------------
-" highlighting tune
-"----------------------------------------------------------------------
-function! VimTuneHighlight(mode)
-endfunc
-
-
-
-"----------------------------------------------------------------------
 " Shougo
 "----------------------------------------------------------------------
-
-
 command! -range -nargs=1 AddNumbers
       \ call s:add_numbers((<line2>-<line1>+1) * eval(<args>))
 function! s:add_numbers(num)
@@ -202,4 +229,5 @@ function! s:open_junk_list()
 	let junk_dir = tr(junk_dir, '\', '/')
 	exec "Leaderf file " . fnameescape(junk_dir)
 endfunction
+
 
