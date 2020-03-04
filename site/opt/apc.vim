@@ -153,6 +153,8 @@ endfunc
 function! s:apc_check_init()
 	if &bt == '' && get(g:apc_enable_ft, &ft, 0) != 0
 		ApcEnable
+	elseif &bt == '' && get(g:apc_enable_ft, '*', 0) != 0
+		ApcEnable
 	endif
 endfunc
 
