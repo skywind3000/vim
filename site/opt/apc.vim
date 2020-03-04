@@ -5,11 +5,11 @@
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
 " Last Modified: 2020/03/04 06:36
-" Verision: 1.0.1
+" Verision: 1.0.2
 "
 " Usage:
 "
-" set cpt=.,w,b,k,t
+" set cpt=k,.,w
 " set completeopt=menu,menuone,noselect
 " let g:apc_enable_ft = {'text':1, 'markdown':1, 'php':1}
 " 
@@ -35,7 +35,7 @@ let g:apc_min_length = get(g:, 'apc_min_length', 2)
 let g:apc_key_ignore = get(g:, 'apc_key_ignore', [])
 
 " reset cpt
-let g:apc_reset_cpt = get(g:, 'apc_reset_cpt', 'k,.,b,w')
+let g:apc_reset_cpt = get(g:, 'apc_reset_cpt', '')
 
 " bs close
 let g:apc_bs_close = get(g:, 'apc_bs_close', 1) 
@@ -80,33 +80,6 @@ function! s:on_backspace()
 	endif
 	return "\<c-e>\<bs>"
 endfunc
-
-
-"----------------------------------------------------------------------
-" log file
-"----------------------------------------------------------------------
-function! s:log_append(filename, text)
-	let l:ts = strftime("[%Y-%m-%d %H:%M:%S] ")
-	if 1
-		call writefile([l:ts . a:text], a:filename, 'a')
-	else
-		exec "redir >> ".fnameescape(a:filename)
-		silent echon l:ts.a:text."\n"
-		silent exec "redir END"
-	endif
-endfunc
-
-
-"----------------------------------------------------------------------
-" write log for debug
-"----------------------------------------------------------------------
-function! s:log(text)
-	if 0
-		call s:log_append('d:/output.log', a:text)
-	endif
-endfunc
-
-
 
 
 "----------------------------------------------------------------------
