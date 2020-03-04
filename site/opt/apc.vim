@@ -140,7 +140,7 @@ function! s:apc_disable()
 		silent! iunmap <buffer><expr> <bs>
 	endif
 	if get(b:, 'apc_save_infer', '') != ''
-		let &l:infercase = save_infer
+		let &l:infercase = g:apc_save_infer
 	endif
 	let b:apc_init_autocmd = 0
 	let b:apc_init_tab = 0
