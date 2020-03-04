@@ -21,9 +21,9 @@ if g:vim_startup != ''
 endif
 
 if get(g:, 'vim_manual', 0) == 0
-	let g:bundle_group += ['simple']
+	let g:bundle_group += ['simple', 'basic']
 	if g:vim_startup == 'nvim'
-		let g:bundle_group += ['basic']
+		let g:bundle_group += ['inter']
 	elseif g:vim_startup == 'mvim'
 		let g:bundle_group += ['basic', 'inter', 'high', 'opt']
 		let g:bundle_group += ['ale']
