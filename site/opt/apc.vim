@@ -114,6 +114,8 @@ function! s:apc_enable()
 		inoremap <silent><buffer><expr> <tab>
 					\ pumvisible()? "\<c-n>" :
 					\ <SID>check_back_space() ? "\<tab>" : "\<c-n>"
+		inoremap <silent><buffer><expr> <s-tab>
+					\ pumvisible()? "\<c-p>" : "\<s-tab>"
 		let b:apc_init_tab = 1
 	endif
 	inoremap <silent><buffer><expr> <bs> <SID>on_backspace()
@@ -125,28 +127,24 @@ endfunc
 
 " disable apc
 function! s:apc_disable()
-	let init_autocmd = get(b:, 'apc_init_autocmd', 0)
-	let init_tab = get(b:, 'apc_init_tab', 0)
-	let init_bs = get(b:, 'apc_init_bs', 0)
-	let save_infer = get(b:, 'apc_save_infer', '')
-	if init_autocmd
+	if get(b:, 'apc_init_autocmd', 0)
 		augroup ApcEventGroup
 			au! 
 		augroup END
 	endif
-	if init_tab
+	if get(b:, 'apc_init_tab', 0)
 		silent! iunmap <buffer><expr> <tab>
+		silent! iunmap <buffer><expr> <s-tab>
 	endif
-	if init_bs
+	if get(b:, 'apc_init_bs', 0)
 		silent! iunmap <buffer><expr> <bs>
 	endif
-	if save_infer != ''
+	if get(b:, 'apc_save_infer', '') != ''
 		let &l:infercase = save_infer
 	endif
 	let b:apc_init_autocmd = 0
 	let b:apc_init_tab = 0
 	let b:apc_init_bs = 0
-	let b:apc_save_cpt = ''
 	let b:apc_save_infer = ''
 	let b:apc_enable = 0
 endfunc
