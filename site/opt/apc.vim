@@ -18,7 +18,7 @@
 "
 " Usage:
 "
-" set cpt=k,.,w
+" set cpt=.,k,b
 " set completeopt=menu,menuone,noselect
 " let g:apc_enable_ft = {'text':1, 'markdown':1, 'php':1}
 " 
@@ -26,10 +26,6 @@
 
 " vim: set noet fenc=utf-8 ff=unix sts=4 sw=4 ts=4 :
 
-
-"----------------------------------------------------------------------
-" config
-"----------------------------------------------------------------------
 
 " enable filetypes
 let g:apc_enable_ft = get(g:, 'apc_enable_ft', {})
@@ -50,10 +46,7 @@ let g:apc_reset_cpt = get(g:, 'apc_reset_cpt', '')
 let g:apc_bs_close = get(g:, 'apc_bs_close', 1) 
 
 
-"----------------------------------------------------------------------
-" internal methods
-"----------------------------------------------------------------------
-
+" get word before cursor
 function! s:get_context()
 	return strpart(getline('.'), 0, col('.') - 1)
 endfunc
@@ -91,9 +84,7 @@ function! s:on_backspace()
 endfunc
 
 
-"----------------------------------------------------------------------
-" feed popup
-"----------------------------------------------------------------------
+" autocmd for CursorMovedI
 function! s:feed_popup()
 	let enable = get(b:, 'apc_enable', 0)
 	let lastx = get(b:, 'apc_lastx', -1)
@@ -142,9 +133,7 @@ function! s:feed_popup()
 endfunc
 
 
-"----------------------------------------------------------------------
-" event
-"----------------------------------------------------------------------
+" autocmd for CompleteDone
 function! s:complete_done()
 	let x = col('.') - 1
 	let y = line('.') - 1
@@ -154,15 +143,12 @@ function! s:complete_done()
 endfunc
 
 
-"----------------------------------------------------------------------
 " enable apc
-"----------------------------------------------------------------------
 function! s:apc_enable()
 	call s:apc_disable()
 	augroup ApcEventGroup
 		au!
 		au CursorMovedI <buffer> nested call s:feed_popup()
-		" au TextChangedI <buffer> call s:feed_popup()
 		au CompleteDone <buffer> call s:complete_done()
 	augroup END
 	let b:apc_init_autocmd = 1
@@ -185,9 +171,7 @@ function! s:apc_enable()
 endfunc
 
 
-"----------------------------------------------------------------------
 " disable apc
-"----------------------------------------------------------------------
 function! s:apc_disable()
 	let init_autocmd = get(b:, 'apc_init_autocmd', 0)
 	let init_tab = get(b:, 'apc_init_tab', 0)
@@ -220,9 +204,7 @@ function! s:apc_disable()
 endfunc
 
 
-"----------------------------------------------------------------------
 " check if need to be enabled
-"----------------------------------------------------------------------
 function! s:apc_check_init()
 	if &bt != ''
 		return
@@ -234,20 +216,12 @@ function! s:apc_check_init()
 endfunc
 
 
-"----------------------------------------------------------------------
-" commands
-"----------------------------------------------------------------------
+" commands & autocmd
 command -nargs=0 ApcEnable call s:apc_enable()
 command -nargs=0 ApcDisable call s:apc_disable()
 
-
-"----------------------------------------------------------------------
-" autocmd
-"----------------------------------------------------------------------
 augroup ApcInitGroup
 	au!
 	au FileType * call s:apc_check_init()
 augroup END
-
-
 
