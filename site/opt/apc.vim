@@ -4,18 +4,17 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/04 06:36
-" Verision: 1.0.2
+" Last Modified: 2020/03/05 02:40
+" Verision: 1.0.3
 "
 " Features:
 "
 " - auto popup complete window without select the first one
 " - tab/s-tab to cycle suggestions, <c-e> to cancel
-" - exactly the same experience like youcompleteme
-" - super tiny and useful when you need buffer/dictionary completion
+" - same experience as youcompleteme in buffer/dict completion.
 " - every thing is local to buffer (autocmd/keymap)
-" - use ApcEnable/ApcDisable to toggle in certiain buffer.
 " - co-exists with other completion plugins.
+" - use ApcEnable/ApcDisable to toggle for certiain file.
 "
 " Usage:
 "
