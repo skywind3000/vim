@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/03 14:31
-" Verision: 1.6.4
+" Last Modified: 2020/03/03 12:42
+" Verision: 1.6.3
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -83,6 +83,14 @@ let g:asynctasks_notify = get(g:, 'asynctasks_notify', '')
 " set to zero to create .tasks without template
 let g:asynctasks_template = get(g:, 'asynctasks_template', 1)
 
+" Add highlight colors if they don't exist.
+if !hlexists('AsyncRunSuccess')
+        highlight link AsyncRunSuccess ModeMsg
+endif
+
+if !hlexists('AsyncRunFailure')
+        highlight link AsyncRunFailure ErrorMsg
+endif
 
 
 "----------------------------------------------------------------------
@@ -839,8 +847,6 @@ function! s:task_option(task)
 			let opts.raw = 1
 		elseif output == 'vim'
 			let opts.mode = 'bang'
-		elseif output == 'hide' || output == 'hidden'
-			let opts.mode = 'hide'
 		endif
 	endif
 	if has_key(task, 'silent') && task.silent
@@ -1402,7 +1408,7 @@ function! asynctasks#finish(what)
 		exec "norm! \<esc>"
 	elseif a:what == 'echo'
 		redraw
-		echohl ModeMsg
+                execute 'echohl '.eval('g:asyncrun_status ==# "failure" ? "AsyncRunFailure" : "AsyncRunSuccess"')
 		echon "Task finished: " . g:asyncrun_status
 		echohl None
 	elseif a:what =~ '^sound:'
