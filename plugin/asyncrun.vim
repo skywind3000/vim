@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/03/07 05:53
+" Last Modified: 2020/03/07 05:57
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1162,10 +1162,10 @@ function! s:start_in_terminal(opts)
 			if has_key(a:opts, 'hidden')
 				exec 'setlocal bufhidden=' . (hidden? 'hide' : '')
 			endif
-		endif
-		if focus == 0
-			exec has('nvim')? 'stopinsert' : ''
-			exec 'tabprevious'
+			if focus == 0
+				exec has('nvim')? 'stopinsert' : ''
+				exec 'tabprevious'
+			endif
 		endif
 		return 0
 	elseif pos == 'cur' || pos == 'curwin' || pos == 'current'
