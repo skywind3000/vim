@@ -98,7 +98,11 @@ function! vimmake#grep(text, cwd)
 	elseif mode == 'rg'
 		let cmd = 'rg -n --no-heading --color never '. (fixed? '-F ' : '')
 		for item in g:vimmake_grep_exts
-			let cmd .= ' -g *.'. item
+			if s:vimmake_windows == 0
+				let cmd .= " -g \'*.". item . "'"
+			else
+				let cmd .= ' -g *.'. item
+			endif
 		endfor
 		let cmd .= ' '. shellescape(a:text)
 		if a:cwd != '.' && a:cwd != ''
