@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/03 12:42
-" Verision: 1.6.3
+" Last Modified: 2020/03/07 06:14
+" Verision: 1.6.4
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -52,6 +52,9 @@ let g:asynctasks_environ = get(g:, 'asynctasks_environ', {})
 
 " features
 let g:asynctasks_feature = get(g:, 'asynctasks_feature', {})
+
+" confirm file name in :AsyncEdit ?
+let g:asynctasks_confirm = get(g:, 'asynctasks_confirm', 1)
 
 " terminal mode: tab/curwin/top/bottom/left/right/quickfix/external
 let g:asynctasks_term_pos = get(g:, 'asynctasks_term_pos', 'quickfix')
@@ -1193,13 +1196,15 @@ function! s:task_edit(mode, path)
 		endif
 	endif
 	let name = fnamemodify(expand(name), ':p')
-	call inputsave()
-	let r = input('(Edit task config): ', name)
-	call inputrestore()
-	if r == ''
-		return -1
+	if g:asynctasks_confirm
+		call inputsave()
+		let r = input('(Edit task config): ', name)
+		call inputrestore()
+		if r == ''
+			return -1
+		endif
+		let name = r
 	endif
-	let name = r
 	let newfile = filereadable(name)? 0 : 1
 	let filedir = fnamemodify(name, ':p:h')
 	if isdirectory(filedir) == 0 && filedir != ''
