@@ -83,6 +83,12 @@ let g:asynctasks_notify = get(g:, 'asynctasks_notify', '')
 " set to zero to create .tasks without template
 let g:asynctasks_template = get(g:, 'asynctasks_template', 1)
 
+" set to 1 to remember last user input for each variable
+let g:asynctasks_remember = get(g:, 'asynctasks_remember', 0)
+
+" last user input, key is 'taskname:variable'
+let g:asynctasks_history = get(g:, 'asynctasks_history', {})
+
 " Add highlight colors if they don't exist.
 if !hlexists('AsyncRunSuccess')
         highlight link AsyncRunSuccess ModeMsg
@@ -729,7 +735,7 @@ endfunc
 "----------------------------------------------------------------------
 " ask user what to do
 "----------------------------------------------------------------------
-function! s:command_input(command)
+function! s:command_input(command, taskname, remember)
 	let command = a:command
 	let mark_open = '$(?'
 	let mark_close = ')'
@@ -746,15 +752,22 @@ function! s:command_input(command)
 		endif
 		let name = strpart(command, p1 + size_open, p2 - p1 - size_open)
 		let mark = mark_open . name . mark_close
+		let text = ''
+		let rkey = a:taskname . ':' . name
+		if a:remember
+			let text = get(g:asynctasks_history, rkey, '')
+			" echom 'remember: <' . text . '>'
+		endif
 		echohl Type
 		call inputsave()
 		try
-			let t = input('Input argument (' . name . '): ')
+			let t = input('Input argument (' . name . '): ', text)
 		catch /^Vim:Interrupt$/
 			let t = ""
 		endtry
 		call inputrestore()
 		echohl None
+		let g:asynctasks_history[rkey] = t
 		if t == ''
 			return ''
 		endif
@@ -1030,7 +1043,9 @@ function! asynctasks#start(bang, taskname, path, ...)
 	if s:command_check(command, get(task, 'cwd', '')) != 0
 		return -7
 	endif
-	let command = s:command_input(command)
+	let remember = g:asynctasks_remember
+	let remember = has_key(task, 'remember')? task.remember : remember
+	let command = s:command_input(command, a:taskname, remember)
 	if command == ''
 		redraw
 		echo ""

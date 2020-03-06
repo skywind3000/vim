@@ -89,6 +89,7 @@ function! s:lf_task_accept(line, arg)
 	endif
 	let name = strpart(a:line, 0, pos)
 	let name = substitute(name, '^\s*\(.\{-}\)\s*$', '\1', '')
+	redraw
 	if name != ''
 		exec "AsyncTask " . name
 	endif
