@@ -3,6 +3,12 @@
 SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 SCRIPT="$SCRIPTPATH/asynctask.py"
 
+if [ ! -e "$SCRIPT" ]; then
+	SCRIPTPATH="$(readlink """$0""")"
+	SCRIPTPATH="$( cd "$(dirname "$SCRIPTPATH")" >/dev/null 2>&1 ; pwd -P )"
+	SCRIPT="$SCRIPTPATH/asynctask.py"
+fi
+
 if [ -e "$SCRIPT" ]; then
 	if [ -x "$(which python 2> /dev/null)" ]; then
 		python "$SCRIPT" "$@"
