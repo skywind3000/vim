@@ -163,10 +163,15 @@ function! TerminalOpen()
 			let cmd = cmd . ((kill != '')? (' ++kill=' . kill) : '')
 			exec cmd . ' ++norestore ++rows=' . height . ' ' . shell
 			setlocal nonumber norelativenumber signcolumn=no
+			let jid = term_getjob(bufnr())
+			let b:__terminal_jid__ = jid
 		else
 			exec pos . ' ' . height . 'split'
-			exec 'term ' . shell
+			exec 'enew'
+			let shell = (shell != '')? shell : &shell
+			let jid = termopen(shell, {})
 			setlocal nonumber norelativenumber signcolumn=no
+			let b:__terminal_jid__ = jid
 			startinsert
 		endif
 		silent execute cd . ' '. fnameescape(savedir)
@@ -232,6 +237,38 @@ function! TerminalToggle()
 		call TerminalOpen()
 	else
 		call TerminalClose()
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" send text to terminal
+"----------------------------------------------------------------------
+function! TerminalSend(text)
+	let bid = get(t:, '__terminal_bid__', -1)
+	let alive = 0
+	if bid > 0 && bufname(bid) != ''
+		let wid = bufwinnr(bid)
+		if wid > 0
+			let alive = (bufname(bid) != '')? 1 : 0
+		endif
+	endif
+	echom "alive: ". alive
+	if alive == 0
+		call TerminalClose()
+		call TerminalOpen()
+	endif
+	let bid = get(t:, '__terminal_bid__', -1)
+	if bid > 0
+		let jid = getbufvar(bid, '__terminal_jid__', '')
+		if string(jid) != ''
+			if has('nvim') == 0
+				let ch = job_getchannel(jid)
+				call ch_sendraw(ch, a:text)
+			else
+				call chansend(jid, a:text)
+			endif
+		endif
 	endif
 endfunc
 
