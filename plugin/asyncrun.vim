@@ -195,6 +195,9 @@ let g:asyncrun_script = get(g:, 'asyncrun_script', '')
 " strict to execute vim script
 let g:asyncrun_strict = get(g:, 'asyncrun_strict', 0)
 
+" terminal job name
+let g:asyncrun_name = ''
+
 
 
 "----------------------------------------------------------------------
@@ -303,6 +306,7 @@ let s:async_quick = 0
 let s:async_scroll = 0
 let s:async_congest = 0
 let s:async_efm = &errorformat
+let s:async_term = {}
 
 " check :cbottom available ?
 if s:async_nvim == 0
@@ -1078,6 +1082,8 @@ function! s:terminal_open(opts)
 	let command = a:opts.cmd
 	let hidden = get(a:opts, 'hidden', 0)
 	let shell = (has('nvim') == 0)? 1 : 0
+	let pos = get(a:opts, 'pos', 'bottom')
+	let pos = (pos == 'background')? 'hide' : pos
 	if get(a:opts, 'safe', get(g:, 'asyncrun_term_safe', 0)) != 0
 		let command = s:ScriptWrite(command, 0)
 		if stridx(command, ' ') >= 0
@@ -1099,35 +1105,73 @@ function! s:terminal_open(opts)
 		endif
 	endif
 	if has('nvim') == 0
-		let opts = {'curwin':1, 'norestore':1, 'term_finish':'open'}
-		let opts.term_kill = 'term'
-		let opts.exit_cb = function('s:terminal_exit')
-		let bid = term_start(command, opts)
+		if pos != 'hide'
+			let opts = {'curwin':1, 'norestore':1, 'term_finish':'open'}
+			let opts.term_kill = 'term'
+			let opts.exit_cb = function('s:terminal_exit')
+			try
+				let bid = term_start(command, opts)
+			catch /^.*/
+				call s:ErrorMsg('E37: No write since last change')
+				return -1
+			endtry
+			let jid = (bid > 0)? term_getjob(bid) : -1
+			let success = (bid > 0)? 1 : 0
+		else
+			let opts = {'stoponexit':'term'}
+			let opts.exit_cb = function('s:terminal_exit')
+			let jid = job_start(command, opts)
+			let bid = -1
+			let success = (job_status(jid) != 'fail')? 1 : 0
+		endif
+		let pid = (success)? (job_info(jid)['process']) : -1
 	else
 		let opts = {}
 		let opts.on_exit = function('s:terminal_exit')
-		try
-			enew
-		catch /^.*/
-			call s:ErrorMsg('E37: No write since last change')
-			return -1
-		endtry
-		let jid = termopen(command, opts)
-		let bid = (&bt == 'terminal')? winbufnr(0) : -1
+		if pos != 'hide'
+			try
+				enew
+			catch /^.*/
+				call s:ErrorMsg('E37: No write since last change')
+				return -1
+			endtry
+			let jid = termopen(command, opts)
+			let bid = (&bt == 'terminal')? winbufnr(0) : -1
+		else
+			let jid = jobstart(command, opts)
+			let jid = (jid > 0)? jid : -1
+			let bid = -1
+		endif
+		let success = (jid > 0)? 1 : 0
+		let pid = (success)? jid : -1
 	endif
-	if &bt != 'terminal'
+	if success == 0
+		call s:ErrorMsg('Process creation failed')
 		return -1
 	endif
-	setlocal nonumber signcolumn=no norelativenumber
-	let b:asyncrun_cmd = a:opts.cmd
-	if get(a:opts, 'listed', 1) == 0
-		setlocal nobuflisted
+	if pos != 'hide'
+		setlocal nonumber signcolumn=no norelativenumber
+		let b:asyncrun_cmd = a:opts.cmd
+		if get(a:opts, 'listed', 1) == 0
+			setlocal nobuflisted
+		endif
+		exec has('nvim')? 'startinsert' : ''
+		if has_key(a:opts, 'hidden')
+			exec 'setlocal bufhidden=' . (hidden? 'hide' : '')
+		endif
 	endif
-	exec has('nvim')? 'startinsert' : ''
-	if has_key(a:opts, 'hidden')
-		exec 'setlocal bufhidden=' . (hidden? 'hide' : '')
+	let opts = {}
+	let opts.name = get(a:opts, 'name', '')
+	let opts.post = get(a:opts, 'post', '')
+	let opts.cmd = get(a:opts, 'cmd', '')
+	if has_key(a:opts, 'exit')
+		let opts.exit = a:opts.exit
 	endif
-	return 0
+	let opts.pid = pid
+	let opts.jid = jid
+	let opts.bid = bid
+	let s:async_term[pid] = opts
+	return pid
 endfunc
 
 
@@ -1135,7 +1179,26 @@ endfunc
 " exit callback
 "----------------------------------------------------------------------
 function! s:terminal_exit(...)
-	echom "finish"
+	if has('nvim') == 0
+		let pid = job_info(a:1)['process']
+	else
+		let pid = a:1
+	endif
+	let code = a:2
+	if !has_key(s:async_term, pid)
+		return -1
+	endif
+	let opts = s:async_term[pid]
+	unlet s:async_term[pid]
+	let g:asyncrun_code = code
+	let g:asyncrun_name = opts.name
+	if opts.post != ''
+		exec opts.post
+	endif
+	if has_key(opts, 'exit')
+		let F = function(opts.exit)
+		call F(opts.name, code)
+	endif
 endfunc
 
 
@@ -1209,6 +1272,9 @@ function! s:start_in_terminal(opts)
 		endif
 		return 0
 	elseif pos == 'cur' || pos == 'curwin' || pos == 'current'
+		let hr = s:terminal_open(a:opts)
+		return 0
+	elseif pos == 'hide' || pos == 'background'
 		let hr = s:terminal_open(a:opts)
 		return 0
 	endif
