@@ -4,7 +4,7 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/07 16:37
+" Last Modified: 2020/03/07 16:43
 " Verision: 1.6.5
 "
 " for more information, please visit:
@@ -76,6 +76,9 @@ let g:asynctasks_term_hidden = get(g:, 'asynctasks_term_hidden', 0)
 
 " set nolisted to terminal buffer ?
 let g:asynctasks_term_listed = get(g:, 'asynctasks_term_listed', 1)
+
+" set to 1 to pass arguments in a safe way (intermediate script)
+let g:asynctasks_term_safe = get(g:, 'asynctasks_term_safe', 0)
 
 " strict to detect $(VIM_CWORD) to avoid empty string
 let g:asynctasks_strict = get(g:, 'asynctasks_strict', 1)
@@ -888,7 +891,7 @@ function! s:task_option(task)
 	if has_key(task, 'auto')
 		let opts.auto = task.auto
 	endif
-	let opts.safe = 1
+	let opts.safe = g:asynctasks_term_safe
 	let opts.reuse = g:asynctasks_term_reuse
 	if g:asynctasks_term_hidden != 0
 		let opts.hidden = 1
