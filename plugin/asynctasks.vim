@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/07 06:14
-" Verision: 1.6.4
+" Last Modified: 2020/03/07 16:37
+" Verision: 1.6.5
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -900,6 +900,9 @@ function! s:task_option(task)
 	if listed == 0
 		let opts.listed = 0
 	endif
+	if has_key(task, 'safe')
+		let opts.safe = task.safe
+	endif
 	let notify = g:asynctasks_notify
 	if has_key(task, 'notify')
 		let notify = task.notify
@@ -1428,8 +1431,12 @@ function! asynctasks#finish(what)
 		exec "norm! \<esc>"
 	elseif a:what == 'echo'
 		redraw
-                execute 'echohl '.eval('g:asyncrun_status ==# "failure" ? "AsyncRunFailure" : "AsyncRunSuccess"')
-		echon "Task finished: " . g:asyncrun_status
+		exec 'echohl '. ((g:asyncrun_code != 0)? "AsyncRunFailure" : "AsyncRunSuccess")
+		let t = 'Task finished: '
+		if g:asyncrun_name != ''
+			let t = 'Task ' . g:asyncrun_name . ' finished: '
+		endif
+		echo t . ((g:asyncrun_code != 0)? 'failure' : 'success')
 		echohl None
 	elseif a:what =~ '^sound:'
 		if exists('*sound_playfile')
@@ -1482,7 +1489,7 @@ function! s:complete(ArgLead, CmdLine, CursorPos)
 	let rows = []
 	let size = len(a:ArgLead)
 	for task in tasks.avail
-		if task =~ '^\.'
+		if task =~ '^\.' && (!(a:ArgLead =~ '^\.'))
 			continue
 		endif
 		if stridx(task, a:ArgLead) == 0
@@ -1569,5 +1576,4 @@ function! asynctasks#timing()
 	echo s:private.rtp.config
 	return tt
 endfunc
-
 
