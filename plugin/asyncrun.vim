@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/03/07 10:37
+" Last Modified: 2020/03/07 11:48
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1152,6 +1152,7 @@ function! s:terminal_open(opts)
 	if pos != 'hide'
 		setlocal nonumber signcolumn=no norelativenumber
 		let b:asyncrun_cmd = a:opts.cmd
+		let b:asyncrun_name = get(a:opts, 'name', '')
 		if get(a:opts, 'listed', 1) == 0
 			setlocal nobuflisted
 		endif
@@ -1264,7 +1265,7 @@ function! s:start_in_terminal(opts)
 			endif
 		endif
 		let hr = s:terminal_open(a:opts)
-		if hr == 0
+		if hr >= 0
 			if focus == 0
 				exec has('nvim')? 'stopinsert' : ''
 				exec 'tabprevious'
@@ -1306,7 +1307,7 @@ function! s:start_in_terminal(opts)
 	keepalt noautocmd call win_gotoid(origin)
 	noautocmd call win_gotoid(uid)
 	let hr = s:terminal_open(a:opts)
-	if focus == 0 && hr == 0
+	if focus == 0 && hr >= 0
 		exec has('nvim')? 'stopinsert' : ''
 		call win_gotoid(origin)
 	endif
@@ -1803,7 +1804,7 @@ endfunc
 " asyncrun - version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.5.6'
+	return '2.6.0'
 endfunc
 
 
