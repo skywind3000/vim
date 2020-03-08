@@ -1697,6 +1697,9 @@ function! asyncrun#run(bang, opts, args, ...)
 		return s:async_program_cmd
 	endif
 
+	" update marcros
+	let l:macros['VIM_RUNNAME'] = get(l:opts, 'name', '')
+
 	" update info (current running command text)
 	let g:asyncrun_info = a:args
 
@@ -1773,9 +1776,6 @@ function! asyncrun#run(bang, opts, args, ...)
 	elseif l:save
 		silent! wall
 	endif
-
-	" setup name
-	let $VIM_RUNNAME = get(l:opts, 'name', '')
 
 	" run command
 	let l:retval = s:run(l:opts)
