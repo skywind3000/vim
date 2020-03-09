@@ -499,4 +499,3 @@ command! -complete=file -nargs=1 SelectiveDrop call <SID>SelectiveDrop(<q-args>)
 
 " set twt=conpty
 
-
