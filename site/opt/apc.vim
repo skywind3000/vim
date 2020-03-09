@@ -117,7 +117,7 @@ function! s:apc_enable()
 					\ pumvisible()? "\<c-p>" : "\<s-tab>"
 		let b:apc_init_tab = 1
 	endif
-	inoremap <silent><buffer><expr> <cr> pumvisible()? "\<c-e>\<cr>" : "\<cr>"
+	inoremap <silent><buffer><expr> <cr> pumvisible()? "\<c-y>\<cr>" : "\<cr>"
 	inoremap <silent><buffer><expr> <bs> <SID>on_backspace()
 	let b:apc_init_bs = 1
 	let b:apc_init_cr = 1
