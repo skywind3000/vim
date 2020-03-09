@@ -1349,6 +1349,11 @@ function! s:run(opts)
 	if type(l:mode) == type('') && l:mode == 'raw'
 		let l:mode = 0
 		let l:opts.raw = 1
+	elseif type(l:mode) == type('') && l:mode =~ '^<.*>$'
+		let name = strpart(l:mode, 1, strlen(l:mode) - 2)
+		if has_key(g:asyncrun_runner, name)
+			let l:runner = name
+		endif
 	elseif type(l:mode) == 0 && l:mode == 6
 		let pos = get(l:opts, 'pos', '')
 		if has_key(g:asyncrun_runner, pos)
