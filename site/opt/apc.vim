@@ -21,7 +21,6 @@ let g:apc_enable_ft = get(g:, 'apc_enable_ft', {})    " enable filetypes
 let g:apc_enable_tab = get(g:, 'apc_enable_tab', 1)   " remap tab
 let g:apc_min_length = get(g:, 'apc_min_length', 2)   " minimal length to open popup
 let g:apc_key_ignore = get(g:, 'apc_key_ignore', [])  " ignore keywords
-let g:apc_bs_close = get(g:, 'apc_bs_close', 1)       " enable <BS> close
 
 " get word before cursor
 function! s:get_context()
@@ -118,8 +117,10 @@ function! s:apc_enable()
 					\ pumvisible()? "\<c-p>" : "\<s-tab>"
 		let b:apc_init_tab = 1
 	endif
+	inoremap <silent><buffer><expr> <cr> pumvisible()? "\<c-e>\<cr>" : "\<cr>"
 	inoremap <silent><buffer><expr> <bs> <SID>on_backspace()
 	let b:apc_init_bs = 1
+	let b:apc_init_cr = 1
 	let b:apc_save_infer = &infercase
 	setlocal infercase
 	let b:apc_enable = 1
@@ -138,6 +139,9 @@ function! s:apc_disable()
 	endif
 	if get(b:, 'apc_init_bs', 0)
 		silent! iunmap <buffer><expr> <bs>
+	endif
+	if get(b:, 'apc_init_cr', 0)
+		silent! iunmap <buffer><expr> <cr>
 	endif
 	if get(b:, 'apc_save_infer', '') != ''
 		let &l:infercase = b:apc_save_infer
