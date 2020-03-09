@@ -7,9 +7,12 @@ Contents ~
  2. What Is It ?                                               |apc-what-is-it|
  3. Features                                                     |apc-features|
  4. Usage                                                           |apc-usage|
- 5. Cooperative                                               |apc-cooperative|
- 6. Credit                                                         |apc-credit|
- 7. References                                                 |apc-references|
+ 5. Commands                                                     |apc-commands|
+  1. ApcEnable                                                      |apcenable|
+  2. ApcDisable                                                    |apcdisable|
+ 6. Cooperative                                               |apc-cooperative|
+ 7. Credit                                                         |apc-credit|
+ 8. References                                                 |apc-references|
 
 ===============================================================================
                                                              *apc-introduction*
@@ -80,6 +83,23 @@ And perhaps a dictionary database plugin for many languages:
   Plug 'skywind3000/vim-dict'
 <
 Then you go.
+
+===============================================================================
+                                                                 *apc-commands*
+Commands ~
+
+-------------------------------------------------------------------------------
+                                                                    *apcenable*
+ApcEnable ~
+
+Enable plugin for the current buffer. Useful when you didn't set
+'g:apc_enable_ft'.
+
+-------------------------------------------------------------------------------
+                                                                   *apcdisable*
+ApcDisable ~
+
+Disable plugin for the current buffer.
 
 ===============================================================================
                                                               *apc-cooperative*
