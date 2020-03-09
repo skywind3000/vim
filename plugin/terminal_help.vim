@@ -258,6 +258,8 @@ function! s:terminal_exit(...)
 		endif
 		if alive
 			call TerminalClose()
+		elseif bid > 0
+			exec 'bdelete! '.bid
 		endif
 	endif
 endfunc
