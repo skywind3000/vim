@@ -1368,11 +1368,6 @@ function! s:run(opts)
 		if has_key(g:asyncrun_runner, pos)
 			let l:runner = pos
 		endif
-	elseif has_key(l:opts, 'runner')
-		let pos = get(l:opts, 'runner', '')
-		if has_key(g:asyncrun_runner, pos)
-			let l:runner = pos
-		endif
 	endif
 
 	" process makeprg/grepprg in -program=?
