@@ -3,7 +3,7 @@
 " terminal_help.vim -
 "
 " Created by skywind on 2020/01/01
-" Last Modified: 2020/01/01 01:21:33
+" Last Modified: 2020/03/09 12:56
 "
 "======================================================================
 
@@ -120,8 +120,8 @@ function! TerminalOpen()
 		endif
 	endfunc
 	let uid = win_getid()
-	noautocmd windo call s:terminal_view(0)
-	noautocmd call win_gotoid(uid)
+	keepalt noautocmd windo call s:terminal_view(0)
+	keepalt noautocmd call win_gotoid(uid)
 	if bid > 0
 		let name = bufname(bid)
 		if name != ''
@@ -221,6 +221,24 @@ function! TerminalClose()
 	let sid = win_getid()
 	noautocmd windo call s:terminal_view(1)
 	call win_gotoid(sid)
+	let jid = getbufvar(bid, '__terminal_jid__', -1)
+	let dead = 0
+	if has('nvim') == 0
+		if type(jid) == v:t_job
+			let dead = (job_status(jid) == 'dead')? 1 : 0
+		endif
+	else
+		if jid >= 0
+			try
+				let pid = jobpid(jid)
+			catch /^Vim\%((\a\+)\)\=:E900:/
+				let dead = 1
+			endtry
+		endif
+	endif
+	if dead
+		exec 'bdelete! '. bid
+	endif
 endfunc
 
 
@@ -253,10 +271,31 @@ function! TerminalSend(text)
 			let alive = (bufname(bid) != '')? 1 : 0
 		endif
 	endif
-	echom "alive: ". alive
+	" check if buffer exists
+	if alive
+		" check if job stopped
+		let jid = getbufvar(bid, '__terminal_jid__', -1)
+		if has('nvim') == 0
+			if type(jid) == v:t_job
+				let alive = (job_status(jid) == 'dead')? 0 : 1
+			endif
+		else
+			if jid >= 0
+				try
+					let pid = jobpid(jid)
+				catch /^Vim\%((\a\+)\)\=:E900:/
+					let alive = 0
+				endtry
+			endif
+		endif
+	endif
+	let x = win_getid()
 	if alive == 0
 		call TerminalClose()
 		call TerminalOpen()
+		if has('nvim')
+			stopinsert
+		endif
 	endif
 	let bid = get(t:, '__terminal_bid__', -1)
 	if bid > 0
@@ -270,6 +309,19 @@ function! TerminalSend(text)
 			endif
 		endif
 	endif
+	if has('nvim')
+		let bid = get(t:, '__terminal_bid__', -1)
+		if bid > 0 && bufname(bid) != ''
+			let wid = bufwinnr(bid)
+			if wid > 0
+				exec '' . wid . 'wincmd w'
+			endif
+			startinsert
+			stopinsert
+			exec 'normal G'
+		endif
+	endif
+	call win_gotoid(x)
 endfunc
 
 
