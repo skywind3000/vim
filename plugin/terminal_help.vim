@@ -3,7 +3,7 @@
 " terminal_help.vim -
 "
 " Created by skywind on 2020/01/01
-" Last Modified: 2020/03/09 12:56
+" Last Modified: 2020/03/09 14:33
 "
 "======================================================================
 
@@ -106,7 +106,7 @@ endfunc
 "----------------------------------------------------------------------
 " open a new/previous terminal
 "----------------------------------------------------------------------
-function! TerminalOpen()
+function! TerminalOpen(...)
 	let bid = get(t:, '__terminal_bid__', -1)
 	let pos = get(g:, 'terminal_pos', 'rightbelow')
 	let height = get(g:, 'terminal_height', 10)
@@ -149,6 +149,7 @@ function! TerminalOpen()
 	endif
 	if succeed == 0
 		let shell = get(g:, 'terminal_shell', '')
+		let command = (shell != '')? shell : &shell
 		let close = get(g:, 'terminal_close', 0)
 		let savedir = getcwd()
 		if g:terminal_cwd == 1
@@ -158,18 +159,20 @@ function! TerminalOpen()
 			silent execute cd . ' '. fnameescape(s:project_root())
 		endif
 		if has('nvim') == 0
-			let kill = get(g:, 'terminal_kill', '')
-			let cmd = pos . ' term ' . (close? '++close' : '++noclose') 
-			let cmd = cmd . ((kill != '')? (' ++kill=' . kill) : '')
-			exec cmd . ' ++norestore ++rows=' . height . ' ' . shell
+			exec pos . ' ' . height . 'split'
+			let opts = {'curwin':1, 'norestore':1, 'term_finish':'open'}
+			let opts.term_kill = get(g:, 'terminal_kill', 'term')
+			let opts.exit_cb = function('s:terminal_exit')
+			let bid = term_start(command, opts)
 			setlocal nonumber norelativenumber signcolumn=no
-			let jid = term_getjob(bufnr())
+			let jid = term_getjob(bid)
 			let b:__terminal_jid__ = jid
 		else
 			exec pos . ' ' . height . 'split'
 			exec 'enew'
-			let shell = (shell != '')? shell : &shell
-			let jid = termopen(shell, {})
+			let opts = {}
+			let opts.on_exit = function('s:terminal_exit')
+			let jid = termopen(command, opts)
 			setlocal nonumber norelativenumber signcolumn=no
 			let b:__terminal_jid__ = jid
 			startinsert
@@ -238,6 +241,24 @@ function! TerminalClose()
 	endif
 	if dead
 		exec 'bdelete! '. bid
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" process exit callback
+"----------------------------------------------------------------------
+function! s:terminal_exit(...)
+	let close = get(g:, 'terminal_close', 0)
+	if close != 0
+		let bid = get(t:, '__terminal_bid__', -1)
+		let alive = 0
+		if bid > 0 && bufname(bid) != ''
+			let alive = (bufwinnr(bid) > 0)? 1 : 0
+		endif
+		if alive
+			call TerminalClose()
+		endif
 	endif
 endfunc
 
