@@ -3,7 +3,7 @@
 " apc.vim - auto popup completion window
 "
 " Created by skywind on 2020/03/05
-" Last Modified: 2020/03/05 03:28
+" Last Modified: 2020/03/09 20:28
 "
 " Features:
 "
@@ -149,6 +149,7 @@ function! s:apc_disable()
 	let b:apc_init_autocmd = 0
 	let b:apc_init_tab = 0
 	let b:apc_init_bs = 0
+	let b:apc_init_cr = 0
 	let b:apc_save_infer = ''
 	let b:apc_enable = 0
 endfunc
