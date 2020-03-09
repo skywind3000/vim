@@ -499,3 +499,16 @@ command! -complete=file -nargs=1 SelectiveDrop call <SID>SelectiveDrop(<q-args>)
 
 " set twt=conpty
 
+"----------------------------------------------------------------------
+" new asyncrun runner: 'thelp'
+"----------------------------------------------------------------------
+function! s:runner_proc(opts)
+	let cwd = getcwd()
+	call TerminalSend('cd ' . shellescape(cwd) . "\r")
+	call TerminalSend(a:opts.cmd . "\r")
+endfunc
+
+let g:asyncrun_runner = get(g:, 'asyncrun_runner', {})
+let g:asyncrun_runner.thelp = function('s:runner_proc')
+
+
