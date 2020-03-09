@@ -114,6 +114,8 @@ let g:cppman_open_mode = '<auto>'
 
 command! -bang -nargs=* -complete=file Make AsyncRun -program=make @ <args>
 
+" let g:terminal_shell='cmd /s /k "c:\drivers\clink\clink.cmd inject"'
+
 
 "----------------------------------------------------------------------
 "- OmniCpp

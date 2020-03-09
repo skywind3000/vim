@@ -276,6 +276,7 @@ let delimitMate_offByDefault = 1
 " terminal help
 "----------------------------------------------------------------------
 let g:terminal_close = 1
+let g:terminal_list = 0
 let g:terminal_fixheight =1
 
 
