@@ -1066,6 +1066,7 @@ function! asynctasks#start(bang, taskname, path, ...)
 		return 0
 	endif
 	let opts = s:task_option(task)
+	let opts.name = a:taskname
 	let skip = g:asyncrun_skip
 	if opts.mode == 'bang' || opts.mode == 2
 		" let g:asyncrun_skip = or(g:asyncrun_skip, 2)
@@ -1437,7 +1438,7 @@ function! asynctasks#finish(what)
 		exec 'echohl '. ((g:asyncrun_code != 0)? "AsyncRunFailure" : "AsyncRunSuccess")
 		let t = 'Task finished: '
 		if g:asyncrun_name != ''
-			let t = 'Task ' . g:asyncrun_name . ' finished: '
+			let t = 'Task [' . g:asyncrun_name . '] finished: '
 		endif
 		echo t . ((g:asyncrun_code != 0)? 'failure' : 'success')
 		echohl None
