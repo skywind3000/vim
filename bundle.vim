@@ -107,7 +107,7 @@ if index(g:bundle_group, 'basic') >= 0
 	Plug 'dag/vim-fish'
 	Plug 'skywind3000/vim-dict'
 	
-	if has('python') || has('python3')
+	if has('python3') || has('python')
 		Plug 'Yggdroot/LeaderF'
 		Plug 'tamago324/LeaderF-filer'
 		IncScript site/bundle/leaderf.vim
