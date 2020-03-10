@@ -69,6 +69,29 @@ noremap <silent>\nh :nohl<cr>
 
 
 "----------------------------------------------------------------------
+" window keymaps
+"----------------------------------------------------------------------
+noremap <silent>\ww <c-w>w
+noremap <silent>\wv <c-w>v
+noremap <silent>\ws <c-w>s
+noremap <silent>\wh <c-w>h
+noremap <silent>\wj <c-w>j
+noremap <silent>\wk <c-w>k
+noremap <silent>\wl <c-w>l
+noremap <silent>\wc <c-w>c
+noremap <silent>\wo <c-w>o
+noremap <silent>\w1 :1wincmd w<cr>
+noremap <silent>\w2 :2wincmd w<cr>
+noremap <silent>\w3 :3wincmd w<cr>
+noremap <silent>\w4 :4wincmd w<cr>
+noremap <silent>\w5 :5wincmd w<cr>
+noremap <silent>\w6 :6wincmd w<cr>
+noremap <silent>\w7 :7wincmd w<cr>
+noremap <silent>\w8 :8wincmd w<cr>
+noremap <silent>\w9 :9wincmd w<cr>
+
+
+"----------------------------------------------------------------------
 " tab keymap
 "----------------------------------------------------------------------
 noremap <silent>\tc :tabnew<cr>
@@ -159,6 +182,8 @@ if has('gui_running')
 	inoremap <silent><m-t> <ESC>:tabnew<cr>
 	noremap <silent><m-w> :tabclose<cr>
 	inoremap <silent><m-w> <ESC>:tabclose<cr>
+	noremap <silent><m-q> :close<cr>
+	inoremap <silent><m-q> <ESC>:close<cr>
 	noremap <m-s> :w<cr>
 	inoremap <m-s> <esc>:w<cr>
 endif
@@ -174,9 +199,7 @@ set listchars=tab:\|\ ,trail:.,extends:>,precedes:<
 set matchtime=3
 
 " leader definition
-noremap <silent>\w :w<cr>
-noremap <silent>\q :q<cr>
-noremap <silent>\l :close<cr>
+noremap <silent>Q :confirm qall<cr>
 
 " window management
 noremap <tab>h <c-w>h
@@ -184,10 +207,15 @@ noremap <tab>j <c-w>j
 noremap <tab>k <c-w>k
 noremap <tab>l <c-w>l
 noremap <tab>w <c-w>w
-
-" ctrl-enter to insert a empty line below, shift-enter to insert above
-noremap <tab>o o<ESC>
-noremap <tab>O O<ESC>
+noremap <tab>c <c-w>c
+noremap <tab>+ <c-w>+
+noremap <tab>- <c-w>-
+noremap <tab>, <c-w>< 
+noremap <tab>. <c-w>>
+noremap <tab>= <c-w>=
+noremap <tab>s <c-w>s
+noremap <tab>v <c-w>v
+noremap <tab>o <c-w>o
 
 " tab enhancement
 noremap <silent><tab> <nop>
@@ -211,6 +239,43 @@ cnoremap <c-f> <c-d>
 cnoremap <c-b> <left>
 cnoremap <c-d> <del>
 cnoremap <c-_> <c-k>
+
+
+"----------------------------------------------------------------------
+" unimpaired
+"----------------------------------------------------------------------
+nnoremap <silent>[a :previous<cr>
+nnoremap <silent>]a :next<cr>
+nnoremap <silent>[A :first<cr>
+nnoremap <silent>]A :last<cr>
+nnoremap <silent>[b :bprevious<cr>
+nnoremap <silent>]b :bnext<cr>
+nnoremap <silent>[r :tabprevious<cr>
+nnoremap <silent>]r :tabnext<cr>
+nnoremap <silent>[R :tabfirst<cr>
+nnoremap <silent>]R :tablast<cr>
+nnoremap <silent>[q :cprevious<cr>
+nnoremap <silent>]q :cnext<cr>
+nnoremap <silent>[Q :cfirst<cr>
+nnoremap <silent>]Q :clast<cr>
+nnoremap <silent>[l :lprevious<cr>
+nnoremap <silent>]l :lnext<cr>
+nnoremap <silent>[L :lfirst<cr>
+nnoremap <silent>]L :llast<cr>
+nnoremap <silent>[t :tprevious<cr>
+nnoremap <silent>]t :tnext<cr>
+nnoremap <silent>[T :tfirst<cr>
+nnoremap <silent>]T :tlast<cr>
+
+" unimpaired options
+nnoremap <silent>[oc :setl cursorline<cr>
+nnoremap <silent>]oc :setl nocursorline<cr>
+nnoremap <silent>[os :setl spell<cr>
+nnoremap <silent>]os :setl nospell<cr>
+nnoremap <silent>[op :setl paste<cr>
+nnoremap <silent>]op :setl nopaste<cr>
+nnoremap <silent>[ow :setl wrap<cr>
+nnoremap <silent>]ow :setl nowrap<cr>
 
 
 

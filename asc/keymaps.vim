@@ -74,7 +74,6 @@ noremap <space>y yiw
 noremap <C-S> :w<cr>
 inoremap <C-S> <ESC>:w<cr>
 
-nnoremap <silent>Q :confirm qall<cr>
 noremap <silent><m-t> :tabnew<cr>
 inoremap <silent><m-t> <ESC>:tabnew<cr>
 noremap <silent><m-w> :tabclose<cr>
