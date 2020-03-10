@@ -21,8 +21,8 @@ noremap <m-m> :cclose<cr>:Leaderf --nowrap tag<cr>
 let g:Lf_MruMaxFiles = 2048
 let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
 
-noremap <m-r> :Leaderf --nowrap task<cr>
-inoremap <m-r> <esc>:Leaderf --nowrap task<cr>
+noremap <m-g> :Leaderf --nowrap task<cr>
+inoremap <m-g> <esc>:Leaderf --nowrap task<cr>
 
 if has('gui_running')
 	noremap <c-f12> :Leaderf --nowrap task<cr>
@@ -119,6 +119,7 @@ let g:Lf_Extensions.task = {
 			\     'Lf_hl_funcScope': '^\S\+',
 			\     'Lf_hl_funcDirname': '^\S\+\s*\zs<.*>\ze\s*:',
 			\ },
+			\ 'after_enter': string(function('s:lf_win_init'))[10:-3],
 		\ }
 
 " let g:Lf_WindowPosition='bottom'
