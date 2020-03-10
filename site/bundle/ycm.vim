@@ -27,6 +27,12 @@ let g:ycm_goto_buffer_command = 'new-or-existing-tab'
 
 
 "----------------------------------------------------------------------
+" find '.ycm_extra_conf.py' in YouComplete/third_party/ycmd
+"----------------------------------------------------------------------
+" let g:ycm_global_ycm_extra_conf = 'd:/dev/vim/ycm_extra_conf.py'
+
+
+"----------------------------------------------------------------------
 " Ycm White List
 "----------------------------------------------------------------------
 let g:ycm_filetype_whitelist = { 
