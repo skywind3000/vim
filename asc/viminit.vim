@@ -250,10 +250,10 @@ nnoremap <silent>[A :first<cr>
 nnoremap <silent>]A :last<cr>
 nnoremap <silent>[b :bprevious<cr>
 nnoremap <silent>]b :bnext<cr>
-nnoremap <silent>[r :tabprevious<cr>
-nnoremap <silent>]r :tabnext<cr>
-nnoremap <silent>[R :tabfirst<cr>
-nnoremap <silent>]R :tablast<cr>
+nnoremap <silent>[w :tabprevious<cr>
+nnoremap <silent>]w :tabnext<cr>
+nnoremap <silent>[W :tabfirst<cr>
+nnoremap <silent>]W :tablast<cr>
 nnoremap <silent>[q :cprevious<cr>
 nnoremap <silent>]q :cnext<cr>
 nnoremap <silent>[Q :cfirst<cr>
