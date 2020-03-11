@@ -193,7 +193,6 @@ if index(g:bundle_group, 'high') >= 0
 
 	let g:errormarker_disablemappings = 1
 	nnoremap <silent> <leader>cm :ErrorAtCursor<CR>
-	nnoremap <silent> [e :ErrorAtCursor<CR>
 	nnoremap <silent> <leader>cM :RemoveErrorMarkers<cr>
 
 	nmap <m-e> <Plug>(choosewin)
