@@ -71,9 +71,9 @@ noremap <silent>\nh :nohl<cr>
 "----------------------------------------------------------------------
 " window keymaps
 "----------------------------------------------------------------------
-noremap <silent>\ww <c-w>w
+noremap <silent>\wa <c-w>w
 noremap <silent>\wv <c-w>v
-noremap <silent>\ws <c-w>s
+noremap <silent>\wb <c-w>s
 noremap <silent>\wh <c-w>h
 noremap <silent>\wj <c-w>j
 noremap <silent>\wk <c-w>k
@@ -218,6 +218,7 @@ noremap <tab>= <c-w>=
 noremap <tab>s <c-w>s
 noremap <tab>v <c-w>v
 noremap <tab>o <c-w>o
+noremap <tab><tab> <c-w><c-w>
 
 " tab enhancement
 noremap <silent><tab> <nop>

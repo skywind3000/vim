@@ -924,3 +924,10 @@ hi! link manSectionHeading Keyword
 " cmake
 hi! link cmakeCommand Keyword
 
+hi! link VimwikiHeader1 SublimeOrange
+hi! link VimwikiHeader2 SublimeGreen
+hi! link VimwikiHeader3 SublimePurple
+hi! VimwikiLink ctermfg=81 guifg=#66e9df gui=underline cterm=underline
+hi! link VimwikiPre SublimeWarmGrey
+
+

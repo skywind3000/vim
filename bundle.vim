@@ -270,6 +270,12 @@ if index(g:bundle_group, 'deoplete') >= 0
 	IncScript site/bundle/deoplete.vim
 endif
 
+" vimwiki
+if index(g:bundle_group, 'vimwiki') >= 0
+	Plug 'vimwiki/vimwiki'
+	IncScript site/bundle/vimwiki.vim
+endif
+
 " echodoc
 if index(g:bundle_group, 'echodoc') >= 0
 	Plug 'Shougo/echodoc.vim'
