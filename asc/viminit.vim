@@ -99,6 +99,8 @@ noremap <silent>\tq :tabclose<cr>
 noremap <silent>\tn :tabnext<cr>
 noremap <silent>\tp :tabprev<cr>
 noremap <silent>\to :tabonly<cr>
+noremap <silent>\th :-tabmove<cr>
+noremap <silent>\tl :+tabmove<cr>
 noremap <silent>\1 :tabn 1<cr>
 noremap <silent>\2 :tabn 2<cr>
 noremap <silent>\3 :tabn 3<cr>
