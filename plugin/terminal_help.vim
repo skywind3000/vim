@@ -133,7 +133,7 @@ function! TerminalOpen(...)
 					if has('nvim')
 						startinsert
 					else
-						exec "normal i"
+						exec "normal! i"
 					endif
 				endif
 			else
@@ -341,7 +341,7 @@ function! TerminalSend(text)
 			endif
 			startinsert
 			stopinsert
-			exec 'normal G'
+			exec 'normal! G'
 		endif
 	endif
 	call win_gotoid(x)
