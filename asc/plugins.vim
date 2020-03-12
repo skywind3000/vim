@@ -258,8 +258,8 @@ let g:asynctasks_term_pos = (s:windows && s:gui)? 'external' : 'tab'
 " text
 "----------------------------------------------------------------------
 let g:vim_dict_config = { 
-			\ "text" : 'wordmax',
-			\ "markdown" : 'wordmax',
+			\ "text" : 'text',
+			\ "markdown" : 'text',
 			\ "html": 'html,javascript,css,css3',
 			\ }
 
