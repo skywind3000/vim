@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/07 16:43
-" Verision: 1.6.5
+" Last Modified: 2020/03/13 06:29
+" Verision: 1.6.6
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -321,6 +321,16 @@ function! s:ExtractOpt(command)
 		let cmd = substitute(cmd, '^-\w\+\%(=\%(\\.\|\S\)*\)\=\s*', '', '')
 	endwhile
 	return [cmd, opts]
+endfunc
+
+
+" change case for comparation
+function! s:pathcase(path)
+	if s:windows == 0
+		return (has('win32unix') == 0)? (a:path) : tolower(a:path)
+	else
+		return tolower(tr(a:path, '/', '\'))
+	endif
 endfunc
 
 
@@ -1217,6 +1227,15 @@ function! s:task_edit(mode, path)
 	if isdirectory(filedir) == 0 && filedir != ''
 		silent! call mkdir(filedir, 'p')
 	endif
+	for ii in range(winnr('$'))
+		let ww = ii + 1
+		let nn = s:abspath(bufname(winbufnr(ww)))
+		let tt = s:abspath(name)
+		if (s:pathcase(nn) == s:pathcase(tt))
+			exec '' . ww . 'wincmd w'
+			return 0
+		endif
+	endfor
 	exec "split " . fnameescape(name)
 	setlocal ft=dosini
 	let template = s:template
@@ -1229,6 +1248,7 @@ function! s:task_edit(mode, path)
 		setlocal nomodified
 		exec "normal gg"
 	endif
+	return 0
 endfunc
 
 

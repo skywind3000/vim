@@ -170,19 +170,24 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" normal case
+"----------------------------------------------------------------------
+function! asclib#path#normcase(path)
+	if s:windows == 0
+		return (has('win32unix') == 0)? (a:path) : tolower(a:path)
+	else
+		return tolower(tr(a:path, '/', '\'))
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " returns 1 for equal, 0 for not equal
 "----------------------------------------------------------------------
 function! asclib#path#equal(path1, path2)
-	let p1 = asclib#path#abspath(a:path1)
-	let p2 = asclib#path#abspath(a:path2)
-	if s:windows || has('win32unix')
-		let p1 = tolower(p1)
-		let p2 = tolower(p2)
-	endif
-	if p1 == p2
-		return 1
-	endif
-	return 0
+	let p1 = asclib#path#normcase(asclib#path#abspath(a:path1))
+	let p2 = asclib#path#normcase(asclib#path#abspath(a:path2))
+	return (p1 == p2)? 1 : 0
 endfunc
 
 
@@ -193,7 +198,7 @@ function! asclib#path#runtime(path)
 	let pathname = fnamemodify(s:scripthome, ':h')
 	let pathname = asclib#path#join(pathname, a:path)
 	let pathname = fnamemodify(pathname, ':p')
-	return substitute(pathname, '\\', '/', 'g')
+	return tr(pathname, '\', '/')
 endfunc
 
 
@@ -338,19 +343,19 @@ endfunc
 " path to name
 "----------------------------------------------------------------------
 function! asclib#path#cachedir(cache_dir, root_dir, filename)
-    if asclib#path#isabs(a:filename)
-        return a:filename
-    endif
-    let l:file_path = asclib#path#stripslash(a:root_dir) . '/' . a:filename
+	if asclib#path#isabs(a:filename)
+		return a:filename
+	endif
+	let l:file_path = asclib#path#stripslash(a:root_dir) . '/' . a:filename
 	let cache_dir = a:cache_dir
-    if cache_dir != ""
-        " Put the tag file in the cache dir instead of inside the
-        " project root.
-        let l:file_path = cache_dir . '/' . tr(l:file_path, '\/: ', '---_')
-        let l:file_path = substitute(l:file_path, '/\-', '/', '')
-    endif
-    let l:file_path = asclib#path#normalize(l:file_path)
-    return l:file_path
+	if cache_dir != ""
+		" Put the tag file in the cache dir instead of inside the
+		" project root.
+		let l:file_path = cache_dir . '/' . tr(l:file_path, '\/: ', '---_')
+		let l:file_path = substitute(l:file_path, '/\-', '/', '')
+	endif
+	let l:file_path = asclib#path#normalize(l:file_path)
+	return l:file_path
 endfunc
 
 
