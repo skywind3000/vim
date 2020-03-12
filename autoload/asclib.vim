@@ -215,7 +215,7 @@ function! asclib#open_gprof(image, profile)
 		let l:profile = 'gmon.out'
 	endif
 	let command = 'gprof '.shellescape(l:image).' '.shellescape(l:profile)
-	let text = vimmake#python_system(command)
+	let text = asclib#core#system(command)
 	let text = substitute(text, '\r', '', 'g')
 	vnew
 	let l:save = @0
