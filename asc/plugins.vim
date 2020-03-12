@@ -318,3 +318,10 @@ let g:gutentags_plus_switch = 0
 
 
 
+"----------------------------------------------------------------------
+" styles
+"----------------------------------------------------------------------
+let g:jellybeans_use_term_italics = 0
+let g:jellybeans_use_gui_italics = 0
+
+
