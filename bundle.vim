@@ -100,9 +100,9 @@ if index(g:bundle_group, 'basic') >= 0
 	Plug 'pprovost/vim-ps1', { 'for': 'ps1' }
 	Plug 'tbastos/vim-lua', { 'for': 'lua' }
 	Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['c', 'cpp'] }
-	Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
+	" Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
 	Plug 'vim-python/python-syntax', { 'for': ['python'] }
-	" Plug 'pboettch/vim-cmake-syntax', { 'for': ['cmake'] }
+	Plug 'pboettch/vim-cmake-syntax', { 'for': ['cmake'] }
 	Plug 'tpope/vim-eunuch'
 	Plug 'dag/vim-fish'
 	Plug 'skywind3000/vim-dict'
@@ -124,12 +124,13 @@ if index(g:bundle_group, 'basic') >= 0
 	" noremap <space>ht :Startify<cr>
 	" noremap <space>hy :tabnew<cr>:Startify<cr> 
 
-	let g:cpp_class_scope_highlight = 1
+	" let g:cpp_class_scope_highlight = 1
 	let g:cpp_member_variable_highlight = 1
 	let g:cpp_class_decl_highlight = 1
 	" let g:cpp_experimental_simple_template_highlight = 1
 	let g:cpp_concepts_highlight = 1
 	let g:cpp_no_function_highlight = 1
+	let g:cpp_posix_standard = 1
 
 	let g:python_highlight_builtins = 1
 	let g:python_highlight_builtin_objs = 1
