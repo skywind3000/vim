@@ -32,6 +32,7 @@ Contents ~
     9. The |g:asynctasks_term_hidden| option
     10. The |g:asynctasks_term_listed| option
     11. The |g:asynctasks_template| option
+    12. The |g:asynctasks_confirm| option
  5. Task Examples                                    |asynctasks-task-examples|
  6. Command Line Tool                            |asynctasks-command-line-tool|
  7. Frequently Asked Questions          |asynctasks-frequently-asked-questions|
@@ -564,7 +565,8 @@ Here is a instruction [20] to integrate with 'fzf', 'leaderf' and 'coc-list'.
                                                  *asynctasks-customize-runners*
 Customize runners ~
 
-For customizing additional runners, see customize runners [21].
+For customizing additional runners, or to run task in 'tmux' pane and
+'gnome-terminal' tab/window, please visit customize runners [21].
 
 -------------------------------------------------------------------------------
                                                            *asynctasks-options*
@@ -640,6 +642,11 @@ The *g:asynctasks_template* option
 
 Set to zero to create '.tasks' file without template.
 
+-------------------------------------------------------------------------------
+The *g:asynctasks_confirm* option
+
+Set to zero to skip filename confirmation in ':AsyncTaskEdit'.
+
 ===============================================================================
                                                      *asynctasks-task-examples*
 Task Examples ~
@@ -652,8 +659,8 @@ There are many examples about: cmake, grep, ninja, wsl and more:
                                                  *asynctasks-command-line-tool*
 Command Line Tool ~
 
-This plugin provides you an 'asyncrun.py' script (in the 'bin' folder) when you
-want to run tasks right in your shell:
+This plugin provides you an 'asynctask.py' script (in the 'bin' folder) when
+you want to run tasks right in your shell:
 >
   # run tasks in any child directory of your project 
   # no need to go back to project root directory, because "cwd=<root>".
