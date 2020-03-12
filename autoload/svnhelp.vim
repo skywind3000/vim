@@ -16,14 +16,14 @@ endfunc
 " svn main
 "----------------------------------------------------------------------
 function! svnhelp#svn(command)
-	let hr = vimmake#python_system('svn '. a:command)
-	let s:shell_error = g:vimmake_shell_error
+	let hr = asclib#core#system('svn '. a:command)
+	let s:shell_error = g:asclib#core#shell_error
 	return hr
 endfunc
 
 function! svnhelp#git(command)
-	let hr = vimmake#python_system('git '. a:command)
-	let s:shell_error = g:vimmake_shell_error
+	let hr = asclib#core#system('git '. a:command)
+	let s:shell_error = g:asclib#core#shell_error
 	return hr
 endfunc
 

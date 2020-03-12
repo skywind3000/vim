@@ -207,7 +207,7 @@ endfun
 
 " Acquire Theme Data: {{{
 
-" Brief: 
+" Brief:
 "   Function to get theme information and store in variables for other
 "   functions to use
 "
@@ -219,13 +219,13 @@ endfun
 "   g:PaperColor_Theme_Options            <dictionary>  user options
 "
 " Expose:
-"   s:theme_name       <string>     the name of the selected theme 
+"   s:theme_name       <string>     the name of the selected theme
 "   s:selected_theme   <dictionary> the selected theme object (contains palette, etc.)
 "   s:selected_variant <string>     'light' or 'dark'
 "   s:palette          <dictionary> the palette of selected theme
 "   s:options          <dictionary> user options
 fun! s:acquire_theme_data()
-  
+
   " Get theme name: {{{
   let s:theme_name = 'default'
 
@@ -343,8 +343,8 @@ endfun
 fun! s:generate_theme_option_variables()
   " 0. All possible theme option names must be registered here
   let l:available_theme_options = [
-        \ 'allow_bold', 
-        \ 'allow_italic', 
+        \ 'allow_bold',
+        \ 'allow_italic',
         \ 'transparent_background',
         \ ]
 
@@ -382,7 +382,7 @@ fun! s:generate_theme_option_variables()
   if has_key(s:options, 'theme')
     let s:theme_options = s:options['theme']
   endif
-  
+
   " 3.1 In case user sets for a theme without specifying which variant
   if has_key(s:theme_options, s:theme_name)
     let l:theme_options = s:theme_options[s:theme_name]
@@ -394,7 +394,7 @@ fun! s:generate_theme_option_variables()
 
 
   " 3.2 In case user sets for a specific variant of a theme
-  
+
   " Create the string that the user might have set for this theme variant
   " for example, 'default.dark'
   let l:specific_theme_variant = s:theme_name . '.' . s:selected_variant
@@ -456,7 +456,7 @@ fun! s:set_overriding_colors()
       if !empty(s:themeOpt_override)
         call s:load_GUI_to_256_converter()
       endif
- 
+
       for l:color in keys(s:themeOpt_override)
         let l:value = s:themeOpt_override[l:color]
         if l:value[1] == ''
@@ -492,7 +492,7 @@ endfun
 " Expose:
 "   s:langOpt_[LANGUAGE]__[OPTION]  <any>   variables for language options
 "
-" Example: 
+" Example:
 "     g:PaperColor_Theme_Options has something like this:
 "       'language': {
 "       \   'python': {
@@ -518,10 +518,10 @@ fun! s:generate_language_option_variables()
   " Part of user-config options
   if has_key(s:options, 'language')
     let l:language_options = s:options['language']
-    " echo l:language_options 
+    " echo l:language_options
     for l:lang in keys(l:language_options)
       let l:options = l:language_options[l:lang]
-      " echo l:lang 
+      " echo l:lang
       " echo l:options
       for l:option in keys(l:options)
         let s:{'langOpt_' . l:lang . '__' . l:option} = l:options[l:option]
@@ -807,11 +807,11 @@ endfun
 fun! s:set_format_attributes()
   " These are the default
   if s:mode == s:MODE_GUI_COLOR
-    let s:ft_bold    = " gui=bold "
-    let s:ft_none    = " gui=none "
-    let s:ft_reverse = " gui=reverse "
-    let s:ft_italic  = " gui=italic "
-    let s:ft_italic_bold = " gui=italic,bold "
+    let s:ft_bold    = " cterm=bold gui=bold "
+    let s:ft_none    = " cterm=none gui=none "
+    let s:ft_reverse = " cterm=reverse gui=reverse "
+    let s:ft_italic  = " cterm=italic gui=italic "
+    let s:ft_italic_bold = " cterm=italic,bold gui=italic,bold "
   elseif s:mode == s:MODE_256_COLOR
     let s:ft_bold    = " cterm=bold "
     let s:ft_none    = " cterm=none "
@@ -1102,6 +1102,13 @@ fun! s:set_color_variables()
   let g:terminal_color_14 = color14[0]
   let g:terminal_color_15 = color15[0]
 
+  " Vim 8's :terminal buffer ANSI colors
+  if has('terminal')
+    let g:terminal_ansi_colors = [color00[0], color01[0], color02[0], color03[0],
+        \ color04[0], color05[0], color06[0], color07[0], color08[0], color09[0],
+        \ color10[0], color11[0], color12[0], color13[0], color14[0], color15[0]]
+  endif
+
 endfun
 " }}}
 
@@ -1130,6 +1137,7 @@ fun! s:apply_syntax_highlightings()
     " Switching between dark & light variant through `set background`
     if s:is_dark " DARK VARIANT
       set background=dark
+      exec 'hi EndOfBuffer' . s:fg_cursor_fg  . s:ft_none
     else " LIGHT VARIANT
       set background=light
     endif
@@ -1146,6 +1154,8 @@ fun! s:apply_syntax_highlightings()
   exec 'hi Search' . s:fg_search_fg . s:bg_search_bg
   exec 'hi StatusLine' . s:fg_statusline_active_bg . s:bg_statusline_active_fg
   exec 'hi StatusLineNC' . s:fg_statusline_inactive_bg . s:bg_statusline_inactive_fg
+  exec 'hi StatusLineTerm' . s:fg_statusline_active_bg . s:bg_statusline_active_fg
+  exec 'hi StatusLineTermNC' . s:fg_statusline_inactive_bg . s:bg_statusline_inactive_fg
   exec 'hi Visual' . s:fg_visual_fg . s:bg_visual_bg
   exec 'hi Directory' . s:fg_blue
   exec 'hi ModeMsg' . s:fg_olive
@@ -1311,7 +1321,7 @@ fun! s:apply_syntax_highlightings()
   exec 'hi cFormat' . s:fg_olive
   exec 'hi cStorageClass' . s:fg_navy . s:ft_bold
 
-  exec 'hi cBoolean' . s:fg_green
+  exec 'hi cBoolean' . s:fg_green . s:ft_bold
   exec 'hi cCharacter' . s:fg_olive
   exec 'hi cConstant' . s:fg_green . s:ft_bold
   exec 'hi cConditional' . s:fg_purple . s:ft_bold
@@ -1342,7 +1352,7 @@ fun! s:apply_syntax_highlightings()
   endif
 
   " CPP highlighting
-  exec 'hi cppBoolean' . s:fg_navy
+  exec 'hi cppBoolean' . s:fg_green . s:ft_bold
   exec 'hi cppSTLnamespace' . s:fg_purple
   exec 'hi cppSTLexception' . s:fg_pink
   exec 'hi cppSTLfunctional' . s:fg_foreground . s:ft_bold
@@ -1350,7 +1360,7 @@ fun! s:apply_syntax_highlightings()
   exec 'hi cppExceptions' . s:fg_red
   exec 'hi cppStatement' . s:fg_blue
   exec 'hi cppStorageClass' . s:fg_navy . s:ft_bold
-  exec 'hi cppAccess' . s:fg_blue
+  exec 'hi cppAccess' . s:fg_orange . s:ft_bold
   if s:langOpt_cpp__highlight_standard_library == 1
     exec 'hi cppSTLconstant' . s:fg_green . s:ft_bold
     exec 'hi cppSTLtype' . s:fg_pink . s:ft_bold
@@ -1364,6 +1374,24 @@ fun! s:apply_syntax_highlightings()
   endif
   " exec 'hi cppSTL' . s:fg_blue
 
+  " Rust highlighting
+  exec 'hi rustKeyword' . s:fg_pink
+  exec 'hi rustModPath' . s:fg_blue
+  exec 'hi rustModPathSep' . s:fg_blue
+  exec 'hi rustLifetime' . s:fg_purple
+  exec 'hi rustStructure' . s:fg_aqua . s:ft_bold
+  exec 'hi rustAttribute' . s:fg_aqua . s:ft_bold
+  exec 'hi rustPanic' . s:fg_olive . s:ft_bold
+  exec 'hi rustTrait' . s:fg_blue . s:ft_bold
+  exec 'hi rustEnum' . s:fg_green . s:ft_bold
+  exec 'hi rustEnumVariant' . s:fg_green
+  exec 'hi rustSelf' . s:fg_orange
+  exec 'hi rustSigil' . s:fg_aqua . s:ft_bold
+  exec 'hi rustOperator' . s:fg_aqua . s:ft_bold
+  exec 'hi rustMacro' . s:fg_olive . s:ft_bold
+  exec 'hi rustMacroVariable' . s:fg_olive
+  exec 'hi rustAssert' . s:fg_olive . s:ft_bold
+  exec 'hi rustConditional' . s:fg_purple . s:ft_bold
 
   " Lex highlighting
   exec 'hi lexCFunctions' . s:fg_foreground
@@ -1502,7 +1530,7 @@ fun! s:apply_syntax_highlightings()
   exec 'hi mkdLink' . s:fg_blue . s:ft_bold
   exec 'hi mkdURL' . s:fg_comment
   exec 'hi mkdString' . s:fg_foreground
-  exec 'hi mkdBlockQuote' . s:fg_foreground . s:bg_popupmenu_bg
+  exec 'hi mkdBlockQuote' . s:fg_pink
   exec 'hi mkdLinkTitle' . s:fg_pink
   exec 'hi mkdDelimiter' . s:fg_aqua
   exec 'hi mkdRule' . s:fg_pink
@@ -1537,7 +1565,6 @@ fun! s:apply_syntax_highlightings()
   exec 'hi pythonStrFormatting' . s:fg_olive . s:ft_bold
 
   exec 'hi pythonBoolean' . s:fg_green . s:ft_bold
-  exec 'hi pythonExClass' . s:fg_red
   exec 'hi pythonBytesEscape' . s:fg_olive . s:ft_bold
   exec 'hi pythonDottedName' . s:fg_purple
   exec 'hi pythonStrFormat' . s:fg_foreground
@@ -1583,11 +1610,29 @@ fun! s:apply_syntax_highlightings()
   exec 'hi javaScriptMember' . s:fg_foreground
 
   " @target https://github.com/pangloss/vim-javascript
+  exec 'hi jsImport' . s:fg_pink . s:ft_bold
+  exec 'hi jsExport' . s:fg_pink . s:ft_bold
+  exec 'hi jsModuleAs' . s:fg_pink . s:ft_bold
+  exec 'hi jsFrom' . s:fg_pink . s:ft_bold
+  exec 'hi jsExportDefault' . s:fg_pink . s:ft_bold
   exec 'hi jsFuncParens' . s:fg_blue
   exec 'hi jsFuncBraces' . s:fg_blue
   exec 'hi jsParens' . s:fg_blue
   exec 'hi jsBraces' . s:fg_blue
   exec 'hi jsNoise' . s:fg_blue
+
+  " Jsx Highlighting
+  " @target https://github.com/MaxMEllon/vim-jsx-pretty
+  exec 'hi jsxTagName' . s:fg_wine
+  exec 'hi jsxComponentName' . s:fg_wine
+  exec 'hi jsxAttrib' . s:fg_pink
+  exec 'hi jsxEqual' . s:fg_comment
+  exec 'hi jsxString' . s:fg_blue
+  exec 'hi jsxCloseTag' . s:fg_comment
+  exec 'hi jsxCloseString' . s:fg_comment
+  exec 'hi jsxDot' . s:fg_wine
+  exec 'hi jsxNamespace' . s:fg_wine
+  exec 'hi jsxPunct' . s:fg_comment
 
   " Json Highlighting
   " @target https://github.com/elzr/vim-json
@@ -1600,7 +1645,7 @@ fun! s:apply_syntax_highlightings()
   exec 'hi jsonNumber' . s:fg_orange
   exec 'hi jsonNull' . s:fg_purple . s:ft_bold
   exec 'hi jsonBoolean' . s:fg_green . s:ft_bold
-  exec 'hi jsonCommentError' . s:fg_pink . s:bg_background 
+  exec 'hi jsonCommentError' . s:fg_pink . s:bg_background
 
   " Go Highlighting
   exec 'hi goDirective' . s:fg_red
@@ -1728,14 +1773,25 @@ fun! s:apply_syntax_highlightings()
   exec 'hi rubyBoolean' . s:fg_green . s:ft_bold
 
   " Fortran Highlighting
-  exec 'hi fortranUnitHeader' . s:fg_foreground . s:ft_bold
+  exec 'hi fortranUnitHeader' . s:fg_blue . s:ft_bold
+  exec 'hi fortranIntrinsic' . s:fg_blue . s:bg_background . s:ft_none
   exec 'hi fortranType' . s:fg_pink . s:ft_bold
-  exec 'hi fortranStructure' . s:fg_blue . s:ft_bold
+  exec 'hi fortranTypeOb' . s:fg_pink . s:ft_bold
+  exec 'hi fortranStructure' . s:fg_aqua
   exec 'hi fortranStorageClass' . s:fg_navy . s:ft_bold
   exec 'hi fortranStorageClassR' . s:fg_navy . s:ft_bold
   exec 'hi fortranKeyword' . s:fg_pink
-  exec 'hi fortranReadWrite' . s:fg_blue
+  exec 'hi fortranReadWrite' . s:fg_aqua . s:ft_bold
   exec 'hi fortranIO' . s:fg_navy
+  exec 'hi fortranOperator' . s:fg_aqua . s:ft_bold
+  exec 'hi fortranCall' . s:fg_aqua . s:ft_bold
+  exec 'hi fortranContinueMark' . s:fg_green
+
+  " ALGOL Highlighting (Plugin: https://github.com/sterpe/vim-algol68)
+  exec 'hi algol68Statement' . s:fg_blue . s:ft_bold
+  exec 'hi algol68Operator' . s:fg_aqua . s:ft_bold
+  exec 'hi algol68PreProc' . s:fg_green
+  exec 'hi algol68Function' . s:fg_blue
 
   " R Highlighting
   exec 'hi rType' . s:fg_blue
@@ -1987,11 +2043,11 @@ fun! s:apply_syntax_highlightings()
   exec 'hi awkSpecialPrintf' . s:fg_olive . s:ft_bold
 
   " Elm highlighting
-  exec 'hi elmImport' . s:fg_navy 
+  exec 'hi elmImport' . s:fg_navy
   exec 'hi elmAlias' . s:fg_aqua
   exec 'hi elmType' . s:fg_pink
   exec 'hi elmOperator' . s:fg_aqua . s:ft_bold
-  exec 'hi elmBraces' . s:fg_aqua . s:ft_bold 
+  exec 'hi elmBraces' . s:fg_aqua . s:ft_bold
   exec 'hi elmTypedef' . s:fg_blue .  s:ft_bold
   exec 'hi elmTopLevelDecl' . s:fg_green . s:ft_bold
 
@@ -2062,7 +2118,7 @@ fun! s:apply_syntax_highlightings()
   exec 'hi NERDTreeDirSlash' . s:fg_pink
   exec 'hi NERDTreeFile' . s:fg_foreground
   exec 'hi NERDTreeExecFile' . s:fg_green
-  exec 'hi NERDTreeOpenable' . s:fg_pink . s:ft_bold
+  exec 'hi NERDTreeOpenable' . s:fg_aqua . s:ft_bold
   exec 'hi NERDTreeClosable' . s:fg_pink
 
   " Plugin: Tagbar
@@ -2126,12 +2182,16 @@ fun! s:apply_syntax_highlightings()
   exec 'hi gitcommitUntrackedFile' . s:fg_diffdelete_fg
   exec 'hi gitcommitBranch' . s:fg_aqua . s:ft_bold
   exec 'hi gitcommitDiscardedType' . s:fg_diffdelete_fg
+  exec 'hi gitcommitDiff' . s:fg_comment
 
-  exec 'hi diffFile' . s:fg_aqua . s:ft_bold
-  exec 'hi diffIndexLine' . s:fg_purple
+  exec 'hi diffFile' . s:fg_blue
+  exec 'hi diffSubname' . s:fg_comment
+  exec 'hi diffIndexLine' . s:fg_comment
   exec 'hi diffAdded' . s:fg_diffadd_fg
   exec 'hi diffRemoved' . s:fg_diffdelete_fg
-  exec 'hi diffLine' . s:fg_orange . s:ft_bold
+  exec 'hi diffLine' . s:fg_orange
+  exec 'hi diffBDiffer' . s:fg_orange
+  exec 'hi diffNewFile' . s:fg_comment
 
 endfun
 " }}}
@@ -2161,7 +2221,7 @@ command! -nargs=0 PaperColor :call g:PaperColor()
 
 hi clear
 syntax reset
-let g:colors_name = "papercol"
+let g:colors_name = "PaperColor"
 
 call s:acquire_theme_data()
 call s:identify_color_mode()
