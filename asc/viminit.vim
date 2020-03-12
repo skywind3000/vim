@@ -71,9 +71,9 @@ noremap <silent>\nh :nohl<cr>
 "----------------------------------------------------------------------
 " window keymaps
 "----------------------------------------------------------------------
-noremap <silent>\wa <c-w>w
+noremap <silent>\ww <c-w>w
 noremap <silent>\wv <c-w>v
-noremap <silent>\wb <c-w>s
+noremap <silent>\ws <c-w>s
 noremap <silent>\wh <c-w>h
 noremap <silent>\wj <c-w>j
 noremap <silent>\wk <c-w>k
