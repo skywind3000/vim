@@ -15,5 +15,5 @@ nmap <space>w<space>t <Plug>VimwikiTabMakeDiaryNote
 nmap <space>w<space>y <Plug>VimwikiMakeYesterdayDiaryNote
 nmap <space>w<space>m <Plug>VimwikiMakeTomorrowDiaryNote
 
-
+nmap <space>wh  <Plug>Vimwiki2HTML
 

@@ -4,7 +4,7 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/13 06:29
+" Last Modified: 2020/03/13 07:28
 " Verision: 1.6.6
 "
 " for more information, please visit:
@@ -1228,12 +1228,15 @@ function! s:task_edit(mode, path)
 		silent! call mkdir(filedir, 'p')
 	endif
 	for ii in range(winnr('$'))
-		let ww = ii + 1
-		let nn = s:abspath(bufname(winbufnr(ww)))
-		let tt = s:abspath(name)
-		if (s:pathcase(nn) == s:pathcase(tt))
-			exec '' . ww . 'wincmd w'
-			return 0
+		let wid = ii + 1
+		let bid = winbufnr(wid)
+		if getbufvar(bid, '&buftype', '') == ''
+			let nn = s:abspath(bufname(bid))
+			let tt = s:abspath(name)
+			if (s:pathcase(nn) == s:pathcase(tt))
+				exec '' . wid . 'wincmd w'
+				return 0
+			endif
 		endif
 	endfor
 	exec "split " . fnameescape(name)
