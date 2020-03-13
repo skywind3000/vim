@@ -35,3 +35,17 @@ function! asclib#common#writefile(lines, name)
 endfunc
 
 
+"----------------------------------------------------------------------
+" class.word
+"----------------------------------------------------------------------
+function! asclib#common#class_word()
+	let text = getline('.')
+	let pre = text[:col('.') - 1]
+	let suf = text[col('.'):]
+	let word = matchstr(pre, "[A-Za-z0-9_.]*$") 
+	let word = word . matchstr(suf, "^[A-Za-z0-9_]*")
+	let cword = expand('<cword>')
+	return (strlen(word) > strlen(cword))? word : cword
+endfunc
+
+
