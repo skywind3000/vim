@@ -151,12 +151,24 @@ function! TerminalOpen(...)
 		let shell = get(g:, 'terminal_shell', '')
 		let command = (shell != '')? shell : &shell
 		let close = get(g:, 'terminal_close', 0)
+		if has('nvim') && 0
+			for ii in range(winnr('$') + 8)
+				let info = nvim_win_get_config(0)
+				if has_key(info, 'anchor') == 0
+					break
+				endif
+				keepalt noautocmd exec "normal! \<c-w>w"
+			endfor
+			let uid = win_getid()
+		endif
 		let savedir = getcwd()
-		if g:terminal_cwd == 1
-			let workdir = (expand('%') == '')? getcwd() : expand('%:p:h')
-			silent execute cd . ' '. fnameescape(workdir)
-		elseif g:terminal_cwd == 2
-			silent execute cd . ' '. fnameescape(s:project_root())
+		if &bt == ''
+			if g:terminal_cwd == 1
+				let workdir = (expand('%') == '')? getcwd() : expand('%:p:h')
+				silent execute cd . ' '. fnameescape(workdir)
+			elseif g:terminal_cwd == 2
+				silent execute cd . ' '. fnameescape(s:project_root())
+			endif
 		endif
 		if has('nvim') == 0
 			exec pos . ' ' . height . 'split'
