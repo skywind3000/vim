@@ -63,6 +63,7 @@ let g:vimwiki_k_context = [
 			\ ["&Rename Link\t<space>wr", "normal \<Plug>VimwikiRenameLink"],
 			\ ['--'],
 			\ ["&Toggle Checkbox\tAlt+/", "normal \<Plug>VimwikiToggleListItem"],
+			\ ["Remove &Checkbox\tgl<space>", "normal \<Plug>VimwikiRemoveSingleCB"],
 			\ ]
 
 
