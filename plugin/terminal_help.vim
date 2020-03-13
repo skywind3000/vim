@@ -529,3 +529,4 @@ let g:asyncrun_runner = get(g:, 'asyncrun_runner', {})
 let g:asyncrun_runner.thelp = function('s:runner_proc')
 
 
+
