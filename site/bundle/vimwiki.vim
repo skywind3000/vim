@@ -75,6 +75,8 @@ function! s:local_setup()
 	silent! unmap =P
 	silent! unmap =o
 	silent! unmap =op
+	silent! nmap <buffer> <m-N> <Plug>VimwikiNextLink
+	silent! nmap <buffer> <m-P> <Plug>VimwikiPrevLink
 	nnoremap <buffer> <silent>K :call quickui#tools#clever_context('wk', g:vimwiki_k_context, {})<cr>
 endfunc
 
