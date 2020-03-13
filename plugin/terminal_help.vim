@@ -407,12 +407,16 @@ if get(g:, 'terminal_default_mapping', 1)
 	noremap <m-L> <c-w>l
 	noremap <m-J> <c-w>j
 	noremap <m-K> <c-w>k
-	noremap <m-P> <c-w>p
+	if mapcheck('<m-P>', 'n') == ''
+		noremap <m-P> <c-w>p
+	endif
 	inoremap <m-H> <esc><c-w>h
 	inoremap <m-L> <esc><c-w>l
 	inoremap <m-J> <esc><c-w>j
 	inoremap <m-K> <esc><c-w>k
-	inoremap <m-P> <esc><c-w>p
+	if mapcheck('<m-P>', 'n') == ''
+		inoremap <m-P> <esc><c-w>p
+	endif
 
 	if has('terminal') && exists(':terminal') == 2 && has('patch-8.1.1')
 		set termwinkey=<c-_>
@@ -444,6 +448,7 @@ if get(g:, 'terminal_default_mapping', 1)
 		exec s:cmd . '<c-\><c-n>:call TerminalToggle()<cr>'
 	endif
 endif
+
 
 "----------------------------------------------------------------------
 " drop a file and ask user to select a window for dropping if there
