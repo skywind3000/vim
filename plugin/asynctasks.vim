@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/13 07:28
-" Verision: 1.6.6
+" Last Modified: 2020/03/14 22:55
+" Verision: 1.6.7
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -94,6 +94,9 @@ let g:asynctasks_remember = get(g:, 'asynctasks_remember', 0)
 
 " last user input, key is 'taskname:variable'
 let g:asynctasks_history = get(g:, 'asynctasks_history', {})
+
+" control how to open a split window in AsyncTaskEdit
+let g:asynctasks_edit_split = get(g:, 'asynctasks_edit_split', '')
 
 " Add highlight colors if they don't exist.
 if !hlexists('AsyncRunSuccess')
@@ -1239,7 +1242,18 @@ function! s:task_edit(mode, path)
 			endif
 		endif
 	endfor
-	exec "split " . fnameescape(name)
+	let mods = s:strip(g:asynctasks_edit_split)
+	if mods == ''
+		exec "split " . fnameescape(name)
+	elseif mods == 'auto'
+		if winwidth(0) >= 160
+			exec "vert split ". fnameescape(name)
+		else
+			exec "split ". fnameescape(name)
+		endif
+	else
+		exec mods . " split " . fnameescape(name)
+	endif
 	setlocal ft=dosini
 	let template = s:template
 	if g:asynctasks_template == 0
