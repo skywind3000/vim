@@ -59,7 +59,7 @@ call plug#begin(get(g:, 'bundle_home', '~/.vim/bundles'))
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'simple') >= 0
 	Plug 'easymotion/vim-easymotion'
-	" Plug 'Raimondi/delimitMate'
+	Plug 'Raimondi/delimitMate'
 	Plug 'justinmk/vim-dirvish'
 	Plug 'justinmk/vim-sneak'
 	Plug 'tpope/vim-unimpaired'
