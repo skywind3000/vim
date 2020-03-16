@@ -3,7 +3,7 @@
 " viminit.vim - Vim initialize script
 "
 " Maintainer: skywind3000 (at) gmail.com
-" Last Modified: 2018/02/10 12:52
+" Last Modified: 2020/03/16 23:52
 "
 " Tiny script which makes vim become neat and handy, supports vim.tiny
 "
@@ -218,7 +218,6 @@ noremap <tab>= <c-w>=
 noremap <tab>s <c-w>s
 noremap <tab>v <c-w>v
 noremap <tab>o <c-w>o
-noremap <tab><tab> <c-w><c-w>
 
 " tab enhancement
 noremap <silent><tab> <nop>
