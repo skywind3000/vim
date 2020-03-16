@@ -17,7 +17,7 @@ if has('gui_running')
 	hi! SpellBad gui=undercurl guisp=red
 	hi! SpellCap gui=undercurl guisp=blue
 	hi! SpellRare gui=undercurl guisp=magenta
-	hi! SpellRare gui=undercurl guisp=cyan
+	hi! SpellLocal gui=undercurl guisp=cyan
 else
 	hi! SpellBad term=standout cterm=underline
 	hi! SpellCap term=underline cterm=underline

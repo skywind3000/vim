@@ -181,7 +181,7 @@ endif
 if index(g:bundle_group, 'high') >= 0
 	Plug 'kshenoy/vim-signature'
 	Plug 'mhinz/vim-signify'
-	Plug 'mh21/errormarker.vim'
+	" Plug 'mh21/errormarker.vim'
 	Plug 't9md/vim-choosewin'
 	Plug 'francoiscabrol/ranger.vim'
 	Plug 'kana/vim-textobj-user'
