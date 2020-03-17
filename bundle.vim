@@ -340,6 +340,11 @@ if index(g:bundle_group, 'vista') >= 0
 	Plug 'liuchengxu/vista.vim'
 endif
 
+if index(g:bundle_group, 'clap') >= 0
+	Plug 'liuchengxu/vim-clap'
+	IncScript site/bundle/clap.vim
+endif
+
 if index(g:bundle_group, 'neoformat') >= 0
 	Plug 'sbdchd/neoformat'
     let g:neoformat_python_autopep8 = {
