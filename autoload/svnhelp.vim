@@ -364,6 +364,32 @@ function! svnhelp#tp_diff() abort
 	endif
 endfunc
 
+function! svnhelp#tp_push() abort
+	let info = svnhelp#tinfo()
+	if info.mode == 0
+		call svnhelp#errmsg('not in a git repository')
+		return 0
+	endif
+	if info.mode == 1
+		call svnhelp#errmsg('not in a git repository')
+	else
+		call svnhelp#tgit('/command:push /path:'.shellescape(info.root))
+	endif
+endfunc
+
+function! svnhelp#tp_sync() abort
+	let info = svnhelp#tinfo()
+	if info.mode == 0
+		call svnhelp#errmsg('not in a git repository')
+		return 0
+	endif
+	if info.mode == 1
+		call svnhelp#errmsg('not in a git repository')
+	else
+		call svnhelp#tgit('/command:sync /path:'.shellescape(info.root))
+	endif
+endfunc
+
 
 "----------------------------------------------------------------------
 " file 
