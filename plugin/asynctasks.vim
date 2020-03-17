@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/14 22:55
-" Verision: 1.6.7
+" Last Modified: 2020/03/17 11:43
+" Verision: 1.6.8
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1084,6 +1084,7 @@ function! asynctasks#start(bang, taskname, path, ...)
 	if opts.mode == 'bang' || opts.mode == 2
 		" let g:asyncrun_skip = or(g:asyncrun_skip, 2)
 	endif
+	let command = s:replace(command, '$(VIM_PROFILE)', g:asynctasks_profile)
 	if a:0 < 3 || (a:0 >= 3 && a:1 <= 0)
 		call asyncrun#run(a:bang, opts, command)
 	else
@@ -1296,6 +1297,7 @@ let s:macros = {
 	\ 'VIM_COLUMNS': "How many columns in vim's screen",
 	\ 'VIM_LINES': "How many lines in vim's screen", 
 	\ 'VIM_SVRNAME': 'Value of v:servername for +clientserver usage',
+	\ 'VIM_PROFILE': 'Current building profile (debug/release/...)',
 	\ 'WSL_FILEPATH': '(WSL) File name of current buffer with full path',
 	\ 'WSL_FILENAME': '(WSL) File name of current buffer without path',
 	\ 'WSL_FILEDIR': 
@@ -1340,6 +1342,7 @@ function! s:expand_macros()
     let macros['VIM_HOME'] = expand(split(&rtp, ',')[0])
 	let macros['VIM_PRONAME'] = fnamemodify(macros['VIM_ROOT'], ':t')
 	let macros['VIM_DIRNAME'] = fnamemodify(macros['VIM_CWD'], ':t')
+	let macros['VIM_PROFILE'] = g:asynctasks_profile
 	let macros['<cwd>'] = macros['VIM_CWD']
 	let macros['<root>'] = macros['VIM_ROOT']
 	if expand("%:e") == ''
@@ -1366,7 +1369,7 @@ function! s:task_macro(wsl)
 	let names = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT', 'FILETYPE']
 	let names += ['FILENOEXT', 'PATHNOEXT', 'CWD', 'RELDIR', 'RELNAME']
 	let names += ['CWORD', 'CFILE', 'CLINE', 'VERSION', 'SVRNAME', 'COLUMNS']
-	let names += ['LINES', 'GUI', 'ROOT', 'DIRNAME', 'PRONAME']
+	let names += ['LINES', 'GUI', 'ROOT', 'DIRNAME', 'PRONAME', 'PROFILE']
 	let rows = []
 	let rows += [['Macro', 'Detail', 'Value']]
 	let highmap = {}
@@ -1388,7 +1391,6 @@ function! s:task_macro(wsl)
 			continue
 		endif
 		let rows += [['$(' . name . ')', s:macros[name], macros[name]]]
-		" let rows += [['', macros[name]]]
 		let highmap[index . ',0'] = 'Keyword'
 		let highmap[index . ',1'] = 'Statement'
 		let highmap[index . ',2'] = 'Comment'

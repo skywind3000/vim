@@ -39,6 +39,7 @@ let g:Lf_WindowHeight = 0.30
 let g:Lf_CacheDirectory = expand('~/.vim/cache')
 let g:Lf_ShowRelativePath = 1
 let g:Lf_HideHelp = 1
+let g:Lf_NoChdir = 1
 
 let g:Lf_WildIgnore = {
             \ 'dir': ['.svn','.git','.hg'],

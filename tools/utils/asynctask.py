@@ -6,8 +6,8 @@
 #
 # Maintainer: skywind3000 (at) gmail.com, 2020
 #
-# Last Modified: 2020/03/01 21:59
-# Verision: 1.0.7
+# Last Modified: 2020/03/17 11:54
+# Verision: 1.0.8
 #
 # for more information, please visit:
 # https://github.com/skywind3000/asynctasks.vim
@@ -62,6 +62,7 @@ MACROS_HELP = {
 	'VIM_COLUMNS': "How many columns in vim's screen",
 	'VIM_LINES': "How many lines in vim's screen", 
 	'VIM_SVRNAME': 'Value of v:servername for +clientserver usage',
+    'VIM_PROFILE': 'Current building profile (debug/release/...)',
 	'WSL_FILEPATH': '(WSL) File name of current buffer with full path',
 	'WSL_FILENAME': '(WSL) File name of current buffer without path',
 	'WSL_FILEDIR': '(WSL) Full path of current buffer without the file name',
@@ -726,6 +727,7 @@ class configure (object):
         macros['VIM_ROOT'] = self.root
         macros['VIM_DIRNAME'] = os.path.basename(macros['VIM_CWD'])
         macros['VIM_PRONAME'] = os.path.basename(macros['VIM_ROOT'])
+        macros['VIM_PROFILE'] = self.profile
         if sys.platform[:3] == 'win':
             t = ['FILEPATH', 'FILEDIR', 'FILENAME', 'FILEEXT', 'FILENOEXT']
             t += ['PATHNOEXT', 'CWD', 'RELDIR', 'RELNAME', 'ROOT']
@@ -959,7 +961,7 @@ class TaskManager (object):
         macros = self.config.macros_expand()
         names = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT', 'FILETYPE']
         names += ['FILENOEXT', 'PATHNOEXT', 'CWD', 'RELDIR', 'RELNAME']
-        names += ['ROOT', 'DIRNAME', 'PRONAME']
+        names += ['ROOT', 'DIRNAME', 'PRONAME', 'PROFILE']
         rows = []
         c0 = 'YELLOW'
         c1 = 'RED'
@@ -1149,6 +1151,7 @@ def main(args = None):
             tm.task_list('L' in opts)
             return 0
         else:
+            tm.setup(opts)
             tm.task_macros('M' in opts)
             return 0
     if 'i' in opts or 'f' in opts:
