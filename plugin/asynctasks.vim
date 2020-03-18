@@ -1072,11 +1072,11 @@ function! asynctasks#start(bang, taskname, path, ...)
 		redraw
 		echo ""
 		redraw
-		return 0
+		return -8
 	endif
 	let command = s:command_environ(command)
 	if command == ''
-		return 0
+		return -9
 	endif
 	let opts = s:task_option(task)
 	let opts.name = a:taskname
