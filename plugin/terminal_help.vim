@@ -3,7 +3,7 @@
 " terminal_help.vim -
 "
 " Created by skywind on 2020/01/01
-" Last Modified: 2020/03/12 16:56
+" Last Modified: 2020/03/19 18:33
 "
 "======================================================================
 
@@ -194,6 +194,13 @@ function! TerminalOpen(...)
 		setlocal bufhidden=hide
 		if get(g:, 'terminal_list', 1) == 0
 			setlocal nobuflisted
+		endif
+		if get(g:, 'terminal_auto_insert', 0) != 0
+			if has('nvim') == 0
+				autocmd WinEnter <buffer> exec "normal! i"
+			else
+				autocmd WinEnter <buffer> startinsert
+			endif
 		endif
 	endif
 	let x = win_getid()
