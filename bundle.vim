@@ -62,6 +62,7 @@ if index(g:bundle_group, 'simple') >= 0
 	Plug 'Raimondi/delimitMate'
 	Plug 'justinmk/vim-dirvish'
 	Plug 'justinmk/vim-sneak'
+	Plug 'tpope/vim-fugitive'
 	Plug 'tpope/vim-unimpaired'
 	Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
 	Plug 'bootleq/vim-cycle'
@@ -91,7 +92,6 @@ endif
 " package group - basic
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'basic') >= 0
-	Plug 'tpope/vim-fugitive'
 	Plug 'tpope/vim-rhubarb'
 	Plug 'mhinz/vim-startify'
 	Plug 'flazz/vim-colorschemes'
