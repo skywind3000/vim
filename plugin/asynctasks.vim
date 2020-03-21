@@ -274,6 +274,7 @@ function! s:search_parent(name, cwd)
 		let name = fnamemodify(name, ':p')
 		let output += [s:abspath(name)]
 	endfor
+	call reverse(output)
 	return output
 endfunc
 

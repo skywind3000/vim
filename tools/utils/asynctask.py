@@ -6,8 +6,8 @@
 #
 # Maintainer: skywind3000 (at) gmail.com, 2020
 #
-# Last Modified: 2020/03/17 11:54
-# Verision: 1.0.8
+# Last Modified: 2020/03/21 20:52
+# Verision: 1.0.9
 #
 # for more information, please visit:
 # https://github.com/skywind3000/asynctasks.vim
@@ -646,6 +646,7 @@ class configure (object):
             if os.path.normcase(path) == os.path.normcase(parent):
                 break
             path = parent
+        output.reverse()
         return output
 
     # search for local configs
