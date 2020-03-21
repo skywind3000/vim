@@ -22,6 +22,7 @@ call quickui#menu#install("&File", [
 			\ [ "LeaderF &Buffer", 'Leaderf buffer', 'List current buffers in leaderf'],
 			\ [ "--", ],
 			\ [ "J&unk File", 'JunkFile', ''],
+			\ [ "Junk L&ist", 'JunkList', ''],
 			\ ])
 
 if has('win32') || has('win64') || has('win16')
