@@ -11,7 +11,7 @@ set wildmenu
 set ignorecase
 set cpo-=<
 set lazyredraw
-set errorformat=%.\ %#-->\ %f:%l:%c,%f:%l:%c:%m,%f:%l:%m,%f(%l):%m
+set errorformat=%.\ %#-->\ %f:%l:%c,%f(%l):%m,%f:%l:%c:%m,%f:%l:%m
 set vop=folds,cursor
 set fdm=indent
 set foldlevel=99
