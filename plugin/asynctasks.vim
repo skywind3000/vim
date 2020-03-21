@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/21 20:54
-" Verision: 1.6.9
+" Last Modified: 2020/03/21 21:15
+" Verision: 1.7.0
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1198,7 +1198,7 @@ let s:template = [
 "----------------------------------------------------------------------
 " edit task
 "----------------------------------------------------------------------
-function! s:task_edit(mode, path)
+function! s:task_edit(mode, path, template)
 	let name = a:path
 	if s:requirement('asyncrun') == 0
 		return -1
@@ -1258,8 +1258,15 @@ function! s:task_edit(mode, path)
 	endif
 	setlocal ft=dosini
 	let template = s:template
-	if g:asynctasks_template == 0
+	if type(g:asynctasks_template) == 0
+		if g:asynctasks_template == 0
+			let template = ['# vim: set fenc=utf-8 ft=dosini:', '']
+		endif
+	elseif type(g:asynctasks_template) == type({})
 		let template = ['# vim: set fenc=utf-8 ft=dosini:', '']
+		if has_key(g:asynctasks_template, a:template)
+			let template = g:asynctasks_template[a:template]
+		endif
 	endif
 	if newfile
 		exec "normal ggVGx"
@@ -1431,9 +1438,6 @@ function! asynctasks#cmd(bang, args, ...)
 	elseif args ==# '-L'
 		call s:task_list('', 1)
 		return 0
-	elseif args ==# '-e' || args ==# '-E'
-		call s:task_edit(args, path)
-		return 0
 	elseif args ==# '-m'
 		call s:task_macro(0)
 		return 0
@@ -1443,6 +1447,11 @@ function! asynctasks#cmd(bang, args, ...)
 	endif
 	let [args, opts] = s:ExtractOpt(args)
 	let args = s:strip(args)
+	if has_key(opts, 'e') || has_key(opts, 'E')
+		let mode = has_key(opts, 'e')? '-e' : '-E'
+		call s:task_edit(mode, '', args)
+		return 0
+	endif
 	if has_key(opts, 'p')
 		let profile = args
 		if profile != ''
@@ -1531,13 +1540,29 @@ function! s:complete(ArgLead, CmdLine, CursorPos)
 	endif
 	let tasks = s:private.tasks
 	let rows = []
-	let size = len(a:ArgLead)
 	for task in tasks.avail
 		if task =~ '^\.' && (!(a:ArgLead =~ '^\.'))
 			continue
 		endif
 		if stridx(task, a:ArgLead) == 0
 			let candidate += [task]
+		endif
+	endfor
+	return candidate
+endfunc
+
+
+"----------------------------------------------------------------------
+" complete for template
+"----------------------------------------------------------------------
+function! s:complete_edit(ArgLead, CmdLine, CursorPos)
+	if type(g:asynctasks_template) != type({})
+		return []
+	endif
+	let candidate = []
+	for key in keys(g:asynctasks_template)
+		if stridx(key, a:ArgLead) == 0
+			let candidate += [key]
 		endif
 	endfor
 	return candidate
@@ -1555,8 +1580,9 @@ command! -bang -nargs=* -range=0 -complete=customlist,s:complete AsyncTask
 "----------------------------------------------------------------------
 " help commands
 "----------------------------------------------------------------------
-command! -bang -nargs=0 AsyncTaskEdit
-			\ call asynctasks#cmd('', ('<bang>' == '')? '-e' : '-E')
+command! -bang -nargs=? -complete=customlist,s:complete_edit AsyncTaskEdit 
+			\ call asynctasks#cmd('', 
+			\ (('<bang>' == '')? '-e' : '-E') . ' ' . <q-args>)
 
 command! -bang -nargs=0 AsyncTaskList 
 			\ call asynctasks#cmd('', ('<bang>' == '')? '-l' : '-L')
