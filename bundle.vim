@@ -154,7 +154,7 @@ if index(g:bundle_group, 'inter') >= 0
 	Plug 'tomtom/tlib_vim'
 	Plug 'garbas/vim-snipmate'
 	" Plug 'vim-scripts/FuzzyFinder'
-	Plug 'rust-lang/rust.vim', { 'for': 'rust' }
+	" Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 	Plug 'xolox/vim-notes', { 'on': ['Note', 'SearchNotes', 'DeleteNotes', 'RecentNotes'] }
 	Plug 'skywind3000/vimoutliner', { 'for': 'votl' }
 	Plug 'mattn/webapi-vim'

@@ -8,6 +8,7 @@ let g:asynctasks_template.cmake = [
 			\ "[project-build]",
 			\ "command=cmake --build build",
 			\ "cwd=<root>",
+			\ "errorformat=%. %#--> %f:%l:%c",
 			\ "",
 			\ "[project-run]",
 			\ "command=build/$(VIM_PRONAME)",
