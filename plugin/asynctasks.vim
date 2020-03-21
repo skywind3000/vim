@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/21 21:15
-" Verision: 1.7.0
+" Last Modified: 2020/03/21 22:13
+" Verision: 1.7.1
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1541,11 +1541,13 @@ function! s:complete(ArgLead, CmdLine, CursorPos)
 	let tasks = s:private.tasks
 	let rows = []
 	for task in tasks.avail
-		if task =~ '^\.' && (!(a:ArgLead =~ '^\.'))
-			continue
-		endif
-		if stridx(task, a:ArgLead) == 0
-			let candidate += [task]
+		if task != ''
+			if task =~ '^\.' && (!(a:ArgLead =~ '^\.'))
+				continue
+			endif
+			if stridx(task, a:ArgLead) == 0
+				let candidate += [task]
+			endif
 		endif
 	endfor
 	return candidate
@@ -1561,8 +1563,10 @@ function! s:complete_edit(ArgLead, CmdLine, CursorPos)
 	endif
 	let candidate = []
 	for key in keys(g:asynctasks_template)
-		if stridx(key, a:ArgLead) == 0
-			let candidate += [key]
+		if key != ''
+			if stridx(key, a:ArgLead) == 0
+				let candidate += [key]
+			endif
 		endif
 	endfor
 	return candidate
