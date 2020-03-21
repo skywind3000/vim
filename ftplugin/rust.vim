@@ -3,5 +3,5 @@ if exists('b:ftplugin_rust_loaded')
 endif
 let b:ftplugin_rust_loaded = 1
 
-setlocal errorformat=%.\ %#-->\ %f:%l:%c
+" setlocal errorformat=%.\ %#-->\ %f:%l:%c
 
