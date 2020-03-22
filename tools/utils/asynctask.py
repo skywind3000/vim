@@ -465,6 +465,10 @@ class configure (object):
                 if not marker:
                     continue
                 test = os.path.join(base, marker)
+                if ('*' in test) or ('?' in test) or ('[' in test):
+                    import glob
+                    if glob.glob(test):
+                        return base
                 if os.path.exists(test):
                     return base
             if os.path.normcase(parent) == os.path.normcase(base):
