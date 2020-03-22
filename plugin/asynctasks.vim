@@ -1256,14 +1256,14 @@ function! s:task_edit(mode, path, template)
 				let choices = ['&0 empty']
 				let names = keys(g:asynctasks_template)
 				for key in names
-					if len(choices) < 9
+					if len(choices) < 10
 						let idx = len(choices)
 						let choices += ['&'.idx . ' ' . key]
 					endif
 				endfor
 				let options = join(choices, "\n")
 				if len(choices) > 1 && newfile
-					let t = 'Select a template, ESC for giveup'
+					let t = 'Select a template (ESC to quit):'
 					let choice = confirm(t, options)
 					if choice == 0
 						return 0
