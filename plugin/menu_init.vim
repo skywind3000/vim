@@ -23,11 +23,12 @@ call quickui#menu#install("&File", [
 			\ [ "--", ],
 			\ [ "J&unk File", 'JunkFile', ''],
 			\ [ "Junk L&ist", 'JunkList', ''],
+			\ [ "--", ],
+			\ [ "&Terminal", 'OpenTerminal tab', 'Open internal terminal in a new tab'],
 			\ ])
 
 if has('win32') || has('win64') || has('win16')
 	call quickui#menu#install('&File', [
-				\ [ "--", ],
 				\ [ "Start &Cmd", 'silent !start /b cmd /C c:\drivers\clink\clink.cmd' ],
 				\ [ "Start &PowerShell", 'silent !start powershell.exe' ],
 				\ [ "Open &Explore", 'call Show_Explore()' ],

@@ -913,7 +913,7 @@ command! -nargs=? -range MyCheatSheetAlign <line1>,<line2>call s:Tools_CheatShee
 "----------------------------------------------------------------------
 " Load url
 "----------------------------------------------------------------------
-function! s:Tools_ReadUrl(url)
+function! s:ReadUrl(url)
 	if executable('curl')
 		exec 'r !curl -sL '.shellescape(a:url)
 	elseif executable('wget')
@@ -923,14 +923,14 @@ function! s:Tools_ReadUrl(url)
 	endif
 endfunc
 
-command! -nargs=1 MyUrlRead call s:Tools_ReadUrl(<q-args>)
+command! -nargs=1 MyUrlRead call s:ReadUrl(<q-args>)
 
 
 
 "----------------------------------------------------------------------
 " Remove some path from $PATH
 "----------------------------------------------------------------------
-function! s:Tools_RemovePath(path) abort
+function! s:RemovePath(path) abort
 	let windows = 0
 	let path = a:path
 	let sep = ':'
@@ -959,7 +959,18 @@ function! s:Tools_RemovePath(path) abort
 	let $PATH = text
 endfunc
 
-command! -nargs=1 EnvPathRemove call s:Tools_RemovePath(<q-args>)
+command! -nargs=1 EnvPathRemove call s:RemovePath(<q-args>)
 
+
+
+"----------------------------------------------------------------------
+" open terminal
+"----------------------------------------------------------------------
+function! s:OpenTerminal(pos)
+	let shell = get(g:, 'terminal_shell', split(&shell, ' ')[0])
+	exec 'AsyncRun -mode=term -pos='. (a:pos) . ' -cwd=<root> ' . shell
+endfunc
+
+command! -nargs=1 OpenTerminal call s:OpenTerminal(<q-args>)
 
 
