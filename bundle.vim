@@ -399,6 +399,10 @@ if index(g:bundle_group, 'keysound') >= 0
 	let g:keysound_enable = 1
 endif
 
+if index(g:bundle_group, 'icons') >= 0
+	Plug 'istepura/vim-toolbar-icons-silk'
+endif
+
 
 "----------------------------------------------------------------------
 " packages end
