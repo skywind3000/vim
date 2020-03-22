@@ -1247,9 +1247,6 @@ function! s:start_in_terminal(opts)
 			endif
 		endif
 	endfor
-	if get(a:opts, 'reuse', 1) == 0
-		let avail = -1
-	endif
 	let focus = get(a:opts, 'focus', 1)
 	if pos ==? 'tab'
 		if get(a:opts, 'reuse', 0) == 0
@@ -1307,7 +1304,7 @@ function! s:start_in_terminal(opts)
 	keepalt noautocmd windo call s:save_restore_view(0)
 	keepalt noautocmd call win_gotoid(uid)
 	let origin = win_getid()
-	if avail < 0
+	if avail < 0 || get(a:opts, 'reuse', 1) == 0
 		let rows = get(a:opts, 'rows', '')
 		let cols = get(a:opts, 'cols', '')
 		if pos == 'top'
