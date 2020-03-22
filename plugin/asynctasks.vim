@@ -224,10 +224,10 @@ endfunc
 
 " returns nearest parent directory contains one of the markers
 function! s:find_root(name, markers, strict)
-	let name = fnamemodify((a:name != '')? a:name : bufname(), ':p')
+	let name = fnamemodify((a:name != '')? a:name : bufname(0), ':p')
 	let finding = ''
 	" iterate all markers
-	for marker in split(a:markers, ',')
+	for marker in a:markers
 		if marker != ''
 			" search as a file
 			let x = findfile(marker, name . '/;')

@@ -3,7 +3,7 @@
 " path.vim - 
 "
 " Created by skywind on 2018/04/25
-" Last Modified: 2018/04/25 15:46:44
+" Last Modified: 2020/03/22 15:51
 "
 "======================================================================
 
@@ -249,17 +249,17 @@ endfunc
 " find project root
 "----------------------------------------------------------------------
 function! s:find_root(path, markers, strict)
-    function! s:guess_root(filename, markers)
-        let fullname = asclib#path#fullname(a:filename)
-        if exists('b:asclib_path_root')
-            return b:asclib_path_root
-        endif
-        if fullname =~ '^fugitive:/'
-            if exists('b:git_dir')
-                return fnamemodify(b:git_dir, ':h')
-            endif
-            return '' " skip any fugitive buffers early
-        endif
+	function! s:guess_root(filename, markers)
+		let fullname = asclib#path#fullname(a:filename)
+		if exists('b:asclib_path_root')
+			return b:asclib_path_root
+		endif
+		if fullname =~ '^fugitive:/'
+			if exists('b:git_dir')
+				return fnamemodify(b:git_dir, ':h')
+			endif
+			return '' " skip any fugitive buffers early
+		endif
 		let pivot = fullname
 		if !isdirectory(pivot)
 			let pivot = fnamemodify(pivot, ':h')
@@ -268,7 +268,15 @@ function! s:find_root(path, markers, strict)
 			let prev = pivot
 			for marker in a:markers
 				let newname = asclib#path#join(pivot, marker)
-				if filereadable(newname)
+				if stridx(newname, '*') >= 0 || stridx(newname, '?') >= 0
+					if glob(newname) != ''
+						return pivot
+					endif
+				elseif stridx(newname, '[') >= 0 || stridx(newname, ']') >= 0
+					if glob(newname) != ''
+						return pivot
+					endif
+				elseif filereadable(newname)
 					return pivot
 				elseif isdirectory(newname)
 					return pivot
@@ -279,7 +287,7 @@ function! s:find_root(path, markers, strict)
 				break
 			endif
 		endwhile
-        return ''
+		return ''
     endfunc
 	let root = s:guess_root(a:path, a:markers)
 	if root != ''
