@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/03/22 15:54
+" Last Modified: 2020/03/22 16:00
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1246,10 +1246,10 @@ function! s:start_in_terminal(opts)
 				endif
 			endif
 		endif
-		if get(a:opts, 'reuse', 1) == 0
-			let avail = -1
-		endif
 	endfor
+	if get(a:opts, 'reuse', 1) == 0
+		let avail = -1
+	endif
 	let focus = get(a:opts, 'focus', 1)
 	if pos ==? 'tab'
 		if get(a:opts, 'reuse', 0) == 0
