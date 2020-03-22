@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/22 16:36
-" Verision: 1.7.2
+" Last Modified: 2020/03/22 16:44
+" Verision: 1.7.3
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1244,19 +1244,6 @@ function! s:task_edit(mode, path, template)
 			endif
 		endif
 	endfor
-	let mods = s:strip(g:asynctasks_edit_split)
-	if mods == ''
-		exec "split " . fnameescape(name)
-	elseif mods == 'auto'
-		if winwidth(0) >= 160
-			exec "vert split ". fnameescape(name)
-		else
-			exec "split ". fnameescape(name)
-		endif
-	else
-		exec mods . " split " . fnameescape(name)
-	endif
-	setlocal ft=dosini
 	let template = s:template
 	if type(g:asynctasks_template) == 0
 		if g:asynctasks_template == 0
@@ -1278,7 +1265,9 @@ function! s:task_edit(mode, path, template)
 				if len(choices) > 1 && newfile
 					let t = 'Select a template, ESC for giveup'
 					let choice = confirm(t, options)
-					if choice > 1
+					if choice == 0
+						return 0
+					elseif choice > 1
 						let key = names[choice - 2]
 						let template += g:asynctasks_template[key]
 					endif
@@ -1288,6 +1277,19 @@ function! s:task_edit(mode, path, template)
 			let template += g:asynctasks_template[a:template]
 		endif
 	endif
+	let mods = s:strip(g:asynctasks_edit_split)
+	if mods == ''
+		exec "split " . fnameescape(name)
+	elseif mods == 'auto'
+		if winwidth(0) >= 160
+			exec "vert split ". fnameescape(name)
+		else
+			exec "split ". fnameescape(name)
+		endif
+	else
+		exec mods . " split " . fnameescape(name)
+	endif
+	setlocal ft=dosini
 	if newfile
 		exec "normal ggVGx"
 		call append(line('.') - 1, template)
