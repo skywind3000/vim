@@ -268,11 +268,7 @@ function! s:find_root(path, markers, strict)
 			let prev = pivot
 			for marker in a:markers
 				let newname = asclib#path#join(pivot, marker)
-				if stridx(newname, '*') >= 0 || stridx(newname, '?') >= 0
-					if glob(newname) != ''
-						return pivot
-					endif
-				elseif stridx(newname, '[') >= 0 || stridx(newname, ']') >= 0
+				if newname =~ '[\*\?\[\]]'
 					if glob(newname) != ''
 						return pivot
 					endif
