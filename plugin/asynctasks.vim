@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/22 16:44
-" Verision: 1.7.3
+" Last Modified: 2020/03/24 18:20
+" Verision: 1.7.4
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -770,11 +770,20 @@ function! s:command_input(command, taskname, remember)
 		if p2 < 0
 			break
 		endif
+		let remember = a:remember
 		let name = strpart(command, p1 + size_open, p2 - p1 - size_open)
 		let mark = mark_open . name . mark_close
 		let text = ''
+		let kiss = stridx(name, ':')
+		if kiss >= 0
+			let text = s:strip(strpart(name, kiss + 1))
+			let name = s:strip(strpart(name, 0, kiss))
+			if text == ''
+				let remember = 1
+			endif
+		endif
 		let rkey = a:taskname . ':' . name
-		if a:remember
+		if remember && text == ''
 			let text = get(g:asynctasks_history, rkey, '')
 			" echom 'remember: <' . text . '>'
 		endif
