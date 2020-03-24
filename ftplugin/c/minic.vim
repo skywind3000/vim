@@ -5,7 +5,9 @@ endif
 let b:ftplugin_minic = 1
 
 
-setlocal commentstring=//\ %s
-let b:commentary_format = "// %s"
 
+setlocal commentstring=//\ %s
+setlocal comments-=:// comments+=:///,://
+
+let b:commentary_format = "// %s"
 
