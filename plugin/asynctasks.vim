@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/24 18:20
-" Verision: 1.7.4
+" Last Modified: 2020/03/25 04:37
+" Verision: 1.7.5
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -869,6 +869,9 @@ function! s:task_option(task)
 			elseif pos == 'quickfix'
 				let opts.mode = 'async'
 				let opts.raw = 1
+			elseif pos == 'hide'
+				let opts.mode = 'term'
+				let opts.pos = 'hide'
 			elseif pos != 'external' && pos != 'system' && pos != 'os'
 				let opts.mode = 'term'
 				let opts.pos = pos
@@ -879,7 +882,7 @@ function! s:task_option(task)
 				let opts.mode = 'system'
 			else
 				let opts.mode = 'term'
-				let opts.pos = 'bottom'
+				let opts.pos = pos
 				let opts.cols = g:asynctasks_term_cols
 				let opts.rows = g:asynctasks_term_rows
 				let opts.focus = g:asynctasks_term_focus
@@ -889,6 +892,8 @@ function! s:task_option(task)
 			let opts.raw = 1
 		elseif output == 'vim'
 			let opts.mode = 'bang'
+		elseif output == 'hide'
+			let opts.mode = 'hide'
 		endif
 	endif
 	if has_key(task, 'silent') && task.silent
