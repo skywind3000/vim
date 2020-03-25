@@ -24,7 +24,8 @@ call quickui#menu#install("&File", [
 			\ [ "J&unk File", 'JunkFile', ''],
 			\ [ "Junk L&ist", 'JunkList', ''],
 			\ [ "--", ],
-			\ [ "&Terminal", 'OpenTerminal tab', 'Open internal terminal in a new tab'],
+			\ [ "&Terminal Tab", 'OpenTerminal tab', 'Open internal terminal in a new tab'],
+			\ [ "&Terminal Split", 'OpenTerminal right', 'Open internal terminal in a split'],
 			\ ])
 
 if has('win32') || has('win64') || has('win16')
