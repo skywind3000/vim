@@ -1,3 +1,7 @@
+if !has('patch-8.0.0')
+	finish
+endif
+
 let g:asynctasks_template = {}
 
 let g:asynctasks_template.cmake = [

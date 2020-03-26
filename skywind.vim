@@ -43,7 +43,10 @@ runtime! macros/matchit.vim
 "----------------------------------------------------------------------
 let g:asyncrun_msys = 'd:/software/msys32'
 
-set shortmess+=c
+if has('patch-8.0.0')
+	set shortmess+=c
+endif
+
 set cpt=.,w,k
 
 
