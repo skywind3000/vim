@@ -126,7 +126,12 @@ function! asclib#path#fullname(f)
 			let f = '%'
 		endtry
 	endif
-	let f = (f != '%')? f : expand('%')
+	if f == '%'
+		let f = expand('%')
+		if &bt == 'terminal'
+			let f = ''
+		endif
+	endif
 	let f = fnamemodify(f, ':p')
 	if has('win32') || has('win64') || has('win16') || has('win95')
 		let f = substitute(f, "\\", '/', 'g')
