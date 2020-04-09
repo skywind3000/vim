@@ -9,8 +9,6 @@
 
 " global settings
 let s:winopen = 0
-let g:status_var = ""
-set statusline=\ %<%F[%1*%M%*%n%R%H]\ %{''.g:status_var}%=\ %y\ %0(%{&fileformat}\ [%{(&fenc==\"\"?&enc:&fenc).(&bomb?\",BOM\":\"\")}]\ %v:%l/%L%)
 set splitright
 set smartcase
 set switchbuf=useopen,usetab,newtab
@@ -179,6 +177,35 @@ function! Open_HeaderFile(where)
 	endfor
 	echo 'switch failed, can not find another part of c/c++ source'
 endfunc
+
+" switch header/source
+function! Switch_HeaderSource()
+	if &modified
+		if &hidden == 0 && &bufhidden != 'hide'
+			echo 'file is modified'
+			return
+		endif
+	endif
+	let main = expand('%:p:r')
+	let ext = expand('%:e')
+	if index(['c', 'cpp', 'm', 'mm', 'cc'], ext) >= 0
+		let altnames = ['h', 'hpp', 'hh']
+	elseif index(['h', 'hh', 'hpp'], ext) >= 0
+		let altnames = ['c', 'cpp', 'cc', 'm', 'mm']
+	else
+		echo 'switch failed, not a c/c++ file'
+		return
+	endif
+	for next in altnames
+		let newname = main . '.' . next
+		if filereadable(newname)
+			exec 'e ' . fnameescape(newname)
+			return
+		endif
+	endfor
+endfunc
+
+command! -nargs=0 SwitchHeaderSource call Switch_HeaderSource()
 
 " Open Explore in new tab with current directory
 function! Open_Explore(where)
@@ -379,7 +406,6 @@ endfunc
 
 
 " quickfix
-let g:status_var = ""
 let g:asyncrun_status = ''
 augroup QuickfixStatus
 	" au! BufWinEnter quickfix setlocal 

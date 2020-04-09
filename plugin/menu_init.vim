@@ -189,8 +189,9 @@ let g:context_menu_k = [
 			\ [ "Get &Type\t(YCM)", 'YcmCompleter GetTypeImprecise'],
 			\ [ "--", ],
 			\ ['Dash &Help', 'call asclib#utils#dash_ft(&ft, expand("<cword>"))'],
-			\ ['Cpp&man', 'exec "Cppman " . expand("<cword>")', '', 'c,cpp'],
-			\ ['P&ython Doc', 'call quickui#tools#python_help("")', 'python'],
+			\ ['Cpp&man', 'exec "Cppman " . expand("<cword>")', '', "c,cpp"],
+			\ ['P&ython Doc', 'call quickui#tools#python_help("")', '', 'python'],
+			\ ["S&witch Header/Source", 'SwitchHeaderSource', '', "c,cpp"],
 			\ ]
 
 
