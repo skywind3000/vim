@@ -928,7 +928,7 @@ command! -nargs=? -range MyCheatSheetAlign <line1>,<line2>call s:Tools_CheatShee
 "----------------------------------------------------------------------
 function! s:Tools_ClassInsert(clsname)
 	let clsname = escape(a:clsname, '/\[*~^')
-	let text = 's/\w\+\s*(/' . clsname . '::&/'
+	let text = 's/\~\=\w\+\s*(/' . clsname . '::&/'
 	silent! keepjumps exec text
 endfunc
 
