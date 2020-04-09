@@ -162,14 +162,26 @@ function! Open_HeaderFile(where)
 		echo 'switch failed, not a c/c++ source'
 		return
 	endif
+	if a:where < 0 || a:where == 0
+		if &modified
+			if &hidden == 0 && &bufhidden != 'hide'
+				echo 'file is modified'
+				return
+			endif
+		endif
+	endif
 	for l:next in l:altnames
 		let l:newname = l:main . '.' . l:next
 		if filereadable(l:newname)
-			if a:where == 0
+			if a:where < 0
+				exec 'e ' . fnameescape(l:newname)
+			elseif a:where == 0
 				call Tools_FileSwitch('e', l:newname)
 			elseif a:where == 1
 				call Tools_FileSwitch('vs', l:newname)
-			else
+			elseif a:where == 2
+				call Tools_FileSwitch('split', l:newname)
+			elseif a:where == 3
 				call Tools_FileSwitch('tabnew', l:newname)
 			endif
 			return
@@ -178,34 +190,9 @@ function! Open_HeaderFile(where)
 	echo 'switch failed, can not find another part of c/c++ source'
 endfunc
 
-" switch header/source
-function! Switch_HeaderSource()
-	if &modified
-		if &hidden == 0 && &bufhidden != 'hide'
-			echo 'file is modified'
-			return
-		endif
-	endif
-	let main = expand('%:p:r')
-	let ext = expand('%:e')
-	if index(['c', 'cpp', 'm', 'mm', 'cc'], ext) >= 0
-		let altnames = ['h', 'hpp', 'hh']
-	elseif index(['h', 'hh', 'hpp'], ext) >= 0
-		let altnames = ['c', 'cpp', 'cc', 'm', 'mm']
-	else
-		echo 'switch failed, not a c/c++ file'
-		return
-	endif
-	for next in altnames
-		let newname = main . '.' . next
-		if filereadable(newname)
-			exec 'e ' . fnameescape(newname)
-			return
-		endif
-	endfor
-endfunc
-
-command! -nargs=0 SwitchHeaderSource call Switch_HeaderSource()
+command! -nargs=0 SwitchHeaderEdit call Open_HeaderFile(-1)
+command! -nargs=0 SwitchHeaderSplit call Open_HeaderFile(1)
+command! -nargs=0 SwitchHeaderTab call Open_HeaderFile(3)
 
 " Open Explore in new tab with current directory
 function! Open_Explore(where)

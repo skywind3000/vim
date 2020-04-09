@@ -191,7 +191,7 @@ let g:context_menu_k = [
 			\ ['Dash &Help', 'call asclib#utils#dash_ft(&ft, expand("<cword>"))'],
 			\ ['Cpp&man', 'exec "Cppman " . expand("<cword>")', '', "c,cpp"],
 			\ ['P&ython Doc', 'call quickui#tools#python_help("")', '', 'python'],
-			\ ["S&witch Header/Source", 'SwitchHeaderSource', '', "c,cpp"],
+			\ ["S&witch Header\t<spc>fw", 'SwitchHeaderEdit', '', "c,cpp"],
 			\ ]
 
 
