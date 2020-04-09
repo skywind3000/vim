@@ -933,7 +933,7 @@ function! s:Tools_ClassInsert(clsname)
 endfunc
 
 command! -nargs=1 -range ClassInsert <line1>,<line2>call s:Tools_ClassInsert(<q-args>)
-command! -nargs=0 -range BraceExpand <line1>,<line2>s/;\s*$/\r{\r\r}\r\r/
+command! -nargs=0 -range BraceExpand <line1>,<line2>s/;\s*$/\r{\r}\r\r/
 
 
 "----------------------------------------------------------------------
