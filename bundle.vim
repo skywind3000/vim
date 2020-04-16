@@ -403,6 +403,10 @@ if index(g:bundle_group, 'icons') >= 0
 	Plug 'istepura/vim-toolbar-icons-silk'
 endif
 
+if index(g:bundle_group, 'floaterm') >= 0
+	Plug 'voldikss/vim-floaterm'
+endif
+
 
 "----------------------------------------------------------------------
 " packages end
