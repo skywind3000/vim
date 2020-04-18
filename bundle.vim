@@ -103,6 +103,7 @@ if index(g:bundle_group, 'basic') >= 0
 	" Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
 	Plug 'vim-python/python-syntax', { 'for': ['python'] }
 	Plug 'pboettch/vim-cmake-syntax', { 'for': ['cmake'] }
+	Plug 'beyondmarc/hlsl.vim'
 	Plug 'tpope/vim-eunuch'
 	Plug 'dag/vim-fish'
 	Plug 'skywind3000/vim-dict'
