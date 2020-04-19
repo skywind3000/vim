@@ -222,7 +222,7 @@ let g:help_content_win32 = [
 if has('win32') || has('win64') || has('win16') || has('winxp')
 	call quickui#menu#install('Help (&?)', [
 				\ ['-'],
-				\ ['&Content Win32', 'call MenuHelp_HelpList(g:help_content_win32)', ''],
+				\ ['&Content Win32', 'call MenuHelp_HelpList("h", g:help_content_win32)', ''],
 				\ ])
 endif
 
