@@ -7,6 +7,8 @@
 "
 "======================================================================
 
+let s:keymaps = '123456789abcdefimnopqrstuvwxyz'
+
 function! MenuHelp_FormatJson()
 	exec "%!python -m json.tool"
 endfunc
@@ -87,5 +89,40 @@ function! MenuHelp_TaskList()
 	call quickui#tools#clever_listbox('tasks', rows, opts)
 endfunc
 
+function! MenuHelp_WinHelp(help)
+	let t = expand('<cword>')
+	echohl Type
+	call inputsave()
+	let t = input('Search help of ('. fnamemodify(a:help, ':t').'): ', t)
+	call inputrestore()
+	echohl None
+	redraw | echo "" | redraw
+	if t == ''
+		return 0
+	endif
+	let extname = tolower(fnamemodify(a:help, ':e'))
+	if extname == 'hlp'
+		call asclib#open_win32_help(a:help, t)
+	elseif extname == 'chm'
+		call asclib#open_win32_chm(a:help, t)
+	else
+		echo "unknow filetype"
+	endif
+endfunc
+
+function! MenuHelp_HelpList(content)
+	let content = []
+	let index = 0
+	for item in a:content
+		let key = (index < len(s:keymaps))? strpart(s:keymaps, index, 1) : ''
+		let text = '[' . ((key == '')? ' ' : ('&' . key)) . "]\t"
+		let text = text . item[0] . "\t" . item[1]
+		let cmd = 'call MenuHelp_WinHelp("' . item[1] . '")'
+		let content += [[text, cmd]]
+		let index += 1
+	endfor
+	let opts = {'title': 'Help Content', 'index':0, 'close':'button'}
+	call quickui#listbox#open(content, opts)
+endfunc
 
 

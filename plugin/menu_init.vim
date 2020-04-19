@@ -208,3 +208,23 @@ endif
 
 
 
+"----------------------------------------------------------------------
+" Help Content
+"----------------------------------------------------------------------
+let g:help_content_win32 = [
+			\ [ 'Win32 Help', 'd:/dev/help/win32.hlp'],
+			\ [ 'MSDN of VC6', 'd:/dev/help/chm/vc.chm'],
+			\ [ 'Python2 Help', 'd:/dev/help/chm/python2713.chm'],
+			\ [ 'Python3 Help', 'd:/dev/help/chm/python362.chm'],
+			\ [ 'DirectX 9c', 'd:/dev/help/chm/DirectX9_c.chm'],
+			\ ]
+
+if has('win32') || has('win64') || has('win16') || has('winxp')
+
+	call quickui#menu#install('Help (&?)', [
+				\ ['-'],
+				\ ['&Content Win32', 'call MenuHelp_HelpList(g:help_content_win32)', ''],
+				\ ])
+endif
+
+
