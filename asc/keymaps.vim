@@ -14,8 +14,8 @@ for s:index in range(10)
 	let s:button = (s:index > 0)? 'F'.s:index : 'F10'
 	exec 'noremap <space>'.s:index.' :VimTool ' . s:index . '<cr>'
 	if has('gui_running')
-		exec "noremap <C-".s:button."> :VimTool c".s:index . '<cr>'
-		exec "inoremap <C-".s:button."> <ESC>:VimTool c".s:index . '<cr>'
+		exec "noremap <C-".s:button."> :AsyncTask task-c-f".s:index . '<cr>'
+		exec "inoremap <C-".s:button."> <ESC>:AsyncTask task-c-f".s:index . '<cr>'
 	endif
 endfor
 
