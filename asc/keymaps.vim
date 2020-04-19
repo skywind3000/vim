@@ -26,8 +26,8 @@ if (has('gui_running') || has('nvim')) && (has('win32') || has('win64'))
 	for s:index in range(10)
 		let s:name = ''.s:index
 		if s:index == 0 | let s:name = '10' | endif
-		exec 'noremap <silent><M-'.s:keys[s:index].'> :VimTool '.s:index.'<cr>'
-		exec 'inoremap <silent><M-'.s:keys[s:index].'> <ESC>:VimTool '.s:index.'<cr>'
+		exec 'noremap <silent><M-'.s:keys[s:index].'> :AsyncTask task-f'.s:index.'<cr>'
+		exec 'inoremap <silent><M-'.s:keys[s:index].'> <ESC>:AsyncTask task-f'.s:index.'<cr>'
 	endfor
 else
 	" require to config terminal to remap key alt-shift+? to '\033[{0}?~'
