@@ -29,8 +29,9 @@ fi
 
 
 # Load local bash/zsh compatible settings
-_INIT_SH_NOFUN=1
-_INIT_SH_NOLOG=1
+INIT_SH_NOFUN=1
+INIT_SH_NOLOG=1
+DISABLE_Z_PLUGIN=1
 [ -f "$HOME/.local/etc/init.sh" ] && source "$HOME/.local/etc/init.sh"
 
 # exit for non-interactive shell
@@ -136,6 +137,9 @@ ZSH_HIGHLIGHT_STYLES[assign]=none
 [ -f "$HOME/.local/etc/local.zsh" ] && source "$HOME/.local/etc/local.zsh"
 
 antigen apply
+
+# work around: fast syntax highlighting may crash zsh without this
+FAST_HIGHLIGHT[chroma-git]="chroma/-ogit.ch"
 
 # options
 unsetopt correct_all
