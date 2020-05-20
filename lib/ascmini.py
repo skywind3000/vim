@@ -1052,10 +1052,10 @@ class LazyRequests (object):
             timeout = option.get('timeout')
         if 'proxy' in option:
             proxy = option['proxy']
-            if isinstance(proxy, str):
-                if proxy and proxy.startswith('socks5://'):
-                    proxy = 'socks5h://' + proxy[9:]
-                    proxy = {'http': proxy, 'https': proxy}
+        if proxy and isinstance(proxy, str):
+            if proxy.startswith('socks5://'):
+                proxy = 'socks5h://' + proxy[9:]
+                proxy = {'http': proxy, 'https': proxy}
         if timeout:
             argv['timeout'] = timeout
         if proxy:
