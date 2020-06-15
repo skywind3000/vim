@@ -50,6 +50,7 @@ call quickui#menu#install("&Edit", [
 			\ ['--'],
 			\ ['&Align Table', 'Tabularize /|', ''],
 			\ ['Align &Cheatsheet', 'MyCheatSheetAlign', ''],
+			\ ['&Break long line', 'call MenuHelp_SplitLine()', ''],
 			\ ])
 
 call quickui#menu#install('&Symbol', [

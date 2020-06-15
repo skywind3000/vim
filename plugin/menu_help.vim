@@ -125,4 +125,24 @@ function! MenuHelp_HelpList(name, content)
 	call quickui#tools#clever_listbox(a:name, content, opts)
 endfunc
 
+function! MenuHelp_SplitLine()
+	echohl Type
+	call inputsave()
+	let t = input('Enter maximum line width: ')
+	call inputrestore()
+	redraw | echo "" | redraw
+	if t == ''
+		return 0
+	endif
+	let width = str2nr(t)
+	if width <= 0
+		echohl ErrorMsg
+		echo "Invalid number: " . t
+		echohl None
+		redraw
+		return 0
+	endif
+	exec 'LineBreaker ' . width
+endfunc
+
 
