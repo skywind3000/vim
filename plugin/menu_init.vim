@@ -92,6 +92,10 @@ call quickui#menu#install("&Build", [
 			\ ['&Stop Building', 'AsyncStop'],
 			\ ])
 
+call quickui#menu#install("&C/C++", [
+			\ ["HELLO", "echo 'hello'"],
+			\ ])
+
 call quickui#menu#install("&Git", [
 			\ ['&View Diff', 'call svnhelp#svn_diff("%")'],
 			\ ['&Show Log', 'call svnhelp#svn_log("%")'],
