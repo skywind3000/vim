@@ -123,6 +123,7 @@ endif
 
 call quickui#menu#install("&C/C++", [
 			\ ["&Switch Header/Source\t<spc>fw", "call Open_HeaderFile(-1)"],
+			\ ["Split &Header/Source\t<spc>fw", "call Open_HeaderFile(1)"],
 			\ ])
 
 call quickui#menu#install('&Tools', [
