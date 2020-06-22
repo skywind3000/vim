@@ -92,10 +92,6 @@ call quickui#menu#install("&Build", [
 			\ ['&Stop Building', 'AsyncStop'],
 			\ ])
 
-call quickui#menu#install("&C/C++", [
-			\ ["HELLO", "echo 'hello'"],
-			\ ])
-
 call quickui#menu#install("&Git", [
 			\ ['&View Diff', 'call svnhelp#svn_diff("%")'],
 			\ ['&Show Log', 'call svnhelp#svn_log("%")'],
@@ -124,6 +120,10 @@ if has('win32') || has('win64') || has('win16') || has('win95')
 				\ ["File Lo&g\t(Tortoise)", 'call svnhelp#tf_log()', 'TortoiseGit / TortoiseSvn'],
 				\ ])
 endif
+
+call quickui#menu#install("&C/C++", [
+			\ ["HELLO", "echo 'hello'"],
+			\ ])
 
 call quickui#menu#install('&Tools', [
 			\ ['Compare &History', 'call svnhelp#compare_ask_file()', ''],
