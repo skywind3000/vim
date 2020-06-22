@@ -122,7 +122,7 @@ if has('win32') || has('win64') || has('win16') || has('win95')
 endif
 
 call quickui#menu#install("&C/C++", [
-			\ ["HELLO", "echo 'hello'"],
+			\ ["&Switch Header/Source\t<spc>fw", "call Open_HeaderFile(-1)"],
 			\ ])
 
 call quickui#menu#install('&Tools', [
