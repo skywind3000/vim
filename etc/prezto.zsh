@@ -199,3 +199,4 @@ zstyle ':completion:*:complete:-command-:*:*' ignored-patterns '*.pdf|*.exe|*.dl
 zstyle ':completion:*:*sh:*:' tag-order files
 
 
+
