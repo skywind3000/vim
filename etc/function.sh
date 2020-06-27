@@ -556,6 +556,7 @@ function zlua_enable() {
 		mkdir -p -m 700 "$HOME/.local/share/zlua" 2> /dev/null
 	fi
 	export _ZL_DATA="$HOME/.local/share/zlua/zlua.txt"
+	export _ZL_USE_LFS=1
 	[[ -z "$1" ]] && LUA_EXEC="$(command -v lua)" || LUA_EXEC="$1"
 	if [[ -x "$LUA_EXEC" ]]; then
 		if [[ -n "$BASH_VERSION" ]]; then
