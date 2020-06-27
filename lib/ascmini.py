@@ -437,6 +437,19 @@ class PosixKit (object):
                 text = content.decode('utf-8', 'ignore')
         return text
 
+    # save file text
+    def save_file_text (self, filename, content, encoding = None):
+        import codecs
+        if encoding is None:
+            encoding = 'utf-8'
+        if (not isinstance(content, unicode)) and isinstance(content, bytes):
+            return self.save_file_content(filename, content)
+        with codecs.open(filename, 'w', 
+                encoding = encoding, 
+                errors = 'ignore') as fp:
+            fp.write(content)
+        return True
+
     # load ini without ConfigParser
     def load_ini (self, filename, encoding = None):
         text = self.load_file_text(filename, encoding)
@@ -1038,24 +1051,38 @@ class LazyRequests (object):
 
     def request (self, name, url, data = None, post = False, header = None):
         import requests
+        import copy
         s = self.__session_get(name)
         if not s:
             s = requests.Session()
         r = None
         option = self._options.get(name, {})
         argv = {}
-        if header is not None:
-            argv['headers'] = header
         timeout = self._option.get('timeout', None)
         proxy = self._option.get('proxy', None)
+        agent = self._option.get('agent', None)
         if 'timeout' in option:
             timeout = option.get('timeout')
         if 'proxy' in option:
             proxy = option['proxy']
+        if proxy and isinstance(proxy, str):
+            if proxy.startswith('socks5://'):
+                proxy = 'socks5h://' + proxy[9:]
+                proxy = {'http': proxy, 'https': proxy}
+        if 'agent' in option:
+            agent = option['agent']
         if timeout:
             argv['timeout'] = timeout
         if proxy:
             argv['proxies'] = proxy
+        if header is None:
+            header = {}
+        else:
+            header = copy.deepcopy(header)
+        if agent:
+            header['User-Agent'] = agent
+        if header is not None:
+            argv['headers'] = header
         if not post:
             if data is not None:
                 argv['params'] = data
@@ -1116,6 +1143,12 @@ class LazyRequests (object):
         else:
             text = r.text
         return r.status_code, text
+
+
+#----------------------------------------------------------------------
+# instance
+#----------------------------------------------------------------------
+lazy = LazyRequests()
 
 
 #----------------------------------------------------------------------

@@ -1000,3 +1000,16 @@ endfunc
 command! -nargs=1 OpenTerminal call s:OpenTerminal(<q-args>)
 
 
+"----------------------------------------------------------------------
+" break long lines to small lines of 76 characters.
+"----------------------------------------------------------------------
+function! s:LineBreaker(width)
+	let width = &textwidth
+	let &textwidth = str2nr(a:width)	
+	exec 'normal ggVGgq'
+	let &textwidth = width
+endfunc
+
+command! -nargs=1 LineBreaker call s:LineBreaker(<q-args>)
+
+

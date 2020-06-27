@@ -374,3 +374,36 @@ function! asclib#path#cachedir(cache_dir, root_dir, filename)
 endfunc
 
 
+"----------------------------------------------------------------------
+" push current dir in stack and switch dir to path
+"----------------------------------------------------------------------
+function! asclib#path#push_dir(path)
+	if !exists('s:dir_stack')
+		let s:dir_stack = []
+	endif
+	let previous = getcwd()
+	let s:dir_stack += [previous]
+	call asclib#path#chdir(a:path)
+	return previous
+endfunc
+
+
+"----------------------------------------------------------------------
+" pop current dir in stack
+"----------------------------------------------------------------------
+function! asclib#path#pop_dir()
+	if !exists('s:dir_stack')
+		let s:dir_stack = []
+	endif
+	let size = len(s:dir_stack)
+	if size == 0
+		return ''
+	endif
+	let previous = s:dir_stack[size - 1]
+	call remove(s:dir_stack, size - 1)
+	call asclib#path#chdir(previous)
+	return previous
+endfunc
+
+
+

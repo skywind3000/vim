@@ -50,6 +50,7 @@ call quickui#menu#install("&Edit", [
 			\ ['--'],
 			\ ['&Align Table', 'Tabularize /|', ''],
 			\ ['Align &Cheatsheet', 'MyCheatSheetAlign', ''],
+			\ ['&Break long line', 'call MenuHelp_SplitLine()', ''],
 			\ ])
 
 call quickui#menu#install('&Symbol', [
@@ -119,6 +120,11 @@ if has('win32') || has('win64') || has('win16') || has('win95')
 				\ ["File Lo&g\t(Tortoise)", 'call svnhelp#tf_log()', 'TortoiseGit / TortoiseSvn'],
 				\ ])
 endif
+
+call quickui#menu#install("&C/C++", [
+			\ ["&Switch Header/Source\t<spc>fw", "call Open_HeaderFile(-1)"],
+			\ ["Split &Header/Source\t<spc>fw", "call Open_HeaderFile(1)"],
+			\ ])
 
 call quickui#menu#install('&Tools', [
 			\ ['Compare &History', 'call svnhelp#compare_ask_file()', ''],
@@ -215,14 +221,14 @@ let g:help_content_win32 = [
 			\ [ 'Win32 Help', 'd:/dev/help/win32.hlp'],
 			\ [ 'MSDN of VC6', 'd:/dev/help/chm/vc.chm'],
 			\ [ 'Python2 Help', 'd:/dev/help/chm/python2713.chm'],
-			\ [ 'Python3 Help', 'd:/dev/help/chm/python362.chm'],
+			\ [ 'Python3 Help', 'd:/dev/help/chm/python382.chm'],
 			\ [ 'DirectX 9c', 'd:/dev/help/chm/DirectX9_c.chm'],
 			\ ]
 
 if has('win32') || has('win64') || has('win16') || has('winxp')
 	call quickui#menu#install('Help (&?)', [
 				\ ['-'],
-				\ ['&Content Win32', 'call MenuHelp_HelpList(g:help_content_win32)', ''],
+				\ ['&Content Win32', 'call MenuHelp_HelpList("h", g:help_content_win32)', ''],
 				\ ])
 endif
 

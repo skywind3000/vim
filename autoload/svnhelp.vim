@@ -64,13 +64,11 @@ endfunc
 function! svnhelp#git_name(target, revision)
 	let filename = fnamemodify(expand(a:target), ':p')
 	let filedir = fnamemodify(filename, ':h')
-	let cd = haslocaldir()? 'lcd ' : 'cd '
 	let cmd = 'ls-tree --full-name --name-only '.a:revision
-	let savedir = getcwd()
 	let cmd.= ' '.shellescape(filename)
-	exec cd . fnameescape(filedir)
+	call asclib#path#push_dir(filedir)
 	let hr = svnhelp#git(cmd)
-	exec cd . savedir
+	call asclib#path#pop_dir()
 	if s:shell_error
 		return ''
 	endif
@@ -88,11 +86,9 @@ function! svnhelp#git_cat(target, revision)
 	let cmd.= ' > '. shellescape(tmp)
 	let filename = fnamemodify(expand(a:target), ':p')
 	let filedir = fnamemodify(filename, ':h')
-	let savedir = getcwd()
-	let cd = haslocaldir()? 'lcd ' : 'cd '
-	exec cd. fnameescape(filedir)
+	call asclib#path#push_dir(filedir)
 	call svnhelp#git(cmd)
-	exec cd. savedir
+	call asclib#path#pop_dir()
 	if s:shell_error == 0
 		return tmp
 	endif
@@ -287,18 +283,19 @@ function! svnhelp#tinfo() abort
 	let info.filename = expand('%:t')
 	let info.filedir = expand('%:p:h')
 	let info.filepath = expand('%:p')
-	let cd = haslocaldir()? 'lcd ' : 'cd '
 	let savecwd = getcwd()
 	if root == ''
 		return info
 	endif
-	exec cd . root
+	call asclib#path#push_dir(root)
 	let info.filerel = expand('%')
-	exec cd . savecwd
+	call asclib#path#pop_dir()
 	let info.filerel = substitute(info.filerel, '\\', '/', 'g')
 	if isdirectory(asclib#path#join(root, '.svn'))
 		let info.mode = 1
 	elseif isdirectory(asclib#path#join(root, '.git'))
+		let info.mode = 2
+	elseif filereadable(asclib#path#join(root, '.git'))
 		let info.mode = 2
 	else
 		return info

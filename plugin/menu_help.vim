@@ -110,7 +110,7 @@ function! MenuHelp_WinHelp(help)
 	endif
 endfunc
 
-function! MenuHelp_HelpList(content)
+function! MenuHelp_HelpList(name, content)
 	let content = []
 	let index = 0
 	for item in a:content
@@ -122,7 +122,27 @@ function! MenuHelp_HelpList(content)
 		let index += 1
 	endfor
 	let opts = {'title': 'Help Content', 'index':0, 'close':'button'}
-	call quickui#listbox#open(content, opts)
+	call quickui#tools#clever_listbox(a:name, content, opts)
+endfunc
+
+function! MenuHelp_SplitLine()
+	echohl Type
+	call inputsave()
+	let t = input('Enter maximum line width: ')
+	call inputrestore()
+	redraw | echo "" | redraw
+	if t == ''
+		return 0
+	endif
+	let width = str2nr(t)
+	if width <= 0
+		echohl ErrorMsg
+		echo "Invalid number: " . t
+		echohl None
+		redraw
+		return 0
+	endif
+	exec 'LineBreaker ' . width
 endfunc
 
 

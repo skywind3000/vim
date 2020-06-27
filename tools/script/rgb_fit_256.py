@@ -90,7 +90,7 @@ def color_extract(rgb):
 def color_fit(color):
     r, g, b = color_extract(color)
     nearest_index = -1
-    nearest_dist = 0xff * 0xff * 64 * 4
+    nearest_dist = 0xff * 0xff * 64 * 64 * 4
     for index in range(256):
         color = PALETTE[index]
         G = (color >> 8) & 0xff
