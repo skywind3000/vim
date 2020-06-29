@@ -2693,21 +2693,18 @@ end
 os.lfs = {}
 os.lfs.disable = os.getenv('_ZL_DISABLE_LFS')
 if os.lfs.disable == nil then
-	local m = string.lower(os.lfs.disable)
-	if (m ~= '1' and m ~= 'yes' and m ~= 'true' and m ~= 't') then
-		os.lfs.status, os.lfs.pkg = pcall(require, 'lfs')
-		if os.lfs.status then
-			local lfs = os.lfs.pkg
-			os.path.exists = function (name)
-				return lfs.attributes(name) and true or false
+	os.lfs.status, os.lfs.pkg = pcall(require, 'lfs')
+	if os.lfs.status then
+		local lfs = os.lfs.pkg
+		os.path.exists = function (name)
+			return lfs.attributes(name) and true or false
+		end
+		os.path.isdir = function (name)
+			local mode = lfs.attributes(name)
+			if not mode then 
+				return false
 			end
-			os.path.isdir = function (name)
-				local mode = lfs.attributes(name)
-				if not mode then 
-					return false
-				end
-				return (mode.mode == 'directory') and true or false
-			end
+			return (mode.mode == 'directory') and true or false
 		end
 	end
 end
