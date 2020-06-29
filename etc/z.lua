@@ -2693,8 +2693,8 @@ end
 os.lfs = {}
 os.lfs.disable = os.getenv('_ZL_DISABLE_LFS')
 if os.lfs.disable == nil then
-	local m = string.lower(os.lfs.enable)
-	if (m == '1' or m == 'yes' or m == 'true' or m == 't') then
+	local m = string.lower(os.lfs.disable)
+	if (m ~= '1' and m ~= 'yes' and m ~= 'true' and m ~= 't') then
 		os.lfs.status, os.lfs.pkg = pcall(require, 'lfs')
 		if os.lfs.status then
 			local lfs = os.lfs.pkg
