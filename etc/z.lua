@@ -4,7 +4,7 @@
 -- z.lua - a cd command that learns, by skywind 2018, 2019, 2020
 -- Licensed under MIT license.
 --
--- Version 1.8.6, Last Modified: 2020/03/17 16:32
+-- Version 1.8.7, Last Modified: 2020/06/29 18:04
 --
 -- * 10x faster than fasd and autojump, 3x faster than z.sh
 -- * available for posix shells: bash, zsh, sh, ash, dash, busybox
@@ -2691,8 +2691,8 @@ end
 -- LFS optimize
 -----------------------------------------------------------------------
 os.lfs = {}
-os.lfs.enable = os.getenv('_ZL_USE_LFS')
-if os.lfs.enable ~= nil then
+os.lfs.disable = os.getenv('_ZL_DISABLE_LFS')
+if os.lfs.disable == nil then
 	local m = string.lower(os.lfs.enable)
 	if (m == '1' or m == 'yes' or m == 'true' or m == 't') then
 		os.lfs.status, os.lfs.pkg = pcall(require, 'lfs')
