@@ -349,7 +349,7 @@ if os.native.status then
 			local hr = kernel32.GetShortPathNameA(name, buffer, 4096)
 			return (hr ~= 0) and ffi.string(buffer, hr) or nil
 		end
-		function os.native.CaseCorrectPathName(name)
+		function os.native.GetRealPathName(name)
 			local short = os.native.GetShortPathName(name)
 			if short then
 				return os.native.GetLongPathName(short)
@@ -1378,8 +1378,11 @@ function z_add(path)
 			end
 			if not skip then
 				if windows then
-					if os.native and os.native.CaseCorrectPathName then
-						path = os.native.CaseCorrectPathName(path)
+					if os.native and os.native.GetRealPathName then
+						local ts = os.native.GetRealPathName(path)
+						if ts then
+							path = ts
+						end
 					end
 				end
 				M = data_insert(M, path)
