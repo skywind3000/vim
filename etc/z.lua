@@ -319,14 +319,16 @@ if os.native.status then
 		uint32_t GetTickCount(void);
 		uint32_t GetFileAttributesA(const char *name);
 		uint32_t GetCurrentDirectoryA(uint32_t size, char *ptr);
+		uint32_t GetShortPathNameA(const char *longname, char *shortname, uint32_t size);
+		uint32_t GetLongPathNameA(const char *shortname, char *longname, uint32_t size);
 		]]
 		local kernel32 = ffi.load('kernel32.dll')
-		local buffer = ffi.new('char[?]', 300)
+		local buffer = ffi.new('char[?]', 4100)
 		local INVALID_FILE_ATTRIBUTES = 0xffffffff
 		local FILE_ATTRIBUTE_DIRECTORY = 0x10
 		os.native.kernel32 = kernel32
 		function os.native.GetFullPathName(name)
-			local hr = kernel32.GetFullPathNameA(name, 290, buffer, nil)
+			local hr = kernel32.GetFullPathNameA(name, 4096, buffer, nil)
 			return (hr > 0) and ffi.string(buffer, hr) or nil
 		end
 		function os.native.ReplaceFile(replaced, replacement)
@@ -338,6 +340,21 @@ if os.native.status then
 		end
 		function os.native.GetFileAttributes(name)
 			return kernel32.GetFileAttributesA(name)
+		end
+		function os.native.GetLongPathName(name)
+			local hr = kernel32.GetLongPathNameA(name, buffer, 4096)
+			return (hr ~= 0) and ffi.string(buffer, hr) or nil
+		end
+		function os.native.GetShortPathName(name)
+			local hr = kernel32.GetShortPathNameA(name, buffer, 4096)
+			return (hr ~= 0) and ffi.string(buffer, hr) or nil
+		end
+		function os.native.CaseCorrectPathName(name)
+			local short = os.native.GetShortPathName(name)
+			if short then
+				return os.native.GetLongPathName(short)
+			end
+			return nil
 		end
 		function os.native.exists(name)
 			local attr = os.native.GetFileAttributes(name)
@@ -352,7 +369,7 @@ if os.native.status then
 			return (attr % (2 * isdir)) >= isdir
 		end
 		function os.native.getcwd()
-			local hr = kernel32.GetCurrentDirectoryA(299, buffer)
+			local hr = kernel32.GetCurrentDirectoryA(4096, buffer)
 			if hr <= 0 then return nil end
 			return ffi.string(buffer, hr)
 		end
@@ -1360,6 +1377,11 @@ function z_add(path)
 				end
 			end
 			if not skip then
+				if windows then
+					if os.native and os.native.CaseCorrectPathName then
+						path = os.native.CaseCorrectPathName(path)
+					end
+				end
 				M = data_insert(M, path)
 				count = count + 1
 			end
