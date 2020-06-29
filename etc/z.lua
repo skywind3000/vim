@@ -554,6 +554,9 @@ function os.path.exists(name)
 	if name == '/' then
 		return true
 	end
+	if os.native and os.native.exists then
+		return os.native.exists(name)
+	end
 	local ok, err, code = os.rename(name, name)
 	if not ok then
 		if code == 13 then
