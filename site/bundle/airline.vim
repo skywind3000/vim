@@ -51,3 +51,6 @@ function AirlineSetupMe(font)
 endfunc
 
 
+call AirlineSetupMe(get(g:, 'airline_font', 0))
+
+
