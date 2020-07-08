@@ -60,7 +60,6 @@ function! s:override_event()
 	augroup END
 endfunc
 
-
 if 1
 	autocmd! VimEnter * call s:override_event()
 endif
