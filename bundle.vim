@@ -232,7 +232,6 @@ if index(g:bundle_group, 'opt') >= 0
 	endif
 
 
-
 	if s:uname == 'windows' 
 		let g:python3_host_prog="python"
 	endif
