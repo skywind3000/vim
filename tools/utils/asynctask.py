@@ -814,13 +814,13 @@ class TaskManager (object):
                 macro = '$(WSL_CFILE)'
             else:
                 macro = '$(VIM_' + name + ')'
-            if name in command:
+            if macro in command:
                 t = '%s is invalid in command line'%macro
                 pretty.error(t)
                 if ini: print('from %s:'%ini)
                 pretty.perror(cc, 'command=' + command)
                 return 3
-            if name in cwd:
+            if macro in cwd:
                 t = '%s is invalid in command line'%macro
                 pretty.error(t)
                 if ini: print('from %s:'%ini)
