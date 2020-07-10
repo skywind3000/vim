@@ -853,7 +853,7 @@ class TaskManager (object):
                 else:
                     text = input(prompt)
             except KeyboardInterrupt:
-                text = ''
+                return ''
             p3 = mark.find(':')
             if p3 >= 0 and (not text):
                 text = mark[p3 + 1:-1]
