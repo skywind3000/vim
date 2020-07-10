@@ -48,3 +48,21 @@ function! LightlineMode()
 endfunc
 
 
+"----------------------------------------------------------------------
+" override event
+"----------------------------------------------------------------------
+function! s:override_event()
+	augroup lightline
+		autocmd!
+		autocmd WinEnter,BufEnter,BufDelete,FileChangedShellPost * call lightline#update()
+		autocmd ColorScheme * if !has('vim_starting') || expand('<amatch>') !=# 'macvim'
+					\ | call lightline#update() | call lightline#highlight() | endif
+	augroup END
+endfunc
+
+if 1
+	autocmd! VimEnter * call s:override_event()
+endif
+
+
+
