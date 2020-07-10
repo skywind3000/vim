@@ -227,12 +227,8 @@ if index(g:bundle_group, 'opt') >= 0
 		let g:gutentags_modules += ['gtags_cscope']
 	endif
 	if len(g:gutentags_modules) > 0
-		if s:uname != 'windows'
-			Plug 'ludovicchabant/vim-gutentags'
-		else
-			Plug 'ludovicchabant/vim-gutentags'
-			" Plug 'skywind3000/vim-gutentags'
-		endif
+		" Plug 'ludovicchabant/vim-gutentags'
+		Plug 'skywind3000/vim-gutentags'
 	endif
 
 
