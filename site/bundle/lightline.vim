@@ -49,7 +49,7 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" override event
+" prevent GVim crash
 "----------------------------------------------------------------------
 function! s:override_event()
 	augroup lightline
