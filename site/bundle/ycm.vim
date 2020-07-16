@@ -31,6 +31,9 @@ let g:ycm_goto_buffer_command = 'new-or-existing-tab'
 "----------------------------------------------------------------------
 " let g:ycm_global_ycm_extra_conf = 'd:/dev/vim/ycm_extra_conf.py'
 
+" remove auto hover
+let g:ycm_auto_hover = ''
+
 
 "----------------------------------------------------------------------
 " Ycm White List
