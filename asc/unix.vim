@@ -67,6 +67,11 @@ if has('patch-7.4.500') || v:version >= 800
 	endif
 endif
 
+" enable new-style cursorline (for numbers only)
+if has('nvim') == 0 && has('patch-8.1.2020')
+	set cursorlineopt=number cursorline
+endif
+
 
 "----------------------------------------------------------------------
 " fixed cursor shaping compatible issues for some terminals

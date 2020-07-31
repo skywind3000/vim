@@ -49,10 +49,6 @@ endif
 
 set cpt=.,w,k
 
-if has('nvim') == 0 && has('patch-8.1.2020')
-	set cursorlineopt=number cursorline
-endif
-
 
 "----------------------------------------------------------------------
 "- FileType Preference
