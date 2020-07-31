@@ -49,8 +49,9 @@ endif
 
 set cpt=.,w,k
 
-set cursorlineopt=number
-set cursorline
+if has('nvim') == 0
+	set cursorlineopt=number cursorline
+endif
 
 
 "----------------------------------------------------------------------
