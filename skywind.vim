@@ -49,6 +49,9 @@ endif
 
 set cpt=.,w,k
 
+set cursorlineopt=number
+set cursorline
+
 
 "----------------------------------------------------------------------
 "- FileType Preference
