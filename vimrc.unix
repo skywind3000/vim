@@ -16,7 +16,6 @@ if !exists('g:bundle_group')
 	let g:bundle_group = []
 endif
 
-
 let g:vim_startup = get(g:, 'vim_startup', '')
 
 if g:vim_startup != ''
