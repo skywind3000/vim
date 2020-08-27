@@ -207,7 +207,7 @@ function! s:GscopeFind(bang, what, ...)
 	let keyword = (a:0 > 0)? a:1 : ''
 	let dbname = s:get_gtags_file()
 	let root = get(b:, 'gutentags_root', '')
-	if dbname == '' || root == ''
+	if (dbname == '' || root == '') && a:what != 'z'
 		call s:ErrorMsg("no gtags database for this project, check gutentags's documents")
 		return 0
 	endif
@@ -313,15 +313,54 @@ command! -nargs=0 GscopeKill call s:GscopeKill()
 "----------------------------------------------------------------------
 " taglist
 "----------------------------------------------------------------------
+function! s:global_taglist(pattern) abort
+	let dbname = s:get_gtags_file()
+	let root = get(b:, 'gutentags_root', '')
+	if dbname == '' || root == ''
+		call s:ErrorMsg("no gtags database for this project, check gutentags's documents")
+		return 0
+	endif
+	if !filereadable(dbname)
+		call s:ErrorMsg('gtags database is not ready yet')
+		return 0
+	endif
+	let pwd = getcwd()
+	let $GTAGSDBPATH = fnamemodify(dbname, ':p:h')
+	let $GTAGSROOT = root
+	let lst = systemlist('global --result=cscope -a "'. a:pattern . '"')
+	let rsl_list = []
+	for li in lst
+	    let tag_info = {}
+	    let tag_info['filename'] = li[:stridx(li, " ") - 1]
+	    let li = li[stridx(li, " ") + 1:]
+	    let tag_info['name'] = li[:stridx(li, " ") - 1]
+	    let li = li[stridx(li, " ") + 1:]
+	    let tag_info['line'] = str2nr(li[:stridx(li, " ") - 1])
+	    let li = li[stridx(li, " ") + 1:]
+	    let tag_info['cmd'] = '/^' . li . '$/'
+	    let rsl_list = add(rsl_list, tag_info)
+	endfor
+	return rsl_list
+endfunc
+
+
 function! s:taglist(pattern)
     let ftags = []
     try
-        let ftags = taglist(a:pattern)
+	if &cscopetag
+	    let ftags = s:global_taglist(a:pattern)
+	else
+	    let ftags = taglist(a:pattern)
+	endif
     catch /^Vim\%((\a\+)\)\=:E/
         " if error occured, reset tagbsearch option and try again.
         let bak = &tagbsearch
         set notagbsearch
-        let ftags = taglist(a:pattern)
+	if &cscopetag
+		let ftags = s:global_taglist(a:pattern)
+	else
+		let ftags = taglist(a:pattern)
+	endif
         let &tagbsearch = bak
     endtry
 	" take care ctags windows filename bug
