@@ -302,7 +302,7 @@ let g:gutentags_project_root = ['.root']
 let g:gutentags_ctags_tagfile = '.tags'
 
 " let g:gutentags_modules = ['ctags', 'gtags_cscope']
-if exists('g:gutentags_cache_dir')
+if exists('g:gutentags_cache_dir') == 0
 	let g:gutentags_cache_dir = expand('~/.cache/tags')
 endif
 
