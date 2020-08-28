@@ -306,6 +306,10 @@ if exists('g:gutentags_cache_dir')
 	let g:gutentags_cache_dir = expand('~/.cache/tags')
 endif
 
+if !isdirectory(g:gutentags_cache_dir)
+	call mkdir(g:gutentags_cache_dir, 'p')
+endif
+
 let g:gutentags_ctags_extra_args = []
 let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']
 let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
