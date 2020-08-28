@@ -302,7 +302,10 @@ let g:gutentags_project_root = ['.root']
 let g:gutentags_ctags_tagfile = '.tags'
 
 " let g:gutentags_modules = ['ctags', 'gtags_cscope']
-let g:gutentags_cache_dir = expand('~/.cache/tags')
+if exists('g:gutentags_cache_dir')
+	let g:gutentags_cache_dir = expand('~/.cache/tags')
+endif
+
 let g:gutentags_ctags_extra_args = []
 let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']
 let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
