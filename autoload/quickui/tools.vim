@@ -434,11 +434,3 @@ function! quickui#tools#clever_listbox(name, content, opts)
 	call quickui#listbox#open(a:content, opts)
 endfunc
 
-
-
-"----------------------------------------------------------------------
-" 
-"----------------------------------------------------------------------
-function! quickui#tools#list_snippet()
-endfunc
-
