@@ -221,7 +221,7 @@ function! vimmake#keymap()
 	inoremap <silent><F10> <ESC>:call asyncrun#quickfix_toggle(6)<cr>
 	inoremap <silent><s-f5> <ESC>:AsyncTask project-run<cr>
 	inoremap <silent><s-f6> <ESC>:AsyncTask project-test<cr>
-	inoremap <silent><s-f7> <ESC>:AsyncTask project-ini<cr>
+	inoremap <silent><s-f7> <ESC>:AsyncTask project-init<cr>
 	inoremap <silent><s-f8> <ESC>:AsyncTask project-install<cr>
 	inoremap <silent><s-f9> <ESC>:AsyncTask project-build<cr>
 
