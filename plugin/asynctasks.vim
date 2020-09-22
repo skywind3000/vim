@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/09/21 21:58
-" Verision: 1.7.6
+" Last Modified: 2020/03/25 04:37
+" Verision: 1.7.5
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -872,8 +872,6 @@ function! s:task_option(task)
 			elseif pos == 'hide'
 				let opts.mode = 'term'
 				let opts.pos = 'hide'
-			elseif pos == 'hide-system'
-				let opts.mode = 'hide'
 			elseif pos != 'external' && pos != 'system' && pos != 'os'
 				let opts.mode = 'term'
 				let opts.pos = pos
