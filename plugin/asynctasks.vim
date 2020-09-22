@@ -872,7 +872,7 @@ function! s:task_option(task)
 			elseif pos == 'hide'
 				let opts.mode = 'term'
 				let opts.pos = 'hide'
-			elseif pos == 'background'
+			elseif pos == 'hide-system'
 				let opts.mode = 'hide'
 			elseif pos != 'external' && pos != 'system' && pos != 'os'
 				let opts.mode = 'term'
