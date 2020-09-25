@@ -212,6 +212,11 @@ if has('unix')
 		endif
 		set restorescreen
 	endif
+	" disable modifyOtherKeys
+	if exists('+t_TI') && exists('+t_TE')
+		let &t_TI = ''
+		let &t_TE = ''
+	endif
 endif
 
 
