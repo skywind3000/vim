@@ -161,7 +161,12 @@ if index(g:bundle_group, 'inter') >= 0
 	Plug 'mattn/webapi-vim'
 	Plug 'mattn/gist-vim'
 	Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
-	Plug 'lifepillar/vim-cheat40',
+	if 1
+		Plug 'inkarkat/vim-ingo-library'
+		Plug 'inkarkat/vim-mark'
+	else
+		Plug 'lifepillar/vim-cheat40',
+	endif
 	" Plug 'Yggdroot/indentLine'
 
 	if has('python3') || has('python')
