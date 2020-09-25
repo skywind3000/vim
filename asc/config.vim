@@ -197,7 +197,6 @@ if has('unix')
 		let &t_TI = ''
 		let &t_TE = ''
 	endif
-
 	let s:uname = system('uname')
 	let s:xterm = 0
 	if s:uname =~ "FreeBSD"
