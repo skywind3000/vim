@@ -192,6 +192,12 @@ call s:Filter_Push("Vim Script", "*.vim")
 
 " restore screen after quitting
 if has('unix')
+	" disable modifyOtherKeys
+	if exists('+t_TI') && exists('+t_TE')
+		let &t_TI = ''
+		let &t_TE = ''
+	endif
+
 	let s:uname = system('uname')
 	let s:xterm = 0
 	if s:uname =~ "FreeBSD"
@@ -211,11 +217,6 @@ if has('unix')
 			endif
 		endif
 		set restorescreen
-	endif
-	" disable modifyOtherKeys
-	if exists('+t_TI') && exists('+t_TE')
-		let &t_TI = ''
-		let &t_TE = ''
 	endif
 endif
 
