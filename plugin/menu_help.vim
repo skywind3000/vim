@@ -147,6 +147,7 @@ endfunc
 
 function! MenuHelp_EasyMotion(what)
 	if a:what != ''
+		stopinsert
 		call feedkeys("\<Plug>(easymotion-" . a:what . ")", '')
 	endif
 endfunc
