@@ -1,5 +1,7 @@
 
 let g:EasyMotion_keys = 'asdghklqwertyuiopzxcvbnmfj;'
+let g:EasyMotion_keys = 'asdghklqwertyuiopzxcvbnmfj;1234567890'
+
 let g:EasyMotion_smartcase = 1
 
 nmap <space>q <Plug>(easymotion-s)
