@@ -85,6 +85,7 @@ if index(g:bundle_group, 'simple') >= 0
 	map gZ <Plug>Sneak_S
 
 	IncScript site/bundle/cycle.vim
+	IncScript site/bundle/easymotion.vim
 endif
 
 
