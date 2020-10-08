@@ -1,6 +1,6 @@
 
 let g:EasyMotion_keys = 'asdghklqwertyuiopzxcvbnmfj;'
-let g:EasyMotion_keys = 'asdghklqwertyuiopzxcvbnmfj;123456789'
+let g:EasyMotion_keys = 'asdghklqwertyuiopzxcvbnmfj;23456789'
 
 let g:EasyMotion_smartcase = 1
 
