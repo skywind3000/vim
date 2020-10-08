@@ -145,4 +145,11 @@ function! MenuHelp_SplitLine()
 	exec 'LineBreaker ' . width
 endfunc
 
+function! MenuHelp_EasyMotion(what)
+	if a:what != ''
+		call feedkeys("\<Plug>(easymotion-" . a:what . ")", '')
+	endif
+endfunc
+
+
 
