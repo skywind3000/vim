@@ -7,6 +7,7 @@ nmap <space>z <Plug>(easymotion-bd-w)
 
 nmap <tab>m <Plug>(easymotion-s)
 nmap <tab>n <Plug>(easymotion-bd-w)
+nmap <c-q> <Plug>(easymotion-bd-w)
 
 
 
