@@ -69,8 +69,8 @@ call quickui#menu#install('&Symbol', [
 			\ ])
 
 call quickui#menu#install('&Move', [
-			\ ["EasyMotion &Search", 'call MenuHelp_EasyMotion("s")', 'easymotion-s'],
-			\ ["EasyMotion &Word", 'call MenuHelp_EasyMotion("bd-w")', 'easymotion-bd-w'],
+			\ ["EasyMotion &Search\t<tab>m", 'call MenuHelp_EasyMotion("s")', 'easymotion-s'],
+			\ ["EasyMotion &Word\t<tab>n", 'call MenuHelp_EasyMotion("bd-w")', 'easymotion-bd-w'],
 			\ [ "--" ],
 			\ ["Quickfix &First\t:cfirst", 'cfirst', 'quickfix cursor rewind'],
 			\ ["Quickfix L&ast\t:clast", 'clast', 'quickfix cursor to the end'],
