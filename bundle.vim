@@ -65,6 +65,7 @@ if index(g:bundle_group, 'simple') >= 0
 	Plug 'tpope/vim-fugitive'
 	Plug 'tpope/vim-unimpaired'
 	Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
+	Plug 'sonph/onehalf', {'rtp': 'vim/'}
 	Plug 'bootleq/vim-cycle'
 	Plug 'tpope/vim-surround'
 
