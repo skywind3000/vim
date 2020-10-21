@@ -242,11 +242,12 @@ command! -nargs=+ Log call s:quick_note(<q-args>)
 function! s:quick_note(text)
 	let text = substitute(a:text, '^\s*\(.\{-}\)\s*$', '\1', '')
 	if exists('*writefile') && text != ''
-		let filename = get(g:, 'quick_note_file', '~/.vim/quicknote.md')
-		let notehead = get(g:, 'quick_note_head', '- ')
+		let filename = get(g:, 'quicknote_file', '~/.vim/quicknote.md')
+		let notehead = get(g:, 'quicknote_head', '- ')
 		let notetime = strftime("[%Y-%m-%d %H:%M:%S] ")
-		call writefile([notehead . notetime . text], expand(filename), 'a')
-		redraw
+		let realname = expand(filename)
+		call writefile([notehead . notetime . text], realname, 'a')
+		checktime
 		echo notetime . text
 	endif
 endfunc
