@@ -411,6 +411,11 @@ if index(g:bundle_group, 'floaterm') >= 0
 	Plug 'voldikss/vim-floaterm'
 endif
 
+if index(g:bundle_group, 'tabnine') >= 0
+	Plug 'codota/tabnine-vim'
+	IncScript site/bundle/tabnine.vim
+endif
+
 
 "----------------------------------------------------------------------
 " packages end
