@@ -238,4 +238,17 @@ function! s:open_junk_list()
 	exec "Leaderf file " . fnameescape(expand(junk_dir))
 endfunction
 
+command! -nargs=+ Log call s:quick_note(<q-args>)
+function! s:quick_note(text)
+	let text = substitute(a:text, '^\s*\(.\{-}\)\s*$', '\1', '')
+	if exists('*writefile') && text != ''
+		let filename = get(g:, 'quick_note_file', '~/.vim/quicknote.md')
+		let notehead = get(g:, 'quick_note_head', '- ')
+		let notetime = strftime("[%Y-%m-%d %H:%M:%S] ")
+		call writefile([notehead . notetime . text], expand(filename), 'a')
+		redraw
+		echo notetime . text
+	endif
+endfunc
+
 
