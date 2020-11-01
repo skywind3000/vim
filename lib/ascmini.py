@@ -6,7 +6,7 @@
 # ascmini.py - mini library
 #
 # Created by skywind on 2017/03/24
-# Version: 7, Last Modified: 2019/09/27 07:56
+# Version: 8, Last Modified: 2020/11/01 15:06
 #
 #======================================================================
 from __future__ import print_function
@@ -455,6 +455,8 @@ class PosixKit (object):
         text = self.load_file_text(filename, encoding)
         config = {}
         sect = 'default'
+        if text is None:
+            return None
         for line in text.split('\n'):
             line = line.strip('\r\n\t ')
             if not line:
