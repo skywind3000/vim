@@ -1665,6 +1665,38 @@ def json_loads(text):
 
 
 #----------------------------------------------------------------------
+# misc functions
+#----------------------------------------------------------------------
+
+# calling fzf
+def fzf_execute(input, args = None, fzf = None):
+    import tempfile
+    code = 0
+    output = None
+    args = args is not None and args or ''
+    fzf = fzf is not None and fzf or 'fzf'
+    with tempfile.TemporaryDirectory(prefix = 'fzf.') as dirname:
+        outname = os.path.join(dirname, 'output.txt')
+        if isinstance(input, list):
+            inname = os.path.join(dirname, 'input.txt')
+            with open(inname, 'wb') as fp:
+                content = '\n'.join([ str(n) for n in input ])
+                fp.write(content.encode('utf-8'))
+            cmd = '%s %s < "%s" > "%s"'%(fzf, args, inname, outname)
+        elif isinstance(input, str):
+            cmd = '%s | %s %s > "%s"'%(input, fzf, args, outname)
+        code = os.system(cmd)
+        if os.path.exists(outname):
+            with open(outname, 'rb') as fp:
+                output = fp.read()
+    if output is not None:
+        output = output.decode('utf-8')
+    if code != 0:
+        return None
+    return output
+
+
+#----------------------------------------------------------------------
 # testing case
 #----------------------------------------------------------------------
 if __name__ == '__main__':
