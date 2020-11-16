@@ -241,7 +241,7 @@ endif
 "----------------------------------------------------------------------
 let g:context_menu_git = [
 			\ ["&Stage (add)\ts", 'exec "normal s"' ],
-			\ ["&Unsage (reset)\tu", 'exec "normal u"' ],
+			\ ["&Unstage (reset)\tu", 'exec "normal u"' ],
 			\ ["&Toggle stage/unstage\t-", 'exec "normal -"' ],
 			\ ["Unstage &Everything\tU", 'exec "normal U"' ],
 			\ ["D&iscard change\tX", 'exec "normal X"' ],
@@ -251,11 +251,11 @@ let g:context_menu_git = [
 			\ ["Diff &Horizontal\tdh", 'exec "normal dh"' ],
 			\ ["Diff &Vertical\tdv", 'exec "normal dv"' ],
 			\ ["--"],
-			\ ["&Open file\t<CR>", 'exec "normal \<cr>"' ],
-			\ ["Open in new split\to", 'exec "normal o"' ],
-			\ ["Open in new vsplit\tgO", 'exec "normal gO"' ],
-			\ ["Open in new tab\tO", 'exec "normal O"' ],
-			\ ["Open in preview\tp", 'exec "normal p"' ],
+			\ ["&Open File\t<CR>", 'exec "normal \<cr>"' ],
+			\ ["Open in New Split\to", 'exec "normal o"' ],
+			\ ["Open in New Vsplit\tgO", 'exec "normal gO"' ],
+			\ ["Open in New Tab\tO", 'exec "normal O"' ],
+			\ ["Open in &Preview\tp", 'exec "normal p"' ],
 			\ ["--"],
 			\ ["&Commit\tcc", 'exec "normal cc"' ],
 			\ ]
