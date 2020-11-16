@@ -236,3 +236,41 @@ if has('win32') || has('win64') || has('win16') || has('winxp')
 endif
 
 
+"----------------------------------------------------------------------
+" fugitive 
+"----------------------------------------------------------------------
+let g:context_menu_git = [
+			\ ["&Stage (add)\ts", 'exec "normal s"' ],
+			\ ["&Unsage (reset)\tu", 'exec "normal u"' ],
+			\ ["&Toggle stage/unstage\t-", 'exec "normal -"' ],
+			\ ["Unstage &Everything\tU", 'exec "normal U"' ],
+			\ ["D&iscard change\tX", 'exec "normal X"' ],
+			\ ["--"],
+			\ ["Inline &Diff\t=", 'exec "normal ="' ],
+			\ ["Diff S&plit\tdd", 'exec "normal dd"' ],
+			\ ["Diff &Horizontal\tdh", 'exec "normal dh"' ],
+			\ ["Diff &Vertical\tdv", 'exec "normal dv"' ],
+			\ ["--"],
+			\ ["&Open file\t<CR>", 'exec "normal \<cr>"' ],
+			\ ["Open in new split\to", 'exec "normal o"' ],
+			\ ["Open in new vsplit\tgO", 'exec "normal gO"' ],
+			\ ["Open in new tab\tO", 'exec "normal O"' ],
+			\ ["Open in preview\tp", 'exec "normal p"' ],
+			\ ["--"],
+			\ ["&Commit\tcc", 'exec "normal cc"' ],
+			\ ]
+
+function! s:setup_fugitive()
+	nnoremap <silent><buffer>K :call quickui#tools#clever_context('g', g:context_menu_git, {})<cr>
+endfunc
+
+
+"----------------------------------------------------------------------
+" events
+"----------------------------------------------------------------------
+augroup MenuEvents
+	au!
+	au FileType fugitive call s:setup_fugitive()
+augroup END
+
+
