@@ -591,6 +591,23 @@ function zlua_with_fz() {
 }
 
 
+#----------------------------------------------------------------------
+# mintty background image
+#----------------------------------------------------------------------
+function mintty_set_background() {
+	if [ "$#" -eq 0 ] ; then
+		echo "require image file name !"
+		return
+	fi
+	FILE="$1"
+	if [ -f "$FILE" ] ; then
+		BRIGHT="${2:-100}"
+		printf "\e]11;%s\e\\" "_${FILE},${BRIGHT}"
+	else
+		echo "'$FILE' is not a valid file !"
+	fi
+}
+
 
 #----------------------------------------------------------------------
 # fff 
