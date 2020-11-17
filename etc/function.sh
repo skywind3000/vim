@@ -600,7 +600,9 @@ function mintty_set_background() {
 		return
 	fi
 	FILE="$1"
-	if [ -f "$FILE" ] ; then
+	if [ "$FILE" = "/dev/null" ] ; then
+		printf "\e]11;\e\\"
+	elif [ -f "$FILE" ] ; then
 		BRIGHT="${2:-100}"
 		printf "\e]11;%s\e\\" "_${FILE},${BRIGHT}"
 	else
