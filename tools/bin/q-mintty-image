@@ -1,7 +1,6 @@
 #! /bin/sh
 
-q_mintty_set_bgimg()
-{
+q_mintty_set_bgimg() {
 	if [ "$#" -eq 0 ] ; then
 		echo "require image file name !"
 		return
