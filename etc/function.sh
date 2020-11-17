@@ -597,9 +597,7 @@ function zlua_with_fz() {
 function mintty_set_background() {
 	if [ "$#" -eq 0 ] ; then
 		echo "require image file name !"
-		return
-	fi
-	if [ "$1" = "/dev/null" ] ; then
+	elif [ "$1" = "/dev/null" ] ; then
 		printf "\e]11;\e\\"
 	elif [ -f "$1" ] ; then
 		FILE="$(realpath -s """$1""" 2> /dev/null)"
