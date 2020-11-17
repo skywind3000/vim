@@ -599,14 +599,14 @@ function mintty_set_background() {
 		echo "require image file name !"
 		return
 	fi
-	FILE="$1"
-	if [ "$FILE" = "/dev/null" ] ; then
+	if [ "$1" = "/dev/null" ] ; then
 		printf "\e]11;\e\\"
-	elif [ -f "$FILE" ] ; then
+	elif [ -f "$1" ] ; then
+		FILE="$(realpath -s """$1""" 2> /dev/null)"
 		BRIGHT="${2:-100}"
 		printf "\e]11;%s\e\\" "_${FILE},${BRIGHT}"
 	else
-		echo "'$FILE' is not a valid file !"
+		echo "'$1' is not a valid file !"
 	fi
 }
 
