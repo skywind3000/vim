@@ -99,9 +99,9 @@ function! vimmake#grep(text, cwd)
 		let cmd = 'rg -n --no-heading --color never '. (fixed? '-F ' : '')
 		for item in g:vimmake_grep_exts
 			if s:vimmake_windows == 0
-				let cmd .= " -g \'*.". item . "'"
+				let cmd .= " -g '!*.". item . "'"
 			else
-				let cmd .= ' -g *.'. item
+				let cmd .= ' -g "!*.'. item . '"'
 			endif
 		endfor
 		let cmd .= ' '. shellescape(a:text)
