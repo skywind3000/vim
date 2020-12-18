@@ -13,5 +13,4 @@ tags
 *.pyc
 .tasks
 tools/scratch
-doc/tags
-tags
+/doc/tags

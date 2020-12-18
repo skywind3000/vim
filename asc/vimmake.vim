@@ -97,13 +97,17 @@ function! vimmake#grep(text, cwd)
 		call asyncrun#run('', {'mode':0}, cmd)
 	elseif mode == 'rg'
 		let cmd = 'rg -n --no-heading --color never '. (fixed? '-F ' : '')
-		for item in g:vimmake_grep_exts
-			if s:vimmake_windows == 0
-				let cmd .= " -g \'*.". item . "'"
-			else
-				let cmd .= ' -g "*.'. item . '"'
-			endif
-		endfor
+		if len(g:vimmake_grep_exts) > 0
+			let cmd .= ' --type-clear src '
+			for item in g:vimmake_grep_exts
+				if s:vimmake_windows == 0
+					let cmd .= " --type-add 'src:*.". item . "'"
+				else
+					let cmd .= " --type-add \"src:*.". item . "\""
+				endif
+			endfor
+			let cmd .= " -tsrc "
+		endif
 		let cmd .= ' '. shellescape(a:text)
 		if a:cwd != '.' && a:cwd != ''
 			let cmd .= ' '. shellescape(asyncrun#fullname(a:cwd))
