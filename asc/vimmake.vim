@@ -138,6 +138,64 @@ endfunc
 command! -bang -nargs=+ GrepCode call s:Cmd_GrepCode('<bang>', <f-args>)
 
 
+"----------------------------------------------------------------------
+" list hash tags
+"----------------------------------------------------------------------
+function! vimmake#grep_tag(cwd)
+	let mode = get(g:, 'vimmake_grep_mode', '')
+	let mode = (mode == '')? 'grep' : mode
+	let mode = 'rg'
+	if mode == 'grep'
+		let text = '[\s:\-\.,\(\)\{\}]#\w*'
+		let l:inc = ''
+		for l:item in g:vimmake_grep_exts
+			if s:vimmake_windows == 0
+				let l:inc .= " --include='*." . l:item . "'"
+			else
+				let l:inc .= " --include=*." . l:item
+			endif
+		endfor
+		if a:cwd == '.' || a:cwd == ''
+			let l:inc .= ' *'
+		else
+			let l:full = asyncrun#fullname(a:cwd)
+			let l:inc .= ' '.shellescape(l:full)
+		endif
+		let cmd = 'grep -s -h -R -P '
+		let cmd .= shellescape(text). l:inc .' /dev/null'
+		let cmd .= ' | grep -v -P ' . shellescape('^\s*#')
+		let cmd .= ' | grep -s -h -o -P ' . shellescape(text)
+		let cmd .= ' | grep -s -h -o ' . shellescape('#\w\+')
+		let cmd .= ' | sort | uniq'
+		call asyncrun#run('', {}, cmd)
+	elseif mode == 'rg'
+		let cmd = 'rg --no-heading --no-filename --color never '
+		let text = '[\s:\-\.,\(\)\{\}]#\w+'
+		if len(g:vimmake_grep_exts) > 0
+			let cmd .= ' --type-clear src '
+			for item in g:vimmake_grep_exts
+				if s:vimmake_windows == 0
+					let cmd .= " --type-add 'src:*.". item . "'"
+				else
+					let cmd .= " --type-add \"src:*.". item . "\""
+				endif
+			endfor
+			let cmd .= " -tsrc "
+		endif
+		let cmd .= ' '. shellescape(text)
+		if a:cwd != '.' && a:cwd != ''
+			let cmd .= ' '. shellescape(asyncrun#fullname(a:cwd))
+		else
+			let cmd .= ' .'
+		endif
+		let cmd .= ' | rg -v ' . shellescape('^\s*#')
+		let cmd .= ' | rg -o ' . shellescape(text)
+		let cmd .= ' | rg -o ' . shellescape('#\w+')
+		let cmd .= ' | sort | uniq'
+		call asyncrun#run('', {'mode':0}, cmd)
+	endif
+endfunc
+
 
 "----------------------------------------------------------------------
 " cscope easy
