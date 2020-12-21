@@ -72,12 +72,12 @@ function! vimmake#grep(text, cwd)
 	elseif mode == 'findstr'
 		let l:inc = ''
 		for l:item in g:vimmake_grep_exts
-            if a:cwd == '.' || a:cwd == ''
-                let l:inc .= '*.'.l:item.' '
-            else
-                let l:full = asyncrun#fullname(a:cwd)
+			if a:cwd == '.' || a:cwd == ''
+				let l:inc .= '*.'.l:item.' '
+			else
+				let l:full = asyncrun#fullname(a:cwd)
 				let l:inc .= '"%CD%/*.'.l:item.'" '
-            endif
+			endif
 		endfor
 		let options = { 'cwd':a:cwd }
 		call asyncrun#run('', options, 'findstr /n /s /C:"'.a:text.'" '.l:inc)
@@ -91,9 +91,9 @@ function! vimmake#grep(text, cwd)
 			let cmd .= '-G '.shellescape('('.join(inc, '|').')$'). ' '
 		endif
 		let cmd .= '--nogroup --nocolor '.shellescape(a:text)
-        if a:cwd != '.' && a:cwd != ''
+		if a:cwd != '.' && a:cwd != ''
 			let cmd .= ' '. shellescape(asyncrun#fullname(a:cwd))
-        endif
+		endif
 		call asyncrun#run('', {'mode':0}, cmd)
 	elseif mode == 'rg'
 		let cmd = 'rg -n --no-heading --color never '. (fixed? '-F ' : '')
@@ -117,14 +117,14 @@ function! vimmake#grep(text, cwd)
 endfunc
 
 function! s:Cmd_GrepCode(bang, what, ...)
-    let l:cwd = (a:0 == 0)? fnamemodify(expand('%'), ':h') : a:1
-    if a:bang != ''
-        let l:cwd = asyncrun#get_root(l:cwd)
-    endif
-    if l:cwd != ''
-        let l:cwd = asyncrun#fullname(l:cwd)
-    endif
-    call vimmake#grep(a:what, l:cwd)
+	let l:cwd = (a:0 == 0)? fnamemodify(expand('%'), ':h') : a:1
+	if a:bang != ''
+		let l:cwd = asyncrun#get_root(l:cwd)
+	endif
+	if l:cwd != ''
+		let l:cwd = asyncrun#fullname(l:cwd)
+	endif
+	call vimmake#grep(a:what, l:cwd)
 	let title = 'GrepCode' . a:bang . ' '. a:what
 	if has('nvim') == 0 && (v:version >= 800 || has('patch-7.4.2210'))
 		call setqflist([], 'a', {'title':title})
@@ -339,24 +339,24 @@ if !exists('g:vimmake_ctags_flags')
 endif
 
 function! vimmake#update_tags(cwd, mode, outname)
-    if a:cwd == '!'
-        let l:cwd = asyncrun#get_root('%')
-    else
-        let l:cwd = asyncrun#fullname(a:cwd)
-        let l:cwd = fnamemodify(l:cwd, ':p:h')
-    endif
-    let l:cwd = substitute(l:cwd, '\\', '/', 'g')
+	if a:cwd == '!'
+		let l:cwd = asyncrun#get_root('%')
+	else
+		let l:cwd = asyncrun#fullname(a:cwd)
+		let l:cwd = fnamemodify(l:cwd, ':p:h')
+	endif
+	let l:cwd = substitute(l:cwd, '\\', '/', 'g')
 	if a:mode == 'ctags' || a:mode == 'ct'
-        let l:ctags = s:PathJoin(l:cwd, a:outname)
+		let l:ctags = s:PathJoin(l:cwd, a:outname)
 		if filereadable(l:ctags)
 			try | call delete(l:ctags) | catch | endtry
 		endif
-        let l:options = {}
-        let l:options['cwd'] = l:cwd
-        let l:command = 'ctags -R -f '. shellescape(l:ctags)
+		let l:options = {}
+		let l:options['cwd'] = l:cwd
+		let l:command = 'ctags -R -f '. shellescape(l:ctags)
 		let l:parameters = ' '. g:vimmake_ctags_flags. ' '
 		let l:parameters .= '--sort=yes '
-        call asyncrun#run('', l:options, l:command . l:parameters . ' .')
+		call asyncrun#run('', l:options, l:command . l:parameters . ' .')
 	endif
 	if index(['cscope', 'cs', 'pycscope', 'py'], a:mode) >= 0
 		let l:fullname = s:PathJoin(l:cwd, a:outname)
