@@ -139,11 +139,11 @@ command! -bang -nargs=+ GrepCode call s:Cmd_GrepCode('<bang>', <f-args>)
 
 
 "----------------------------------------------------------------------
-" list hash tags
+" returns cmd
 "----------------------------------------------------------------------
-function! vimmake#grep_tag(cwd)
+function! vimmake#hashtag(cmd)
 	let mode = get(g:, 'vimmake_grep_mode', '')
-	let mode = (mode == '')? 'grep' : mode
+	let mode = (mode == '' || mode == 'findstr')? 'grep' : mode
 	let mode = 'rg'
 	if mode == 'grep'
 		let text = '[\s:\-\.,\(\)\{\}]#\w*'
@@ -166,8 +166,7 @@ function! vimmake#grep_tag(cwd)
 		let cmd .= ' | grep -v -P ' . shellescape('^\s*#')
 		let cmd .= ' | grep -s -h -o -P ' . shellescape(text)
 		let cmd .= ' | grep -s -h -o ' . shellescape('#\w\+')
-		let cmd .= ' | sort | uniq'
-		call asyncrun#run('', {}, cmd)
+		return cmd
 	elseif mode == 'rg'
 		let cmd = 'rg --no-heading --no-filename --color never '
 		let text = '[\s:\-\.,\(\)\{\}]#\w+'
@@ -191,6 +190,18 @@ function! vimmake#grep_tag(cwd)
 		let cmd .= ' | rg -v ' . shellescape('^\s*#')
 		let cmd .= ' | rg -o ' . shellescape(text)
 		let cmd .= ' | rg -o ' . shellescape('#\w+')
+		return cmd
+	endif
+	return ''
+endfunc
+
+
+"----------------------------------------------------------------------
+" list hash tags
+"----------------------------------------------------------------------
+function! vimmake#grep_tag(cwd)
+	let cmd = vimmake#hashtag(cwd)
+	if cmd != ''
 		let cmd .= ' | sort | uniq'
 		call asyncrun#run('', {'mode':0}, cmd)
 	endif
