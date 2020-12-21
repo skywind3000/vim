@@ -141,7 +141,7 @@ command! -bang -nargs=+ GrepCode call s:Cmd_GrepCode('<bang>', <f-args>)
 "----------------------------------------------------------------------
 " returns cmd
 "----------------------------------------------------------------------
-function! s:hashtag_cmd(cwd)
+function! vimmake#hashtag(cwd)
 	let mode = get(g:, 'vimmake_grep_mode', '')
 	let mode = (mode == '' || mode == 'findstr')? 'grep' : mode
 	if mode == 'grep'
@@ -193,73 +193,6 @@ function! s:hashtag_cmd(cwd)
 	endif
 	return ''
 endfunc
-
-
-" list hash tags in quickfix
-function! vimmake#grep_tag(cwd)
-	let cmd = s:hashtag_cmd(a:cwd)
-	if cmd != ''
-		let cmd .= ' | sort | uniq'
-		call asyncrun#run('', {'mode':0}, cmd)
-	endif
-endfunc
-
-
-" returns hashtags
-function! vimmake#list_tag(cwd)
-	let cmd = s:hashtag_cmd(a:cwd)
-	if cmd != ''
-		let text = asclib#core#system(cmd)
-		" let text = iconv(text, 'gbk', &encoding)
-		let tags = {}
-		if g:asclib#core#shell_error != 0
-			return {}
-		endif
-		for t in split(text, '\n')
-			let t = substitute(t, '^\s*\(.\{-}\)\s*$', '\1', '')
-			if t != ''
-				let tags[t] = str2nr(get(tags, t, '')) + 1
-			endif
-		endfor
-		return tags
-	endif
-	return []
-endfunc
-
-
-" GrepTag
-function! s:Cmd_GrepTag(bang, ...)
-	let l:cwd = (a:0 == 0)? fnamemodify(expand('%'), ':h') : a:1
-	if a:bang != ''
-		let l:cwd = asyncrun#get_root(l:cwd)
-	endif
-	if l:cwd != ''
-		let l:cwd = asyncrun#fullname(l:cwd)
-	endif
-	redraw
-	echohl Title
-	echo 'waiting ...'
-	echohl None
-	let tags = vimmake#list_tag(l:cwd)
-	redraw
-	echo ''
-	redraw
-	if len(tags) == 0
-		return
-	endif
-	let opts = {}
-	let opts.title = 'Hash Tag'
-	let cmds = []
-	for key in sort(keys(tags))
-		let text = key . "\t" . tags[key] . "\t" . l:cwd
-		let cmd = 'GrepCode' . a:bang . ' ' . fnameescape(key) . ' '
-		let item = [text, cmd . ' ' . fnameescape(l:cwd)]
-		let cmds += [item]
-	endfor
-	call quickui#tools#clever_listbox('hashtags', cmds, opts)
-endfunc
-
-command! -bang -nargs=* GrepTag call s:Cmd_GrepTag('<bang>', <f-args>)
 
 
 "----------------------------------------------------------------------
