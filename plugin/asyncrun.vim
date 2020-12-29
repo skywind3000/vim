@@ -1860,7 +1860,7 @@ endfunc
 " asyncrun - version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.7.5'
+	return '2.7.6'
 endfunc
 
 
