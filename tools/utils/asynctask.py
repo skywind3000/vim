@@ -7,7 +7,7 @@
 # Maintainer: skywind3000 (at) gmail.com, 2020
 #
 # Last Modified: 2020/12/29 22:05
-# Verision: 1.1.0
+# Verision: 1.1.1
 #
 # for more information, please visit:
 # https://github.com/skywind3000/asynctasks.vim
@@ -835,6 +835,16 @@ class TaskManager (object):
             return 5
         return 0
 
+    def raw_input (self, prompt):
+        try:
+            if sys.version_info[0] < 3:
+                text = raw_input(prompt)  # noqa: F821
+            else:
+                text = input(prompt)
+        except KeyboardInterrupt:
+            return ''
+        return text
+
     def command_input (self, command):
         mark_open = '$(?'
         mark_close = ')'
@@ -850,17 +860,39 @@ class TaskManager (object):
                 break
             name = command[p1 + size_open:p2]
             mark = mark_open + name + mark_close
-            prompt = 'Input argument (%s): '%name
-            try:
-                if sys.version_info[0] < 3:
-                    text = raw_input(prompt)  # noqa: F821
+            tail = ''
+            p3 = name.find(':')
+            if p3 >= 0:
+                tail = name[p3 + 1:].strip()
+                name = name[:p3].strip()
+            if ',' not in tail:
+                prompt = 'Input argument (%s): '%name
+                text = self.raw_input(prompt)
+                if not text:
+                    text = tail.strip()
+            else:
+                select = []
+                names = []
+                for part in tail.split(','):
+                    part = part.replace('&', '').strip()
+                    if part:
+                        select.append(part)
+                if len(select) == 0:
+                    prompt = 'Input argument (%s): '%name
+                    text = self.raw_input(prompt)
                 else:
-                    text = input(prompt)
-            except KeyboardInterrupt:
-                return ''
-            p3 = mark.find(':')
-            if p3 >= 0 and (not text):
-                text = mark[p3 + 1:-1]
+                    print('Select argument (%s): '%name)
+                    for index, part in enumerate(select):
+                        print('%d. %s'%(index + 1, part))
+                    text = ''
+                    if len(select) > 0:
+                        index = self.raw_input('Type number: ')
+                        try:
+                            index = int(index)
+                        except:
+                            index = 0
+                        if index > 0 and index <= len(select):
+                            text = select[index - 1]
             text = text.strip()
             if not text:
                 return ''

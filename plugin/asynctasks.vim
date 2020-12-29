@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/12/29 21:42
-" Verision: 1.8.0
+" Last Modified: 2020/12/30 00:39
+" Verision: 1.8.1
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -844,20 +844,44 @@ function! s:command_input(command, taskname, remember)
 			endif
 		endif
 		let rkey = a:taskname . ':' . name
+		let ikey = rkey . ':pos'
+		let select = []
+		let lastid = -1
 		if remember && text == ''
 			let text = get(g:asynctasks_history, rkey, '')
 			" echom 'remember: <' . text . '>'
+		elseif stridx(text, ',') >= 0
+			for part in split(text, ',')
+				let part = s:strip(part)
+				if part != ''
+					let select += [part]
+				endif
+			endfor
+			let lastid = str2nr(get(g:asynctasks_history, ikey, ''))
 		endif
-		echohl Type
 		call inputsave()
-		try
-			let t = input('Input argument (' . name . '): ', text)
-		catch /^Vim:Interrupt$/
-			let t = ""
-		endtry
+		if len(select) == 0
+			echohl Type
+			try
+				let t = input('Input argument (' . name . '): ', text)
+			catch /^Vim:Interrupt$/
+				let t = ""
+			endtry
+			echohl None
+			let g:asynctasks_history[rkey] = t
+		else
+			let items = join(select, "\n")
+			let t = ''
+			try
+				let choice = confirm('Choose argument (' . name . ')', items, lastid)
+				if choice > 0
+					let g:asynctasks_history[ikey] = choice
+					let t = s:replace(select[choice - 1], '&', '')
+				endif
+			catch /^Vim:Interrupt$/
+			endtry
+		endif
 		call inputrestore()
-		echohl None
-		let g:asynctasks_history[rkey] = t
 		if t == ''
 			return ''
 		endif
