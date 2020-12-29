@@ -88,25 +88,25 @@ endfunc
 " join two path
 "----------------------------------------------------------------------
 function! asclib#path#join(home, name)
-    let l:size = strlen(a:home)
-    if l:size == 0 | return a:name | endif
+	let l:size = strlen(a:home)
+	if l:size == 0 | return a:name | endif
 	if asclib#path#isabs(a:name)
 		return a:name
 	endif
-    let l:last = strpart(a:home, l:size - 1, 1)
-    if has("win32") || has("win64") || has("win16") || has('win95')
-        if l:last == "/" || l:last == "\\"
-            return a:home . a:name
-        else
-            return a:home . '/' . a:name
-        endif
-    else
-        if l:last == "/"
-            return a:home . a:name
-        else
-            return a:home . '/' . a:name
-        endif
-    endif
+	let l:last = strpart(a:home, l:size - 1, 1)
+	if has("win32") || has("win64") || has("win16") || has('win95')
+		if l:last == "/" || l:last == "\\"
+			return a:home . a:name
+		else
+			return a:home . '/' . a:name
+		endif
+	else
+		if l:last == "/"
+			return a:home . a:name
+		else
+			return a:home . '/' . a:name
+		endif
+	endif
 endfunc
 
 
@@ -286,7 +286,7 @@ function! s:find_root(path, markers, strict)
 			endif
 		endwhile
 		return ''
-    endfunc
+	endfunc
 	if a:path == '%'
 		if exists('b:asyncrun_root') && b:asyncrun_root != ''
 			return b:asyncrun_root

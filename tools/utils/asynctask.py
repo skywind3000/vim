@@ -6,8 +6,8 @@
 #
 # Maintainer: skywind3000 (at) gmail.com, 2020
 #
-# Last Modified: 2020/03/21 20:52
-# Verision: 1.0.9
+# Last Modified: 2020/12/29 22:05
+# Verision: 1.1.0
 #
 # for more information, please visit:
 # https://github.com/skywind3000/asynctasks.vim
@@ -656,12 +656,16 @@ class configure (object):
     # search for local configs
     def collect_local_config (self):
         names = self.search_parent(self.home)
+        parts = self.cfg_name.split(',')
         for name in names:
-            t = os.path.abspath(os.path.join(name, self.cfg_name))
-            if not os.path.exists(t):
-                continue
-            obj = self.read_ini(t)
-            self.config_merge(self.tasks, obj, t, 'local')
+            for part in parts:
+                part = part.strip('\r\n\t ')
+                if not part:
+                    continue
+                t = os.path.abspath(os.path.join(name, part))
+                if os.path.exists(t):
+                    obj = self.read_ini(t)
+                    self.config_merge(self.tasks, obj, t, 'local')
         return 0
 
     # merge global and local config

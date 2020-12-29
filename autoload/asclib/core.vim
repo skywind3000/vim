@@ -176,7 +176,7 @@ function! s:system_msys(cmd)
 		call asclib#core#errmsg("msys does not exist in " .. msys)
 		return ''
 	endif
-    let last = strpart(msys, strlen(msys) - 1, 1)
+	let last = strpart(msys, strlen(msys) - 1, 1)
 	let name = (last == '/' || last == "\\")? msys : (msys .. '/')
 	let name = name .. 'usr/bin/bash.exe'
 	if !executable(name)

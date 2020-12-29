@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/03/25 04:37
-" Verision: 1.7.5
+" Last Modified: 2020/12/29 21:42
+" Verision: 1.8.0
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -35,7 +35,7 @@ endif
 " task profile
 let g:asynctasks_profile = get(g:, 'asynctasks_profile', 'debug')
 
-" local config
+" local config, can be a comma separated list like '.tasks,.git/.tasks'
 let g:asynctasks_config_name = get(g:, 'asynctasks_config_name', '.tasks')
 
 " global config in every runtimepath
@@ -100,11 +100,11 @@ let g:asynctasks_edit_split = get(g:, 'asynctasks_edit_split', '')
 
 " Add highlight colors if they don't exist.
 if !hlexists('AsyncRunSuccess')
-        highlight link AsyncRunSuccess ModeMsg
+	highlight link AsyncRunSuccess ModeMsg
 endif
 
 if !hlexists('AsyncRunFailure')
-        highlight link AsyncRunFailure ErrorMsg
+	highlight link AsyncRunFailure ErrorMsg
 endif
 
 
@@ -266,16 +266,37 @@ function! s:chdir(path)
 	silent execute cmd . ' '. fnameescape(a:path)
 endfunc
 
-" search files upwards
-function! s:search_parent(name, cwd)
-	let finding = findfile(a:name, a:cwd . '/;', -1)
-	let output = []
-	for name in finding
-		let name = fnamemodify(name, ':p')
-		let output += [s:abspath(name)]
-	endfor
-	call reverse(output)
-	return output
+" join two path
+function! s:path_join(home, name)
+	let l:size = strlen(a:home)
+	if l:size == 0 | return a:name | endif
+	let l:last = strpart(a:home, l:size - 1, 1)
+	if has("win32") || has("win64") || has("win16") || has('win95')
+		let l:first = strpart(a:name, 0, 1)
+		if l:first == "/" || l:first == "\\"
+			let head = strpart(a:home, 1, 2)
+			if index([":\\", ":/"], head) >= 0
+				return strpart(a:home, 0, 2) . a:name
+			endif
+			return a:name
+		elseif index([":\\", ":/"], strpart(a:name, 1, 2)) >= 0
+			return a:name
+		endif
+		if l:last == "/" || l:last == "\\"
+			return a:home . a:name
+		else
+			return a:home . '/' . a:name
+		endif
+	else
+		if strpart(a:name, 0, 1) == "/"
+			return a:name
+		endif
+		if l:last == "/"
+			return a:home . a:name
+		else
+			return a:home . '/' . a:name
+		endif
+	endif
 endfunc
 
 " get absolute path
@@ -307,6 +328,46 @@ function! s:abspath(path)
 		endif
 	endif
 	return f
+endfunc
+
+" config names
+function! s:config_names()
+	let cname = g:asynctasks_config_name
+	let parts = (type(cname) == 1)? split(cname, ',') : cname
+	let names = []
+	for name in parts
+		let t = s:strip(name)
+		if t != ''
+			let names += [t]
+		endif
+	endfor
+	return names
+endfunc
+
+" search files upwards
+function! s:search_parent(path)
+	let config = s:config_names()
+	let output = []
+	let root = s:abspath(a:path)
+	if len(config) == 0
+		return []
+	endif
+	while 1
+		for name in config
+			let test = s:path_join(root, name)
+			let test = s:abspath(test)
+			if filereadable(test)
+				let output += [test]
+			endif
+		endfor
+		let prev = root
+		let root = fnamemodify(root, ':h')
+		if root == prev
+			break
+		endif
+	endwhile
+	call reverse(output)
+	return output
 endfunc
 
 
@@ -572,7 +633,7 @@ endfunc
 " fetch local config
 "----------------------------------------------------------------------
 function! s:compose_local_config(path)
-	let names = s:search_parent(g:asynctasks_config_name, a:path)
+	let names = s:search_parent(a:path)
 	let config = {}
 	for name in names
 		let s:error = ''
@@ -1182,31 +1243,31 @@ endfunc
 " config template
 "----------------------------------------------------------------------
 let s:template = [
-	\ '# vim: set fenc=utf-8 ft=dosini:',
-	\ '',
-	\ '# define a new task named "file-build"',
-	\ '[file-build]',
-	\ '',
-	\ '# shell command, use quotation for filenames containing spaces',
-	\ '# check ":AsyncTaskMacro" to see available macros',
-	\ 'command=gcc "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)"',
-	\ '',
-	\ '# working directory, can change to $(VIM_ROOT) for project root',
-	\ 'cwd=$(VIM_FILEDIR)',
-	\ '',
-	\ '# output mode, can be one of quickfix and terminal',
-	\ '# - quickfix: output to quickfix window',
-	\ '# - terminal: run the command in the internal terminal',
-	\ 'output=quickfix',
-	\ '',
-	\ '# this is for output=quickfix only',
-	\ "# if it is omitted, vim's current errorformat will be used.",
-	\ 'errorformat=%f:%l:%m',
-	\ '',
-	\ '# save file before execute',
-	\ 'save=1',
-	\ '',
-	\ ]
+			\ '# vim: set fenc=utf-8 ft=dosini:',
+			\ '',
+			\ '# define a new task named "file-build"',
+			\ '[file-build]',
+			\ '',
+			\ '# shell command, use quotation for filenames containing spaces',
+			\ '# check ":AsyncTaskMacro" to see available macros',
+			\ 'command=gcc "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)"',
+			\ '',
+			\ '# working directory, can change to $(VIM_ROOT) for project root',
+			\ 'cwd=$(VIM_FILEDIR)',
+			\ '',
+			\ '# output mode, can be one of quickfix and terminal',
+			\ '# - quickfix: output to quickfix window',
+			\ '# - terminal: run the command in the internal terminal',
+			\ 'output=quickfix',
+			\ '',
+			\ '# this is for output=quickfix only',
+			\ "# if it is omitted, vim's current errorformat will be used.",
+			\ 'errorformat=%f:%l:%m',
+			\ '',
+			\ '# save file before execute',
+			\ 'save=1',
+			\ '',
+			\ ]
 
 
 "----------------------------------------------------------------------
@@ -1220,7 +1281,7 @@ function! s:task_edit(mode, path, template)
 	if name == ''
 		if a:mode ==# '-e'
 			let name = asyncrun#get_root('%')
-			let name = name . '/' . g:asynctasks_config_name
+			let name = name . '/' . (s:config_names()[0])
 		elseif has('nvim')
 			if $XDG_CONFIG_HOME != ''
 				let name = $XDG_CONFIG_HOME . '/' . g:asynctasks_rtp_config
@@ -1318,45 +1379,45 @@ endfunc
 " macro help 
 "----------------------------------------------------------------------
 let s:macros = { 
-	\ 'VIM_FILEPATH': 'File name of current buffer with full path',
-	\ 'VIM_FILENAME': 'File name of current buffer without path',
-	\ 'VIM_FILEDIR': 'Full path of current buffer without the file name',
-	\ 'VIM_FILEEXT': 'File extension of current buffer',
-	\ 'VIM_FILETYPE': 'File type (value of &ft in vim)',
-	\ 'VIM_FILENOEXT': 
-		\ 'File name of current buffer without path and extension',
-	\ 'VIM_PATHNOEXT':
-		\ 'Current file name with full path but without extension',
-	\ 'VIM_CWD': 'Current directory',
-	\ 'VIM_RELDIR': 'File path relativize to current directory',
-	\ 'VIM_RELNAME': 'File name relativize to current directory',
-	\ 'VIM_ROOT': 'Project root directory',
-	\ 'VIM_PRONAME': 'Name of current project root directory',
-	\ 'VIM_DIRNAME': "Name of current directory",
-	\ 'VIM_CWORD': 'Current word under cursor',
-	\ 'VIM_CFILE': 'Current filename under cursor',
-	\ 'VIM_CLINE': 'Cursor line number in current buffer',
-	\ 'VIM_GUI': 'Is running under gui ?',
-	\ 'VIM_VERSION': 'Value of v:version',
-	\ 'VIM_COLUMNS': "How many columns in vim's screen",
-	\ 'VIM_LINES': "How many lines in vim's screen", 
-	\ 'VIM_SVRNAME': 'Value of v:servername for +clientserver usage',
-	\ 'VIM_PROFILE': 'Current building profile (debug/release/...)',
-	\ 'WSL_FILEPATH': '(WSL) File name of current buffer with full path',
-	\ 'WSL_FILENAME': '(WSL) File name of current buffer without path',
-	\ 'WSL_FILEDIR': 
-		\ '(WSL) Full path of current buffer without the file name',
-	\ 'WSL_FILEEXT': '(WSL) File extension of current buffer',
-	\ 'WSL_FILENOEXT': 
-		\ '(WSL) File name of current buffer without path and extension',
-	\ 'WSL_PATHNOEXT':
-		\ '(WSL) Current file name with full path but without extension',
-	\ 'WSL_CWD': '(WSL) Current directory',
-	\ 'WSL_RELDIR': '(WSL) File path relativize to current directory',
-	\ 'WSL_RELNAME': '(WSL) File name relativize to current directory',
-	\ 'WSL_ROOT': '(WSL) Project root directory',
-	\ 'WSL_CFILE': '(WSL) Current filename under cursor',
-	\ }
+			\ 'VIM_FILEPATH': 'File name of current buffer with full path',
+			\ 'VIM_FILENAME': 'File name of current buffer without path',
+			\ 'VIM_FILEDIR': 'Full path of current buffer without the file name',
+			\ 'VIM_FILEEXT': 'File extension of current buffer',
+			\ 'VIM_FILETYPE': 'File type (value of &ft in vim)',
+			\ 'VIM_FILENOEXT': 
+			\ 'File name of current buffer without path and extension',
+			\ 'VIM_PATHNOEXT':
+			\ 'Current file name with full path but without extension',
+			\ 'VIM_CWD': 'Current directory',
+			\ 'VIM_RELDIR': 'File path relativize to current directory',
+			\ 'VIM_RELNAME': 'File name relativize to current directory',
+			\ 'VIM_ROOT': 'Project root directory',
+			\ 'VIM_PRONAME': 'Name of current project root directory',
+			\ 'VIM_DIRNAME': "Name of current directory",
+			\ 'VIM_CWORD': 'Current word under cursor',
+			\ 'VIM_CFILE': 'Current filename under cursor',
+			\ 'VIM_CLINE': 'Cursor line number in current buffer',
+			\ 'VIM_GUI': 'Is running under gui ?',
+			\ 'VIM_VERSION': 'Value of v:version',
+			\ 'VIM_COLUMNS': "How many columns in vim's screen",
+			\ 'VIM_LINES': "How many lines in vim's screen", 
+			\ 'VIM_SVRNAME': 'Value of v:servername for +clientserver usage',
+			\ 'VIM_PROFILE': 'Current building profile (debug/release/...)',
+			\ 'WSL_FILEPATH': '(WSL) File name of current buffer with full path',
+			\ 'WSL_FILENAME': '(WSL) File name of current buffer without path',
+			\ 'WSL_FILEDIR': 
+			\ '(WSL) Full path of current buffer without the file name',
+			\ 'WSL_FILEEXT': '(WSL) File extension of current buffer',
+			\ 'WSL_FILENOEXT': 
+			\ '(WSL) File name of current buffer without path and extension',
+			\ 'WSL_PATHNOEXT':
+			\ '(WSL) Current file name with full path but without extension',
+			\ 'WSL_CWD': '(WSL) Current directory',
+			\ 'WSL_RELDIR': '(WSL) File path relativize to current directory',
+			\ 'WSL_RELNAME': '(WSL) File name relativize to current directory',
+			\ 'WSL_ROOT': '(WSL) Project root directory',
+			\ 'WSL_CFILE': '(WSL) Current filename under cursor',
+			\ }
 
 
 "----------------------------------------------------------------------
@@ -1383,7 +1444,7 @@ function! s:expand_macros()
 	let macros['VIM_LINES'] = ''.&lines
 	let macros['VIM_GUI'] = has('gui_running')? 1 : 0
 	let macros['VIM_ROOT'] = asyncrun#get_root('%')
-    let macros['VIM_HOME'] = expand(split(&rtp, ',')[0])
+	let macros['VIM_HOME'] = expand(split(&rtp, ',')[0])
 	let macros['VIM_PRONAME'] = fnamemodify(macros['VIM_ROOT'], ':t')
 	let macros['VIM_DIRNAME'] = fnamemodify(macros['VIM_CWD'], ':t')
 	let macros['VIM_PROFILE'] = g:asynctasks_profile
@@ -1614,7 +1675,7 @@ endfunc
 "----------------------------------------------------------------------
 
 command! -bang -nargs=* -range=0 -complete=customlist,s:complete AsyncTask
-		\ call asynctasks#cmd('<bang>', <q-args>, <count>, <line1>, <line2>)
+			\ call asynctasks#cmd('<bang>', <q-args>, <count>, <line1>, <line2>)
 
 
 "----------------------------------------------------------------------
