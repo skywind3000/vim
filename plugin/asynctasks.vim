@@ -4,7 +4,7 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/12/30 13:20
+" Last Modified: 2020/12/30 13:22
 " Verision: 1.8.2
 "
 " for more information, please visit:
@@ -1588,8 +1588,12 @@ function! asynctasks#cmd(bang, args, ...)
 					endif
 					let candidates += ['&' . (ii + 1) . ' ' . parts[ii]]
 				endfor
-				let prompt = 'Change profile to'
-				let choice = confirm(prompt, join(candidates, "\n"), index)
+				let prompt = 'Change profile to: '
+				try
+					let choice = confirm(prompt, join(candidates, "\n"), index)
+				catch /^Vim:Interrupt$/
+					return 0
+				endtry
 				if choice < 1 || choice > len(parts)
 					return 0
 				endif
