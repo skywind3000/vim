@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2020/12/30 00:39
-" Verision: 1.8.1
+" Last Modified: 2020/12/30 13:20
+" Verision: 1.8.2
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1574,9 +1574,27 @@ function! asynctasks#cmd(bang, args, ...)
 		return 0
 	endif
 	if has_key(opts, 'p')
-		let profile = args
+		let profile = s:strip(args)
 		if profile != ''
-			let g:asynctasks_profile = profile
+			let parts = filter(split(args, ' '), 'v:val != ""')
+			if len(parts) == 1
+				let g:asynctasks_profile = profile
+			else
+				let index = -1
+				let candidates = []
+				for ii in range(len(parts))
+					if parts[ii] == g:asynctasks_profile
+						let index = ii + 1
+					endif
+					let candidates += ['&' . (ii + 1) . ' ' . parts[ii]]
+				endfor
+				let prompt = 'Change profile to'
+				let choice = confirm(prompt, join(candidates, "\n"), index)
+				if choice < 1 || choice > len(parts)
+					return 0
+				endif
+				let g:asynctasks_profile = parts[choice - 1]
+			endif
 		endif
 		echohl Number
 		echo 'Current profile: '. g:asynctasks_profile
