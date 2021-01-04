@@ -145,6 +145,7 @@ FAST_HIGHLIGHT[chroma-git]="chroma/-ogit.ch"
 unsetopt correct_all
 unsetopt share_history
 setopt prompt_subst
+unsetopt prompt_cr prompt_sp
 
 setopt BANG_HIST                 # Treat the '!' character specially during expansion.
 setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
