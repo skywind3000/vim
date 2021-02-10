@@ -1,0 +1,30 @@
+#! /bin/sh
+
+SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+SCRIPT="$SCRIPTPATH/asynctask.py"
+
+if [ ! -e "$SCRIPT" ]; then
+	SCRIPTPATH="$(readlink """$0""")"
+	SCRIPTPATH="$( cd "$(dirname "$SCRIPTPATH")" >/dev/null 2>&1 ; pwd -P )"
+	SCRIPT="$SCRIPTPATH/asynctask.py"
+fi
+
+if [ -e "$SCRIPT" ]; then
+	if [ -x "$(which python 2> /dev/null)" ]; then
+		python "$SCRIPT" "$@"
+	elif [ -x "$(which python3 2> /dev/null)" ]; then
+		python3 "$SCRIPT" "$@"
+	elif [ -x "$(which python2 2> /dev/null)" ]; then
+		python2 "$SCRIPT" "$@"
+	elif [ -x "/usr/bin/python" ]; then
+		/usr/bin/python "$SCRIPT" "$@"
+	elif [ -x "/usr/bin/python3" ]; then
+		/usr/bin/python3 "$SCRIPT" "$@"
+	elif [ -x "/usr/bin/python2" ]; then
+		/usr/bin/python2 "$SCRIPT" "$@"
+	fi
+else
+	echo "Error: not find asynctask.py" 
+	exit 1
+fi
+

@@ -1,0 +1,24 @@
+#! /bin/sh
+
+DIR_ARCHIVE="${DIR_ARCHIVE:-$HOME/archive}"
+DIR_SCRATCH="${DIR_SCRATCH:-$HOME/scratch}"
+
+if [ -z "$(ls -A """$DIR_SCRATCH""")" ]; then
+        echo "folder: $DIR_SCRATCH is empty"
+        exit
+fi
+
+if [ ! -d "$DIR_ARCHIVE" ]; then
+        mkdir -p "$DIR_ARCHIVE"
+fi
+
+DATE="$(date '+%Y-%m-%d')"
+
+DIR_DST="$DIR_ARCHIVE/$DATE"
+
+if [ ! -d "$DIR_DST" ]; then
+        mkdir -p "$DIR_DST"
+fi
+
+mv $DIR_SCRATCH/* "$DIR_DST"
+

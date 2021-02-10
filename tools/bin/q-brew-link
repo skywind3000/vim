@@ -1,0 +1,13 @@
+#! /bin/sh
+
+if [ -n "$1" ]; then
+	if [ -x "/home/linuxbrew/.linuxbrew/bin/$1" ]; then
+		NAME="$(readlink -f /home/linuxbrew/.linuxbrew/bin/$1)"
+		ln -s "$NAME" ~/.local/bin/
+	else
+		echo "missing: /home/linuxbrew/.linuxbrew/bin/$1"
+	fi
+else
+	echo "usage: q-brew-link <name>"
+fi
+

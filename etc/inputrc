@@ -1,0 +1,36 @@
+# $HOME/inputrc - global inputrc for libreadline
+# See readline(3readline) and `info rluserman' for more information.
+# vim: set ts=4 sw=4 tw=0 noet ft=readline :
+
+# the following line is actually
+# equivalent to "\C-?": delete-char
+"\e[3~": delete-char
+
+# VT
+"\e[1~": beginning-of-line
+"\e[4~": end-of-line
+
+# kvt
+"\e[H": beginning-of-line
+"\e[F": end-of-line
+
+# rxvt and konsole (i.e. the KDE-app...)
+"\e[7~": beginning-of-line
+"\e[8~": end-of-line
+
+# VT220
+"\eOH": beginning-of-line
+"\eOF": end-of-line
+
+# navigation
+"\eh": backward-char
+"\el": forward-char
+"\ej": next-history
+"\ek": previous-history
+"\eH": backward-word
+"\eL": forward-word
+"\eJ": beginning-of-line
+"\eK": end-of-line
+
+
+

@@ -1,0 +1,15 @@
+#! /bin/sh
+
+
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+
+
+CHEAT=""
+
+[ -f "$SCRIPTPATH/../lib/cheat.py" ] && CHEAT="$SCRIPTPATH/../lib/cheat.py"
+[ -n "$CHEAT"] && [ ! -f "$CHEAT" ] && CHEAT="$HOME/.local/lib/python/cheat.py"
+[ ! -f "$CHEAT" ] && [ -n "$VIM_CONFIG" ] && CHEAT="$VIM_CONFIG/lib/cheat.py"
+
+env python2 "$CHEAT" $@
+

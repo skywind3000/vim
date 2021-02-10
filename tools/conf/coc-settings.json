@@ -1,0 +1,53 @@
+{
+	"snippets.ultisnips.directories": [
+		"snippets"
+	],
+
+
+	"coc.source.coc-snippets.enable": true,
+	"suggest.enablePreview": true,
+
+    "list.autoResize": false,
+    "list.maxHeight": 15,
+    "list.source.grep.defaultArgs": ["-smartcase", "-regex"],
+    "list.source.grep.defaultOptions": ["--interactive", "--no-sort", "--regex"],
+    "python.jediEnabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.pylintArgs": ["--disable=wildcard-import,invalid-name,missing-function-docstring,broad-except,logging-format-interpolation,missing-module-docstring,missing-class-docstring,line-too-long,too-few-public-methods,inconsistent-return-statements,too-many-branches,too-many-locals,too-many-statements,too-many-arguments,too-many-instance-attributes", "--enable=unused-import"],
+    "pyright.reportMissintTypeStubs": false,
+    "snippets.extends": {
+        "cpp": ["c"],
+        "javascriptreact": ["javascript"],
+        "typescript": ["javascript"]
+    },
+    "snippets.trace": "verbose",
+    "suggest.completionItemKindLabels": {
+        "class": "\uf0e8",
+        "color": "\ue22b",
+        "constant": "\uf8ff",
+        "default": "\uf29c",
+        "event": "\ufacd",
+        "enum": "\uf435",
+        "enumMember": "\uf02b",
+        "field": "\uf93d",
+        "file": "\uf471",
+        "folder": "\uf115",
+        "function": "\uf794",
+        "interface": "\ufa52",
+        "keyword": "\uf893",
+        "method": "\uf6a6",
+        "module": "\uf668",
+        "operator": "\uf915",
+        "property": "\ufab6",
+        "reference": "\uf87a",
+        "snippet": "\uf64d",
+        "struct": "\ufb44",
+        "text": "\ue612",
+        "typeParameter": "\uf278",
+        "unit": "\uf475",
+        "value": "\uf8a3",
+        "variable": "\uf71b"
+    }
+}
+
