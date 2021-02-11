@@ -128,6 +128,9 @@ function! asclib#core#system(cmd, ...)
 		call asclib#core#chdir(previous)
 	endif
 	let g:asclib#core#shell_error = s:shell_error
+	if (a:0) > 1 && has('iconv')
+		let hr = iconv(hr, a:2, &encoding)
+	endif
 	return hr
 endfunc
 
@@ -217,6 +220,9 @@ function! asclib#core#unix_system(cmd, ...)
 	endif
 	if cwd != ''
 		call asclib#core#chdir(previous)
+	endif
+	if (a:0) > 1 && has('iconv')
+		let hr = iconv(hr, a:2, &encoding)
 	endif
 	return hr
 endfunc
