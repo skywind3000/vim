@@ -116,32 +116,7 @@ endfunc
 " full file name
 "----------------------------------------------------------------------
 function! asclib#path#fullname(f)
-	let f = a:f
-	if f =~ "'."
-		try
-			redir => m
-			silent exe ':marks' f[1]
-			redir END
-			let f = split(split(m, '\n')[-1])[-1]
-			let f = filereadable(f)? f : ''
-		catch
-			let f = '%'
-		endtry
-	endif
-	if f == '%'
-		let f = expand('%')
-		if &bt == 'terminal' || &bt == 'nofile'
-			let f = ''
-		endif
-	endif
-	let f = fnamemodify(f, ':p')
-	if s:windows
-		let f = substitute(f, "\\", '/', 'g')
-	endif
-	if f =~ '\/$'
-		let f = fnamemodify(f, ':h')
-	endif
-	return f
+	return asclib#path#abspath(f)
 endfunc
 
 

@@ -21,7 +21,7 @@ endfunc
 " string strip
 "----------------------------------------------------------------------
 function! asclib#string#strip(text)
-	return substitute(a:text, '^\s*\(.\{-}\)\s*$', '\1', '')
+	return substitute(a:text, '^\s*\(.\{-}\)[\s\r\n]*$', '\1', '')
 endfunc
 
 
