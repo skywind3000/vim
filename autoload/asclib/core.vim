@@ -228,4 +228,55 @@ function! asclib#core#unix_system(cmd, ...)
 endfunc
 
 
+"----------------------------------------------------------------------
+" write script to a file and return filename
+"----------------------------------------------------------------------
+function! asclib#core#script_write(name, command, pause)
+	let tmpname = fnamemodify(tempname(), ':h') . '\' . (a:name) . '.cmd'
+	let command = a:command
+	if s:windows != 0
+		let lines = ["@echo off\r"]
+		let $VIM_COMMAND = a:command
+		let $VIM_PAUSE = (a:pause)? 'pause' : ''
+		if a:pause < 0
+			let $VIM_PAUSE = 'timeout ' . (-(a:pause)) . ' > nul'
+		endif
+		let lines += ["call %VIM_COMMAND% \r"]
+		let lines += ["set VIM_EXITCODE=%ERRORLEVEL%\r"]
+		let lines += ["call %VIM_PAUSE% \r"]
+		let lines += ["exit %VIM_EXITCODE%\r"]
+	else
+		let shell = split(&shell, ' ')[0]
+		let shell = (shell == 'fish')? 'bash' : shell
+		let lines = ['#! ' . shell]
+		let lines += [command]
+		if a:pause > 0
+			if executable('bash')
+				let pause = 'read -n1 -rsp "press any key to continue ..."'
+				let lines += ['bash -c ''' . pause . '''']
+			else
+				let lines += ['echo "press enter to continue ..."']
+				let lines += ['sh -c "read _tmp_"']
+			endif
+		elseif a:pause < 0
+			let lines += ['sleep ' . (-(a:pause))]
+		endif
+		let tmpname = fnamemodify(tempname(), ':h') . '/' . (a:name) . '.sh'
+	endif
+	if v:version >= 700
+		call writefile(lines, tmpname)
+	else
+		exe 'redir ! > '.fnameescape(tmpname)
+		for line in lines
+			silent echo line
+		endfor
+		redir END
+	endif
+	if s:windows == 0
+		if exists('*setfperm')
+			silent! call setfperm(tmpname, 'rwxrwxrws')
+		endif
+	endif
+	return tmpname
+endfunc
 
