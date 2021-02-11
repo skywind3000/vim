@@ -116,7 +116,7 @@ endfunc
 " full file name
 "----------------------------------------------------------------------
 function! asclib#path#fullname(f)
-	return asclib#path#abspath(f)
+	return asclib#path#abspath(a:f)
 endfunc
 
 

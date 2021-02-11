@@ -1040,5 +1040,18 @@ command! -nargs=* -bang OpenURL call s:OpenURL(<q-args>, '<bang>')
 command! -nargs=0 -bang PlugBrowse call s:OpenURL('', '<bang>')
 
 
+"----------------------------------------------------------------------
+" browse code in github oitlab
+"----------------------------------------------------------------------
+function! s:BrowseGit(name, bang, ...)
+	let name = asclib#string#strip(a:name)
+	let raw = (a:0 > 0)? (a:1) : 0
+	let url = asclib#utils#git_browse(name, raw)
+	if url != ''
+		call s:OpenURL(url, a:bang)
+	endif
+endfunc
+
+command! -nargs=* -bang BrowseGit call s:BrowseGit(<q-args>, '<bang>')
 
 

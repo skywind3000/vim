@@ -292,3 +292,76 @@ function! asclib#utils#open_url(url, ...)
 endfunc
 
 
+"----------------------------------------------------------------------
+" browse code in github gitlab
+"----------------------------------------------------------------------
+function! asclib#utils#git_browse(name, ...)
+	let name = (a:name == '')? expand('%:p') : (a:name)
+	let root = asclib#cvs#root(name)
+	if root == ''
+		return ''
+	endif
+	let remote = asclib#cvs#git_remote(root, 'origin')
+	if remote == ''
+		return ''
+	endif
+	let branch = asclib#cvs#git_branch(root)
+	if branch == ''
+		return ''
+	endif
+	let uri = asclib#cvs#git_fullname(name)
+	if uri == ''
+		return ''
+	endif
+	let raw = (a:0 > 0)? (a:1) : 0
+	if remote =~ '^https:\/\/github\.com\/'
+		let text = matchstr(remote, '^https:\/\/github\.com\/\zs.*$')
+		if text =~ '\.git$'
+			let text = matchstr(text, '.*\ze\.git$')
+		endif
+		let url = 'https://github.com/' . text 
+		if raw == 0
+			return url . '/blob/' . branch . '/' . uri
+		else
+			return url . '/raw/' . branch . '/' . uri
+		endif
+	elseif remote =~ '^git@github\.com:'
+		let text = matchstr(remote, '^git@github\.com:\zs.*$')
+		if text =~ '\.git$'
+			let text = matchstr(text, '.*\ze\.git$')
+		endif
+		let url = 'https://github.com/' . text 
+		if raw == 0
+			return url . '/blob/' . branch . '/' . uri
+		else
+			return url . '/raw/' . branch . '/' . uri
+		endif
+	elseif remote =~ '^https:\/\/gitlab\.com\/'
+		let text = matchstr(remote, '^https:\/\/gitlab\.com\/\zs.*$')
+		if text =~ '\.git$'
+			let text = matchstr(text, '.*\ze\.git$')
+		endif
+		let url = 'https://gitlab.com/' . text 
+		if raw == 0
+			return url . '/-/blob/' . branch . '/' . uri
+		else
+			return url . '/-/raw/' . branch . '/' . uri
+		endif
+	elseif remote =~ '^git@gitlab\.com:'
+		let text = matchstr(remote, '^git@gitlab\.com:\zs.*$')
+		if text =~ '\.git$'
+			let text = matchstr(text, '.*\ze\.git$')
+		endif
+		let url = 'https://gitlab.com/' . text 
+		if raw == 0
+			return url . '/-/blob/' . branch . '/' . uri
+		else
+			return url . '/-/raw/' . branch . '/' . uri
+		endif
+	endif
+	return ''
+endfunc
+
+
+
+
