@@ -117,8 +117,16 @@ endfunc
 "----------------------------------------------------------------------
 " call system 
 "----------------------------------------------------------------------
-function! asclib#core#system(cmd)
+function! asclib#core#system(cmd, ...)
+	let cwd = ((a:0) > 0)? (a:1) : ''
+	if cwd != ''
+		let previous = getcwd()
+		call asclib#core#chdir(cwd)
+	endif
 	let hr = s:python_system(a:cmd, get(g:, 'asclib#core#python', 0))
+	if cwd != ''
+		call asclib#core#chdir(previous)
+	endif
 	let g:asclib#core#shell_error = s:shell_error
 	return hr
 endfunc
@@ -191,16 +199,26 @@ endfunc
 "----------------------------------------------------------------------
 " call system() in linux/unix, or use wsl/msys for windows
 "----------------------------------------------------------------------
-function! asclib#core#unix_system(cmd)
+function! asclib#core#unix_system(cmd, ...)
+	let cwd = ((a:0) > 0)? (a:1) : ''
+	if cwd != ''
+		let previous = getcwd()
+		call asclib#core#chdir(cwd)
+	endif
 	if s:windows == 0
-		return system(a:cmd)
-	endif
-	let msys = get(g:, 'asclib#core#msys_home', '')
-	if msys == ''
-		return s:system_wsl(a:cmd)
+		let hr = system(a:cmd)
 	else
-		return s:system_msys(a:cmd)
+		let msys = get(g:, 'asclib#core#msys_home', '')
+		if msys == ''
+			let hr = s:system_wsl(a:cmd)
+		else
+			let hr = s:system_msys(a:cmd)
+		endif
 	endif
+	if cwd != ''
+		call asclib#core#chdir(previous)
+	endif
+	return hr
 endfunc
 
 
