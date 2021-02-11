@@ -43,16 +43,18 @@ function! asclib#path#abspath(path)
 			let f = '%'
 		endtry
 	endif
-	let f = (f != '%')? f : expand('%')
+	if f == '%'
+		let f = expand('%')
+		if &bt == 'terminal' || &bt == 'nofile'
+			let f = ''
+		endif
+	endif
 	let f = fnamemodify(f, ':p')
-	if s:windows != 0
+	if s:windows
 		let f = substitute(f, "\\", '/', 'g')
 	endif
-	if len(f) > 1
-		let size = len(f)
-		if f[size - 1] == '/'
-			let f = strpart(f, 0, size - 1)
-		endif
+	if f =~ '\/$'
+		let f = fnamemodify(f, ':h')
 	endif
 	return f
 endfunc
@@ -128,7 +130,7 @@ function! asclib#path#fullname(f)
 	endif
 	if f == '%'
 		let f = expand('%')
-		if &bt == 'terminal'
+		if &bt == 'terminal' || &bt == 'nofile'
 			let f = ''
 		endif
 	endif

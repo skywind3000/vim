@@ -562,7 +562,7 @@ function! quickui#core#fullname(f)
 	endif
 	if f == '%'
 		let f = expand('%')
-		if &bt == 'terminal'
+		if &bt == 'terminal' || &bt == 'nofile'
 			let f = ''
 		endif
 	endif
