@@ -276,6 +276,16 @@ function! asclib#utils#open_url(url, ...)
 		let browser = (browser == '')? 'open' : browser
 		call system(browser . ' ' . url . ' &')
 	else
+		let cmd = '/mnt/c/Windows/System32/cmd.exe'
+		if $WSL_DISTRO_NAME != '' && executable(cmd)
+			if executable('xdg-open') == 0 || browser =~ '\\'
+				if $WSL_DISTRO_NAME != ''
+					let browser = (browser == '')? 'start' : browser
+					call system(cmd . ' /C ' . browser . ' ' . url . ' &')
+					return
+				endif
+			endif
+		endif
 		let browser = (browser == '')? 'xdg-open' : browser
 		call system(browser . ' ' . url . ' &')
 	endif
