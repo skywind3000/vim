@@ -27,6 +27,7 @@ call quickui#menu#install("&File", [
 			\ [ "&Terminal Tab", 'OpenTerminal tab', 'Open internal terminal in a new tab'],
 			\ [ "Terminal Spl&it", 'OpenTerminal right', 'Open internal terminal in a split'],
 			\ [ "Open &URL", 'OpenURL', 'Open URL under cursor'],
+			\ [ "Browse &Git", 'BrowseGit', 'Browse code in github'],
 			\ ])
 
 if has('win32') || has('win64') || has('win16')
