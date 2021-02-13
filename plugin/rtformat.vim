@@ -144,10 +144,12 @@ function! s:check_enable()
 		return 0
 	endif
 	if &ft == 'vim'
+		call s:errmsg('unsupported filetype: ' . &ft)
 		return 0
 	elseif &ft == 'python'
 		return 1
 	endif
+	call s:errmsg('unsupported filetype: ' . &ft)
 	return 0
 endfunc
 
@@ -162,16 +164,24 @@ function! s:RTFormatEnable()
 	silent! iunmap <buffer> <cr>
 	inoremap <buffer><cr> <c-\><c-o>:call RealTimeFormatCode()<cr>
 	let b:rtf_enable = 1
+	redraw
+	echohl TODO
+	echo "RTFormat is enabled in current buffer, exit with :RTFormatDisable"
+	echohl None
 	return 0
 endfunc
 
 function! s:RTFormatDisable()
-	if s:check_enable() != 0
+	if s:check_enable() == 0
 		return 0
 	endif
 	if get(b:, 'rtf_enable', 0) != 0
 		silent! iunmap <buffer> <cr>
 	endif
+	redraw
+	echohl TODO
+	echo "RTFormat is disabled in current buffer"
+	echohl None
 	let b:rtf_enable = 0
 endfunc
 
