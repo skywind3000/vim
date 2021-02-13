@@ -128,7 +128,6 @@ function! RealTimeFormatCode()
 			call feedkeys("\<end>", 'n')
 		endif
 	endif
-	" return pumvisible()? "\<c-y>\<cr>" : "\<cr>"
 	if pumvisible()
 		call feedkeys("\<c-y>\<cr>", 'n')
 	else
