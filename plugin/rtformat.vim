@@ -16,10 +16,6 @@ let g:rtf_python = get(g:, 'rtf_python', 0)
 
 
 "----------------------------------------------------------------------
-" output error message
-"----------------------------------------------------------------------
-
-"----------------------------------------------------------------------
 " python
 "----------------------------------------------------------------------
 let s:py_cmd = ''
@@ -93,15 +89,15 @@ function! s:format_line(text)
 		let body = matchstr(a:text, '^\s*\zs.*$')
 		exec s:py_cmd "import vim"
 		exec s:py_cmd "__t = vim.eval('body')"
-		if 0
+		if 1
+			exec s:py_cmd "import autopep8"
+			exec s:py_cmd "__o = {'select':['E', 'W']}"
+			exec s:py_cmd "__t = autopep8.fix_code(__t, options = __o)"
+		else
 			exec s:py_cmd "import yapf.yapflib.yapf_api"
 			exec s:py_cmd "__t = yapf.yapflib.yapf_api.FormatCode(__t)"
 			exec s:py_cmd "if type(__t) == type([]): __t = __t[0]"
 			exec s:py_cmd "if type(__t) == type((0,)): __t = __t[0]"
-		else
-			exec s:py_cmd "import autopep8"
-			exec s:py_cmd "__o = {'select':['E', 'W']}"
-			exec s:py_cmd "__t = autopep8.fix_code(__t, options = __o)"
 		endif
 		exec s:py_cmd '__t = __t.strip("\r\n\t ")'
 		" exec s:py_cmd "print(repr(__t))"
