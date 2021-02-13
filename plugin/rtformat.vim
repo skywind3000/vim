@@ -176,7 +176,7 @@ function! s:RTFormatEnable()
 		return 0
 	endif
 	silent! iunmap <buffer> <cr>
-	inoremap <buffer><cr> <c-\><c-o>:call RealTimeFormatCode()<cr>
+	inoremap <silent><buffer><cr> <c-\><c-o>:call RealTimeFormatCode()<cr>
 	let b:rtf_enable = 1
 	redraw
 	echohl TODO
