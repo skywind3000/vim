@@ -94,7 +94,7 @@ let s:pep8_rules += ['E265', 'E266', 'E27']
 " format line
 "----------------------------------------------------------------------
 function! s:format_line(text)
-	if &ft == 'python'
+	if &ft == 'python' || &ft == 'c' || &ft == 'cpp' || &ft == 'lua'
 		let head = matchstr(a:text, '^\s*')
 		let body = matchstr(a:text, '^\s*\zs.*$')
 		exec s:py_cmd "import vim"
@@ -156,7 +156,7 @@ function! s:check_enable()
 	if &ft == 'vim'
 		call s:errmsg('unsupported filetype: ' . &ft)
 		return 0
-	elseif &ft == 'python'
+	elseif &ft == 'python' || &ft == 'c' || &ft == 'cpp' || &ft == 'lua'
 		return 1
 	endif
 	call s:errmsg('unsupported filetype: ' . &ft)
