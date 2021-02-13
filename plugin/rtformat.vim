@@ -86,8 +86,8 @@ endfunc
 let s:pep8_rules = ['E101', 'E11', 'E121', 'E122', 'E123', 'E124', 'E125']
 let s:pep8_rules += ['E126', 'E127', 'E128', 'E129',  'E131', 'E133', ]
 let s:pep8_rules += ['E20', 'E211', 'E22', 'E224', 'E225', 'E226', 'E227']
-let s:pep8_rules += ['E228', 'E231', 'E241', 'E242', 'E251', 'E252', 'E26']
-let s:pep8_rules += ['E265', 'E266', 'E27']
+let s:pep8_rules += ['E228', 'E231', 'E241', 'E242', 'E251', 'E252']
+let s:pep8_rules += ['E27']
 
 
 "----------------------------------------------------------------------
@@ -97,11 +97,15 @@ function! s:format_line(text)
 	if &ft == 'python' || &ft == 'c' || &ft == 'cpp' || &ft == 'lua'
 		let head = matchstr(a:text, '^\s*')
 		let body = matchstr(a:text, '^\s*\zs.*$')
+		let rules = deepcopy(s:pep8_rules)
+		if &ft == 'python'
+			let rules += ['E26', 'E265', 'E266']
+		endif
 		exec s:py_cmd "import vim"
 		exec s:py_cmd "__t = vim.eval('body')"
 		if 1
 			exec s:py_cmd "import autopep8"
-			exec s:py_cmd "__o = {'select':vim.eval('s:pep8_rules')}"
+			exec s:py_cmd "__o = {'select':vim.eval('rules')}"
 			exec s:py_cmd "__t = autopep8.fix_code(__t, options = __o)"
 		else
 			exec s:py_cmd "import yapf.yapflib.yapf_api"
