@@ -1,3 +1,13 @@
+"======================================================================
+"
+" leaderf_snippet.vim - 
+"
+" Created by skywind on 2021/02/01
+" Last Modified: 2021/02/13 21:07:12
+"
+"======================================================================
+
+
 "----------------------------------------------------------------------
 " Query SnipMate Database
 "----------------------------------------------------------------------
@@ -88,13 +98,26 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" checks
+"----------------------------------------------------------------------
+
+function! s:check_snipmate()
+	return (exists(':SnipMateOpenSnippetFiles') == 2)
+endfunc
+
+function! s:check_ultisnips()
+	return (exists(':UltiSnipsEdit') == 2)
+endfunc
+
+
+"----------------------------------------------------------------------
 " internal 
 "----------------------------------------------------------------------
 let s:bufid = -1
 let s:filetype = ''
 let s:accept = ''
 let s:snips = {}
-let s:is_snipmate = 0
+let s:snip_engine = -1
 let s:inited = 0
 let g:Lf_Extensions = get(g:, 'Lf_Extensions', {})
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
@@ -103,11 +126,16 @@ function! s:init_python()
 	if s:inited != 0
 		return 0
 	endif
-	if exists(':UltiSnipsEdit') == 2
-		let s:is_snipmate = 0
+	if s:check_snipmate()
+		let s:snip_engine = 0
+		let s:inited = 1
+		return 0
+	elseif s:check_ultisnips()
+		let s:snip_engine = 1
 		call UltiSnips#SnippetsInCurrentScope(1)
 	else
-		let s:is_snipmate = 1
+		let s:snip_engine = -1
+		let s:inited = 1
 		return 0
 	endif
 	exec g:Lf_py 'import sys, vim'
@@ -116,7 +144,7 @@ function! s:init_python()
 	exec g:Lf_py 'import leaderf_snippet'
 	if g:Lf_PythonVersion == 2
 		exec 'py2' 'import imp'
-		exec 'py3' 'imp.reload(leaderf_snippet)'
+		exec 'py2' 'imp.reload(leaderf_snippet)'
 	else
 		exec 'py3' 'import importlib'
 		exec 'py3' 'importlib.reload(leaderf_snippet)'
@@ -127,17 +155,26 @@ function! s:init_python()
 endfunc
 
 function! s:lf_snippet_source(...)
-	let s:is_snipmate = (exists(':UltiSnipsEdit') != 2)
 	let source = []
 	if s:inited == 0
 		call s:init_python()
 		let s:inited = 1
 	endif
-	if s:is_snipmate
+	if s:snip_engine == 0
 		let matches = SnipMateQuery('', 0)
-	else
+	elseif s:snip_engine == 1
 		" let matches = UltiSnipsQuery()
 		let matches = UltiSnipsQuery2()
+	else
+		let error = "ERROR: Require UltiSnip (recommended) or SnipMate !!"
+		redraw
+		echohl ErrorMsg
+		echom error
+		echohl None
+		let source += [error]
+		let source += [error]
+		let source += [error]
+		return source
 	endif
 	let snips = {}
 	let width = 100
@@ -146,7 +183,7 @@ function! s:lf_snippet_source(...)
 		if trigger =~ '^\u'
 			continue
 		endif
-		if s:is_snipmate
+		if s:snip_engine == 0
 			let desc = SnipMateDescription(item[1], width)
 			let snips[trigger] = item[1]
 		else
@@ -172,14 +209,14 @@ function! s:lf_snippet_accept(line, arg)
 	redraw
 	if name != ''
 		let s:accept = name . "\<Plug>snipMateTrigger"
-		if s:is_snipmate
+		if s:snip_engine == 0
 			if mode(1) =~ 'i'
 				call feedkeys(name . "\<Plug>snipMateTrigger", '!')
 				" call feedkeys(name . "\<c-r>=snipMate#TriggerSnippet(1)\<cr>", '!')
 			else
 				call feedkeys('a' . name . "\<Plug>snipMateTrigger", '!')
 			endif
-		else
+		elseif s:snip_engine == 1
 			if mode(1) =~ 'i'
 				call feedkeys("\<right>", '!')
 				" call feedkeys("" .  name . "\<m-e>", '!')
