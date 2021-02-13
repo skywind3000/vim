@@ -169,7 +169,9 @@ function! s:RTFormatDisable()
 	if s:check_enable() != 0
 		return 0
 	endif
-	silent! iunmap <buffer> <cr>
+	if get(b:, 'rtf_enable', 0) != 0
+		silent! iunmap <buffer> <cr>
+	endif
 	let b:rtf_enable = 0
 endfunc
 
