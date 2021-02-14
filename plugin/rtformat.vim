@@ -149,11 +149,9 @@ function! RealTimeFormatCode()
 		let text = s:format_line(body)
 		let b:rtformat_text = text
 		let hr = pumvisible()? "\<c-y>" : ""
-		" let hr .= "\<c-g>u\<c-u>"
 		let hr .= "\<c-g>u\<esc>S"
 		let hr .= "\<c-r>=b:rtformat_text\<cr>"
 		let hr .= "\<c-r>=\"\\n\"\<cr>"
-		" echo "info: " . s:repr(hr) . " -> " . s:repr(b:rtformat_text)
 		return hr
 	endif
 	let text = pumvisible()? "\<c-y>" : ""
@@ -213,5 +211,23 @@ endfunc
 
 command! -nargs=0 RTFormatEnable call s:RTFormatEnable()
 command! -nargs=0 RTFormatDisable call s:RTFormatDisable()
+
+
+"----------------------------------------------------------------------
+" autocmd
+"----------------------------------------------------------------------
+
+if get(g:, 'rtformat_auto', 0)
+	augroup RTFormatGroup
+		au!
+		autocmd FileType python silent RTFormatEnable
+	augroup END
+else
+	augroup RTFormatGroup
+		au!
+	augroup END
+endif
+
+
 
 
