@@ -101,13 +101,13 @@ if index(g:bundle_group, 'basic') >= 0
 	Plug 'pprovost/vim-ps1', { 'for': 'ps1' }
 	Plug 'tbastos/vim-lua', { 'for': 'lua' }
 	Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['c', 'cpp'] }
-	" Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
 	Plug 'vim-python/python-syntax', { 'for': ['python'] }
 	Plug 'pboettch/vim-cmake-syntax', { 'for': ['cmake'] }
 	Plug 'beyondmarc/hlsl.vim'
 	Plug 'tpope/vim-eunuch'
 	Plug 'dag/vim-fish'
 	Plug 'skywind3000/vim-dict'
+	" Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
 	
 	if has('python3') || has('python')
 		Plug 'Yggdroot/LeaderF'
@@ -149,22 +149,20 @@ end
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'inter') >= 0
 	Plug 'vim-scripts/L9'
-	" Plug 'wsdjeg/FlyGrep.vim'
-	" Plug 'tpope/vim-abolish'
 	Plug 'honza/vim-snippets'
-	" Plug 'vim-scripts/FuzzyFinder'
-	" Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 	Plug 'xolox/vim-notes', { 'on': ['Note', 'SearchNotes', 'DeleteNotes', 'RecentNotes'] }
 	Plug 'skywind3000/vimoutliner', { 'for': 'votl' }
 	Plug 'mattn/webapi-vim'
 	Plug 'mattn/gist-vim'
 	Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
+
 	if 1
 		Plug 'inkarkat/vim-ingo-library'
 		Plug 'inkarkat/vim-mark'
 	else
 		Plug 'lifepillar/vim-cheat40',
 	endif
+
 	" Plug 'Yggdroot/indentLine'
 
 	if get(g:, 'asc_usnip', 0) == 0 || (has('python3') == 0 && has('python') == 0)
@@ -237,14 +235,14 @@ if index(g:bundle_group, 'opt') >= 0
 		let g:gutentags_modules += ['gtags_cscope']
 	endif
 	if len(g:gutentags_modules) > 0
-		" Plug 'ludovicchabant/vim-gutentags'
-		Plug 'skywind3000/vim-gutentags'
+		Plug 'ludovicchabant/vim-gutentags'
+		" Plug 'skywind3000/vim-gutentags'
 	endif
-
 
 	if s:uname == 'windows' 
 		let g:python3_host_prog="python"
 	endif
+
 	if 1
 		" Echo translation in the cmdline
 		nmap <silent> <Leader>tt <Plug>Translate
