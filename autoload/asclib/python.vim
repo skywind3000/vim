@@ -68,8 +68,11 @@ let g:asclib#python#rtp = fnamemodify(g:asclib#python#locate, ':h:h')
 function! asclib#python#exec(script) abort
 	if s:py_version == 0
 		call asclib#common#errmsg('vim does not support python')
-	else
+	elseif type(a:script) == 1
 		exec s:py_cmd a:script
+	elseif type(a:script) == 3
+		let code = join(a:script, "\n")
+		exec s:py_cmd code
 	endif
 endfunc
 
@@ -77,10 +80,19 @@ function! asclib#python#eval(script) abort
 	if s:py_version == 0
 		call asclib#common#errmsg('vim does not support python')
 		return -1
-	elseif s:py_version == 2
-		return pyeval(a:script)
-	elseif s:py_version == 3
-		return py3eval(a:script)
+	else
+		if type(a:script) == 1
+			let code = a:script
+		elseif type(a:script) == 3
+			let code = join(a:script, "\n")
+		else
+			let code = "0"
+		endif
+		if s:py_version == 2
+			return pyeval(code)
+		elseif s:py_version == 3
+			return py3eval(code)
+		endif
 	endif
 endfunc
 
