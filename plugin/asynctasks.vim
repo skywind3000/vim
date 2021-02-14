@@ -4,7 +4,7 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2021/02/14 19:17
+" Last Modified: 2021/02/14 19:33
 " Verision: 1.8.6
 "
 " for more information, please visit:
@@ -580,7 +580,7 @@ function! s:collect_rtp_config() abort
 			let names += [t]
 		endif
 		if $XDG_CONFIG_HOME != ''
-			let t = $XDG_CONFIG_HOME . '/' . rtp_name
+			let t = $XDG_CONFIG_HOME . '/nvim/' . rtp_name
 		else
 			let t = expand('~/.config/nvim') . '/' . rtp_name
 		endif
