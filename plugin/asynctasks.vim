@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2021/02/03 14:13
-" Verision: 1.8.5
+" Last Modified: 2021/02/14 19:17
+" Verision: 1.8.6
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -321,7 +321,14 @@ function! s:abspath(path)
 			let f = '%'
 		endtry
 	endif
-	let f = (f != '%')? f : expand('%')
+	if f == '%'
+		let f = expand('%')
+		if &bt == 'terminal' || &bt == 'nofile'
+			let f = ''
+		endif
+	elseif f =~ '^\~[\/\\]'
+		let f = expand(f)
+	endif
 	let f = fnamemodify(f, ':p')
 	if s:windows != 0
 		let f = substitute(f, '\/', '\\', 'g')
@@ -329,11 +336,8 @@ function! s:abspath(path)
 		let f = substitute(f, '\\', '\/', 'g')
 	endif
 	let f = substitute(f, '\\', '\/', 'g')
-	if len(f) > 1
-		let size = len(f)
-		if f[size - 1] == '/'
-			let f = strpart(f, 0, size - 1)
-		endif
+	if f =~ '\/$'
+		let f = fnamemodify(f, ':h')
 	endif
 	return f
 endfunc

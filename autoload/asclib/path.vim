@@ -3,7 +3,7 @@
 " path.vim - 
 "
 " Created by skywind on 2018/04/25
-" Last Modified: 2020/03/22 15:51
+" Last Modified: 2021/02/14 19:14
 "
 "======================================================================
 
@@ -48,6 +48,8 @@ function! asclib#path#abspath(path)
 		if &bt == 'terminal' || &bt == 'nofile'
 			let f = ''
 		endif
+	elseif f =~ '^\~[\/\\]'
+		let f = expand(f)
 	endif
 	let f = fnamemodify(f, ':p')
 	if s:windows
