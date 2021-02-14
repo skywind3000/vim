@@ -79,6 +79,13 @@ function! s:check_python()
 	return 0
 endfunc
 
+function! s:repr(value)
+	exec s:py_cmd 'import vim'
+	exec s:py_cmd '__t = repr(vim.eval("a:value"))'
+	exec 'let hr = ' . s:py_eval . '("__t")'
+	return hr
+endfunc
+
 
 "----------------------------------------------------------------------
 " rules to apply
@@ -89,30 +96,33 @@ let s:pep8_rules += ['E20', 'E211', 'E22', 'E224', 'E225', 'E226', 'E227']
 let s:pep8_rules += ['E228', 'E231', 'E241', 'E242', 'E251', 'E252']
 let s:pep8_rules += ['E27']
 
+" for python
+let s:pep8_python = deepcopy(s:pep8_rules)
+let s:pep8_python += ['E26', 'E265', 'E266']
+let s:pep8_python += ['E', 'W']
+
+
+"----------------------------------------------------------------------
+" language maps
+"----------------------------------------------------------------------
+let s:enable_ft = {"python":1, "c":1, "cpp":1, "lua":1, "java":1,
+			\ "javascript":1, "json":1, "actionscript":1, 
+			\ }
+
 
 "----------------------------------------------------------------------
 " format line
 "----------------------------------------------------------------------
 function! s:format_line(text)
-	if &ft == 'python' || &ft == 'c' || &ft == 'cpp' || &ft == 'lua'
+	if has_key(s:enable_ft, &ft)
 		let head = matchstr(a:text, '^\s*')
 		let body = matchstr(a:text, '^\s*\zs.*$')
-		let rules = deepcopy(s:pep8_rules)
-		if &ft == 'python'
-			let rules += ['E26', 'E265', 'E266']
-		endif
+		let rules = (&ft != 'python')? s:pep8_rules : s:pep8_python
 		exec s:py_cmd "import vim"
 		exec s:py_cmd "__t = vim.eval('body')"
-		if 1
-			exec s:py_cmd "import autopep8"
-			exec s:py_cmd "__o = {'select':vim.eval('rules')}"
-			exec s:py_cmd "__t = autopep8.fix_code(__t, options = __o)"
-		else
-			exec s:py_cmd "import yapf.yapflib.yapf_api"
-			exec s:py_cmd "__t = yapf.yapflib.yapf_api.FormatCode(__t)"
-			exec s:py_cmd "if type(__t) == type([]): __t = __t[0]"
-			exec s:py_cmd "if type(__t) == type((0,)): __t = __t[0]"
-		endif
+		exec s:py_cmd "import autopep8"
+		exec s:py_cmd "__o = {'select':vim.eval('rules')}"
+		exec s:py_cmd "__t = autopep8.fix_code(__t, options = __o)"
 		exec s:py_cmd '__t = __t.strip("\r\n\t ")'
 		" exec s:py_cmd "print(repr(__t))"
 		exec 'let newbody = ' . s:py_eval . '("__t")'
@@ -127,26 +137,28 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" Main Function
+" Main Format
 "----------------------------------------------------------------------
 function! RealTimeFormatCode()
-	let text = getline('.')
+	let line = getline('.')
 	let pos = col('.') - 1
-	let tail = strpart(text, pos)
-	if tail =~ '^\s*$'
-		let text = s:format_line(text)
-		call setline(line('.'), text)
-		if pumvisible()
-			call feedkeys("\<c-y>\<end>", 'n')
-		else
-			call feedkeys("\<end>", 'n')
-		endif
+	let tail = strpart(line, pos)
+	if tail =~ '^\s*$' && line !~ '^\s*$'
+		let head = matchstr(line, '^\s*')
+		let body = matchstr(line, '^\s*\zs.*$')
+		let text = s:format_line(body)
+		let b:rtformat_text = text
+		let hr = pumvisible()? "\<c-y>" : ""
+		" let hr .= "\<c-g>u\<c-u>"
+		let hr .= "\<c-g>u\<esc>S"
+		let hr .= "\<c-r>=b:rtformat_text\<cr>"
+		let hr .= "\<c-r>=\"\\n\"\<cr>"
+		" echo "info: " . s:repr(hr) . " -> " . s:repr(b:rtformat_text)
+		return hr
 	endif
-	if pumvisible()
-		call feedkeys("\<c-y>\<cr>", 'n')
-	else
-		call feedkeys("\<cr>", 'n')
-	endif
+	let text = pumvisible()? "\<c-y>" : ""
+	let b:rtformat_text = "\r"
+	return text . "\<c-r>=b:rtformat_text\<cr>"
 endfunc
 
 
@@ -160,7 +172,7 @@ function! s:check_enable()
 	if &ft == 'vim'
 		call s:errmsg('unsupported filetype: ' . &ft)
 		return 0
-	elseif &ft == 'python' || &ft == 'c' || &ft == 'cpp' || &ft == 'lua'
+	elseif has_key(s:enable_ft, &ft)
 		return 1
 	endif
 	call s:errmsg('unsupported filetype: ' . &ft)
@@ -176,7 +188,7 @@ function! s:RTFormatEnable()
 		return 0
 	endif
 	silent! iunmap <buffer> <cr>
-	inoremap <silent><buffer><cr> <c-\><c-o>:call RealTimeFormatCode()<cr>
+	imap <silent><buffer><expr> <cr> RealTimeFormatCode()
 	let b:rtf_enable = 1
 	redraw
 	echohl TODO
