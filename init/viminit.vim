@@ -146,6 +146,10 @@ if has('gui_running')
 	inoremap <silent><m-8> <ESC>:tabn 8<cr>
 	inoremap <silent><m-9> <ESC>:tabn 9<cr>
 	inoremap <silent><m-0> <ESC>:tabn 10<cr>
+	noremap <silent><m-up> :tabprev<cr>
+	noremap <silent><m-down> :tabnext<cr>
+	inoremap <silent><m-up> <ESC>:tabprev<cr>
+	inoremap <silent><m-down> <ESC>:tabnext<cr>
 endif
 
 
