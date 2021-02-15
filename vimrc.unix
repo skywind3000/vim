@@ -11,6 +11,13 @@ hi! CursorLineNr cterm=none
 let g:vimmake_cflags = ["-lstdc++"]
 let g:vimmake_build_name = "make"
 let g:escope_gtags_label = 'pygments'
+let g:terminal_skip_key_init = 1
+
+if get(g:, 'vim_num_shift', 0) != 0
+	if $GNOME_TERMINAL_SERVICE != ''
+		let g:altmeta_num_shift = 1
+	endif
+endif
 
 if !exists('g:bundle_group')
 	let g:bundle_group = []
