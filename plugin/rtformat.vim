@@ -1,6 +1,6 @@
 "======================================================================
 "
-" rtformat.vim - Format current line on Enter
+" rtformat.vim - Prettify current line on Enter !!
 "
 " Created by skywind on 2021/02/13
 " Last Modified: 2021/02/17 02:01
@@ -12,8 +12,16 @@
 "----------------------------------------------------------------------
 " settings
 "----------------------------------------------------------------------
+
+" python version: one of 0, 2 and 3
 let g:rtf_python = get(g:, 'rtf_python', 0)
+
+" By default, it will be triggered by `ENTER` in insert mode.
+" set this to 1 to use `CTRL+ENTER` instead, without changing
+" default `ENTER` behavior
 let g:rtf_ctrl_enter = get(g:, 'rtf_ctrl_enter', 0)
+
+" Enable formatting when leaving insert mode
 let g:rtf_on_insert_leave = get(g:, 'rtf_on_insert_leave', 1)
 
 
