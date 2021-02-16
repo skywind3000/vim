@@ -3,7 +3,7 @@
 " rtformat.vim - Format current line on Enter
 "
 " Created by skywind on 2021/02/13
-" Last Modified: 2021/02/17 01:39
+" Last Modified: 2021/02/17 02:01
 "
 "======================================================================
 
