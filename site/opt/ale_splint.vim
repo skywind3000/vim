@@ -1,6 +1,10 @@
 " Author: Lin Wei, skywind3000(at)gmail.com
 " Description: splint linter for c files
 
+if get(g:, 'ale_enabled', 0) == 0
+	finish
+endif
+
 call ale#Set('c_splint_executable', 'splint')
 call ale#Set('c_splint_options', '')
 call ale#Set('c_splint_type', 'W')
