@@ -103,8 +103,9 @@ call quickui#menu#install("&Git", [
 			\ ['File &Add', 'call svnhelp#svn_add("%")'],
 			\ ['-'],
 			\ ['&Fugitive Status', 'Gstatus'],
-			\ ['Fugitive &Push', 'Gpush'],
+			\ ['Fugitive P&ush', 'Gpush'],
 			\ ['Fugitive Fe&tch', 'Gfetch'],
+			\ ['Fugitive R&ead', 'Gread'],
 			\ ])
 
 
