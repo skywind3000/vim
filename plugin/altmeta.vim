@@ -44,7 +44,7 @@ if has('nvim') == 0 && has('gui_running') == 0
 			call s:key_escape('<m-' . i . '>', s:array[i])
 		endfor
 	endif
-	if get(g:, 'altmeta_skip_cm', 0) == 0
+	if get(g:, 'altmeta_ctrl_meta', 0) != 0
 		for i in range(26)
 			let aa = nr2char(char2nr('a') + i)
 			if index(['i', 'j', 'v'], aa) < 0
