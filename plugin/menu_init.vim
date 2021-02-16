@@ -104,6 +104,7 @@ call quickui#menu#install("&Git", [
 			\ ['-'],
 			\ ['&Fugitive Status', 'Gstatus'],
 			\ ['Fugitive &Push', 'Gpush'],
+			\ ['Fugitive Fe&tch', 'Gfetch'],
 			\ ])
 
 
