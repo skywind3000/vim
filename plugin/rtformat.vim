@@ -105,8 +105,8 @@ let s:pep8_python += ['E', 'W']
 "----------------------------------------------------------------------
 " language maps
 "----------------------------------------------------------------------
-let s:enable_ft = {"python":1, "c":1, "cpp":1, "lua":1, "java":1,
-			\ "javascript":1, "json":1, "actionscript":1, 
+let s:enable_ft = {"python":1, "lua":1, "java":1, "javascript":1, 
+			\ "json":1, "actionscript":1, 
 			\ }
 
 
