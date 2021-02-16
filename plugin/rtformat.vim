@@ -13,7 +13,7 @@
 " settings
 "----------------------------------------------------------------------
 let g:rtf_python = get(g:, 'rtf_python', 0)
-let g:rtf_ctrl_cr = get(g:, 'rtf_ctrl_cr', 0)
+let g:rtf_ctrl_enter = get(g:, 'rtf_ctrl_enter', 0)
 let g:rtf_on_insert_leave = get(g:, 'rtf_on_insert_leave', 1)
 
 
@@ -114,7 +114,7 @@ let s:enable_ft = {"python":1, "lua":1, "java":1, "javascript":1,
 "----------------------------------------------------------------------
 " internal variables
 "----------------------------------------------------------------------
-let s:enable_ctrl_cr = 0
+let s:enable_ctrl_enter = 0
 let s:on_insert_leave = 0
 
 
@@ -234,14 +234,14 @@ function! s:RTFormatEnable()
 	if s:check_enable() == 0
 		return 0
 	endif
-	if g:rtf_ctrl_cr == 0
+	if g:rtf_ctrl_enter == 0
 		silent! iunmap <buffer> <cr>
 		imap <silent><buffer><expr> <cr> RealTimeFormatCode()
-		let s:enable_ctrl_cr = 0
+		let s:enable_ctrl_enter = 0
 	else
 		silent! iunmap <buffer> <c-cr>
 		imap <silent><buffer><expr> <c-cr> RealTimeFormatCode()
-		let s:enable_ctrl_cr = 1
+		let s:enable_ctrl_enter = 1
 	endif
 	let b:rtf_enable = 1
 	augroup RTFormatGroup
@@ -260,7 +260,7 @@ function! s:RTFormatDisable()
 		return 0
 	endif
 	if get(b:, 'rtf_enable', 0) != 0
-		if s:enable_ctrl_cr == 0
+		if s:enable_ctrl_enter == 0
 			silent! iunmap <buffer> <cr>
 		else
 			silent! iunmap <buffer> <c-cr>
