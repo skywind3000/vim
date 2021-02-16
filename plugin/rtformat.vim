@@ -3,7 +3,7 @@
 " rtformat.vim - Format current line on Enter
 "
 " Created by skywind on 2021/02/13
-" Last Modified: 2021/02/13 22:57:28
+" Last Modified: 2021/02/17 01:39
 "
 "======================================================================
 
@@ -111,6 +111,12 @@ let s:enable_ft = {"python":1, "lua":1, "java":1, "javascript":1,
 
 
 "----------------------------------------------------------------------
+" internal variables
+"----------------------------------------------------------------------
+let s:on_insert_leave = 0
+
+
+"----------------------------------------------------------------------
 " format line
 "----------------------------------------------------------------------
 function! s:format_line(text)
@@ -149,14 +155,52 @@ function! RealTimeFormatCode()
 		let text = s:format_line(body)
 		let b:rtformat_text = text
 		let hr = pumvisible()? "\<c-y>" : ""
+		let hr .= "\<c-\>\<c-o>:let b:rtformat_insert_leave=1\<cr>"
 		let hr .= "\<c-g>u\<esc>S"
 		let hr .= "\<c-r>=b:rtformat_text\<cr>"
+		let hr .= "\<c-\>\<c-o>:let b:rtformat_insert_leave=0\<cr>"
 		let hr .= "\<c-r>=\"\\n\"\<cr>"
 		return hr
 	endif
 	let text = pumvisible()? "\<c-y>" : ""
 	let b:rtformat_text = "\r"
 	return text . "\<c-r>=b:rtformat_text\<cr>"
+endfunc
+
+
+"----------------------------------------------------------------------
+" Autocmd
+"----------------------------------------------------------------------
+function! s:InsertLeave()
+	if get(b:, 'rtformat_insert_leave', 0) != 0
+		return 0
+	endif
+	if mode(1) =~ 'i'
+		return 0
+	endif
+	let line = getline('.')
+	let head = matchstr(line, '^\s*')
+	let body = matchstr(line, '^\s*\zs.*$')
+	let text = s:format_line(body)
+	if body == text
+		return 0
+	endif
+	let lines = split(text, "\n", 1)
+	let ln = line('.')
+	let pos = 0
+	let b:rtformat_insert_leave = 1
+	while pos < len(lines)
+		if pos == 0
+			call setline(ln, head . lines[0])
+			exec "normal! $"
+		else
+			call append('.', head . lines[pos])
+			exec "normal! j$"
+		endif
+		let pos += 1
+	endwhile
+	let b:rtformat_insert_leave = 0
+	return 0
 endfunc
 
 
@@ -188,6 +232,10 @@ function! s:RTFormatEnable()
 	silent! iunmap <buffer> <cr>
 	imap <silent><buffer><expr> <cr> RealTimeFormatCode()
 	let b:rtf_enable = 1
+	augroup RTFormatGroup
+		au!
+		au InsertLeave * call s:InsertLeave()
+	augroup END
 	redraw
 	echohl TODO
 	echo "RTFormat is enabled in current buffer, exit with :RTFormatDisable"
@@ -206,6 +254,9 @@ function! s:RTFormatDisable()
 	echohl TODO
 	echo "RTFormat is disabled in current buffer"
 	echohl None
+	augroup RTFormatGroup
+		au!
+	augroup END
 	let b:rtf_enable = 0
 endfunc
 
@@ -218,12 +269,12 @@ command! -nargs=0 RTFormatDisable call s:RTFormatDisable()
 "----------------------------------------------------------------------
 
 if get(g:, 'rtformat_auto', 0)
-	augroup RTFormatGroup
+	augroup RTFormatGroup2
 		au!
 		autocmd FileType python silent RTFormatEnable
 	augroup END
 else
-	augroup RTFormatGroup
+	augroup RTFormatGroup2
 		au!
 	augroup END
 endif
