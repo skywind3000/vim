@@ -44,6 +44,15 @@ if has('nvim') == 0 && has('gui_running') == 0
 			call s:key_escape('<m-' . i . '>', s:array[i])
 		endfor
 	endif
+	if get(g:, 'altmeta_skip_cm', 0) == 0
+		for i in range(26)
+			let aa = nr2char(char2nr('a') + i)
+			if index(['i', 'j', 'v'], aa) < 0
+				exec 'let cc="\<c-' . aa . '>"'
+				call s:key_escape('<m-c-' . aa . '>', cc)
+			endif
+		endfor
+	endif
 	if get(g:, 'altmeta_skip_fn', 0) == 0
 		call s:key_escape('<F1>', 'OP')
 		call s:key_escape('<F2>', 'OQ')
