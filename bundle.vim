@@ -93,6 +93,7 @@ endif
 " package group - basic
 "----------------------------------------------------------------------
 if index(g:bundle_group, 'basic') >= 0
+	Plug 't9md/vim-choosewin'
 	Plug 'tpope/vim-rhubarb'
 	Plug 'mhinz/vim-startify'
 	Plug 'flazz/vim-colorschemes'
@@ -107,6 +108,16 @@ if index(g:bundle_group, 'basic') >= 0
 	Plug 'tpope/vim-eunuch'
 	Plug 'dag/vim-fish'
 	Plug 'skywind3000/vim-dict'
+
+	Plug 'kana/vim-textobj-user'
+	" Plug 'kana/vim-textobj-indent'
+	Plug 'kana/vim-textobj-syntax'
+	Plug 'kana/vim-textobj-function', { 'for':['c', 'cpp', 'vim', 'java'] }
+	Plug 'sgur/vim-textobj-parameter'
+	Plug 'bps/vim-textobj-python', {'for': 'python'}
+	Plug 'jceb/vim-textobj-uri'
+	Plug 'tommcdo/vim-exchange'
+
 	" Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
 	
 	if has('python3') || has('python')
@@ -139,6 +150,7 @@ if index(g:bundle_group, 'basic') >= 0
 	let g:python_highlight_builtin_types = 1
 	let g:python_highlight_builtin_funcs = 1
 
+	nmap <m-e> <Plug>(choosewin)
 	map <m-+> <Plug>(expand_region_expand)
 	map <m-_> <Plug>(expand_region_shrink)
 end
@@ -189,23 +201,13 @@ if index(g:bundle_group, 'high') >= 0
 	Plug 'kshenoy/vim-signature'
 	Plug 'mhinz/vim-signify'
 	" Plug 'mh21/errormarker.vim'
-	Plug 't9md/vim-choosewin'
 	Plug 'francoiscabrol/ranger.vim'
-	Plug 'kana/vim-textobj-user'
-	" Plug 'kana/vim-textobj-indent'
-	Plug 'kana/vim-textobj-syntax'
-	Plug 'kana/vim-textobj-function', { 'for':['c', 'cpp', 'vim', 'java'] }
-	Plug 'sgur/vim-textobj-parameter'
-	Plug 'bps/vim-textobj-python', {'for': 'python'}
-	Plug 'jceb/vim-textobj-uri'
-	Plug 'tommcdo/vim-exchange'
 	" Plug 'tpope/vim-apathy'
 
 	let g:errormarker_disablemappings = 1
 	nnoremap <silent> <leader>cm :ErrorAtCursor<CR>
 	nnoremap <silent> <leader>cM :RemoveErrorMarkers<cr>
 
-	nmap <m-e> <Plug>(choosewin)
 	let g:ranger_map_keys = 0
 
 end
