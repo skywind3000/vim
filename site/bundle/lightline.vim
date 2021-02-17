@@ -48,6 +48,21 @@ function! LightlineMode()
 endfunc
 
 
+
+"----------------------------------------------------------------------
+" edge mode
+"----------------------------------------------------------------------
+if get(g:, 'lightline_unicode', 0)
+	let g:lightline.separator = get(g:lightline, 'separator', {})
+	let g:lightline.subseparator = get(g:lightline, 'subseparator', {})
+	let g:lightline.separator.left = "\ue0b0"
+	let g:lightline.separator.right = "\ue0b2"
+	let g:lightline.subseparator.left = "\ue0b1"
+	let g:lightline.subseparator.right = "\ue0b3"
+	echom "FUCK LIGHTLINE"
+endif
+
+
 "----------------------------------------------------------------------
 " prevent GVim crash
 "----------------------------------------------------------------------

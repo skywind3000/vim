@@ -51,13 +51,18 @@ if !exists('g:bundle_group')
 	let g:bundle_group = []
 endif
 
+let g:bundle_enabled = {}
+for key in g:bundle_group | let g:bundle_enabled[key] = 1 | endfor
+let s:enabled = g:bundle_enabled
+
+
 call plug#begin(get(g:, 'bundle_home', '~/.vim/bundles'))
 
 
 "----------------------------------------------------------------------
 " package group - simple
 "----------------------------------------------------------------------
-if index(g:bundle_group, 'simple') >= 0
+if has_key(s:enabled, 'simple')
 	Plug 'easymotion/vim-easymotion'
 	Plug 'Raimondi/delimitMate'
 	Plug 'justinmk/vim-dirvish'
@@ -92,7 +97,7 @@ endif
 "----------------------------------------------------------------------
 " package group - basic
 "----------------------------------------------------------------------
-if index(g:bundle_group, 'basic') >= 0
+if has_key(s:enabled, 'basic')
 	Plug 't9md/vim-choosewin'
 	Plug 'tpope/vim-rhubarb'
 	Plug 'mhinz/vim-startify'
@@ -123,6 +128,7 @@ if index(g:bundle_group, 'basic') >= 0
 	if has('python3') || has('python')
 		Plug 'Yggdroot/LeaderF'
 		Plug 'tamago324/LeaderF-filer'
+		Plug 'voldikss/LeaderF-emoji'
 		IncScript site/bundle/leaderf.vim
 	else
 		Plug 'ctrlpvim/ctrlp.vim'
@@ -159,7 +165,7 @@ end
 "----------------------------------------------------------------------
 " package group - inter
 "----------------------------------------------------------------------
-if index(g:bundle_group, 'inter') >= 0
+if has_key(s:enabled, 'inter')
 	Plug 'vim-scripts/L9'
 	Plug 'honza/vim-snippets'
 	Plug 'xolox/vim-notes', { 'on': ['Note', 'SearchNotes', 'DeleteNotes', 'RecentNotes'] }
@@ -197,12 +203,15 @@ endif
 "----------------------------------------------------------------------
 " package group - high
 "----------------------------------------------------------------------
-if index(g:bundle_group, 'high') >= 0
+if has_key(s:enabled, 'high')
 	Plug 'kshenoy/vim-signature'
 	Plug 'mhinz/vim-signify'
-	" Plug 'mh21/errormarker.vim'
+	Plug 'junegunn/fzf'
+	Plug 'junegunn/fzf.vim'
+	Plug 'jceb/vim-orgmode', { 'for': 'org' }
+	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
+	Plug 'chiel92/vim-autoformat'
 	Plug 'francoiscabrol/ranger.vim'
-	" Plug 'tpope/vim-apathy'
 
 	let g:errormarker_disablemappings = 1
 	nnoremap <silent> <leader>cm :ErrorAtCursor<CR>
@@ -216,17 +225,14 @@ end
 "----------------------------------------------------------------------
 " package group - opt
 "----------------------------------------------------------------------
-if index(g:bundle_group, 'opt') >= 0
-	Plug 'junegunn/fzf'
-	Plug 'junegunn/fzf.vim'
-	Plug 'mhartington/oceanic-next'
-	Plug 'jceb/vim-orgmode', { 'for': 'org' }
-	Plug 'soft-aesthetic/soft-era-vim'
+if has_key(s:enabled, 'opt')
 	Plug 'dyng/ctrlsf.vim'
-	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 	Plug 'tpope/vim-speeddating'
-	Plug 'chiel92/vim-autoformat'
 	Plug 'voldikss/vim-translator'
+	Plug 'mhartington/oceanic-next'
+	Plug 'soft-aesthetic/soft-era-vim'
+	" Plug 'tpope/vim-apathy'
+	" Plug 'mh21/errormarker.vim'
 
 	if executable('tmux')
 		Plug 'benmills/vimux'
@@ -269,7 +275,7 @@ endif
 "----------------------------------------------------------------------
 
 " deoplete
-if index(g:bundle_group, 'deoplete') >= 0
+if has_key(s:enabled, 'deoplete')
 	if has('nvim')
 		Plug 'Shougo/deoplete.nvim'
 	else
@@ -283,48 +289,48 @@ if index(g:bundle_group, 'deoplete') >= 0
 endif
 
 " vimwiki
-if index(g:bundle_group, 'vimwiki') >= 0
+if has_key(s:enabled, 'vimwiki')
 	Plug 'vimwiki/vimwiki'
 	IncScript site/bundle/vimwiki.vim
 endif
 
 " echodoc
-if index(g:bundle_group, 'echodoc') >= 0
+if has_key(s:enabled, 'echodoc')
 	Plug 'Shougo/echodoc.vim'
 	set noshowmode
 	let g:echodoc#enable_at_startup = 1
 endif
 
 " airline
-if index(g:bundle_group, 'airline') >= 0
+if has_key(s:enabled, 'airline')
 	Plug 'vim-airline/vim-airline'
 	Plug 'vim-airline/vim-airline-themes'
 	IncScript site/bundle/airline.vim
 endif
 
 " lightline
-if index(g:bundle_group, 'lightline') >= 0
+if has_key(s:enabled, 'lightline')
 	Plug 'itchyny/lightline.vim'
 	IncScript site/bundle/lightline.vim
 endif
 
-if index(g:bundle_group, 'coc') >= 0
+if has_key(s:enabled, 'coc')
 	Plug 'neoclide/coc.nvim', {'branch': 'release'}
 	IncScript site/bundle/coc.vim
 endif
 
-if index(g:bundle_group, 'vim-doge') >= 0
+if has_key(s:enabled, 'vim-doge')
 	Plug 'kkoomen/vim-doge'
 	IncScript site/bundle/doge.vim
 endif
 
-if index(g:bundle_group, 'nerdtree') >= 0
+if has_key(s:enabled, 'nerdtree')
 	Plug 'scrooloose/nerdtree', {'on': ['NERDTree', 'NERDTreeFocus', 'NERDTreeToggle', 'NERDTreeCWD', 'NERDTreeFind'] }
 	Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 	IncScript site/bundle/nerdtree.vim
 endif
 
-if index(g:bundle_group, 'grammer') >= 0
+if has_key(s:enabled, 'grammer')
 	Plug 'rhysd/vim-grammarous'
 	noremap <space>rg :GrammarousCheck --lang=en-US --no-move-to-first-error --no-preview<cr>
 	map <space>rr <Plug>(grammarous-open-info-window)
@@ -338,25 +344,25 @@ if index(g:bundle_group, 'grammer') >= 0
 endif
 
 
-if index(g:bundle_group, 'ale') >= 0
+if has_key(s:enabled, 'ale')
 	Plug 'w0rp/ale'
 	IncScript site/bundle/ale.vim
 endif
 
-if index(g:bundle_group, 'neomake') >= 0
+if has_key(s:enabled, 'neomake')
 	Plug 'neomake/neomake'
 endif
 
-if index(g:bundle_group, 'vista') >= 0
+if has_key(s:enabled, 'vista')
 	Plug 'liuchengxu/vista.vim'
 endif
 
-if index(g:bundle_group, 'clap') >= 0
+if has_key(s:enabled, 'clap')
 	Plug 'liuchengxu/vim-clap'
 	IncScript site/bundle/clap.vim
 endif
 
-if index(g:bundle_group, 'neoformat') >= 0
+if has_key(s:enabled, 'neoformat')
 	Plug 'sbdchd/neoformat'
     let g:neoformat_python_autopep8 = {
             \ 'exe': 'autopep8',
@@ -371,7 +377,7 @@ if index(g:bundle_group, 'neoformat') >= 0
 endif
 
 
-if index(g:bundle_group, 'neocomplete') >= 0
+if has_key(s:enabled, 'neocomplete')
 	Plug 'Shougo/neocomplete.vim'
 	let g:neocomplete#enable_at_startup = 1
 	let g:neocomplete#sources#syntax#min_keyword_length = 2
@@ -384,7 +390,7 @@ if index(g:bundle_group, 'neocomplete') >= 0
 	endfunction
 endif
 
-if index(g:bundle_group, 'omni') >= 0
+if has_key(s:enabled, 'omni')
 	Plug 'vim-scripts/OmniCppComplete', {'for':['cpp']}
 	" Plug 'c9s/perlomni.vim', {'for':['perl']}
 	Plug 'shawncplus/phpcomplete.vim', {'for': ['php']}
@@ -399,43 +405,52 @@ if index(g:bundle_group, 'omni') >= 0
 endif
 
 
-if index(g:bundle_group, 'lsp') >= 0
+if has_key(s:enabled, 'lsp-lcn')
 	Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next' }
 	IncScript site/bundle/lcn.vim
 endif
 
-if index(g:bundle_group, 'keysound') >= 0
+if has_key(s:enabled, 'keysound')
 	Plug 'skywind3000/vim-keysound'
 	let g:keysound_theme = 'default'
 	let g:keysound_enable = 1
 endif
 
-if index(g:bundle_group, 'icons') >= 0
+if has_key(s:enabled, 'icons')
 	Plug 'istepura/vim-toolbar-icons-silk'
 endif
 
-if index(g:bundle_group, 'floaterm') >= 0
+if has_key(s:enabled, 'floaterm')
 	Plug 'voldikss/vim-floaterm'
 	IncScript site/bundle/floaterm.vim
 endif
 
-if index(g:bundle_group, 'tabnine') >= 0
+if has_key(s:enabled, 'tabnine')
 	Plug 'codota/tabnine-vim'
 	IncScript site/bundle/tabnine.vim
 endif
 
-if index(g:bundle_group, 'colors') >= 0
+if has_key(s:enabled, 'colors')
 	Plug 'sonph/onehalf', {'rtp': 'vim/'}
+	Plug 'sainnhe/sonokai'
+	Plug 'chuling/ci_dark'
+	Plug 'arcticicestudio/nord-vim'
+	Plug 'romainl/Apprentice'
+	Plug 'arzg/vim-colors-xcode'
 endif
 
-if index(g:bundle_group, 'which_key') >= 0
+if has_key(s:enabled, 'which_key')
 	Plug 'liuchengxu/vim-which-key'
 	IncScript site/bundle/which_key.vim
 endif
 
-if index(g:bundle_group, 'supertab') >= 0
+if has_key(s:enabled, 'supertab')
 	Plug 'ervandew/supertab'
 	IncScript site/bundle/supertab.vim
+endif
+
+if has_key(s:enabled, 'blamer')
+	Plug 'APZelos/blamer.nvim'
 endif
 
 
