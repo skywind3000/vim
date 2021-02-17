@@ -210,8 +210,15 @@ if has_key(s:enabled, 'high')
 	Plug 'junegunn/fzf.vim'
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
 	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
-	Plug 'chiel92/vim-autoformat'
 	Plug 'francoiscabrol/ranger.vim'
+	Plug 'sbdchd/neoformat'
+
+	if has('python3') || has('python2')
+		Plug 'chiel92/vim-autoformat'
+		IncScript site/bundle/autoformat.vim
+	endif
+
+	IncScript site/bundle/neoformat.vim
 
 	let g:errormarker_disablemappings = 1
 	nnoremap <silent> <leader>cm :ErrorAtCursor<CR>
@@ -361,21 +368,6 @@ if has_key(s:enabled, 'clap')
 	Plug 'liuchengxu/vim-clap'
 	IncScript site/bundle/clap.vim
 endif
-
-if has_key(s:enabled, 'neoformat')
-	Plug 'sbdchd/neoformat'
-    let g:neoformat_python_autopep8 = {
-            \ 'exe': 'autopep8',
-            \ 'args': ['-s 4', '-E'],
-            \ 'replace': 1, 
-            \ 'stdin': 0, 
-            \ 'valid_exit_codes': [0, 23],
-            \ 'no_append': 1,
-            \ }
-
-    let g:neoformat_enabled_python = ['autopep8']
-endif
-
 
 if has_key(s:enabled, 'neocomplete')
 	Plug 'Shougo/neocomplete.vim'
