@@ -1,7 +1,7 @@
-if exists('b:ftplugin_python_init')
+if exists('b:ftplugin_init_python')
 	finish
 endif
 
-let b:ftplugin_python_init = 1
+let b:ftplugin_init_python = 1
 
 
