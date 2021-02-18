@@ -97,8 +97,21 @@ if !exists(":DiffOrig")
 endif
 
 
+"----------------------------------------------------------------------
 " use ~/.vim/tmp as backup directory
-call Backup_Directory()
+"----------------------------------------------------------------------
+if get(g:, 'asc_no_backup', 0) == 0
+	set backup
+	set writebackup
+	set backupdir=~/.vim/tmp
+	set backupext=.bak
+	set noswapfile
+	set noundofile
+	let path = expand('~/.vim/tmp')
+	if isdirectory(path) == 0
+		silent! call mkdir(path, 'p', 0755)
+	endif
+endif
 
 
 "----------------------------------------------------------------------

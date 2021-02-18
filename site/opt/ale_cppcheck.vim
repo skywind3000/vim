@@ -1,6 +1,10 @@
 " Author: Bart Libert <bart.libert@gmail.com>
 " Description: cppcheck linter for c files
 
+if get(g:, 'ale_enabled', 0) == 0
+	finish
+endif
+
 call ale#Set('c_cppcheck_executable', 'cppcheck')
 call ale#Set('c_cppcheck_options', '--enable=style')
 
@@ -51,22 +55,20 @@ function! s:cpp_cppcheck_GetCommand(buffer) abort
     \   . ' %t'
 endfunction
 
-if 0
-	call ale#linter#Define('c', {
-				\   'name': 'cppcheck',
-				\   'output_stream': 'both',
-				\   'executable': {b -> ale#Var(b, 'c_cppcheck_executable')},
-				\   'command': function('s:c_cppcheck_GetCommand'),
-				\   'callback': 'ale#handlers#cppcheck#HandleCppCheckFormat',
-				\})
+call ale#linter#Define('c', {
+			\   'name': 'cppcheck',
+			\   'output_stream': 'both',
+			\   'executable': {b -> ale#Var(b, 'c_cppcheck_executable')},
+			\   'command': function('s:c_cppcheck_GetCommand'),
+			\   'callback': 'ale#handlers#cppcheck#HandleCppCheckFormat',
+			\})
 
-	call ale#linter#Define('cpp', {
-				\   'name': 'cppcheck',
-				\   'output_stream': 'both',
-				\   'executable': {b -> ale#Var(b, 'cpp_cppcheck_executable')},
-				\   'command': function('s:cpp_cppcheck_GetCommand'),
-				\   'callback': 'ale#handlers#cppcheck#HandleCppCheckFormat',
-				\})
-endif
+call ale#linter#Define('cpp', {
+			\   'name': 'cppcheck',
+			\   'output_stream': 'both',
+			\   'executable': {b -> ale#Var(b, 'cpp_cppcheck_executable')},
+			\   'command': function('s:cpp_cppcheck_GetCommand'),
+			\   'callback': 'ale#handlers#cppcheck#HandleCppCheckFormat',
+			\})
 
 

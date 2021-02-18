@@ -9,7 +9,6 @@ IncScript init/vimmake.vim
 VimmakeKeymap
 
 IncScript init/config.vim
-IncScript init/backup.vim
 
 IncScript init/ignores.vim
 IncScript init/tools.vim

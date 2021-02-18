@@ -27,6 +27,7 @@ if &ft == 'cpp'
 endif
 
 let b:commentary_format = "// %s"
+let s:windows = has('win32') || has('win64') || has('win95') || has('win16')
 
 
 "----------------------------------------------------------------------
@@ -59,7 +60,35 @@ endif
 
 if s:has_astyle > 0
 	let &l:formatprg = s:format_astyle
+	let b:ftplugin_fmt_astyle = &l:formatprg
 endif
 
+
+"----------------------------------------------------------------------
+" format: clang-format
+"----------------------------------------------------------------------
+function! InitClangFormat()
+	if get(s:, 'has_clang', -1) < 0
+		let s:has_clang = executable('clang-format')
+	endif
+	let s:windows = has('win32') || has('win95') || has('win64')
+	let fallback = get(g:, 'asc_format_clang_style', 'Microsoft')
+	if s:has_clang > 0
+		let prg = (s:windows)? 'call clang-format' : 'clang-format'
+		let prg .= ' -style=file --fallback-style=' . fallback
+		let name = expand('%:t')
+		if name != ''
+			let prg .= ' -assume-filename=' . shellescape(name)
+			let cd = (s:windows)? 'cd /D ' : 'cd '
+			let cd = cd . shellescape(expand('%:p:h')) . ' && '
+			let prg = cd . prg
+		endif
+		let &l:formatprg = prg
+	endif
+endfunction
+
+if get(g:, 'asc_format_clang', 1) != 0
+	call InitClangFormat()
+endif
 
 
