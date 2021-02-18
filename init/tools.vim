@@ -17,33 +17,6 @@ set wildmenu
 set wcm=<C-Z>
 "set splitbelow
 
-" open quickfix
-function! Toggle_QuickFix(size)
-	function! s:WindowCheck(mode)
-		if getbufvar('%', '&buftype') == 'quickfix'
-			let s:quickfix_open = 1
-			return
-		endif
-		if a:mode == 0
-			let w:quickfix_save = winsaveview()
-		else
-			call winrestview(w:quickfix_save)
-		endif
-	endfunc
-	let s:quickfix_open = 0
-	let l:winnr = winnr()			
-	windo call s:WindowCheck(0)
-	if s:quickfix_open == 0
-		exec 'botright copen '.a:size
-		wincmd k
-	else
-		cclose
-	endif
-	windo call s:WindowCheck(1)
-	silent exec ''.l:winnr.'wincmd w'
-endfunc
-
-
 " show content in a new vertical split window
 function! s:Show_Content(title, width, content)
 	let l:width = a:width
@@ -142,12 +115,6 @@ command! -nargs=+ FileSwitch call Tools_FileSwitch(<f-args>)
 function! Open_Dictionary(word)
 	let l:expl = system('sdcv --utf8-input --utf8-output -n "'. a:word .'"')
 	call s:Show_Content('[StarDict]', 28, l:expl)
-endfunc
-
-function! Open_Manual(what)
-	let l:text = system('man -S 3:2:1 -P cat "'.a:what.'" | col -b')
-	call s:Show_Content("[man]", 0, l:text)
-	call cursor(1, 1)
 endfunc
 
 " switch header
@@ -392,14 +359,6 @@ function! Change_DirectoryToFile()
 endfunc
 
 
-" quickfix
-let g:asyncrun_status = ''
-augroup QuickfixStatus
-	" au! BufWinEnter quickfix setlocal 
-	" 	\ statusline=%t\ [%{g:asyncrun_status}]\ %{exists('w:quickfix_title')?\ '\ '.w:quickfix_title\ :\ ''}\ %=%-15(%l,%c%V%)\ %P
-augroup END
-
-
 " log file
 function! s:LogAppend(filename, text)
 	let l:ts = strftime("[%Y-%m-%d %H:%M:%S] ")
@@ -438,28 +397,11 @@ function! Toggle_Taglist()
 	silent exec 'TlistToggle'
 endfunc
 
-
-" toggle tagbar
-function! Toggle_Tagbar()
-	call LogWrite('[tagbar] '.expand("%:p"))
-	silent exec 'TagbarToggle'
-endfunc
-
-
 " open explorer/finder
 function! Show_Explore()
 	let l:locate = expand("%:p:h")
 	if has('win32') || has('win64') || has('win16')
 		exec "!start /b cmd.exe /C explorer.exe ".shellescape(l:locate)
-	endif
-endfunc
-
-" CTRL-N -> TAB
-function! Tools_Tab2CN(enable)
-	if a:enable == 0
-		iunmap <TAB>
-	else
-		inoremap <expr> <TAB> pumvisible() ? "\<C-n>" : "\<tab>"
 	endif
 endfunc
 
@@ -522,16 +464,6 @@ function! Tools_SwitchSigns()
 		echo ':signcolumn=auto'
 	endif
 endfunc
-
-" toggle number
-function! Tools_SwitchNumber()
-	if &number == 0
-		set number
-	else
-		set nonumber
-	endif
-endfunc
-
 
 " 0:up, 1:down, 2:pgup, 3:pgdown 4:top, 5:bottom, 
 function! Tools_QuickfixCursor(mode)
@@ -688,9 +620,8 @@ command! -nargs=1 ExpSwitch call Tools_ExpSwitch(<f-args>)
 function! s:run_python(redraw, script)
 	let script = expand(a:script)
 	" echo 'running:'. script
-	py import vim
-	" py execfile(vim.eval('script'), {'__builtins__':__builtins__}, {})
-	py execfile(vim.eval('script'))
+	pyx import vim
+	pyx execfile(vim.eval('script'))
 	if a:redraw
 		call input("press enter to continue")
 		redraw!
@@ -700,81 +631,9 @@ endfunc
 command! -bang -nargs=1 PythonRun call s:run_python(<bang>0, <f-args>)
 
 
-function! s:edit_tool(bang, name)
-	let name = 'vimmake.'. a:name
-	if a:name == '' || a:name == '-' || a:name == '\-'
-		let name = 'vimmake'
-	endif
-	if has('win32') || has('win64') || has('win16') || has('win95')
-		let name = asclib#path#join(g:vimmake_path, name)
-		if a:name != '' && a:name != '-' && a:name != '\-'
-			let name .= '.cmd'
-		endif
-	else
-		let name = asclib#path#join(g:vimmake_path, name)
-		if stridx(name, '~') >= 0
-			let name = expand(name)
-		endif
-		if a:name != '' && a:name != '-' && a:name != '\-'
-			call system('touch '.shellescape(name))
-			call setfperm(name, 'rwxr-xr-x')
-		endif
-	endif
-	if a:bang == ''
-		exec 'FileSwitch split '.fnameescape(name)
-	else
-		exec 'FileSwitch tabe '.fnameescape(name)
-	endif
-	if a:name == '' || a:name == '-' || a:name == '\-'
-		" setlocal ft=ini
-		augroup vimmake_mode_group
-			au! 
-			autocmd BufWritePost <buffer> RefreshToolMode
-		augroup END
-	endif
-endfunc
-
-
-command! -bang -nargs=1 EditTool call s:edit_tool('<bang>', <f-args>)
-
-
-function! s:refresh_tool_mode(bang) abort
-	let name = asclib#path#join(g:vimmake_path, 'vimmake')
-	let name = expand(name)
-	if !filereadable(name)
-		if a:bang != '!'
-			redraw
-			echohl ErrorMsg
-			echo "can not read: ".name
-			echohl None
-		endif
-		return 0
-	endif
-	let content = readfile(name)
-	if !exists('g:vimmake_mode')
-		let g:vimmake_mode = {}
-	endif
-	for curline in content
-		let pos = stridx(curline, ':')
-		if pos <= 0
-			continue
-		endif
-		let name = strpart(curline, 0, pos)
-		let data = strpart(curline, pos + 1)
-		let name = substitute(name, '^\s*\(.\{-}\)\s*$', '\1', '')
-		let data = substitute(data, '^\s*\(.\{-}\)\s*$', '\1', '')
-		if name == ''
-			continue
-		endif
-		let g:vimmake_mode[name] = data
-	endfor
-endfunc
-
-
-command! -bang -nargs=0 RefreshToolMode call s:refresh_tool_mode('<bang>')
 
 function! Tools_SwitchMakeFile()
-	let root = vimmake#get_root('%')
+	let root = asclib#path#get_root('%')
 	let name = asclib#path#join(root, 'Makefile')
 	exec 'FileSwitch tabe '. fnameescape(name)
 endfunc
@@ -825,15 +684,6 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" https://github.com/Shougo/shougo-s-github 
-"----------------------------------------------------------------------
-function! ToggleOption(option_name)
-	execute 'setlocal' a:option_name.'!'
-	execute 'setlocal' a:option_name.'?'
-endfunc
-
-
-"----------------------------------------------------------------------
 " https://github.com/asins/vim 
 "----------------------------------------------------------------------
 function! StripTrailingWhitespace()
@@ -871,42 +721,6 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" Fzf
-"----------------------------------------------------------------------
-function! Tools_FileSearch(...)
-	let path = vimmake#get_root('%')
-	let mode = 0
-	if path == ''
-		return
-	endif
-	if executable('fzf') && exists(':FZF') == 2
-		let mode = 0
-	elseif exists(':LeaderfFile') == 2
-		let mode = 1
-	elseif exists(':CtrlP') == 2
-		let mode = 2
-	endif
-	if a:0 >= 0 && a:1 >= 0
-		let mode = a:1
-	endif
-	if a:0 >= 2 && a:2 != ''
-		let path = a:2
-	endif
-	if mode == 0
-		exec 'FZF '. fnameescape(path)
-	elseif mode == 1
-		exec 'LeaderfFile '. fnameescape(path)
-	elseif mode == 2
-		exec 'CtrlP '. fnameescape(path)
-	endif
-endfunc
-
-
-command! -nargs=? FuzzyFileSearch call Tools_FileSearch(-1, <q-args>)
-
-
-
-"----------------------------------------------------------------------
 " Align cheatsheet
 "----------------------------------------------------------------------
 function! s:Tools_CheatSheetAlign(...)
@@ -934,23 +748,6 @@ endfunc
 
 command! -nargs=1 -range ClassInsert <line1>,<line2>call s:Tools_ClassInsert(<q-args>)
 command! -nargs=0 -range BraceExpand <line1>,<line2>s/;\s*$/\r{\r}\r\r/
-
-
-"----------------------------------------------------------------------
-" Load url
-"----------------------------------------------------------------------
-function! s:ReadUrl(url)
-	if executable('curl')
-		exec 'r !curl -sL '.shellescape(a:url)
-	elseif executable('wget')
-		exec 'r !wget --no-check-certificate -qO- '.shellescape(a:url)
-	else
-		echo "require wget or curl"
-	endif
-endfunc
-
-command! -nargs=1 MyUrlRead call s:ReadUrl(<q-args>)
-
 
 
 "----------------------------------------------------------------------
@@ -1005,9 +802,15 @@ command! -nargs=1 OpenTerminal call s:OpenTerminal(<q-args>)
 "----------------------------------------------------------------------
 function! s:LineBreaker(width)
 	let width = &textwidth
-	let &textwidth = str2nr(a:width)	
+	let p1 = &g:formatprg
+	let p2 = &l:formatprg
+	let &textwidth = str2nr(a:width)
+	set formatprg=
+	setlocal formatprg=
 	exec 'normal ggVGgq'
 	let &textwidth = width
+	let &g:formatprg = p1
+	let &l:formatprg = p2
 endfunc
 
 command! -nargs=1 LineBreaker call s:LineBreaker(<q-args>)
@@ -1041,7 +844,7 @@ command! -nargs=0 -bang PlugBrowse call s:OpenURL('', '<bang>')
 
 
 "----------------------------------------------------------------------
-" browse code in github oitlab
+" browse code in github or gitlab
 "----------------------------------------------------------------------
 function! s:BrowseGit(name, bang, ...)
 	let name = asclib#string#strip(a:name)

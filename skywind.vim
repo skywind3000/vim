@@ -51,17 +51,6 @@ set cpt=.,w,k
 
 
 "----------------------------------------------------------------------
-"- FileType Preference
-"----------------------------------------------------------------------
-augroup SkywindGroup
-	au!
-	" au FileType python setlocal shiftwidth=4 tabstop=4 noexpandtab omnifunc=pythoncomplete#Complete
-	au FileType python setlocal shiftwidth=4 tabstop=4 et omnifunc=python3complete#Complete
-	au FileType cpp setlocal commentstring=//\ %s
-augroup END
-
-
-"----------------------------------------------------------------------
 " config
 "----------------------------------------------------------------------
 let s:settings = {  

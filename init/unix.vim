@@ -126,12 +126,7 @@ augroup END
 "----------------------------------------------------------------------
 function! s:language_setup()
 	" echom "FileType: " . &ft
-	if &ft == 'cpp' || &ft == 'c'
-		setlocal commentstring=//\ %s
-		let b:commentary_format = "// %s"
-	elseif &ft == 'markdown'
-		setlocal wrap
-	elseif &ft == 'qf'
+	if &ft == 'qf'
 		setlocal nonumber
 	endif
 	let tags = expand("~/.vim/tags/") . &ft . '.tags'

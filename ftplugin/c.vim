@@ -1,19 +1,32 @@
+"======================================================================
+"
+" c.vim - c language module
+"
+" Created by skywind on 2021/02/19
+" Last Modified: 2021/02/19 00:56:35
+"
+"======================================================================
+
+"----------------------------------------------------------------------
+" guard: take care vim-plug call setfiletype multiple times
+"----------------------------------------------------------------------
 if exists('b:ftplugin_init_c')
-	finish
+	if get(b:, 'did_ftplugin', 0) == 2
+		finish
+	endif
 endif
 
 let b:ftplugin_init_c = 1
 
-" IncScript site/opt/ale_cppcheck.vim
-
-setlocal commentstring=//\ %s
-setlocal comments-=:// comments+=:///,://
-
-let b:commentary_format = "// %s"
+if exists('b:did_ftplugin')
+	let b:did_ftplugin = 2
+endif
 
 if &ft == 'cpp'
-	finish
+	setlocal commentstring=//\ %s
 endif
+
+let b:commentary_format = "// %s"
 
 
 "----------------------------------------------------------------------
@@ -22,6 +35,7 @@ endif
 if !exists('g:ftplugin_init_splint')
 	if get(g:, 'ale_enabled', 0) != 0
 		IncScript site/opt/ale_splint.vim
+		" IncScript site/opt/ale_cppcheck.vim
 		let g:ftplugin_init_splint = 1
 	endif
 endif
