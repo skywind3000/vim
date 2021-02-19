@@ -211,6 +211,7 @@ if has_key(s:enabled, 'high')
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
 	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 	Plug 'francoiscabrol/ranger.vim'
+	Plug 'AndrewRadev/splitjoin.vim'
 	Plug 'sbdchd/neoformat'
 
 	if has('python3') || has('python2')
