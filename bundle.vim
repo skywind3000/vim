@@ -211,7 +211,6 @@ if has_key(s:enabled, 'high')
 	Plug 'jceb/vim-orgmode', { 'for': 'org' }
 	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 	Plug 'francoiscabrol/ranger.vim'
-	Plug 'AndrewRadev/splitjoin.vim'
 	Plug 'sbdchd/neoformat'
 
 	if has('python3') || has('python2')
@@ -368,6 +367,10 @@ endif
 if has_key(s:enabled, 'clap')
 	Plug 'liuchengxu/vim-clap'
 	IncScript site/bundle/clap.vim
+endif
+
+if has_key(s:enabled, 'splitjoin')
+	Plug 'AndrewRadev/splitjoin.vim'
 endif
 
 if has_key(s:enabled, 'neocomplete')
