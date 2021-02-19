@@ -1,3 +1,5 @@
+#  vim: set ts=4 sw=2 tw=0 et ft=yaml :
+
 ---
 Language:        Cpp
 # BasedOnStyle:  Microsoft
@@ -146,4 +148,5 @@ WhitespaceSensitiveMacros:
   - PP_STRINGIZE
   - BOOST_PP_STRINGIZE
 ...
+
 
