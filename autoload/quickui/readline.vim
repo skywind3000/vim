@@ -216,6 +216,54 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" check is eol
+"----------------------------------------------------------------------
+function! s:readline.is_eol()
+	return self.cursor >= self.size
+endfunc
+
+
+"----------------------------------------------------------------------
+" read code (what == 0) or wide (what != 0)
+"----------------------------------------------------------------------
+function! s:readline.read_data(pos, width, what)
+	let x = a:pos
+	let w = a:width
+	let size = self.size
+	if x < 0
+		let w += x
+		let x = 0
+	endif
+	if x + w > size
+		let w = size - x
+	endif
+	if x >= size || w <= 0
+		return []
+	endif
+	let data = (a:what == 0)? self.code : self.wide
+	return slice(data, x, x + w)
+endfunc
+
+
+"----------------------------------------------------------------------
+" calculate view port size, give length in display-width,
+" returns how many characters can fit in length.
+"----------------------------------------------------------------------
+function! s:readline.viewport(pos, length)
+	let length = a:length
+	let size = self.size
+	let pos = a:pos
+	let pos = (pos < 0)? 0 : pos
+	let pos = (pos > size)? size : pos
+	if length == 0
+		return 0
+	elseif length > 0
+	else
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " save history in current position
 "----------------------------------------------------------------------
 function! s:readline.history_save() abort
