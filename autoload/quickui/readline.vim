@@ -14,9 +14,9 @@
 let s:readline = {}
 let s:readline.cursor = 0       " cursur position in character
 let s:readline.code = []        " buffer character in int list
-let s:readline.text = ''        " text buffer
-let s:readline.size = 0	        " buffer size in character
 let s:readline.wide = []        " char display width
+let s:readline.size = 0	        " buffer size in character
+let s:readline.text = ''        " text buffer
 let s:readline.part = []        " 0/1/2: before/on/after cursor
 
 let s:readline.on_move = ''     " on cursor move
@@ -24,23 +24,9 @@ let s:readline.on_change = ''   " on text change
 
 
 "----------------------------------------------------------------------
-" internal: update text parts
-"----------------------------------------------------------------------
-function! s:readline.__raw_update() abort
-	let self.text = list2str(self.code)
-	let self.size = len(self.code)
-	let cc = self.cursor
-	let p1 = slice(self.code, 0, cc)
-	let p2 = slice(self.code, cc, cc + 1)
-	let p3 = slice(self.code, cc + 1)
-	let self.part = [list2str(p1), list2str(p2), list2str(p3)]
-endfunc
-
-
-"----------------------------------------------------------------------
 " move pos
 "----------------------------------------------------------------------
-function! s:readline.__raw_move(pos) abort
+function! s:readline.move(pos) abort
 	let pos = a:pos
 	let pos = (pos < 0)? 0 : pos
 	let pos = (pos > self.size)? self.size : pos
@@ -52,7 +38,7 @@ endfunc
 "----------------------------------------------------------------------
 " set text
 "----------------------------------------------------------------------
-function! s:readline.__raw_set(text)
+function! s:readline.set(text)
 	let code = list2str(text)
 	let wide = []
 	for cc in code
@@ -61,33 +47,28 @@ function! s:readline.__raw_set(text)
 	endfor
 	let self.code = code
 	let self.wide = wide
-	call self.__raw_move(self.cursor)
+	call self.move(self.cursor)
 endfunc
 
 
 "----------------------------------------------------------------------
-" set text
+" internal: update text parts
 "----------------------------------------------------------------------
-function! s:readline.set(text)
-	call self.__raw_set(a:text)
-	call self.__raw_update()
-endfunc
-
-
-"----------------------------------------------------------------------
-" move: move cursor
-"----------------------------------------------------------------------
-function! s:readline.move(pos) abort
-	call self.__raw_move(pos)
-	call self.__raw_update()
-	return pos
+function! s:readline.update() abort
+	let self.text = list2str(self.code)
+	let self.size = len(self.code)
+	let cc = self.cursor
+	let p1 = slice(self.code, 0, cc)
+	let p2 = slice(self.code, cc, cc + 1)
+	let p3 = slice(self.code, cc + 1)
+	let self.part = [list2str(p1), list2str(p2), list2str(p3)]
 endfunc
 
 
 "----------------------------------------------------------------------
 " insert text in current cursor position
 "----------------------------------------------------------------------
-function! s:readline.__raw_insert(text) abort
+function! s:readline.insert(text) abort
 	let code = str2list(text)
 	let wide = []
 	let cursor = self.cursor
@@ -102,18 +83,9 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" insert text in current cursor position
-"----------------------------------------------------------------------
-function! s:readline.insert(text) abort
-	call self.__raw_input(a:text)
-	call self.__raw_update()
-endfunc
-
-
-"----------------------------------------------------------------------
 " internal function: delete n characters on and after cursor
 "----------------------------------------------------------------------
-function! s:readline.__raw_delete(size) abort
+function! s:readline.delete(size) abort
 	let avail = self.size - cursor
 	if avail <= 0
 		return 0
@@ -122,31 +94,7 @@ function! s:readline.__raw_delete(size) abort
 	let size = (size > avail)? avail : size
 	let cursor = self.cursor
 	call remove(self.code, cursor, cursor + size - 1)
-	call remove(self.code, cursor, cursor + size - 1)
-	return 0
-endfunc
-
-
-"----------------------------------------------------------------------
-" delete n characters on and after cursor
-"----------------------------------------------------------------------
-function! s:readline.delete(size) abort
-	call self.__raw_delete(size)
-	call self.__raw_update()
-endfunc
-
-
-"----------------------------------------------------------------------
-" backspace
-"----------------------------------------------------------------------
-function! s:readline.__raw_backspace(size) abort
-	let avail = self.cursor
-	let size = a:size
-	let size = (size > avail)? avail : size
-	if size > 0
-		let self.cursor -= size
-		call self.__raw_delete(size)
-	endif
+	call remove(self.wide, cursor, cursor + size - 1)
 	return 0
 endfunc
 
@@ -155,8 +103,13 @@ endfunc
 " backspace
 "----------------------------------------------------------------------
 function! s:readline.backspace(size) abort
-	call self.__raw_backspace(a:size)
-	call self.__raw_update()
+	let avail = self.cursor
+	let size = a:size
+	let size = (size > avail)? avail : size
+	if size > 0
+		let self.cursor -= size
+		call self.delete(size)
+	endif
 endfunc
 
 
@@ -165,7 +118,7 @@ endfunc
 "----------------------------------------------------------------------
 function! s:readline.replace(text) abort
 	let length = strchars(a:text)
-	call self.__raw_delete(length)
+	call self.delete(length)
 	return self.insert(a:text)
 endfunc
 
