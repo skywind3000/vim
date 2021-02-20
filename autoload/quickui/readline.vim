@@ -221,21 +221,25 @@ function! s:readline.feed(char) abort
 			call self.history_prev()
 		elseif char == "\<DOWN>"
 			call self.history_next()
-		elseif char == "\<C-Insert>"
-		elseif char == "\<S-Insert>"
-		elseif char == "\<c-w>"
+		elseif char == "\<c-d>"
+			call self.delete(1)
 		elseif char == "\<c-k>"
+			if self.size > self.cursor
+				call self.delete(self.size - self.cursor)
+			endif
 		elseif char == "\<home>"
 			call self.move(0)
 		elseif char == "\<end>"
 			call self.move(self.size)
+		elseif char == "\<C-Insert>"
+		elseif char == "\<S-Insert>"
+		elseif char == "\<c-w>"
 		else
 			return -1
 		endif
 		return 0
 	else
 		call self.insert(char)
-		call self.update()
 	endif
 	return 0
 endfunc
