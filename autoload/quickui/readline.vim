@@ -327,7 +327,7 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" test
+" test suit
 "----------------------------------------------------------------------
 function! quickui#readline#test()
 	let v:errors = []
@@ -353,15 +353,25 @@ function! quickui#readline#test()
 	call obj.move(3)
 	call obj.replace('abcd')
 	call assert_equal('012abcd789', obj.update(), 'test replace')
+	let obj.select = obj.cursor
+	call obj.seek(-2, 1)
+	call obj.visual_delete()
+	call assert_equal('012ab789', obj.update(), 'test visual delete')
+	let obj.select = obj.cursor
+	call obj.seek(2, 1)
+	call assert_equal('78', obj.visual_text(), 'test visual selection')
+	call obj.visual_delete()
+	call assert_equal('012ab9', obj.update(), 'test visual delete2')
 	if len(v:errors) 
 		for error in v:errors
 			echoerr error
 		endfor
 	endif
-	echo obj.update()
+	return obj.update()
 endfunc
 
-call quickui#readline#test()
+" echo quickui#readline#test()
+
 
 "----------------------------------------------------------------------
 " test
