@@ -36,10 +36,24 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" change position, mode: 0/start, 1/current, 2/eol
+"----------------------------------------------------------------------
+function! s:readline.seek(pos, mode) abort
+	if a:mode == 0
+		call self.move(a:pos)
+	elseif a:mode == 1
+		call self.move(self.cursor + a:pos)
+	else
+		call self.move(self.size + a:pos)
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " set text
 "----------------------------------------------------------------------
 function! s:readline.set(text)
-	let code = list2str(text)
+	let code = str2list(a:text)
 	let wide = []
 	for cc in code
 		let ch = nr2char(cc)
@@ -83,15 +97,15 @@ endfunc
 " insert text in current cursor position
 "----------------------------------------------------------------------
 function! s:readline.insert(text) abort
-	let code = str2list(text)
+	let code = str2list(a:text)
 	let wide = []
 	let cursor = self.cursor
 	for cc in code
 		let ch = nr2char(cc)
 		let wide += [strdisplaywidth(cc)]
 	endfor
-	call insert(self.code, code, cursor)
-	call insert(self.wide, wide, cursor)
+	call extend(self.code, code, cursor)
+	call extend(self.wide, wide, cursor)
 	let self.size = len(self.code)
 	let self.cursor += len(code)
 	let self.dirty = 1
@@ -102,6 +116,7 @@ endfunc
 " internal function: delete n characters on and after cursor
 "----------------------------------------------------------------------
 function! s:readline.delete(size) abort
+	let cursor = self.cursor
 	let avail = self.size - cursor
 	if avail > 0
 		let size = a:size
@@ -197,7 +212,7 @@ function! s:readline.visual_replace(text) abort
 		call self.visual_delete()
 		call self.insert(a:text)
 	endif
-endif
+endfunc
 
 
 "----------------------------------------------------------------------
@@ -310,6 +325,43 @@ function! quickui#readline#new()
 	return obj
 endfunc
 
+
+"----------------------------------------------------------------------
+" test
+"----------------------------------------------------------------------
+function! quickui#readline#test()
+	let v:errors = []
+	let obj = quickui#readline#new()
+	call obj.set('0123456789')
+	call assert_equal('0123456789', obj.update(), 'test set')
+	call obj.insert('ABC')
+	call assert_equal('ABC0123456789', obj.update(), 'test insert')
+	call obj.delete(3)
+	call assert_equal('ABC3456789', obj.update(), 'test delete')
+	call obj.backspace(2)
+	call assert_equal('A3456789', obj.update(), 'test backspace')
+	call obj.delete(1000)
+	call assert_equal('A', obj.update(), 'test kill right')
+	call obj.insert('BCD')
+	call assert_equal('ABCD', obj.update(), 'test append')
+	call obj.delete(1000)
+	call assert_equal('ABCD', obj.update(), 'test append')
+	call obj.backspace(1000)
+	call assert_equal('', obj.update(), 'test append')
+	call obj.insert('0123456789')
+	call assert_equal('0123456789', obj.update(), 'test reinit')
+	call obj.move(3)
+	call obj.replace('abcd')
+	call assert_equal('012abcd789', obj.update(), 'test replace')
+	if len(v:errors) 
+		for error in v:errors
+			echoerr error
+		endfor
+	endif
+	echo obj.update()
+endfunc
+
+call quickui#readline#test()
 
 "----------------------------------------------------------------------
 " test
