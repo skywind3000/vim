@@ -18,6 +18,7 @@ let s:readline.wide = []        " char display width
 let s:readline.size = 0         " buffer size in character
 let s:readline.text = ''        " text buffer
 let s:readline.dirty = 0        " dirty
+let s:readline.select = -1      " visual selection start pos
 let s:readline.history = []     " history text
 let s:readline.index = 0        " history pointer, 0 for current
 
@@ -57,7 +58,6 @@ endfunc
 "----------------------------------------------------------------------
 function! s:readline.update() abort
 	let self.text = list2str(self.code)
-	let self.size = len(self.code)
 	let self.dirty = 0
 	return self.text
 endfunc
@@ -147,6 +147,15 @@ endfunc
 " save history in current position
 "----------------------------------------------------------------------
 function! s:readline.history_save() abort
+	let size = len(self.history)
+	if size > 0
+		let self.index = (self.index < 0)? 0 : self.index
+		let self.index = (self.index >= size)? (size - 1) : self.index
+		if self.dirty
+			call self.update()
+		endif
+		let self.history[self.index] = self.text
+	endif
 endfunc
 
 
@@ -154,7 +163,12 @@ endfunc
 " previous history
 "----------------------------------------------------------------------
 function! s:readline.history_prev() abort
-
+	let size = len(self.history)
+	if size > 0
+		call self.history_save()
+		let self.index = (self.index < size - 1)? (self.index + 1) : 0
+		call self.set(self.history[self.index])
+	endif
 endfunc
 
 
@@ -162,6 +176,28 @@ endfunc
 " next history
 "----------------------------------------------------------------------
 function! s:readline.history_next() abort
+	let size = len(self.history)
+	if size > 0
+		call self.history_save()
+		let self.index = (self.index <= 0)? (size - 1) : (self.index - 1)
+		call self.set(self.history[self.index])
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" init history
+"----------------------------------------------------------------------
+function! s:readline.history_init(history) abort
+	if len(a:history) == 0
+		let self.history = []
+		let self.index = 0
+	else
+		let history = deepcopy(a:history) + ['']
+		call reverse(history)
+		let self.history = history
+		let self.index = 0
+	endif
 endfunc
 
 
@@ -182,7 +218,9 @@ function! s:readline.feed(char) abort
 		elseif char == "\<RIGHT>"
 			call self.move(self.cursor + 1)
 		elseif char == "\<UP>"
+			call self.history_prev()
 		elseif char == "\<DOWN>"
+			call self.history_next()
 		elseif char == "\<C-Insert>"
 		elseif char == "\<S-Insert>"
 		elseif char == "\<c-w>"
