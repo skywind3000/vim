@@ -144,6 +144,63 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" get selection range [start, end)
+"----------------------------------------------------------------------
+function! s:readline.visual_range() abort
+	if self.select < 0
+		return [-1, -1]
+	elseif self.select <= self.cursor
+		return [self.select, self.cursor]
+	else
+		return [self.cursor, self.select]
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" get selection text
+"----------------------------------------------------------------------
+function! s:readline.visual_text() abort
+	if self.select < 0
+		return ''
+	else
+		let [start, end] = self.visual_range()
+		let code = slice(self.code, start, end)
+		return list2str(code)
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" delete selection
+"----------------------------------------------------------------------
+function! s:readline.visual_delete() abort
+	if self.select >= 0
+		let cursor = self.cursor
+		let length = self.cursor - self.select
+		if length > 0
+			call self.backspace(length)
+			let self.select = -1
+		elseif length < 0
+			call self.delete(-length)
+			let self.select = -1
+		endif
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" replace selection
+"----------------------------------------------------------------------
+function! s:readline.visual_replace(text) abort
+	if self.select >= 0
+		call self.visual_delete()
+		call self.insert(a:text)
+	endif
+endif
+
+
+"----------------------------------------------------------------------
 " save history in current position
 "----------------------------------------------------------------------
 function! s:readline.history_save() abort
@@ -242,6 +299,23 @@ function! s:readline.feed(char) abort
 		call self.insert(char)
 	endif
 	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" constructor
+"----------------------------------------------------------------------
+function! quickui#readline#new()
+	let obj = deepcopy(s:readline)
+	return obj
+endfunc
+
+
+"----------------------------------------------------------------------
+" test
+"----------------------------------------------------------------------
+function! quickui#readline#cli(prompt)
+	let rl = quickui#readline#new()
 endfunc
 
 
