@@ -282,7 +282,7 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" display: attrib -> 0/padding, 1/text, 2/visual, 4/cursor
+" display: attrib -> 0/left-padding, 1/text, 2/visual, 0x100/cursor
 "----------------------------------------------------------------------
 function! s:readline.display(pos, length)
 	let length = a:length
@@ -305,7 +305,7 @@ function! s:readline.display(pos, length)
 	if length > 0
 		let [visual_start, visual_end] = self.visual_range()
 		while length > 0
-			let check = (sx >= visual_start && sx < visual_end)? 3 : 1
+			let check = (sx >= visual_start && sx < visual_end)? 2 : 1
 			let video[dx] = codes[sx]
 			let attrs[dx] = check
 			let dx += 1
@@ -315,7 +315,7 @@ function! s:readline.display(pos, length)
 	endif
 	if self.cursor >= a:pos && self.cursor < a:length
 		let delta = self.cursor - a:pos
-		let attrs[delta] = or(attrs[delta], 4)
+		let attrs[delta] = or(attrs[delta], 0x100)
 	endif
 	return display
 endfunc
