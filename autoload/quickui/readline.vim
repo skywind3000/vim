@@ -15,12 +15,10 @@ let s:readline = {}
 let s:readline.cursor = 0       " cursur position in character
 let s:readline.code = []        " buffer character in int list
 let s:readline.wide = []        " char display width
-let s:readline.size = 0	        " buffer size in character
+let s:readline.size = 0         " buffer size in character
 let s:readline.text = ''        " text buffer
 let s:readline.part = []        " 0/1/2: before/on/after cursor
-
-let s:readline.on_move = ''     " on cursor move
-let s:readline.on_change = ''   " on text change
+let s:readline.dirty = 0        " dirty
 
 
 "----------------------------------------------------------------------
@@ -47,6 +45,7 @@ function! s:readline.set(text)
 	endfor
 	let self.code = code
 	let self.wide = wide
+	let self.dirty = 1
 	call self.move(self.cursor)
 endfunc
 
@@ -62,6 +61,7 @@ function! s:readline.update() abort
 	let p2 = slice(self.code, cc, cc + 1)
 	let p3 = slice(self.code, cc + 1)
 	let self.part = [list2str(p1), list2str(p2), list2str(p3)]
+	let self.dirty = 0
 endfunc
 
 
@@ -79,6 +79,7 @@ function! s:readline.insert(text) abort
 	call insert(self.code, code, cursor)
 	call insert(self.wide, wide, cursor)
 	let self.cursor += len(code)
+	let self.dirty = 1
 endfunc
 
 
@@ -87,15 +88,14 @@ endfunc
 "----------------------------------------------------------------------
 function! s:readline.delete(size) abort
 	let avail = self.size - cursor
-	if avail <= 0
-		return 0
+	if avail > 0
+		let size = a:size
+		let size = (size > avail)? avail : size
+		let cursor = self.cursor
+		call remove(self.code, cursor, cursor + size - 1)
+		call remove(self.wide, cursor, cursor + size - 1)
+		let self.dirty = 1
 	endif
-	let size = a:size
-	let size = (size > avail)? avail : size
-	let cursor = self.cursor
-	call remove(self.code, cursor, cursor + size - 1)
-	call remove(self.wide, cursor, cursor + size - 1)
-	return 0
 endfunc
 
 
@@ -109,6 +109,7 @@ function! s:readline.backspace(size) abort
 	if size > 0
 		let self.cursor -= size
 		call self.delete(size)
+		let self.dirty = 1
 	endif
 endfunc
 
