@@ -282,27 +282,59 @@ function! s:readline.feed(char) abort
 	let head = len(code)? code[0] : 0
 	if head < 0x20 || head == 0x80
 		if char == "\<BS>"
-			call self.backspace(1)
+			if self.select >= 0
+				call self.visual_delete()
+			else
+				call self.backspace(1)
+			endif
 		elseif char == "\<DELETE>"
-			call self.delete(1)
+			if self.select >= 0
+				call self.visual_delete()
+			else
+				call self.delete(1)
+			endif
 		elseif char == "\<LEFT>"
 			call self.move(self.cursor - 1)
+			let self.select = -1
 		elseif char == "\<RIGHT>"
 			call self.move(self.cursor + 1)
+			let self.select = -1
 		elseif char == "\<UP>"
 			call self.history_prev()
+			let self.select = -1
 		elseif char == "\<DOWN>"
 			call self.history_next()
+			let self.select = -1
+		elseif char == "\<S-Left>"
+			if self.select < 0
+				let self.select = self.cursor
+			endif
+			call self.seek(-1, 1)
+		elseif char == '\<s-Right>'
+			if self.select < 0
+				let self.select = self.cursor
+			endif
+			call self.seek(1, 1)
 		elseif char == "\<c-d>"
-			call self.delete(1)
+			if self.select >= 0
+				call self.visual_delete()
+			else
+				call self.delete(1)
+			endif
 		elseif char == "\<c-k>"
-			if self.size > self.cursor
-				call self.delete(self.size - self.cursor)
+			if self.select >= 0
+				call self.visual_delete()
+			else
+				if self.size > self.cursor
+					call self.delete(self.size - self.cursor)
+				endif
 			endif
 		elseif char == "\<home>"
 			call self.move(0)
+			let self.select = -1
 		elseif char == "\<end>"
 			call self.move(self.size)
+			let self.select = -1
 		elseif char == "\<C-Insert>"
 		elseif char == "\<S-Insert>"
 		elseif char == "\<c-w>"
@@ -311,6 +343,9 @@ function! s:readline.feed(char) abort
 		endif
 		return 0
 	else
+		if self.select >= 0
+			call self.visual_delete()
+		endif
 		call self.insert(char)
 	endif
 	return 0
