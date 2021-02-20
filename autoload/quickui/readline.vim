@@ -295,14 +295,12 @@ function! s:readline.display(pos, length)
 	let dx = 0
 	" skip left spaces
 	if sx < 0
-		let space = -sx
-		let blank = (space <= length)? space : length
-		let length -= blank
-		let sx += blank
-		let dx += blank
+		let length += sx
+		let dx -= sx
+		let sx = 0
 	endif
-	let length = (sx + length > size)? (size - sx) : length
 	if length > 0
+		let length = (sx + length > size)? (size - sx) : length
 		let [visual_start, visual_end] = self.visual_range()
 		while length > 0
 			let check = (sx >= visual_start && sx < visual_end)? 2 : 1
