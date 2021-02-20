@@ -17,8 +17,9 @@ let s:readline.code = []        " buffer character in int list
 let s:readline.wide = []        " char display width
 let s:readline.size = 0         " buffer size in character
 let s:readline.text = ''        " text buffer
-let s:readline.part = []        " 0/1/2: before/on/after cursor
 let s:readline.dirty = 0        " dirty
+let s:readline.history = []     " history text
+let s:readline.index = 0        " history pointer, 0 for current
 
 
 "----------------------------------------------------------------------
@@ -45,6 +46,7 @@ function! s:readline.set(text)
 	endfor
 	let self.code = code
 	let self.wide = wide
+	let self.size = len(code)
 	let self.dirty = 1
 	call self.move(self.cursor)
 endfunc
@@ -56,12 +58,24 @@ endfunc
 function! s:readline.update() abort
 	let self.text = list2str(self.code)
 	let self.size = len(self.code)
-	let cc = self.cursor
-	let p1 = slice(self.code, 0, cc)
-	let p2 = slice(self.code, cc, cc + 1)
-	let p3 = slice(self.code, cc + 1)
-	let self.part = [list2str(p1), list2str(p2), list2str(p3)]
 	let self.dirty = 0
+	return self.text
+endfunc
+
+
+"----------------------------------------------------------------------
+" extract text: -1/0/1 for text before/on/after cursor
+"----------------------------------------------------------------------
+function! s:readline.extract(locate)
+	let cc = self.cursor
+	if a:locate < 0
+		let p = slice(self.code, 0, cc)
+	elseif a:locate == 0
+		let p = slice(self.code, cc, cc + 1)
+	else
+		let p = slice(self.code, cc + 1)
+	endif
+	return list2str(p)
 endfunc
 
 
@@ -78,6 +92,7 @@ function! s:readline.insert(text) abort
 	endfor
 	call insert(self.code, code, cursor)
 	call insert(self.wide, wide, cursor)
+	let self.size = len(self.code)
 	let self.cursor += len(code)
 	let self.dirty = 1
 endfunc
@@ -94,6 +109,7 @@ function! s:readline.delete(size) abort
 		let cursor = self.cursor
 		call remove(self.code, cursor, cursor + size - 1)
 		call remove(self.wide, cursor, cursor + size - 1)
+		let self.size = len(self.code)
 		let self.dirty = 1
 	endif
 endfunc
@@ -119,8 +135,33 @@ endfunc
 "----------------------------------------------------------------------
 function! s:readline.replace(text) abort
 	let length = strchars(a:text)
-	call self.delete(length)
-	return self.insert(a:text)
+	if length > 0
+		call self.delete(length)
+		call self.insert(a:text)
+		let self.dirty = 1
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" save history in current position
+"----------------------------------------------------------------------
+function! s:readline.history_save() abort
+endfunc
+
+
+"----------------------------------------------------------------------
+" previous history
+"----------------------------------------------------------------------
+function! s:readline.history_prev() abort
+
+endfunc
+
+
+"----------------------------------------------------------------------
+" next history
+"----------------------------------------------------------------------
+function! s:readline.history_next() abort
 endfunc
 
 
@@ -133,16 +174,30 @@ function! s:readline.feed(char) abort
 	let head = len(code)? code[0] : 0
 	if head < 0x20 || head == 0x80
 		if char == "\<BS>"
+			call self.backspace(1)
 		elseif char == "\<DELETE>"
+			call self.delete(1)
 		elseif char == "\<LEFT>"
+			call self.move(self.cursor - 1)
 		elseif char == "\<RIGHT>"
+			call self.move(self.cursor + 1)
 		elseif char == "\<UP>"
 		elseif char == "\<DOWN>"
+		elseif char == "\<C-Insert>"
+		elseif char == "\<S-Insert>"
+		elseif char == "\<c-w>"
+		elseif char == "\<c-k>"
+		elseif char == "\<home>"
+			call self.move(0)
+		elseif char == "\<end>"
+			call self.move(self.size)
 		else
 			return -1
 		endif
 		return 0
 	else
+		call self.insert(char)
+		call self.update()
 	endif
 	return 0
 endfunc
