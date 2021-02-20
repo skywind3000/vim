@@ -246,20 +246,78 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" calculate view port size, give length in display-width,
+" calculate available view port size, give length in display-width,
 " returns how many characters can fit in length.
 "----------------------------------------------------------------------
-function! s:readline.viewport(pos, length)
+function! s:readline.avail(pos, length)
 	let length = a:length
 	let size = self.size
+	let wide = self.wide
 	let pos = a:pos
-	let pos = (pos < 0)? 0 : pos
-	let pos = (pos > size)? size : pos
+	let sum = 0
 	if length == 0
 		return 0
 	elseif length > 0
+		while 1
+			let csize = (pos >= 0 && pos < size)? wide[pos] : 1
+			let sum += char_width
+			if sum > length
+				break
+			endif
+			let pos += 1
+		endwhile
+		return pos - a:pos
 	else
+		while 1
+			let csize = (pos >= 0 && pos < size)? wide[pos] : 1
+			let sum += char_width
+			if sum > length
+				break
+			endif
+			let pos -= 1
+		endwhile
+		return a:pos - pos
 	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" display: attrib -> 0/padding, 1/text, 2/visual, 4/cursor
+"----------------------------------------------------------------------
+function! s:readline.display(pos, length)
+	let length = a:length
+	let size = self.size
+	let video = repeat([str2nr(' ')], length)
+	let attrs = repeat([0], length)
+	let codes = self.code
+	let display = []
+	let sx = a:pos
+	let dx = 0
+	" skip left spaces
+	if sx < 0
+		let space = -sx
+		let blank = (space <= length)? space : length
+		let length -= blank
+		let sx += blank
+		let dx += blank
+	endif
+	let length = (sx + length > size)? (size - sx) : length
+	if length > 0
+		let [visual_start, visual_end] = self.visual_range()
+		while length > 0
+			let check = (sx >= visual_start && sx < visual_end)? 3 : 1
+			let video[dx] = codes[sx]
+			let attrs[dx] = check
+			let dx += 1
+			let sx += 1
+			let length -= 1
+		endwhile
+	endif
+	if self.cursor >= a:pos && self.cursor < a:length
+		let delta = self.cursor - a:pos
+		let attrs[delta] = or(attrs[delta], 4)
+	endif
+	return display
 endfunc
 
 
