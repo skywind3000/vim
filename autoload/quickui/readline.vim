@@ -489,7 +489,11 @@ function! s:readline.echo(blink)
 		if attr == 0
 			echohl Normal
 		elseif attr == 1
-			echohl Cursor
+			if a:blink == 0
+				echohl Cursor
+			else
+				echohl Normal
+			endif
 		elseif attr == 2
 			echohl Visual
 		elseif attr == 3
@@ -571,20 +575,26 @@ endfunc
 function! quickui#readline#cli(prompt)
 	let rl = quickui#readline#new()
 	let index = 0
+	let start = localtime()
 	while 1
 		noautocmd redraw
 		echohl Question
 		echon ' (' . index . ') ' . a:prompt
-		" call rl.echo(0)
-		echon rl.display()
+		let ts = float2nr(reltimefloat(reltime()) * 10)
+		call rl.echo((ts % 10) < 5)
+		" echon rl.display()
 		try
-			let code = getchar()
+			let code = getchar(0)
 		catch /^Vim:Interrupt$/
 			let code = "\<c-c>"
 		endtry
 		if type(code) == v:t_number && code == 0
-			exec 'sleep 10m'
-			continue
+			try
+				exec 'sleep 20m'
+				continue
+			catch /^Vim:Interrupt$/
+				let code = "\<c-c>"
+			endtry
 		endif
 		let ch = (type(code) == v:t_number)? nr2char(code) : code
 		if ch == ""
@@ -597,6 +607,7 @@ function! quickui#readline#cli(prompt)
 	endwhile
 	echohl None
 	noautocmd redraw
+	echo ""
 endfunc
 
 call quickui#readline#cli(">>> ")
