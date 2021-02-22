@@ -32,11 +32,13 @@ endif
 "----------------------------------------------------------------------
 " initialize each python file
 "----------------------------------------------------------------------
-if s:has_black
-	setlocal formatprg=black\ -q\ -
-elseif s:has_autopep8
+if s:has_autopep8
 	setlocal formatprg=autopep8\ -
+elseif s:has_black
+	setlocal formatprg=black\ -q\ -
 elseif s:has_yapf
 	setlocal formatprg=yapf
 endif
 	
+
+
