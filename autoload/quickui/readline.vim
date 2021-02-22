@@ -421,12 +421,20 @@ function! s:readline.feed(char) abort
 			else
 				call self.delete(1)
 			endif
-		elseif char == "\<LEFT>"
-			call self.move(self.cursor - 1)
-			let self.select = -1
-		elseif char == "\<RIGHT>"
-			call self.move(self.cursor + 1)
-			let self.select = -1
+		elseif char == "\<LEFT>" || char == "\<c-b>"
+			if self.select >= 0
+				call self.move(min([self.select, self.cursor]))
+				let self.select = -1
+			else
+				call self.seek(-1, 1)
+			endif
+		elseif char == "\<RIGHT>" || char == "\<c-f>"
+			if self.select >= 0
+				call self.move(max([self.select, self.cursor]))
+				let self.select = -1
+			else
+				call self.seek(1, 1)
+			endif
 		elseif char == "\<UP>"
 			call self.history_prev()
 			let self.select = -1
@@ -443,6 +451,16 @@ function! s:readline.feed(char) abort
 				let self.select = self.cursor
 			endif
 			call self.seek(1, 1)
+		elseif char == "\<S-Home>"
+			if self.select < 0
+				let self.select = self.cursor
+			endif
+			call self.seek(0, 0)
+		elseif char == "\<S-End>"
+			if self.select < 0
+				let self.select = self.cursor
+			endif
+			call self.seek(0, 2)
 		elseif char == "\<c-d>"
 			if self.select >= 0
 				call self.visual_delete()
@@ -457,10 +475,10 @@ function! s:readline.feed(char) abort
 					call self.delete(self.size - self.cursor)
 				endif
 			endif
-		elseif char == "\<home>"
+		elseif char == "\<home>" || char == "\<c-a>"
 			call self.move(0)
 			let self.select = -1
-		elseif char == "\<end>"
+		elseif char == "\<end>" || char == "\<c-e>"
 			call self.move(self.size)
 			let self.select = -1
 		elseif char == "\<C-Insert>"
@@ -581,7 +599,7 @@ function! quickui#readline#cli(prompt)
 		echohl Question
 		echon ' (' . index . ') ' . a:prompt
 		let ts = float2nr(reltimefloat(reltime()) * 10)
-		call rl.echo((ts % 10) < 5)
+		call rl.echo((ts % 8) < 3)
 		" echon rl.display()
 		try
 			let code = getchar(0)
@@ -590,7 +608,7 @@ function! quickui#readline#cli(prompt)
 		endtry
 		if type(code) == v:t_number && code == 0
 			try
-				exec 'sleep 20m'
+				exec 'sleep 15m'
 				continue
 			catch /^Vim:Interrupt$/
 				let code = "\<c-c>"
