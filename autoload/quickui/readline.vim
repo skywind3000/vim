@@ -288,8 +288,7 @@ endfunc
 " [(0, "Hello, "), (1, "W"), (0, "orld !!")]
 " avail attributes: 0/normal-text, 1/cursor, 2/visual, 3/visual+cursor
 "----------------------------------------------------------------------
-function! s:readline.display(pos, length)
-	let length = a:length
+function! s:readline.display()
 	let size = self.size
 	let cursor = self.cursor
 	let codes = self.code
@@ -523,18 +522,21 @@ function! quickui#readline#test()
 	call assert_equal('012ab789', obj.update(), 'test visual delete')
 	let obj.select = obj.cursor
 	call obj.seek(2, 1)
+	echo obj.display()
 	call assert_equal('78', obj.visual_text(), 'test visual selection')
 	call obj.visual_delete()
 	call assert_equal('012ab9', obj.update(), 'test visual delete2')
+	call obj.seek(-2, 1)
 	if len(v:errors) 
 		for error in v:errors
 			echoerr error
 		endfor
 	endif
+	echo obj.display()
 	return obj.update()
 endfunc
 
-" echo quickui#readline#test()
+echo quickui#readline#test()
 
 
 "----------------------------------------------------------------------
