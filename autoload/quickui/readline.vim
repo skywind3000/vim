@@ -484,6 +484,38 @@ function! s:readline.feed(char) abort
 		elseif char == "\<C-Insert>"
 		elseif char == "\<S-Insert>"
 		elseif char == "\<c-w>"
+			if self.select < 0
+				let head = self.extract(-1)
+				let word = matchstr(head, '\S\+\s*$')
+				if word != ''
+					call self.backspace(strchars(word))
+				endif
+			else
+				call self.visual_delete()
+			endif
+		elseif char == "\<c-c>"
+			if self.select >= 0
+				let text = self.visual_text()
+				if text != ''
+					let @0 = text
+				endif
+			endif
+		elseif char == "\<c-x>"
+			if self.select >= 0
+				let text = self.visual_text()
+				if text != ''
+					let @0 = text
+					call self.visual_delete()
+				endif
+			endif
+		elseif char == "\<c-v>"
+			let text = split(@0, "\n", 1)[0]
+			if text != ''
+				if self.select >= 0
+					call self.visual_delete()
+				endif
+				call self.insert(text)
+			endif
 		else
 			return -1
 		endif
@@ -618,7 +650,7 @@ function! quickui#readline#cli(prompt)
 		let ch = (type(code) == v:t_number)? nr2char(code) : code
 		if ch == ""
 			continue
-		elseif ch == "\<ESC>" || ch == "\<c-c>"
+		elseif ch == "\<ESC>"
 			break
 		elseif ch == "\<cr>"
 			let accept = rl.update()
