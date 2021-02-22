@@ -594,6 +594,7 @@ function! quickui#readline#cli(prompt)
 	let rl = quickui#readline#new()
 	let index = 0
 	let start = localtime()
+	let accept = ''
 	while 1
 		noautocmd redraw
 		echohl Question
@@ -619,6 +620,9 @@ function! quickui#readline#cli(prompt)
 			continue
 		elseif ch == "\<ESC>" || ch == "\<c-c>"
 			break
+		elseif ch == "\<cr>"
+			let accept = rl.update()
+			break
 		else
 			call rl.feed(ch)
 		endif
@@ -626,9 +630,10 @@ function! quickui#readline#cli(prompt)
 	echohl None
 	noautocmd redraw
 	echo ""
+	return accept
 endfunc
 
-call quickui#readline#cli(">>> ")
+echo quickui#readline#cli(">>> ")
 
 
 
