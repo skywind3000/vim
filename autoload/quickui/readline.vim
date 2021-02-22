@@ -482,7 +482,20 @@ function! s:readline.feed(char) abort
 			call self.move(self.size)
 			let self.select = -1
 		elseif char == "\<C-Insert>"
+			if self.select >= 0
+				let text = self.visual_text()
+				if text != ''
+					let @* = text
+				endif
+			endif
 		elseif char == "\<S-Insert>"
+			let text = split(@*, "\n", 1)[0]
+			if text != ''
+				if self.select >= 0
+					call self.visual_delete()
+				endif
+				call self.insert(text)
+			endif
 		elseif char == "\<c-w>"
 			if self.select < 0
 				let head = self.extract(-1)
