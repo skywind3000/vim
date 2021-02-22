@@ -668,4 +668,3 @@ endfunc
 echo quickui#readline#cli(">>> ")
 
 
-
