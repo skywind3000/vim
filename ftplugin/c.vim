@@ -18,6 +18,7 @@ endif
 
 let b:ftplugin_init_c = 1
 
+" prevent vim-plug set ft=? twice
 if exists('b:did_ftplugin')
 	let b:did_ftplugin = 2
 endif
