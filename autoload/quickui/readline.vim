@@ -300,16 +300,13 @@ function! s:readline.display(pos, length)
 			let code = slice(codes, 0, cursor)
 			let display += [[0, list2str(code)]]
 		endif
-		" content on and after cursor
-		if cursor < size
-			let code = [codes[cursor]]
-			let display += [[1, list2str(code)]]
-			if cursor + 1 < size
-				let code = slice(codes, cursor + 1, size)
-				let display += [[0, list2str(code)]]
-			endif
-		else
-			let display += [[1, ' ']]
+		" content on cursor
+		let code = (cursor < size)? codes[cursor] : char2nr(' ')
+		let display += [[1, list2str([code])]]
+		" content after cursor
+		if cursor + 1 < size
+			let code = slice(codes, cursor + 1, size)
+			let display += [[0, list2str(code)]]
 		endif
 	else
 		let vis_start = (cursor < self.select)? cursor : self.select
@@ -330,10 +327,16 @@ function! s:readline.display(pos, length)
 				let display += [[0, list2str(code)]]
 			endif
 		else
+			" visual selection
 			let code = slice(code, vis_start, vis_endup)
 			let display += [[2, list2str(code)]]
-			if cursor < size
-			else
+			" content on cursor
+			let code = (cursor < size)? codes[cursor] : char2nr(' ')
+			let display += [[1, list2str([code])]]
+			" content after cursor
+			if cursor + 1 < size
+				let code = slice(codes, cursor + 1, size)
+				let display += [[0, list2str(code)]]
 			endif
 		endif
 	endif
