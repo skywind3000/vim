@@ -259,7 +259,7 @@ function! s:readline.avail(pos, length)
 		return 0
 	elseif length > 0
 		while 1
-			let csize = (pos >= 0 && pos < size)? wide[pos] : 1
+			let char_width = (pos >= 0 && pos < size)? wide[pos] : 1
 			let sum += char_width
 			if sum > length
 				break
@@ -269,7 +269,7 @@ function! s:readline.avail(pos, length)
 		return pos - a:pos
 	else
 		while 1
-			let csize = (pos >= 0 && pos < size)? wide[pos] : 1
+			let char_width = (pos >= 0 && pos < size)? wide[pos] : 1
 			let sum += char_width
 			if sum > length
 				break
@@ -282,38 +282,60 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" display: attrib -> 0/left-padding, 1/text, 2/visual, 0x100/cursor
+" display: returns a list of text string with attributes
+" eg. the readline buffer is "Hello, World !!" and cursor is on "W"
+" the returns value should be:
+" [(0, "Hello, "), (1, "W"), (0, "orld !!")]
+" avail attributes: 0/normal-text, 1/cursor, 2/visual, 3/visual+cursor
 "----------------------------------------------------------------------
 function! s:readline.display(pos, length)
 	let length = a:length
 	let size = self.size
-	let video = repeat([str2nr(' ')], length)
-	let attrs = repeat([0], length)
+	let cursor = self.cursor
 	let codes = self.code
 	let display = []
-	let sx = a:pos
-	let dx = 0
-	" skip left spaces
-	if sx < 0
-		let length += sx
-		let dx -= sx
-		let sx = 0
-	endif
-	if length > 0
-		let length = (sx + length > size)? (size - sx) : length
-		let [visual_start, visual_end] = self.visual_range()
-		while length > 0
-			let check = (sx >= visual_start && sx < visual_end)? 2 : 1
-			let video[dx] = codes[sx]
-			let attrs[dx] = check
-			let dx += 1
-			let sx += 1
-			let length -= 1
-		endwhile
-	endif
-	if self.cursor >= a:pos && self.cursor < a:length
-		let delta = self.cursor - a:pos
-		let attrs[delta] = or(attrs[delta], 0x100)
+	if (self.select < 0) || (self.select == cursor)
+		" content before cursor
+		if cursor > 0
+			let code = slice(codes, 0, cursor)
+			let display += [[0, list2str(code)]]
+		endif
+		" content on and after cursor
+		if cursor < size
+			let code = [codes[cursor]]
+			let display += [[1, list2str(code)]]
+			if cursor + 1 < size
+				let code = slice(codes, cursor + 1, size)
+				let display += [[0, list2str(code)]]
+			endif
+		else
+			let display += [[1, ' ']]
+		endif
+	else
+		let vis_start = (cursor < self.select)? cursor : self.select
+		let vis_endup = (cursor > self.select)? cursor : self.select
+		" content befor visual selection
+		if vis_start > 0
+			let code = slice(codes, 0, vis_start)
+			let display += [[0, list2str(code)]]
+		endif
+		" content in visual selection
+		if cursor < self.select
+			let code = [codes[cursor]]
+			let display += [[3, list2str(code)]]
+			let code = slice(codes, cursor + 1, vis_endup)
+			let display += [[2, list2str(code)]]
+			if vis_endup < size
+				let code = slice(codes, vis_endup, size)
+				let display += [[0, list2str(code)]]
+			endif
+		else
+			let code = slice(code, vis_start, vis_endup)
+			let display += [[2, list2str(code)]]
+			if cursor < size
+			else
+			endif
+		endif
 	endif
 	return display
 endfunc
