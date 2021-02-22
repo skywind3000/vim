@@ -327,7 +327,7 @@ function! s:readline.display()
 			endif
 		else
 			" visual selection
-			let code = slice(code, vis_start, vis_endup)
+			let code = slice(codes, vis_start, vis_endup)
 			let display += [[2, list2str(code)]]
 			" content on cursor
 			let code = (cursor < size)? codes[cursor] : char2nr(' ')
@@ -438,7 +438,7 @@ function! s:readline.feed(char) abort
 				let self.select = self.cursor
 			endif
 			call self.seek(-1, 1)
-		elseif char == '\<s-Right>'
+		elseif char == "\<S-Right>"
 			if self.select < 0
 				let self.select = self.cursor
 			endif
@@ -477,6 +477,30 @@ function! s:readline.feed(char) abort
 		call self.insert(char)
 	endif
 	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" display parts
+"----------------------------------------------------------------------
+function! s:readline.echo(blink)
+	let display = self.display()
+	for [attr, text] in display
+		if attr == 0
+			echohl Normal
+		elseif attr == 1
+			echohl Cursor
+		elseif attr == 2
+			echohl Visual
+		elseif attr == 3
+			if a:blink == 0
+				echohl Cursor
+			else
+				echohl Visual
+			endif
+		endif
+		echon text
+	endfor
 endfunc
 
 
@@ -532,18 +556,49 @@ function! quickui#readline#test()
 			echoerr error
 		endfor
 	endif
+	call obj.move(1)
+	let obj.select = 4
 	echo obj.display()
 	return obj.update()
 endfunc
 
-echo quickui#readline#test()
+" echo quickui#readline#test()
 
 
 "----------------------------------------------------------------------
-" test
+" cli test
 "----------------------------------------------------------------------
 function! quickui#readline#cli(prompt)
 	let rl = quickui#readline#new()
+	let index = 0
+	while 1
+		noautocmd redraw
+		echohl Question
+		echon ' (' . index . ') ' . a:prompt
+		" call rl.echo(0)
+		echon rl.display()
+		try
+			let code = getchar()
+		catch /^Vim:Interrupt$/
+			let code = "\<c-c>"
+		endtry
+		if type(code) == v:t_number && code == 0
+			exec 'sleep 10m'
+			continue
+		endif
+		let ch = (type(code) == v:t_number)? nr2char(code) : code
+		if ch == ""
+			continue
+		elseif ch == "\<ESC>" || ch == "\<c-c>"
+			break
+		else
+			call rl.feed(ch)
+		endif
+	endwhile
+	echohl None
+	noautocmd redraw
 endfunc
+
+call quickui#readline#cli(">>> ")
 
 
