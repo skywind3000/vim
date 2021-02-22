@@ -630,7 +630,6 @@ function! quickui#readline#cli(prompt)
 	while 1
 		noautocmd redraw
 		echohl Question
-		echon ' (' . index . ') ' . a:prompt
 		let ts = float2nr(reltimefloat(reltime()) * 10)
 		call rl.echo((ts % 8) < 3)
 		" echon rl.display()
