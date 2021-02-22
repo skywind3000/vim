@@ -7,6 +7,8 @@
 "
 "======================================================================
 
+" vim: set ts=4 sw=4 tw=78 noet :
+
 
 "----------------------------------------------------------------------
 " readline class
@@ -288,7 +290,7 @@ endfunc
 " [(0, "Hello, "), (1, "W"), (0, "orld !!")]
 " avail attributes: 0/normal-text, 1/cursor, 2/visual, 3/visual+cursor
 "----------------------------------------------------------------------
-function! s:readline.display()
+function! s:readline.display() abort
 	let size = self.size
 	let cursor = self.cursor
 	let codes = self.code
@@ -339,6 +341,40 @@ function! s:readline.display()
 			endif
 		endif
 	endif
+	return display
+endfunc
+
+
+"----------------------------------------------------------------------
+" filter display list with a window
+"----------------------------------------------------------------------
+function! s:readline.window(display, start, endup) abort
+	let start = a:start
+	let endup = a:endup
+	let display = []
+	if start < 0
+		let avail = endup - start
+		let avail = min([avail, -start])
+		if avail > 0
+			let display += [[0, repeat(' ', avail)]]
+		endif
+		let start += avail
+	endif
+	if start >= endup
+		return display
+	endif
+	let pos = 0
+	for item in a:display
+		let attribute = item[0]
+		let text = item[1]
+		let chars = strchars(text)
+		let open = pos
+		let close = open + chars
+		if close <= endup || open >= endup
+			continue
+		endif
+		let pos += chars
+	endfor
 	return display
 endfunc
 
