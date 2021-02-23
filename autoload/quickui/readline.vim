@@ -23,6 +23,7 @@ let s:readline.dirty = 0        " dirty
 let s:readline.select = -1      " visual selection start pos
 let s:readline.history = []     " history text
 let s:readline.index = 0        " history pointer, 0 for current
+let s:readline.timer = -1       " cursor blink timer
 
 
 "----------------------------------------------------------------------
@@ -33,6 +34,7 @@ function! s:readline.move(pos) abort
 	let pos = (pos < 0)? 0 : pos
 	let pos = (pos > self.size)? self.size : pos
 	let self.cursor = pos
+	let self.timer = -1
 	return pos
 endfunc
 
@@ -110,6 +112,7 @@ function! s:readline.insert(text) abort
 	call extend(self.wide, wide, cursor)
 	let self.size = len(self.code)
 	let self.cursor += len(code)
+	let self.timer = -1
 	let self.dirty = 1
 endfunc
 
@@ -127,6 +130,7 @@ function! s:readline.delete(size) abort
 		call remove(self.code, cursor, cursor + size - 1)
 		call remove(self.wide, cursor, cursor + size - 1)
 		let self.size = len(self.code)
+		let self.timer = -1
 		let self.dirty = 1
 	endif
 endfunc
@@ -142,6 +146,7 @@ function! s:readline.backspace(size) abort
 	if size > 0
 		let self.cursor -= size
 		call self.delete(size)
+		let self.timer = -1
 		let self.dirty = 1
 	endif
 endfunc
@@ -222,6 +227,27 @@ endfunc
 "----------------------------------------------------------------------
 function! s:readline.is_eol()
 	return self.cursor >= self.size
+endfunc
+
+
+"----------------------------------------------------------------------
+" cursor blink, returns 0 for not blink, 1 for blink (invisible)
+"----------------------------------------------------------------------
+function! s:readline.blink(millisec)
+	let delay_wait = 500
+	let delay_on = 300
+	let delay_off = 300
+	if self.timer < 0
+		let self.timer = a:millisec
+		return 0
+	endif
+	let offset = a:millisec - self.timer
+	if offset < delay_wait
+		return 0
+	else
+		let size = max([delay_on + delay_off, 1])
+		return ((offset % size) < delay_on)? 0 : 1
+	endif
 endfunc
 
 
@@ -674,14 +700,13 @@ endfunc
 function! quickui#readline#cli(prompt)
 	let rl = quickui#readline#new()
 	let index = 0
-	let start = localtime()
 	let accept = ''
 	while 1
 		noautocmd redraw
 		echohl Question
 		echon a:prompt
-		let ts = float2nr(reltimefloat(reltime()) * 10)
-		call rl.echo((ts % 8) < 3)
+		let ts = float2nr(reltimefloat(reltime()) * 1000)
+		call rl.echo(rl.blink(ts))
 		" echon rl.display()
 		try
 			let code = getchar(0)
