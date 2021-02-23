@@ -19,9 +19,12 @@ if get(s:, 'once', 0) == 0
 	let s:once = 1
 	let s:has_go = executable('go')
 	let s:has_gofmt = executable('gofmt')
+	let s:has_goimports = executable('goimports')
 endif
 
-if s:has_gofmt
+if s:has_goimports
+	setlocal formatprg=goimports
+elseif s:has_gofmt
 	setlocal formatprg=gofmt
 endif
 
