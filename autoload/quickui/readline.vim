@@ -396,11 +396,25 @@ function! s:readline.window(display, start, endup) abort
 		let chars = strchars(text)
 		let open = pos
 		let close = open + chars
-		if close <= endup || open >= endup
-			continue
+		if close > start && open < endup
+			let open = max([open, start])
+			let open = min([open, endup])
+			let close = max([close, start])
+			let close = min([close, endup])
+			if open < close
+				if open == pos && close == open + chars
+					let display += [[attribute, text]]
+				else
+					let text = strcharpart(text, open - pos, close - open)
+					let display += [[attribute, text]]
+				endif
+			endif
 		endif
 		let pos += chars
 	endfor
+	if pos < endup
+		let display += [[0, repeat(' ', endup - pos)]]
+	endif
 	return display
 endfunc
 

@@ -212,6 +212,7 @@ if has_key(s:enabled, 'high')
 	Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 	Plug 'francoiscabrol/ranger.vim'
 	Plug 'sbdchd/neoformat'
+	Plug 'dhruvasagar/vim-table-mode'
 
 	if has('python3') || has('python2')
 		Plug 'chiel92/vim-autoformat'
