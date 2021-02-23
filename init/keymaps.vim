@@ -205,6 +205,14 @@ noremap <space>st :AsyncRun svn st<cr>
 " editing commands
 noremap <space>aa ggVG
 
+"----------------------------------------------------------------------
+" text-objects
+"----------------------------------------------------------------------
+onoremap e :<c-u>normal! ggvg<cr>
+vnoremap e ogg0og$
+onoremap il :<c-u>normal! v$o^oh<cr>
+vnoremap il $o^oh
+
 
 "----------------------------------------------------------------------
 " space + j : make
