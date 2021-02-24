@@ -122,6 +122,7 @@ if has_key(s:enabled, 'basic')
 	Plug 'bps/vim-textobj-python', {'for': 'python'}
 	Plug 'jceb/vim-textobj-uri'
 	Plug 'tommcdo/vim-exchange'
+	Plug 'tommcdo/vim-lion'
 
 	" Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
 	

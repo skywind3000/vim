@@ -205,6 +205,7 @@ let g:EchoFuncTrimSize = 1
 let g:EchoFuncBallonOnly = 1
 let g:startify_disable_at_vimenter = 1
 let g:startify_session_dir = '~/.vim/session'
+let g:vim_json_conceal = 0
 
 
 "----------------------------------------------------------------------
