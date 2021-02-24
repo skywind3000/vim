@@ -157,6 +157,7 @@ nnoremap <leader>fd :<c-u>Leaderf cmdHistory<cr>
 nnoremap <leader>fh :<c-u>Leaderf help<cr>
 nnoremap <leader>fj :<c-u>Leaderf jumps<cr>
 nnoremap <leader>fp :<c-u>Leaderf snippet<cr>
+nnoremap <leader>fq :<c-u>Leaderf quickfix<cr>
 
 inoremap <c-x><c-j> <c-\><c-o>:Leaderf snippet<cr>
 
