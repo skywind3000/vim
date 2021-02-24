@@ -131,6 +131,14 @@ let g:Lf_PreviewInPopup = 1
 
 
 "----------------------------------------------------------------------
+" filer
+"----------------------------------------------------------------------
+let g:Lf_FilerShowPromptPath = 1
+let g:Lf_FilerInsertMap = { '<Tab>': 'open_current', '<CR>': 'open_current', '<BS>': 'open_parent_or_backspace' }
+let g:Lf_FilerNormalMap = {'i': 'switch_insert_mode', '<esc>': 'quit', '~': 'goto_root_marker_dir', 'M': 'mkdir', 'T': 'create_file' }
+
+
+"----------------------------------------------------------------------
 " keymap
 "----------------------------------------------------------------------
 inoremap <c-x><c-j> <c-\><c-o>:Leaderf snippet<cr>
