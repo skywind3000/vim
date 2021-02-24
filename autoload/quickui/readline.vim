@@ -480,7 +480,7 @@ endfunc
 "----------------------------------------------------------------------
 " returns new window pos to fit in 
 "----------------------------------------------------------------------
-function! s:readline.reposition(window_pos, display_width)
+function! s:readline.slide_window(window_pos, display_width)
 	let window_pos = a:window_pos
 	let display_width = a:display_width
 	let cursor = self.cursor
