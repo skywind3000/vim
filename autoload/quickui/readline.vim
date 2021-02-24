@@ -478,6 +478,28 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" returns new window pos to fit in 
+"----------------------------------------------------------------------
+function! s:readline.reposition(window_pos, display_width)
+	let window_pos = a:window_pos
+	let display_width = a:display_width
+	let cursor = self.cursor
+	if display_width < 1
+		return cursor
+	elseif cursor < window_pos
+		return cursor
+	endif
+	let window_pos = (window_pos < 0)? 0 : window_pos
+	let wides = self.read_data(window_pos, cursor - window_pos, 1)
+	let width = sum(wides) + 1
+	if width <= display_width
+		return window_pos
+	endif
+	return window_pos
+endfunc
+
+
+"----------------------------------------------------------------------
 " feed character
 "----------------------------------------------------------------------
 function! s:readline.feed(char) abort

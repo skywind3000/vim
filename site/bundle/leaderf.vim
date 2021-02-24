@@ -134,13 +134,31 @@ let g:Lf_PreviewInPopup = 1
 " filer
 "----------------------------------------------------------------------
 let g:Lf_FilerShowPromptPath = 1
-let g:Lf_FilerInsertMap = { '<Tab>': 'open_current', '<CR>': 'open_current', '<BS>': 'open_parent_or_backspace' }
+let g:Lf_FilerInsertMap = { '<Tab>': 'open_current', '<CR>': 'open_current', '<BS>': 'open_parent_or_backspace' , '<up>':'up', '<down>':'down'}
 let g:Lf_FilerNormalMap = {'i': 'switch_insert_mode', '<esc>': 'quit', '~': 'goto_root_marker_dir', 'M': 'mkdir', 'T': 'create_file' }
 
 
 "----------------------------------------------------------------------
 " keymap
 "----------------------------------------------------------------------
+nnoremap <leader>ff :<c-u>Leaderf file<cr>
+nnoremap <leader>fe :<c-u>Leaderf filer<cr>
+nnoremap <leader>fb :<c-u>Leaderf buffer<cr>
+nnoremap <leader>fm :<c-u>Leaderf mru<cr>
+nnoremap <leader>fg :<c-u>Leaderf gtags<cr>
+nnoremap <leader>fr :<c-u>Leaderf rg<cr>
+nnoremap <leader>fw :<c-u>Leaderf window<cr>
+nnoremap <leader>fn :<c-u>Leaderf function<cr>
+nnoremap <leader>ft :<c-u>Leaderf tag<cr>
+nnoremap <leader>fu :<c-u>Leaderf bufTag<cr>
+nnoremap <leader>fs :<c-u>Leaderf self<cr>
+nnoremap <leader>fc :<c-u>Leaderf colorscheme<cr>
+nnoremap <leader>fd :<c-u>Leaderf cmdHistory<cr>
+nnoremap <leader>fh :<c-u>Leaderf help<cr>
+nnoremap <leader>fj :<c-u>Leaderf jumps<cr>
+nnoremap <leader>fp :<c-u>Leaderf snippet<cr>
+
 inoremap <c-x><c-j> <c-\><c-o>:Leaderf snippet<cr>
 
+nnoremap <leader>fd :exec 'Leaderf filer ' . fnameescape(expand('%:p:h'))<cr>
 
