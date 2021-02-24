@@ -141,25 +141,25 @@ let g:Lf_FilerNormalMap = {'i': 'switch_insert_mode', '<esc>': 'quit', '~': 'got
 "----------------------------------------------------------------------
 " keymap
 "----------------------------------------------------------------------
-nnoremap <leader>ff :<c-u>Leaderf file<cr>
-nnoremap <leader>fe :<c-u>Leaderf filer<cr>
-nnoremap <leader>fb :<c-u>Leaderf buffer<cr>
-nnoremap <leader>fm :<c-u>Leaderf mru<cr>
-nnoremap <leader>fg :<c-u>Leaderf gtags<cr>
-nnoremap <leader>fr :<c-u>Leaderf rg<cr>
-nnoremap <leader>fw :<c-u>Leaderf window<cr>
-nnoremap <leader>fn :<c-u>Leaderf function<cr>
-nnoremap <leader>ft :<c-u>Leaderf tag<cr>
-nnoremap <leader>fu :<c-u>Leaderf bufTag<cr>
-nnoremap <leader>fs :<c-u>Leaderf self<cr>
-nnoremap <leader>fc :<c-u>Leaderf colorscheme<cr>
-nnoremap <leader>fd :<c-u>Leaderf cmdHistory<cr>
-nnoremap <leader>fh :<c-u>Leaderf help<cr>
-nnoremap <leader>fj :<c-u>Leaderf jumps<cr>
-nnoremap <leader>fp :<c-u>Leaderf snippet<cr>
-nnoremap <leader>fq :<c-u>Leaderf quickfix<cr>
+nnoremap <space>ff :<c-u>Leaderf file<cr>
+nnoremap <space>fe :<c-u>Leaderf filer<cr>
+nnoremap <space>fb :<c-u>Leaderf buffer<cr>
+nnoremap <space>fm :<c-u>Leaderf mru<cr>
+nnoremap <space>fg :<c-u>Leaderf gtags<cr>
+nnoremap <space>fr :<c-u>Leaderf rg<cr>
+nnoremap <space>fw :<c-u>Leaderf window<cr>
+nnoremap <space>fn :<c-u>Leaderf function<cr>
+nnoremap <space>ft :<c-u>Leaderf tag<cr>
+nnoremap <space>fu :<c-u>Leaderf bufTag<cr>
+nnoremap <space>fs :<c-u>Leaderf self<cr>
+nnoremap <space>fc :<c-u>Leaderf colorscheme<cr>
+nnoremap <space>fy :<c-u>Leaderf cmdHistory<cr>
+nnoremap <space>fh :<c-u>Leaderf help<cr>
+nnoremap <space>fj :<c-u>Leaderf jumps<cr>
+nnoremap <space>fp :<c-u>Leaderf snippet<cr>
+nnoremap <space>fq :<c-u>Leaderf quickfix<cr>
 
 inoremap <c-x><c-j> <c-\><c-o>:Leaderf snippet<cr>
 
-nnoremap <leader>fd :exec 'Leaderf filer ' . fnameescape(expand('%:p:h'))<cr>
+nnoremap <space>fd :exec 'Leaderf filer ' . fnameescape(expand('%:p:h'))<cr>
 
