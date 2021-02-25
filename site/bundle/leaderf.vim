@@ -136,6 +136,7 @@ let g:Lf_PreviewInPopup = 1
 let g:Lf_FilerShowPromptPath = 1
 let g:Lf_FilerInsertMap = { '<Tab>': 'open_current', '<CR>': 'open_current', '<BS>': 'open_parent_or_backspace' , '<up>':'up', '<down>':'down'}
 let g:Lf_FilerNormalMap = {'i': 'switch_insert_mode', '<esc>': 'quit', '~': 'goto_root_marker_dir', 'M': 'mkdir', 'T': 'create_file' }
+" let g:Lf_FilerOnlyIconHighlight = 1
 
 
 "----------------------------------------------------------------------
@@ -161,5 +162,5 @@ nnoremap <space>fq :<c-u>Leaderf quickfix<cr>
 
 inoremap <c-x><c-j> <c-\><c-o>:Leaderf snippet<cr>
 
-nnoremap <space>fd :exec 'Leaderf filer ' . fnameescape(expand('%:p:h'))<cr>
+nnoremap <space>fd :exec 'Leaderf filer ' . shellescape(expand('%:p:h'))<cr>
 
