@@ -1341,9 +1341,16 @@ function! s:template_load()
 					let key = matchstr(line, '^\s*{\zs.*\ze}\s*$')
 					let key = s:strip(key)
 					if name != ''
-						let valid = filter(body, 's:strip(v:val) != ""')
+						let valid = []
+						for text in body
+							if s:strip(text) == ''
+								let valid += (len(valid) > 0)? [text] : []
+							else
+								let valid += [text]
+							endif
+						endfor
 						if len(valid) > 0
-							let s:private.template.tp[name] = body
+							let s:private.template.tp[name] = valid
 						endif
 					endif
 					let [name, body] = [key, []]
@@ -1352,11 +1359,29 @@ function! s:template_load()
 				endif
 			endfor
 			if name != ''
-				let valid = filter(body, 's:strip(v:val) != ""')
+				let valid = []
+				for text in body
+					if s:strip(text) == ''
+						let valid += (len(valid) > 0)? [text] : []
+					else
+						let valid += [text]
+					endif
+				endfor
 				if len(valid) > 0
-					let s:private.template.tp[name] = body
+					let s:private.template.tp[name] = valid
 				endif
 			endif
+			for key in keys(s:private.template.tp)
+				let body = s:private.template.tp[key]
+				while len(body) > 0
+					let pos = len(body) - 1
+					if s:strip(body[pos]) != ''
+						break
+					endif
+					call remove(body, pos)
+				endwhile
+				call extend(body, [''])
+			endfor
 		endif
 		let template = s:private.template.tp
 	endif
