@@ -106,7 +106,8 @@ function! s:readline.insert(text) abort
 	let cursor = self.cursor
 	for cc in code
 		let ch = nr2char(cc)
-		let wide += [strdisplaywidth(cc)]
+		let ww = strwidth(ch)
+		let wide += [ww]
 	endfor
 	call extend(self.code, code, cursor)
 	call extend(self.wide, wide, cursor)
@@ -288,6 +289,7 @@ function! s:readline.avail(pos, length)
 	elseif length > 0
 		while 1
 			let char_width = (pos >= 0 && pos < size)? wide[pos] : 1
+			" echo 'pos=' . pos . ' char_width=' . char_width
 			let sum += char_width
 			if sum > length
 				break
@@ -307,6 +309,22 @@ function! s:readline.avail(pos, length)
 		endwhile
 		return a:pos - pos
 	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" return display width
+"----------------------------------------------------------------------
+function! s:readline.width(start, endup) abort
+	let wide = self.wide
+	let acc = 0
+	let pos = a:start
+	let end = a:endup
+	while pos < end
+		let acc += wide[pos]
+		let pos += 1
+	endwhile
+	return acc
 endfunc
 
 
@@ -492,7 +510,7 @@ function! s:readline.slide(window_pos, display_width)
 	endif
 	let window_pos = (window_pos < 0)? 0 : window_pos
 	let wides = self.read_data(window_pos, cursor - window_pos, 1)
-	let width = sum(wides) + 1
+	let width = reduce(wides, { acc, val -> acc + val }, 0) + 1
 	if width <= display_width
 		return window_pos
 	else
@@ -648,8 +666,17 @@ endfunc
 "----------------------------------------------------------------------
 " display parts
 "----------------------------------------------------------------------
-function! s:readline.echo(blink)
+function! s:readline.echo(blink, ...)
 	let display = self.display()
+	if a:0 >= 2
+		let pos = a:1
+		let width = a:2
+		let avail = self.avail(pos, width)
+		echon "avail=" . avail . ' '
+		let display = self.window(display, pos, pos + avail)
+		echon display
+		return 
+	endif
 	for [attr, text] in display
 		if attr == 0
 			echohl Normal
@@ -741,15 +768,27 @@ function! quickui#readline#cli(prompt)
 	let rl = quickui#readline#new()
 	let index = 0
 	let accept = ''
+	let pos = 0
 	while 1
 		noautocmd redraw
 		echohl Question
 		echon a:prompt
 		let ts = float2nr(reltimefloat(reltime()) * 1000)
-		call rl.echo(rl.blink(ts))
+		if 0
+			call rl.echo(rl.blink(ts))
+		else
+			let size = 5
+			let pos = rl.slide(pos, size)
+			echohl Title
+			echon "<"
+			call rl.echo(rl.blink(ts), pos, size)
+			echohl Title
+			echon "> "
+			echon pos
+		endif
 		" echon rl.display()
 		try
-			let code = getchar(0)
+			let code = getchar()
 		catch /^Vim:Interrupt$/
 			let code = "\<c-c>"
 		endtry
@@ -779,6 +818,13 @@ function! quickui#readline#cli(prompt)
 	return accept
 endfunc
 
-echo quickui#readline#cli(">>> ")
+if 1
+	echo quickui#readline#cli(">>> ")
+else
+	let rl = quickui#readline#new()
+	call rl.insert('a')
+	" echo rl.wide
+	echo rl.avail(0, 5)
+endif
 
 
