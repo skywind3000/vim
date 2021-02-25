@@ -845,7 +845,7 @@ function! quickui#readline#cli(prompt)
 endfunc
 
 if 1
-	echo quickui#readline#cli(">>> ")
+	" echo quickui#readline#cli(">>> ")
 else
 	let rl = quickui#readline#new()
 	call rl.insert('a')
