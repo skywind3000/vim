@@ -243,6 +243,7 @@ let g:asynctasks_extra_config = [s:home . '/'. s:config]
 let g:asynctasks_term_pos = (s:windows && s:gui)? 'external' : 'tab'
 let g:asynctasks_template = 0
 let g:asynctasks_confirm = 0
+let g:asynctasks_template = s:home . '/tools/conf/template.ini'
 " let g:asynctasks_rtp_config = 'etc/tasks.ini'
 
 
