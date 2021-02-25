@@ -439,6 +439,43 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" returns new window pos to fit in 
+"----------------------------------------------------------------------
+function! s:readline.slide(window_pos, display_width)
+	let window_pos = a:window_pos
+	let display_width = a:display_width
+	let cursor = self.cursor
+	if display_width < 1
+		return cursor
+	elseif cursor < window_pos
+		return cursor
+	endif
+	let window_pos = (window_pos < 0)? 0 : window_pos
+	let wides = self.read_data(window_pos, cursor - window_pos, 1)
+	let width = reduce(wides, { acc, val -> acc + val }, 0) + 1
+	if width <= display_width
+		return window_pos
+	else
+		let avail = self.avail(cursor, -display_width)
+		let pos = cursor - avail + 1
+		return max([pos, 0])
+	endif
+	return window_pos
+endfunc
+
+
+"----------------------------------------------------------------------
+" render a window
+"----------------------------------------------------------------------
+function! s:readline.render(pos, display_width)
+	let nchars = self.avail(a:pos, a:display_width)
+	let display = self.display()
+	let display = self.window(display, a:pos, a:pos + nchars)
+	return display
+endfunc
+
+
+"----------------------------------------------------------------------
 " save history in current position
 "----------------------------------------------------------------------
 function! s:readline.history_save() abort
@@ -493,31 +530,6 @@ function! s:readline.history_init(history) abort
 		let self.history = history
 		let self.index = 0
 	endif
-endfunc
-
-
-"----------------------------------------------------------------------
-" returns new window pos to fit in 
-"----------------------------------------------------------------------
-function! s:readline.slide(window_pos, display_width)
-	let window_pos = a:window_pos
-	let display_width = a:display_width
-	let cursor = self.cursor
-	if display_width < 1
-		return cursor
-	elseif cursor < window_pos
-		return cursor
-	endif
-	let window_pos = (window_pos < 0)? 0 : window_pos
-	let wides = self.read_data(window_pos, cursor - window_pos, 1)
-	let width = reduce(wides, { acc, val -> acc + val }, 0) + 1
-	if width <= display_width
-		return window_pos
-	else
-		let avail = self.avail(cursor, -display_width)
-		return window_pos - avail + 1
-	endif
-	return window_pos
 endfunc
 
 
@@ -667,15 +679,10 @@ endfunc
 " display parts
 "----------------------------------------------------------------------
 function! s:readline.echo(blink, ...)
-	let display = self.display()
-	if a:0 >= 2
-		let pos = a:1
-		let width = a:2
-		let avail = self.avail(pos, width)
-		echon "avail=" . avail . ' '
-		let display = self.window(display, pos, pos + avail)
-		echon display
-		return 
+	if a:0 < 2
+		let display = self.render(0, self.size * 4)
+	else
+		let display = self.render(a:1, a:2)
 	endif
 	for [attr, text] in display
 		if attr == 0
@@ -777,7 +784,7 @@ function! quickui#readline#cli(prompt)
 		if 0
 			call rl.echo(rl.blink(ts))
 		else
-			let size = 5
+			let size = 15
 			let pos = rl.slide(pos, size)
 			echohl Title
 			echon "<"
