@@ -482,6 +482,10 @@ function! s:readline.render(pos, display_width)
 			if self.select >= 0
 				let attr = (self.cursor < self.select)? 3 : 1
 			endif
+		else
+			if self.select > a:pos + nchars
+				let attr = (self.cursor < a:pos + nchars)? 2 : 0
+			endif
 		endif
 		let display += [[attr, repeat(' ', a:display_width - total)]]
 	endif
