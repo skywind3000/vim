@@ -471,6 +471,20 @@ function! s:readline.render(pos, display_width)
 	let nchars = self.avail(a:pos, a:display_width)
 	let display = self.display()
 	let display = self.window(display, a:pos, a:pos + nchars)
+	let total = 0
+	for [attr, text] in display
+		let total += strwidth(text)
+	endfor
+	if total < a:display_width
+		let attr = 0
+		if self.cursor == a:pos + nchars
+			let attr = 1
+			if self.select >= 0
+				let attr = (self.cursor < self.select)? 3 : 1
+			endif
+		endif
+		let display += [[attr, repeat(' ', a:display_width - total)]]
+	endif
 	return display
 endfunc
 
@@ -784,14 +798,15 @@ function! quickui#readline#cli(prompt)
 		if 0
 			call rl.echo(rl.blink(ts))
 		else
-			let size = 15
+			let size = 10
 			let pos = rl.slide(pos, size)
 			echohl Title
 			echon "<"
 			call rl.echo(rl.blink(ts), pos, size)
 			echohl Title
-			echon "> "
-			echon pos
+			echon ">"
+			echon " cursor=" . rl.cursor
+			echon " pos=". pos
 		endif
 		" echon rl.display()
 		try
