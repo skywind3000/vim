@@ -134,56 +134,11 @@ let g:Lf_PreviewInPopup = 1
 " filer
 "----------------------------------------------------------------------
 let g:Lf_FilerShowPromptPath = 1
-let g:Lf_FilerInsertMap = { '<Tab>': 'open_current', '<CR>': 'open_current', '<BS>': 'open_parent_or_backspace' , '<up>':'up', '<down>':'down'}
-let g:Lf_FilerNormalMap = {'i': 'switch_insert_mode', '<esc>': 'quit', '~': 'goto_root_marker_dir', 'M': 'mkdir', 'T': 'create_file' }
+let g:Lf_FilerInsertMap = { '<Tab>': 'open_current', '<CR>': 'open_current',
+	\ '<BS>': 'open_parent_or_backspace', '<up>': 'up', '<down>': 'down'}
+let g:Lf_FilerNormalMap = {'i': 'switch_insert_mode', '<esc>': 'quit', 
+	\ '~': 'goto_root_marker_dir', 'M': 'mkdir', 'T': 'create_file' }
 " let g:Lf_FilerOnlyIconHighlight = 1
-
-
-"----------------------------------------------------------------------
-" highlighting
-"----------------------------------------------------------------------
-let g:Lf_PopupPalette2 = {
-	\  'light': {
-	\      'Lf_hl_match': {
-	\                'gui': 'NONE',
-	\                'font': 'NONE',
-	\                'guifg': 'NONE',
-	\                'guibg': '#303136',
-	\                'cterm': 'NONE',
-	\                'ctermfg': 'NONE',
-	\                'ctermbg': '236'
-	\              },
-	\      'Lf_hl_cursorline': {
-	\                'gui': 'NONE',
-	\                'font': 'NONE',
-	\                'guifg': 'NONE',
-	\                'guibg': '#303136',
-	\                'cterm': 'NONE',
-	\                'ctermfg': 'NONE',
-	\                'ctermbg': '236'
-	\              },
-	\      },
-	\  'dark': {
-	\      'Lf_hl_match': {
-	\                'gui': 'NONE',
-	\                'font': 'NONE',
-	\                'guifg': 'NONE',
-	\                'guibg': '#303136',
-	\                'cterm': 'NONE',
-	\                'ctermfg': 'NONE',
-	\                'ctermbg': '236'
-	\              },
-	\      'Lf_hl_cursorline': {
-	\                'gui': 'NONE',
-	\                'font': 'NONE',
-	\                'guifg': 'NONE',
-	\                'guibg': '#303136',
-	\                'cterm': 'NONE',
-	\                'ctermfg': 'NONE',
-	\                'ctermbg': '236'
-	\              },
-	\      }
-	\  }
 
 
 "----------------------------------------------------------------------
