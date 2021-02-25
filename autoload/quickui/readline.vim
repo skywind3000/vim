@@ -296,6 +296,7 @@ function! s:readline.avail(pos, length)
 		endwhile
 		return pos - a:pos
 	else
+		let length = -length
 		while 1
 			let char_width = (pos >= 0 && pos < size)? wide[pos] : 1
 			let sum += char_width
@@ -494,6 +495,9 @@ function! s:readline.slide(window_pos, display_width)
 	let width = sum(wides) + 1
 	if width <= display_width
 		return window_pos
+	else
+		let avail = self.avail(cursor, -display_width)
+		return window_pos - avail + 1
 	endif
 	return window_pos
 endfunc

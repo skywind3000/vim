@@ -140,6 +140,53 @@ let g:Lf_FilerNormalMap = {'i': 'switch_insert_mode', '<esc>': 'quit', '~': 'got
 
 
 "----------------------------------------------------------------------
+" highlighting
+"----------------------------------------------------------------------
+let g:Lf_PopupPalette2 = {
+	\  'light': {
+	\      'Lf_hl_match': {
+	\                'gui': 'NONE',
+	\                'font': 'NONE',
+	\                'guifg': 'NONE',
+	\                'guibg': '#303136',
+	\                'cterm': 'NONE',
+	\                'ctermfg': 'NONE',
+	\                'ctermbg': '236'
+	\              },
+	\      'Lf_hl_cursorline': {
+	\                'gui': 'NONE',
+	\                'font': 'NONE',
+	\                'guifg': 'NONE',
+	\                'guibg': '#303136',
+	\                'cterm': 'NONE',
+	\                'ctermfg': 'NONE',
+	\                'ctermbg': '236'
+	\              },
+	\      },
+	\  'dark': {
+	\      'Lf_hl_match': {
+	\                'gui': 'NONE',
+	\                'font': 'NONE',
+	\                'guifg': 'NONE',
+	\                'guibg': '#303136',
+	\                'cterm': 'NONE',
+	\                'ctermfg': 'NONE',
+	\                'ctermbg': '236'
+	\              },
+	\      'Lf_hl_cursorline': {
+	\                'gui': 'NONE',
+	\                'font': 'NONE',
+	\                'guifg': 'NONE',
+	\                'guibg': '#303136',
+	\                'cterm': 'NONE',
+	\                'ctermfg': 'NONE',
+	\                'ctermbg': '236'
+	\              },
+	\      }
+	\  }
+
+
+"----------------------------------------------------------------------
 " keymap
 "----------------------------------------------------------------------
 nnoremap <space>ff :<c-u>Leaderf file<cr>
