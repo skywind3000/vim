@@ -101,6 +101,7 @@ nnoremap <space>fh :<c-u>Leaderf help<cr>
 nnoremap <space>fj :<c-u>Leaderf jumps<cr>
 nnoremap <space>fp :<c-u>Leaderf snippet<cr>
 nnoremap <space>fq :<c-u>Leaderf quickfix<cr>
+nnoremap <space>fa :<c-u>Leaderf tasks<cr>
 
 inoremap <c-x><c-j> <c-\><c-o>:Leaderf snippet<cr>
 
