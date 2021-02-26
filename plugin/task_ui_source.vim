@@ -56,8 +56,9 @@ let g:Lf_Extensions.tasks = {
 			\ 'accept': string(function('s:lf_task_accept'))[10:-3],
 			\ 'get_digest': string(function('s:lf_task_digest'))[10:-3],
 			\ 'highlights_def': {
-			\     'Lf_hl_funcDirname': '^\S\+',
-			\     'Lf_hl_funcScope': '^\S\+\s*\zs<.*>\ze\s*:',
+			\     'Lf_hl_funcScope': '^\S\+',
+			\     'Lf_hl_funcDirname': '^\S\+\s*\zs<\(.\{-}\)>\ze\s*:',
+			\     'Lf_hl_buftagCode': '^\S\+\s*<\(.\{-}\)>\s*\zs:.*$',
 			\ },
 			\ 'after_enter': string(function('s:lf_win_init'))[10:-3],
 			\ 'help' : 'navigate available tasks from asynctasks.vim',
