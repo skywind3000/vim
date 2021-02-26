@@ -318,7 +318,7 @@ endfunc
 "----------------------------------------------------------------------
 function! asclib#core#text_replace(bid, lnum, end, program) abort
 	let text = getbufline(a:bid, a:lnum, a:end)
-	if type(a:program == v:t_string)
+	if type(a:program) == v:t_string
 		if a:program =~ '^\s*:'
 			let funname = matchstr(a:program, '^\s*:\zs.*$')
 			let hr = call(funname, [text])
