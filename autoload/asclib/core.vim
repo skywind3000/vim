@@ -285,23 +285,46 @@ endfunc
 " run text filter: stdin is a string list which will pass to the 
 " stdin of command. returns the command output.
 "----------------------------------------------------------------------
-function! asclib#core#text_filter(command, stdin, ...)
+function! asclib#core#text_process(command, stdin, ...)
 	let tmpname = tempname()
 	let cwd = (a:0 > 0)? (a:1) : ''
+	let input = []
 	if type(a:stdin) == 1
-		call writefile(split(a:stdin, "\n", 1), tmpname, 'b')
+		let input = split(a:stdin, "\n")
 	else
-		call writefile(a:stdin, tmpname, 'b')
+		let input = deepcopy(a:stdin)
 	endif
+	if s:windows
+		" let input = map(input, 'v:val . "\r"')
+	endif
+	call writefile(input, tmpname)
 	if filereadable(tmpname) == 0
 		return ''
 	endif
+	let outname = tempname()
 	let script = asclib#core#script_write('vim_pipe', a:command, 0)
-	let cmd = script . ' < ' . shellescape(tmpname)
+	let cmd = script . ' < ' . shellescape(tmpname) 
+	let cmd = cmd . ' > ' . shellescape(outname) . ' 2>&1'
 	let hr = asclib#core#system(cmd, cwd)
+	let hr = readfile(outname)
 	silent! call delete(tmpname)
+	silent! call delete(outname)
 	return hr
 endfunc
 
+
+"----------------------------------------------------------------------
+" replace the text from range
+"----------------------------------------------------------------------
+function! asclib#core#text_replace(bid, lnum, end, program)
+	let text = getbufline(a:bid, a:lnum, a:end)
+	let hr = asclib#core#text_process(a:program, text)
+	if len(text) < len(hr)
+		call appendbufline(a:bid, a:lnum, repeat([''], len(hr) - len(text)))
+	elseif len(text) > len(hr)
+		call deletebufline(a:bid, a:lnum, a:lnum + len(text) - len(hr) - 1)
+	endif
+	call setbufline(a:bid, a:lnum, hr)
+endfunc
 
 
