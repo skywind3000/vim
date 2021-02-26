@@ -285,7 +285,7 @@ endfunc
 " run text filter: stdin is a string list which will pass to the 
 " stdin of command. returns the command output.
 "----------------------------------------------------------------------
-function! asclib#core#text_process(command, stdin, ...)
+function! asclib#core#text_process(command, stdin, ...) abort
 	let tmpname = tempname()
 	let cwd = (a:0 > 0)? (a:1) : ''
 	let input = []
@@ -316,9 +316,18 @@ endfunc
 "----------------------------------------------------------------------
 " replace the text from range
 "----------------------------------------------------------------------
-function! asclib#core#text_replace(bid, lnum, end, program)
+function! asclib#core#text_replace(bid, lnum, end, program) abort
 	let text = getbufline(a:bid, a:lnum, a:end)
-	let hr = asclib#core#text_process(a:program, text)
+	if type(a:program == v:t_string)
+		if a:program =~ '^\s*:'
+			let funname = matchstr(a:program, '^\s*:\zs.*$')
+			let hr = call(funname, [text])
+		else
+			let hr = asclib#core#text_process(a:program, text)
+		endif
+	elseif type(a:program) == v:t_func
+		let hr = call(a:program, [text])
+	endif
 	if len(text) < len(hr)
 		call appendbufline(a:bid, a:lnum, repeat([''], len(hr) - len(text)))
 	elseif len(text) > len(hr)
