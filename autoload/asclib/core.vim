@@ -11,7 +11,7 @@
 
 
 "----------------------------------------------------------------------
-" global
+" Global
 "----------------------------------------------------------------------
 let s:windows = has('win32') || has('win64') || has('win95') || has('win16')
 let g:asclib#core#windows = s:windows
@@ -19,7 +19,7 @@ let g:asclib#core#has_nvim = has('nvim')
 
 
 "----------------------------------------------------------------------
-" get instance
+" Get Instance
 "----------------------------------------------------------------------
 function! asclib#core#instance(mode)
 	if a:mode == 'buffer' || a:mode == 'buf' || a:mode == 'b:'
@@ -46,7 +46,7 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" safe change dir
+" Change Directory
 "----------------------------------------------------------------------
 function! asclib#core#chdir(path)
 	if has('nvim')
@@ -59,7 +59,7 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" safe input
+" Safe Input
 "----------------------------------------------------------------------
 function! asclib#core#input(prompt, text)
 	call inputsave()
@@ -115,7 +115,7 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" call system 
+" call system
 "----------------------------------------------------------------------
 function! asclib#core#system(cmd, ...)
 	let cwd = ((a:0) > 0)? (a:1) : ''
@@ -279,4 +279,29 @@ function! asclib#core#script_write(name, command, pause)
 	endif
 	return tmpname
 endfunc
+
+
+"----------------------------------------------------------------------
+" run text filter: stdin is a string list which will pass to the 
+" stdin of command. returns the command output.
+"----------------------------------------------------------------------
+function! asclib#core#text_filter(command, stdin, ...)
+	let tmpname = tempname()
+	let cwd = (a:0 > 0)? (a:1) : ''
+	if type(a:stdin) == 1
+		call writefile(split(a:stdin, "\n", 1), tmpname, 'b')
+	else
+		call writefile(a:stdin, tmpname, 'b')
+	endif
+	if filereadable(tmpname) == 0
+		return ''
+	endif
+	let script = asclib#core#script_write('vim_pipe', a:command, 0)
+	let cmd = script . ' < ' . shellescape(tmpname)
+	let hr = asclib#core#system(cmd, cwd)
+	silent! call delete(tmpname)
+	return hr
+endfunc
+
+
 
