@@ -451,6 +451,11 @@ if has_key(s:enabled, 'blamer')
 	Plug 'APZelos/blamer.nvim'
 endif
 
+if has_key(s:enabled, 'cursorword')
+	Plug 'itchyny/vim-cursorword'
+	let g:cursorword_delay = 200
+endif
+
 
 "----------------------------------------------------------------------
 " packages end
