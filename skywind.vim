@@ -100,6 +100,20 @@ endif
 
 
 "----------------------------------------------------------------------
+"- bufferhint
+"----------------------------------------------------------------------
+if has('patch-8.2.1') || has('nvim-0.4')
+	nnoremap <silent>+ :call quickui#tools#list_buffer('FileSwitch tabe')<cr>
+else
+	nnoremap + :call bufferhint#Popup()<CR>
+endif
+
+let g:bufferhint_CustomHighlight = 1
+hi! default link KeyHint Statement
+hi! default link AtHint Identifier
+
+
+"----------------------------------------------------------------------
 "- miscs
 "----------------------------------------------------------------------
 let g:cppman_open_mode = '<auto>'
@@ -114,6 +128,8 @@ command! -bang -bar -nargs=* Gfetch execute 'AsyncRun<bang> -cwd=' .
 " let g:terminal_shell='cmd /s /k "c:\drivers\clink\clink.cmd inject"'
 set timeoutlen=2000
 
+command! Ghistory :0Gclog! -- %
+
 
 "----------------------------------------------------------------------
 "- OmniCpp
@@ -126,20 +142,6 @@ let OmniCpp_MayCompleteDot = 1
 let OmniCpp_MayCompleteArrow = 1 
 let OmniCpp_MayCompleteScope = 1
 let OmniCpp_DefaultNamespaces = ["std", "_GLIBCXX_STD"]
-
-
-"----------------------------------------------------------------------
-"- bufferhint
-"----------------------------------------------------------------------
-if has('patch-8.2.1') || has('nvim-0.4')
-	nnoremap <silent>+ :call quickui#tools#list_buffer('FileSwitch tabe')<cr>
-else
-	nnoremap + :call bufferhint#Popup()<CR>
-endif
-
-let g:bufferhint_CustomHighlight = 1
-hi! default link KeyHint Statement
-hi! default link AtHint Identifier
 
 
 
