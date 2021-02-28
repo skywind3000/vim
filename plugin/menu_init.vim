@@ -206,8 +206,10 @@ let g:context_menu_k = [
 			\ ['Cpp&man', 'exec "Cppman " . expand("<cword>")', '', "c,cpp"],
 			\ ['P&ython Doc', 'call quickui#tools#python_help("")', '', 'python'],
 			\ ["S&witch Header\t<SPC>fw", 'SwitchHeaderEdit', '', "c,cpp"],
+			\ ["Display Highlight", 'call feedkeys(":hi \<c-r>\<c-w>\<cr>")', '', 'vim'],
 			\ ]
 
+" Keyword
 
 "----------------------------------------------------------------------
 " hotkey
