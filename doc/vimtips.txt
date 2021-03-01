@@ -1,5 +1,5 @@
+__BEGIN__
 *vimtips.txt*	For Vim version 8.0.  
-
 ------------------------------------------------------------------------------
 " new items marked [N] , corrected items marked [C]
 " *best-searching*
@@ -1023,6 +1023,30 @@ endif
 " *Just Another Vim Hacker JAVH*
 vim -c ":%s%s*%Cyrnfr)fcbafbe[Oenz(Zbbyranne%|:%s)[[()])-)Ig|norm Vg?"
 ----------------------------------------
-
 vim:tw=78:ts=8:ft=help:norl:
-
+__END__
+----------------------------------------
+"Read Vimtips into a new vim buffer 
+:silent r ! lynx -dump "http://zzapper.co.uk/vimtips.html" [N]
+" read webpage source html into vim
+gvim http://www.zzapper.co.uk/vimtips.html &
+----------------------------------------
+updated version at http://www.zzapper.co.uk/vimtips.html
+----------------------------------------
+Please email any errors, tips etc to
+vim@rayninfo.co.uk
+" Information Sources
+----------------------------------------
+www.vim.org
+Vim Wiki *** VERY GOOD *** [N]
+Vim Use VIM newsgroup [N]
+comp.editors
+groups.yahoo.com/group/vim "VIM" specific newsgroup
+VIM Webring
+VimTips PDF Version (PRINTABLE!)
+Vimtips in Belarusian 
+----------------------------------------
+" : commands to neutralise < for HTML display and publish
+" use yy@" to execute following commands
+:w!|sav! vimtips.html|:/^__BEGIN__/,/^__END__/s#<#\<#g|:w!|:!vimtipsftp
+----------------------------------------
