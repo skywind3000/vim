@@ -453,7 +453,7 @@ endif
 
 if has_key(s:enabled, 'cursorword')
 	Plug 'itchyny/vim-cursorword'
-	let g:cursorword_delay = 200
+	let g:cursorword_delay = 50
 endif
 
 
