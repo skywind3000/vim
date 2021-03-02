@@ -73,7 +73,7 @@ endif
 
 " returns nearest parent directory contains one of the markers
 function! s:find_root(name, markers, strict)
-	let name = fnamemodify((a:name != '')? a:name : bufname(), ':p')
+	let name = fnamemodify((a:name != '')? a:name : bufname('%'), ':p')
 	let finding = ''
 	" iterate all markers
 	for marker in a:markers
@@ -91,9 +91,17 @@ function! s:find_root(name, markers, strict)
 		endif
 	endfor
 	if finding == ''
-		return (a:strict == 0)? fnamemodify(name, ':h') : ''
+		let path = (a:strict == 0)? fnamemodify(name, ':h') : ''
+	else
+		let path = fnamemodify(finding, ':p')
 	endif
-	return fnamemodify(finding, ':p')
+	if has('win32') || has('win16') || has('win64') || has('win95')
+		let path = substitute(path, '\/', '\', 'g')
+	endif
+	if path =~ '[\/\\]$'
+		let path = fnamemodify(path, ':h')
+	endif
+	return path
 endfunc
 
 " returns project root of current file
