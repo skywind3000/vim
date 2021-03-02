@@ -599,6 +599,11 @@ class configure (object):
                     target[key]['__name__'] = ininame
                 if mode:
                     target[key]['__mode__'] = mode
+            elif key == '*':
+                if '*' not in target:
+                    target['*'] = {}
+                for name in source['*']:
+                    target['*'][name] = source['*'][name]
         for key in special:
             parts = self.trinity_split(key)
             parts = [ n.strip('\r\n\t ') for n in parts ]
