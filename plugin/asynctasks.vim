@@ -675,7 +675,6 @@ function! asynctasks#collect_config(path, force)
 	let path = (a:path == '')? getcwd() : (a:path)
 	let s:index = 0
 	let s:error = ''
-	let s:private.profile = g:asynctasks_profile
 	let c1 = s:compose_rtp_config(a:force)
 	let c2 = s:compose_local_config(path)
 	let tasks = {'config':{}, 'names':{}, 'avail':[]}
