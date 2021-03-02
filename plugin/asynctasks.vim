@@ -4,7 +4,7 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2021/03/02 19:05
+" Last Modified: 2021/03/02 19:18
 " Verision: 1.8.8
 "
 " for more information, please visit:
@@ -916,7 +916,6 @@ endfunc
 "----------------------------------------------------------------------
 function! s:command_environ(command)
 	let command = a:command
-	let environ = get(s:private.tasks, 'environ', {})
 	let mark_open = '$(VIM:'
 	let mark_close = ')'
 	let size_open = strlen(mark_open)
@@ -934,8 +933,8 @@ function! s:command_environ(command)
 		let mark = mark_open . name . mark_close
 		let key = s:strip(name)
 		if has_key(g:asynctasks_environ, key) == 0
-			if has_key(environ, key) == 0
-				let msg = 'Internal variable "'. mark . '" is underfined'
+			if has_key(s:private.tasks.environ, key) == 0
+				let msg = 'Internal variable "'. name . '" is underfined'
 				call s:warning(msg)
 				return ''
 			endif
