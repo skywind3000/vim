@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 #======================================================================
 #
-# asynctask.py - 
+# asynctask.py - execute tasks in command line
 #
 # Maintainer: skywind3000 (at) gmail.com, 2020
 #
-# Last Modified: 2020/12/30 01:16
-# Verision: 1.1.1
+# Last Modified: 2021/03/02 22:35
+# Verision: 1.1.2
 #
 # for more information, please visit:
 # https://github.com/skywind3000/asynctasks.vim
@@ -38,7 +38,7 @@ UNIX = (sys.platform[:3] != 'win') and True or False
 #----------------------------------------------------------------------
 # macros
 #----------------------------------------------------------------------
-MACROS_HELP = { 
+MACROS_HELP = {
 	'VIM_FILEPATH': 'File name of current buffer with full path',
 	'VIM_FILENAME': 'File name of current buffer without path',
 	'VIM_FILEDIR': 'Full path of current buffer without the file name',
@@ -60,7 +60,7 @@ MACROS_HELP = {
 	'VIM_GUI': 'Is running under gui ?',
 	'VIM_VERSION': 'Value of v:version',
 	'VIM_COLUMNS': "How many columns in vim's screen",
-	'VIM_LINES': "How many lines in vim's screen", 
+	'VIM_LINES': "How many lines in vim's screen",
 	'VIM_SVRNAME': 'Value of v:servername for +clientserver usage',
     'VIM_PROFILE': 'Current building profile (debug/release/...)',
 	'WSL_FILEPATH': '(WSL) File name of current buffer with full path',
@@ -68,7 +68,7 @@ MACROS_HELP = {
 	'WSL_FILEDIR': '(WSL) Full path of current buffer without the file name',
 	'WSL_FILEEXT': '(WSL) File extension of current buffer',
     'WSL_FILENOEXT':  # noqa: E261
-      '(WSL) File name of current buffer without path and extension', 
+      '(WSL) File name of current buffer without path and extension',
 	'WSL_PATHNOEXT':
 	  '(WSL) Current file name with full path but without extension',
 	'WSL_CWD': '(WSL) Current directory',
@@ -642,7 +642,7 @@ class configure (object):
         names = newname
         for name in names:
             obj = self.read_ini(name)
-            self.config_merge(self.tasks, obj, name, 'global')        
+            self.config_merge(self.tasks, obj, name, 'global')
         return 0
 
     # search parent
@@ -678,6 +678,7 @@ class configure (object):
         self.tasks = {}
         self.collect_rtp_config()
         self.collect_local_config()
+        self.environ = self.tasks.get('*', {})
         return 0
 
     # extract file type
@@ -759,7 +760,25 @@ class configure (object):
         text = text.replace('<root>', macros.get('VIM_ROOT', ''))
         text = text.replace('<cwd>', macros.get('VIM_CWD', ''))
         return text
-        
+
+    def environ_replace (self, text):
+        mark_open = '$(VIM:'
+        mark_close = ')'
+        size_open = len(mark_open)
+        while True:
+            p1 = text.find(mark_open)
+            if p1 < 0:
+                break
+            p2 = text.find(mark_close, p1)
+            if p2 < 0:
+                break
+            name = text[p1 + size_open:p2]
+            mark = mark_open + name + mark_close
+            name = name.strip()
+            data = self.environ.get(name, '')
+            text = text.replace(mark, data)
+        return text
+
 
 #----------------------------------------------------------------------
 # manager
@@ -811,7 +830,7 @@ class TaskManager (object):
                         if ini: print('from %s:'%ini)
                         pretty.perror(cc, 'command=' + command)
                         return 1
-                    if macro in cwd: 
+                    if macro in cwd:
                         pretty.error('task cwd requires a file name')
                         if ini: print('from %s:'%ini)
                         pretty.perror(cc, 'cwd=' + cwd)
@@ -929,6 +948,7 @@ class TaskManager (object):
                 macros['WSL_RELDIR'] = self.config.path_win2unix(x)
                 macros['WSL_RELNAME'] = self.config.path_win2unix(y)
         command = self.config.macros_replace(command, macros)
+        command = self.config.environ_replace(command)
         command = command.strip()
         for name in macros:
             value = macros.get(name, None)
