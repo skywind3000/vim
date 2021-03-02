@@ -3,7 +3,7 @@
 " gutentags_plus.vim - connecting gtags_cscope db on demand
 "
 " Created by skywind on 2018/04/25
-" Last Modified: 2021/03/02 23:23
+" Last Modified: 2021/03/02 23:30
 "
 "======================================================================
 
@@ -708,3 +708,5 @@ if get(g:, 'gutentags_plus_nomap', 0) == 0
 	nmap <silent> <leader>cz <Plug>GscopeFindCtag
 	nmap <silent> <leader>ck :GscopeKill<cr>
 endif
+
+
