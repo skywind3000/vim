@@ -6,8 +6,8 @@
 #
 # Maintainer: skywind3000 (at) gmail.com, 2020
 #
-# Last Modified: 2021/03/02 22:35
-# Verision: 1.1.2
+# Last Modified: 2021/03/02 22:44
+# Verision: 1.1.3
 #
 # for more information, please visit:
 # https://github.com/skywind3000/asynctasks.vim
@@ -428,6 +428,7 @@ class configure (object):
         self.tasks = {}
         self.environ = {}
         self.config = {}
+        self.avail = []
         self._load_config()
         if self.target == 'file':
             self.filetype = self.match_ft(self.path)
@@ -679,6 +680,13 @@ class configure (object):
         self.collect_rtp_config()
         self.collect_local_config()
         self.environ = self.tasks.get('*', {})
+        self.avail = []
+        keys = list(self.tasks.keys())
+        keys.sort()
+        for key in keys:
+            if key == '*':
+                continue
+            self.avail.append(key)
         return 0
 
     # extract file type
@@ -1001,10 +1009,8 @@ class TaskManager (object):
         c2 = 'cyan'
         c3 = 'white'
         c4 = 'BLACK'
-        names = list(self.config.tasks.keys())
-        names.sort()
         if raw:
-            for name in names:
+            for name in self.config.avail:
                 if (not all) and name.startswith('.'):
                     continue
                 task = self.config.tasks[name]
@@ -1014,7 +1020,7 @@ class TaskManager (object):
             pretty.tabulify(rows)
             return 0
         rows.append([(c0, 'Task'), (c0, 'Type'), (c0, 'Detail')])
-        for name in names:
+        for name in self.config.avail:
             if (not all) and name.startswith('.'):
                 continue
             task = self.config.tasks[name]
