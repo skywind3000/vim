@@ -404,6 +404,8 @@ if has('nvim') == 0 && has('gui_running') == 0
 	endfor
 	for i in range(26)
 		call s:meta_code(nr2char(char2nr('a') + i))
+	endfor
+	for i in range(15) + range(16, 25)
 		call s:meta_code(nr2char(char2nr('A') + i))
 	endfor
 	for c in [',', '.', '/', ';', '{', '}']
@@ -432,16 +434,10 @@ if get(g:, 'terminal_default_mapping', 1)
 	noremap <m-L> <c-w>l
 	noremap <m-J> <c-w>j
 	noremap <m-K> <c-w>k
-	if mapcheck('<m-P>', 'n') == ''
-		noremap <m-P> <c-w>p
-	endif
 	inoremap <m-H> <esc><c-w>h
 	inoremap <m-L> <esc><c-w>l
 	inoremap <m-J> <esc><c-w>j
 	inoremap <m-K> <esc><c-w>k
-	if mapcheck('<m-P>', 'n') == ''
-		inoremap <m-P> <esc><c-w>p
-	endif
 
 	if has('terminal') && exists(':terminal') == 2 && has('patch-8.1.1')
 		set termwinkey=<c-_>
@@ -449,7 +445,7 @@ if get(g:, 'terminal_default_mapping', 1)
 		tnoremap <m-L> <c-_>l
 		tnoremap <m-J> <c-_>j
 		tnoremap <m-K> <c-_>k
-		tnoremap <m-P> <c-_>p
+		tnoremap <m-N> <c-_>p
 		tnoremap <m-q> <c-\><c-n>
 		tnoremap <m--> <c-_>"0
 	elseif has('nvim')
@@ -457,7 +453,7 @@ if get(g:, 'terminal_default_mapping', 1)
 		tnoremap <m-L> <c-\><c-n><c-w>l
 		tnoremap <m-J> <c-\><c-n><c-w>j
 		tnoremap <m-K> <c-\><c-n><c-w>k
-		tnoremap <m-P> <c-\><c-n><c-w>p
+		tnoremap <m-N> <c-\><c-n><c-w>p
 		tnoremap <m-q> <c-\><c-n>
 		tnoremap <m--> <c-\><c-n>"0pa
 	endif

@@ -21,12 +21,12 @@ noremap <m-m> :cclose<cr>:Leaderf --nowrap tag<cr>
 let g:Lf_MruMaxFiles = 2048
 let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
 
-noremap <m-g> :Leaderf --nowrap task<cr>
-inoremap <m-g> <esc>:Leaderf --nowrap task<cr>
+noremap <m-g> :Leaderf --nowrap tasks<cr>
+inoremap <m-g> <esc>:Leaderf --nowrap tasks<cr>
 
 if has('gui_running')
-	noremap <c-f12> :Leaderf --nowrap task<cr>
-	inoremap <c-f12> <esc>:Leaderf --nowrap task<cr>
+	noremap <c-f12> :Leaderf --nowrap tasks<cr>
+	inoremap <c-f12> <esc>:Leaderf --nowrap tasks<cr>
 endif
 
 
