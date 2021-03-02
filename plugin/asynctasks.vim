@@ -4,7 +4,7 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2021/03/02 18:22
+" Last Modified: 2021/03/02 19:05
 " Verision: 1.8.8
 "
 " for more information, please visit:
@@ -941,8 +941,8 @@ function! s:command_environ(command)
 				return ''
 			endif
 		endif
-		let t = get(g:asynctasks_environ, key, '')
-		let t = get(s:private.tasks.environ, key, t)
+		let t = get(s:private.tasks.environ, key, '')
+		let t = get(g:asynctasks_environ, key, t)
 		let command = s:replace(command, mark, t)
 	endwhile
 	return command
