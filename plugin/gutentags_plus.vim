@@ -7,6 +7,8 @@
 "
 "======================================================================
 
+" vim: set ts=4 sw=4 tw=78 noet :
+
 let s:windows = has('win32') || has('win64') || has('win16') || has('win95')
 
 if v:version >= 800
@@ -336,39 +338,39 @@ function! s:global_taglist(pattern) abort
 	let lst = systemlist('global --result=cscope -a "'. a:pattern . '"')
 	let rsl_list = []
 	for li in lst
-	    let tag_info = {}
-	    let tag_info['filename'] = li[:stridx(li, " ") - 1]
-	    let li = li[stridx(li, " ") + 1:]
-	    let tag_info['name'] = li[:stridx(li, " ") - 1]
-	    let li = li[stridx(li, " ") + 1:]
-	    let tag_info['line'] = str2nr(li[:stridx(li, " ") - 1])
-	    let li = li[stridx(li, " ") + 1:]
-	    let tag_info['cmd'] = '/^' . li . '$/'
-	    let rsl_list = add(rsl_list, tag_info)
+		let tag_info = {}
+		let tag_info['filename'] = li[:stridx(li, " ") - 1]
+		let li = li[stridx(li, " ") + 1:]
+		let tag_info['name'] = li[:stridx(li, " ") - 1]
+		let li = li[stridx(li, " ") + 1:]
+		let tag_info['line'] = str2nr(li[:stridx(li, " ") - 1])
+		let li = li[stridx(li, " ") + 1:]
+		let tag_info['cmd'] = '/^' . li . '$/'
+		let rsl_list = add(rsl_list, tag_info)
 	endfor
 	return rsl_list
 endfunc
 
 
 function! s:taglist(pattern)
-    let ftags = []
-    try
-	if &cscopetag
-	    let ftags = s:global_taglist(a:pattern)
-	else
-	    let ftags = taglist(a:pattern)
-	endif
-    catch /^Vim\%((\a\+)\)\=:E/
-        " if error occured, reset tagbsearch option and try again.
-        let bak = &tagbsearch
-        set notagbsearch
-	if &cscopetag
-		let ftags = s:global_taglist(a:pattern)
-	else
-		let ftags = taglist(a:pattern)
-	endif
-        let &tagbsearch = bak
-    endtry
+	let ftags = []
+	try
+		if &cscopetag
+			let ftags = s:global_taglist(a:pattern)
+		else
+			let ftags = taglist(a:pattern)
+		endif
+	catch /^Vim\%((\a\+)\)\=:E/
+		" if error occured, reset tagbsearch option and try again.
+		let bak = &tagbsearch
+		set notagbsearch
+		if &cscopetag
+			let ftags = s:global_taglist(a:pattern)
+		else
+			let ftags = taglist(a:pattern)
+		endif
+		let &tagbsearch = bak
+	endtry
 	" take care ctags windows filename bug
 	let win = has('win32') || has('win64') || has('win95') || has('win16')
 	for item in ftags
@@ -396,7 +398,7 @@ function! s:taglist(pattern)
 			end
 		endif
 	endfor
-    return ftags
+	return ftags
 endfunc
 
 
@@ -440,7 +442,7 @@ endfunc
 "----------------------------------------------------------------------
 function! s:signature(funname, fn_only, filetype)
 	let tags = s:tagfind(a:funname)
-    let funpat = escape(a:funname, '[\*~^')
+	let funpat = escape(a:funname, '[\*~^')
 	let fill_tag = []
 	let ft = (a:filetype == '')? &filetype : a:filetype
 	for i in tags
@@ -674,14 +676,14 @@ endfunc
 " setup keymaps
 "----------------------------------------------------------------------
 func! s:FindCwordCmd(cmd, is_file)
-    let cmd = ":\<C-U>" . a:cmd
-    if a:is_file == 1
-        let cmd .= " " . expand('<cfile>')
-    else
-        let cmd .= " " . expand('<cword>')
-    endif
-    let cmd .= "\<CR>"
-    return cmd
+	let cmd = ":\<C-U>" . a:cmd
+	if a:is_file == 1
+		let cmd .= " " . expand('<cfile>')
+	else
+		let cmd .= " " . expand('<cword>')
+	endif
+	let cmd .= "\<CR>"
+	return cmd
 endf
 
 nnoremap <silent> <expr> <Plug>GscopeFindSymbol     <SID>FindCwordCmd('GscopeFind s', 0)
