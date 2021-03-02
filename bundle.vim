@@ -104,6 +104,10 @@ if has_key(s:enabled, 'basic')
 	Plug 'flazz/vim-colorschemes'
 	Plug 'xolox/vim-misc'
 	Plug 'terryma/vim-expand-region'
+	Plug 'skywind3000/vim-dict'
+	Plug 'tommcdo/vim-exchange'
+	Plug 'tommcdo/vim-lion'
+
 	Plug 'pprovost/vim-ps1', { 'for': 'ps1' }
 	Plug 'tbastos/vim-lua', { 'for': 'lua' }
 	Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['c', 'cpp'] }
@@ -112,7 +116,6 @@ if has_key(s:enabled, 'basic')
 	Plug 'beyondmarc/hlsl.vim'
 	Plug 'tpope/vim-eunuch'
 	Plug 'dag/vim-fish'
-	Plug 'skywind3000/vim-dict'
 
 	Plug 'kana/vim-textobj-user'
 	" Plug 'kana/vim-textobj-indent'
@@ -122,8 +125,6 @@ if has_key(s:enabled, 'basic')
 	Plug 'bps/vim-textobj-python', {'for': 'python'}
 	Plug 'jceb/vim-textobj-uri'
 
-	Plug 'tommcdo/vim-exchange'
-	Plug 'tommcdo/vim-lion'
 
 	" Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
 	
