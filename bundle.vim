@@ -121,6 +121,7 @@ if has_key(s:enabled, 'basic')
 	Plug 'sgur/vim-textobj-parameter'
 	Plug 'bps/vim-textobj-python', {'for': 'python'}
 	Plug 'jceb/vim-textobj-uri'
+
 	Plug 'tommcdo/vim-exchange'
 	Plug 'tommcdo/vim-lion'
 
