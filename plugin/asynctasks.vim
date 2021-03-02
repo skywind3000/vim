@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2021/02/26 01:18
-" Verision: 1.8.7
+" Last Modified: 2021/03/02 18:22
+" Verision: 1.8.8
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -528,7 +528,13 @@ function! s:config_merge(target, source, ininame, mode)
 			if a:mode != ''
 				let a:target[key].__mode__ = a:mode
 			endif
-		else
+		elseif key == '*'
+			if has_key(a:target, '*') == 0
+				let a:target['*'] = {}
+			endif
+			for name in keys(a:source['*'])
+				let a:target['*'][name] = a:source['*'][name]
+			endfor
 		endif
 	endfor
 	for key in special
@@ -669,6 +675,7 @@ function! asynctasks#collect_config(path, force)
 	let path = (a:path == '')? getcwd() : (a:path)
 	let s:index = 0
 	let s:error = ''
+	let s:private.profile = g:asynctasks_profile
 	let c1 = s:compose_rtp_config(a:force)
 	let c2 = s:compose_local_config(path)
 	let tasks = {'config':{}, 'names':{}, 'avail':[]}
@@ -687,7 +694,9 @@ function! asynctasks#collect_config(path, force)
 	for item in avail
 		let tasks.avail += [item[0]]
 	endfor
+	let tasks.environ = get(tasks.config, '*', {})
 	let s:private.tasks = tasks
+	" echo s:private.tasks.environ
 	return (s:index == 0)? 0 : -1
 endfunc
 
@@ -908,6 +917,7 @@ endfunc
 "----------------------------------------------------------------------
 function! s:command_environ(command)
 	let command = a:command
+	let environ = get(s:private.tasks, 'environ', {})
 	let mark_open = '$(VIM:'
 	let mark_close = ')'
 	let size_open = strlen(mark_open)
@@ -925,10 +935,14 @@ function! s:command_environ(command)
 		let mark = mark_open . name . mark_close
 		let key = s:strip(name)
 		if has_key(g:asynctasks_environ, key) == 0
-			call s:warning('Internal Variable "' . mark . '" is undefined')
-			return ''
+			if has_key(environ, key) == 0
+				let msg = 'Internal variable "'. mark . '" is underfined'
+				call s:warning(msg)
+				return ''
+			endif
 		endif
-		let t = g:asynctasks_environ[key]
+		let t = get(g:asynctasks_environ, key, '')
+		let t = get(s:private.tasks.environ, key, t)
 		let command = s:replace(command, mark, t)
 	endwhile
 	return command

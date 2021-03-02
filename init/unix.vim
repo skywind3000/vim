@@ -17,6 +17,7 @@ set fdm=indent
 set foldlevel=99
 set tags=./.tags;,.tags
 set history=2000
+set viminfo+=!
 
 if has('patch-8.1.1300')
 	set shortmess-=S
