@@ -1066,7 +1066,7 @@ class TaskManager (object):
         # self.config
         self.config.load_tasks()
         names = []
-        for name in self.config.tasks:
+        for name in self.config.avail:
             if not name.startswith('.'):
                 names.append(name)
         if len(names) == 0:
@@ -1106,9 +1106,7 @@ class TaskManager (object):
             flag = setting.get('fzf_flag', '')
             flag = (not flag) and '+s ' or flag
             cmd = (fzf and fzf or 'fzf') + ' ' + cmd + ' ' + flag
-            if sys.platform[:3] != 'win':
-                height = '35%'
-                cmd += ' --height ' + height
+            cmd += ' --height 35%'
             rows = []
             width = 0
             names.reverse()
