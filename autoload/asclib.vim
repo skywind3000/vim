@@ -90,7 +90,7 @@ function! asclib#lint_cppcheck(filename)
 	let filename = (a:filename == '')? expand('%') : a:filename
 	let l:template = ' --template="{file}:{line}:{column}: {severity}:{inconclusive:inconclusive:} {message} [{id}]\n{code}"'
 	let cfg = g:asclib#lint_cppcheck_parameters
-	let cfg .= ' ' . l:template
+	" let cfg .= ' ' . l:template
 	let cmd = 'cppcheck '.cfg.' '.shellescape(filename)
 	call asyncrun#run('', {'auto':'make', 'raw':1}, cmd)
 endfunc
