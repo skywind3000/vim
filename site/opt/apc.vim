@@ -164,9 +164,7 @@ function! s:apc_check_init()
 	elseif get(g:apc_enable_ft, '*', 0) != 0
 		ApcEnable
 	elseif get(b:, 'apc_enable', 0)
-		if &ft != ''
-			ApcEnable
-		endif
+		ApcEnable
 	endif
 endfunc
 
