@@ -156,10 +156,17 @@ endfunc
 
 " check if need to be enabled
 function! s:apc_check_init()
-	if &bt == '' && get(g:apc_enable_ft, &ft, 0) != 0
+	if &bt != ''
+		return
+	endif
+	if get(g:apc_enable_ft, &ft, 0) != 0
 		ApcEnable
-	elseif &bt == '' && get(g:apc_enable_ft, '*', 0) != 0
+	elseif get(g:apc_enable_ft, '*', 0) != 0
 		ApcEnable
+	elseif get(b:, 'apc_enable', 0)
+		if &ft != ''
+			ApcEnable
+		endif
 	endif
 endfunc
 
@@ -170,5 +177,7 @@ command! -nargs=0 ApcDisable call s:apc_disable()
 augroup ApcInitGroup
 	au!
 	au FileType * call s:apc_check_init()
+	au BufEnter * call s:apc_check_init()
 augroup END
+
 

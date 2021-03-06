@@ -152,7 +152,7 @@ call quickui#menu#install('&Tools', [
 			\ ])
 
 call quickui#menu#install('&Plugin', [
-			\ ["&NERDTree\t<space>tn", 'NERDTreeToggle', 'toggle nerdtree'],
+			\ ["&NERDTree\t<space>tn", 'exec "NERDTree " . shellescape(asclib#path#get_root("%"))', 'toggle nerdtree'],
 			\ ['&Tagbar', '', 'toggle tagbar'],
 			\ ["&Choose Window/Tab\tAlt+e", "ChooseWin", "fast switch win/tab with vim-choosewin"],
 			\ ["-"],
