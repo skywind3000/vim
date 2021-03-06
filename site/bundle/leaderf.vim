@@ -97,7 +97,7 @@ nnoremap <space>fu :<c-u>Leaderf bufTag<cr>
 nnoremap <space>fs :<c-u>Leaderf self<cr>
 nnoremap <space>fc :<c-u>Leaderf colorscheme<cr>
 nnoremap <space>fy :<c-u>Leaderf cmdHistory<cr>
-nnoremap <space>fh :<c-u>Leaderf help<cr>
+" nnoremap <space>fh :<c-u>Leaderf help<cr>
 nnoremap <space>fj :<c-u>Leaderf jumps<cr>
 nnoremap <space>fp :<c-u>Leaderf snippet<cr>
 nnoremap <space>fq :<c-u>Leaderf quickfix<cr>
