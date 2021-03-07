@@ -27,8 +27,8 @@ let g:NERDTreeHijackNetrw = 0
 " let g:NERDTreeFileExtensionHighlightFullName = 1
 " let g:NERDTreeExactMatchHighlightFullName = 1
 " let g:NERDTreePatternMatchHighlightFullName = 1
-noremap <space>tn :NERDTree<cr>
+noremap <space>tn :exec "NERDTree " . fnameescape(asclib#path#get_root('%'))<cr>
 noremap <space>to :NERDTreeFocus<cr>
 noremap <space>tm :NERDTreeMirror<cr>
-noremap <space>tt :NERDTreeToggle<cr>
+noremap <space>tt :exec "NERDTreeToggle " . fnameescape(asclib#path#get_root('%'))<cr>
 
