@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2021/03/02 19:18
-" Verision: 1.8.8
+" Last Modified: 2021/03/07 19:53
+" Verision: 1.8.9
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1740,7 +1740,7 @@ function! asynctasks#finish(what)
 		if g:asyncrun_name != ''
 			let t = 'Task [' . g:asyncrun_name . '] finished: '
 		endif
-		echo t . ((g:asyncrun_code != 0)? 'failure' : 'success')
+		echom t . ((g:asyncrun_code != 0)? 'failure' : 'success')
 		echohl None
 	elseif a:what =~ '^sound:'
 		if exists('*sound_playfile')
