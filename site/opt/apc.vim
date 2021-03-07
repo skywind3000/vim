@@ -176,6 +176,7 @@ augroup ApcInitGroup
 	au!
 	au FileType * call s:apc_check_init()
 	au BufEnter * call s:apc_check_init()
+	au TabEnter * call s:apc_check_init()
 augroup END
 
 
