@@ -32,6 +32,7 @@ if get(g:, 'vim_manual', 0) == 0
 		let g:bundle_group += ['basic', 'inter', 'high', 'opt']
 		let g:bundle_group += ['ale']
 	endif
+	let g:bundle_group += ['nerdtree']
 endif
 
 if len(g:bundle_group) > 0
