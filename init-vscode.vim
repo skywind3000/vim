@@ -23,6 +23,7 @@ noremap <silent>\wk <c-w>k
 noremap <silent>\wl <c-w>l
 noremap <silent>\wc <c-w>c
 noremap <silent>\wo <c-w>o
+noremap <silent>\wp <c-w>p
 noremap <silent>\w1 :1wincmd w<cr>
 noremap <silent>\w2 :2wincmd w<cr>
 noremap <silent>\w3 :3wincmd w<cr>
@@ -74,6 +75,7 @@ noremap <tab>= <c-w>=
 noremap <tab>s <c-w>s
 noremap <tab>v <c-w>v
 noremap <tab>o <c-w>o
+noremap <tab>p <c-w>p
 
 
 " tab enhancement
