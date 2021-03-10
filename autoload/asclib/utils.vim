@@ -297,19 +297,19 @@ endfunc
 "----------------------------------------------------------------------
 function! asclib#utils#git_browse(name, ...)
 	let name = (a:name == '')? expand('%:p') : (a:name)
-	let root = asclib#cvs#root(name)
+	let root = asclib#vcs#root(name)
 	if root == ''
 		return ''
 	endif
-	let remote = asclib#cvs#git_remote(root, 'origin')
+	let remote = asclib#vcs#git_remote(root, 'origin')
 	if remote == ''
 		return ''
 	endif
-	let branch = asclib#cvs#git_branch(root)
+	let branch = asclib#vcs#git_branch(root)
 	if branch == ''
 		return ''
 	endif
-	let uri = asclib#cvs#git_fullname(name)
+	let uri = asclib#vcs#git_fullname(name)
 	if uri == ''
 		return ''
 	endif
