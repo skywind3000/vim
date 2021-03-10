@@ -77,6 +77,8 @@ if has_key(s:enabled, 'simple')
 	vnoremap gb= :Tabularize /=<CR>
 	nnoremap gb/ :Tabularize /\/\//l4c1<CR>
 	vnoremap gb/ :Tabularize /\/\//l4c1<CR>
+	nnoremap gb* :Tabularize /\/\*/l4c1<cr>
+	vnoremap gb* :Tabularize /\/\*/l4c1<cr>
 	nnoremap gb, :Tabularize /,/r0l1<CR>
 	vnoremap gb, :Tabularize /,/r0l1<CR>
 	nnoremap gbl :Tabularize /\|<cr>
