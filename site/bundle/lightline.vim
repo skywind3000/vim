@@ -6,12 +6,15 @@ let g:lightline = {}
 
 let g:lightline.active = {
 			\ 'left': [ [ 'mode', 'active' ],
-			\           [ 'fullname' ], [ 'status' ] ]
+			\           [ 'fullname' ], [ 'status' ] ],
+			\ 'right': [ ['lineinfo'], ['percent'],
+			\           ['fileformat', 'fileencoding', 'filetype'] ],
 			\ }
 
 let g:lightline.inactive = {
 			\ 'left': [ [ 'mode' ],
-			\           [ 'fullname' ], [ 'status' ] ]
+			\           [ 'fullname' ], [ 'status' ] ],
+			\ 'right': [ ['lineinfo'], ['percent'] ],
 			\ }
 
 
@@ -22,6 +25,7 @@ let g:lightline.component = {
 			\ 'fullname': '%F',
 			\ 'status': '[%M%n%R%H%W]',
 			\ 'mode': '%{LightlineMode()}',
+			\ 'lineinfo': '%3l:%-2v',
 			\ }
 
 
