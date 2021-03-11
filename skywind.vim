@@ -130,6 +130,8 @@ set timeoutlen=2000
 
 command! Ghistory :0Gclog! -- %
 
+" set listchars=tab:»\ ,trail:.,extends:>,precedes:<
+
 
 "----------------------------------------------------------------------
 "- OmniCpp
