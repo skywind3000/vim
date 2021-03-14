@@ -85,12 +85,15 @@ function! asclib#lint_cppcheck(filename)
 		let g:asclib#lint_cppcheck_parameters.= ' --quiet'
 		let g:asclib#lint_cppcheck_parameters.= ' --enable=warning'
 		let g:asclib#lint_cppcheck_parameters.= ',performance,portability'
+		let g:asclib#lint_cppcheck_parameters.= ',style'
 		let g:asclib#lint_cppcheck_parameters.= ' -DWIN32 -D_WIN32'
 	endif
 	let filename = (a:filename == '')? expand('%') : a:filename
-	let l:template = ' --template="{file}:{line}:{column}: {severity}:{inconclusive:inconclusive:} {message} [{id}]\n{code}"'
+	let rc = asclib#path#runtime('tools/conf/cppcheck.conf')
 	let cfg = g:asclib#lint_cppcheck_parameters
-	" let cfg .= ' ' . l:template
+	if filereadable(rc)
+		let cfg .= ' --suppressions-list=' . shellescape(rc)
+	endif
 	let cmd = 'cppcheck '.cfg.' '.shellescape(filename)
 	call asyncrun#run('', {'auto':'make', 'raw':1}, cmd)
 endfunc
