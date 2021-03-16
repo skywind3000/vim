@@ -46,7 +46,7 @@ endif
 "----------------------------------------------------------------------
 
 " Enable vim-diff-enhanced (Christian Brabandt)
-if has('patch-8.1.0388')
+if has('patch-8.2.0001')
 	set diffopt+=internal,algorithm:patience
 	set diffopt+=indent-heuristic
 endif
