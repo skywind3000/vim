@@ -1,7 +1,11 @@
 #----------------------------------------------------------------------
 # Initialize environment and alias
 #----------------------------------------------------------------------
-alias ls='ls --color'
+case "$OSTYPE" in
+	*gnu*|*linux*|*msys*|*cygwin*) alias ls='ls --color' ;;
+	*freebsd*|*darwin*) alias ls='ls -G' ;;
+esac
+	
 alias ll='ls -lh'
 alias la='ls -lAh'
 alias grep='grep --color=tty'
