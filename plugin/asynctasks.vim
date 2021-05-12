@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2021/03/07 19:53
-" Verision: 1.8.9
+" Last Modified: 2021/05/12 20:32
+" Verision: 1.8.10
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1093,7 +1093,9 @@ endfunc
 function! s:command_check(command, cwd)
 	let disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT',
 				\ 'FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
-	if &bt != ''
+	let weak = get(g:, 'asynctasks_weak_check', 0)
+	let weak = get(b:, 'asynctasks_weak_check', weak)
+	if &bt != '' && weak == 0
 		for name in disable
 			for mode in ['$(VIM_', '$(WSL_']
 				let macro = mode . name . ')'
