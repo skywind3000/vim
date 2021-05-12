@@ -1093,8 +1093,8 @@ endfunc
 function! s:command_check(command, cwd)
 	let disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT',
 				\ 'FILENOEXT', 'PATHNOEXT', 'RELDIR', 'RELNAME']
-	let weak = get(g:, 'asynctasks_weak_check', 0)
-	let weak = get(b:, 'asynctasks_weak_check', weak)
+	let weak = get(g:, 'asynctasks_weak_mode', 0)
+	let weak = get(b:, 'asynctasks_weak_mode', weak)
 	if &bt != '' && weak == 0
 		for name in disable
 			for mode in ['$(VIM_', '$(WSL_']
