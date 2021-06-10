@@ -538,7 +538,9 @@ command! -complete=file -nargs=1 SelectiveDrop call <SID>SelectiveDrop(<q-args>)
 "----------------------------------------------------------------------
 function! s:runner_proc(opts)
 	let cwd = getcwd()
-	call TerminalSend('cd ' . shellescape(cwd) . "\r")
+	let cd = (has('win32') || has('win64') || has('win16'))? 'cd /D' : 'cd'
+	let cd = get(g:, 'terminal_cd', cd)
+	call TerminalSend(cd . ' ' . shellescape(cwd) . "\r")
 	call TerminalSend(a:opts.cmd . "\r")
 endfunc
 
