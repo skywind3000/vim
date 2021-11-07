@@ -3,7 +3,7 @@
 " viminit.vim - Vim initialize script
 "
 " Maintainer: skywind3000 (at) gmail.com
-" Last Modified: 2021/03/08 13:40
+" Last Modified: 2021/11/07 16:38
 "
 " Tiny script which makes vim become neat and handy, supports vim.tiny
 "
@@ -258,7 +258,7 @@ cnoremap <c-x><c-e> <c-e>
 cnoremap <c-x><c-d> <c-d>
 
 " quit all
-noremap <silent>Q :confirm qall<cr>
+noremap <silent>Q :<c-u>confirm qall<cr>
 
 
 "----------------------------------------------------------------------
