@@ -11,5 +11,5 @@ CHEAT=""
 [ -n "$CHEAT"] && [ ! -f "$CHEAT" ] && CHEAT="$HOME/.local/lib/python/cheat.py"
 [ ! -f "$CHEAT" ] && [ -n "$VIM_CONFIG" ] && CHEAT="$VIM_CONFIG/lib/cheat.py"
 
-env python2 "$CHEAT" $@
+env python3 "$CHEAT" $@
 

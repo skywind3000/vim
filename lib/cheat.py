@@ -5,7 +5,7 @@
 # cheat.py - python cheat sheet
 #
 # Created by skywind on 2018/01/25
-# Last Modified: 2019/09/27 05:06
+# Last Modified: 2021/11/21 04:57
 #
 #======================================================================
 from __future__ import print_function, unicode_literals
@@ -399,6 +399,7 @@ def http_request(url, timeout = 10, data = None, post = False, head = None):
     headers = []
     import urllib
     import ssl
+    import socket
     if sys.version_info[0] >= 3:
         import urllib.parse
         import urllib.request
