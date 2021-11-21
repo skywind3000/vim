@@ -1,0 +1,6 @@
+- python pip:
+
+  https://bootstrap.pypa.io/get-pip.py
+  https://bootstrap.pypa.io/pip/2.7/get-pip.py
+
+
