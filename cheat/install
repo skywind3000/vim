@@ -21,4 +21,8 @@
   /etc/init.d/ssh $1
   /etc/init.d/supervisor $1
 
+- WSL startup:
+
+  Set ws = CreateObject("Wscript.Shell")
+  ws.run "wsl -d debian -u root /etc/init.wsl start", vbhide
 
