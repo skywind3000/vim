@@ -14,4 +14,11 @@
 
   ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEA2yNZF/SKiYaFKHlpi4HoSxDMIDJfJsjL4+ZbdkNxxscSY02O95txYkwNrQJNLRPVCMy+d5027AuKvT/yKptzJ1POszxUGXqCE/cAb8idAptYu2r1FpWvPzdK1l7UmDrUzr0frvk64hlyeOPjvQ7bFko96NI5UuCFnCpFcC8oTnM= skywind
 
+- WSL init:
+
+  #! /bin/sh
+  /etc/init.d/cron $1
+  /etc/init.d/ssh $1
+  /etc/init.d/supervisor $1
+
 
