@@ -26,3 +26,10 @@
   Set ws = CreateObject("Wscript.Shell")
   ws.run "wsl -d debian -u root /etc/init.wsl start", vbhide
 
+- Build Packages:
+
+  sudo apt-get install build-essential automake autoconf make pkg-config 
+  sudo apt-get install libncursesw5-dev libncurses5-dev libssl-dev libevent-dev
+  sudo apt-get install libuv1-dev libev-dev python2-dev python3-dev
+
+
