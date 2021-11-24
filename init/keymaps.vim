@@ -440,4 +440,3 @@ if has('nvim') && (has('win32') || has('win64'))
 	vnoremap <c-insert> "*y
 endif
 
-
