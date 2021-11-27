@@ -3,7 +3,7 @@
 " readline.vim - 
 "
 " Created by skywind on 2021/02/20
-" Last Modified: 2021/11/28 02:39
+" Last Modified: 2021/11/28 03:41
 "
 "======================================================================
 
@@ -494,6 +494,15 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" calculate mouse click position
+"----------------------------------------------------------------------
+function! s:readline.mouse_click(winpos, offset)
+	let index = self.avail(a:winpos, a:offset) + a:winpos
+	return (index > self.size)? self.size : index
+endfunc
+
+
+"----------------------------------------------------------------------
 " save history in current position
 "----------------------------------------------------------------------
 function! s:readline.history_save() abort
@@ -859,9 +868,8 @@ if 1
 	" echo quickui#readline#cli(">>> ")
 else
 	let rl = quickui#readline#new()
-	call rl.insert('a')
-	" echo rl.wide
-	echo rl.avail(0, 5)
+	call rl.insert('abad')
+	echo rl.mouse_click(0, 5)
 endif
 
 

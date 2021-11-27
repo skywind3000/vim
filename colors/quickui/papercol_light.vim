@@ -25,7 +25,8 @@ hi! QuickDefaultMatch3 ctermfg=64 guifg=#5f8700
 hi! QuickDefaultMatch4 ctermfg=91 guifg=#8700af
 hi! QuickDefaultMatch5 ctermfg=247 guifg=#a2a2a2 
 
-hi! link QuickDefaultInput Pmenu
-hi! link QuickDefaultCursor PmenuSel
-hi! link QuickDefaultVisual PmenuSbar
+hi! QuickDefaultInput ctermfg=254 ctermbg=24 guifg=#e4e4e4 guibg=#005f87
+hi! QuickDefaultCursor ctermfg=238 ctermbg=222 guifg=#444444 guibg=#ffd787
+hi! QuickDefaultVisual ctermfg=31 ctermbg=255 guifg=#0087af guibg=#eeeeee
+
 
