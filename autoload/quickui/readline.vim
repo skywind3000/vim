@@ -3,7 +3,7 @@
 " readline.vim - 
 "
 " Created by skywind on 2021/02/20
-" Last Modified: 2021/02/20 12:58:24
+" Last Modified: 2021/11/28 02:39
 "
 "======================================================================
 
@@ -640,6 +640,7 @@ function! s:readline.feed(char) abort
 			endif
 		elseif char == "\<S-Insert>"
 			let text = split(@*, "\n", 1)[0]
+			let text = substitute(text, '[\r\n\t]', ' ', 'g')
 			if text != ''
 				if self.select >= 0
 					call self.visual_delete()
@@ -673,6 +674,7 @@ function! s:readline.feed(char) abort
 			endif
 		elseif char == "\<c-v>"
 			let text = split(@0, "\n", 1)[0]
+			let text = substitute(text, '[\r\n\t]', ' ', 'g')
 			if text != ''
 				if self.select >= 0
 					call self.visual_delete()

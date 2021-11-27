@@ -127,10 +127,12 @@ function! s:update_input(hwnd)
 	call setbufline(hwnd.bid, 3, text)
 	call quickui#core#win_execute(hwnd.winid, cmdlist)
 	redraw
-	echon 'blink='. blink 
-	echon ' <'
-	call rl.echo(blink, 0, hwnd.w) 
-	echon '>'
+	if 0
+		echon 'blink='. blink 
+		echon ' <'
+		call rl.echo(blink, 0, hwnd.w) 
+		echon '>'
+	endif
 endfunc
 
 
