@@ -51,6 +51,7 @@ function! s:init_input_box(prompt, opts)
 	endif
 	let hwnd.pos = 0
 	let hwnd.wait = 0
+	let hwnd.exit = 0
 	return hwnd
 endfunc
 
@@ -84,11 +85,23 @@ function! s:vim_create_input(prompt, opts)
 	let opts.resize = 0
 	let opts.highlight = hwnd.opts.color
 	let opts.borderhighlight = [bc, bc, bc, bc]
+	let opts.callback = function('s:popup_exit')
 	let hwnd.winid = winid
+	let local = quickui#core#popup_local(winid)
+	let local.hwnd = hwnd
 	call popup_setoptions(winid, opts)
 	call popup_show(winid)
 	redraw
 	return hwnd
+endfunc
+
+
+"----------------------------------------------------------------------
+" exit callback
+"----------------------------------------------------------------------
+function! s:popup_exit(winid, code)
+	let local = quickui#core#popup_local(a:winid)
+	let local.hwnd.exit = 1
 endfunc
 
 
@@ -151,7 +164,7 @@ function! quickui#input#create(prompt, opts)
 	let rl.history += ['']
 	let rl.history += ['5678']
 	let rl.history += ['abcd']
-	while 1
+	while hwnd.exit == 0
 		noautocmd redraw
 		call s:update_input(hwnd)
 		try
@@ -184,6 +197,17 @@ function! quickui#input#create(prompt, opts)
 			let accept = 1
 			call rl.history_save()
 			break
+		elseif ch == "\<LeftMouse>"
+			let pos = getmousepos()
+			if pos.winid == hwnd.winid
+				if pos.line == 3
+					let x = pos.column - 1
+					if x >= 0 && x < hwnd.w
+						let pos = rl.mouse_click(hwnd.pos, x)
+						call rl.seek(pos, 0)
+					endif
+				endif
+			endif
 		else
 			call rl.feed(ch)
 		endif
