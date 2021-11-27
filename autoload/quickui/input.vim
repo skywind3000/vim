@@ -31,7 +31,7 @@ function! s:init_input_box(prompt, opts)
 		endif
 		let hwnd.w = limit
 	endif
-	let hwnd.image = [a:prompt, ' ', repeat('X', hwnd.w)]
+	let hwnd.image = [a:prompt, ' ', repeat(' ', hwnd.w)]
 	let hwnd.bid = quickui#core#scratch_buffer('input', hwnd.image)
 	let hwnd.opts = deepcopy(a:opts)
 	let hwnd.opts.color = get(a:opts, 'color', 'QuickBG')
@@ -148,6 +148,9 @@ function! quickui#input#create(prompt, opts)
 	let rl = hwnd.rl
 	let accept = 0
 	let result = ''
+	let rl.history += ['']
+	let rl.history += ['5678']
+	let rl.history += ['abcd']
 	while 1
 		noautocmd redraw
 		call s:update_input(hwnd)
@@ -179,6 +182,7 @@ function! quickui#input#create(prompt, opts)
 		elseif ch == "\<cr>"
 			let result = rl.update()
 			let accept = 1
+			call rl.history_save()
 			break
 		else
 			call rl.feed(ch)
@@ -188,6 +192,7 @@ function! quickui#input#create(prompt, opts)
 		call popup_close(hwnd.winid)
 	else
 	endif
+	redraw
 	return result
 endfunc
 

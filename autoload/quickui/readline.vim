@@ -518,6 +518,10 @@ function! s:readline.history_prev() abort
 		call self.history_save()
 		let self.index = (self.index < size - 1)? (self.index + 1) : 0
 		call self.set(self.history[self.index])
+		if self.size > 0
+			let self.select = 0
+			let self.cursor = self.size
+		endif
 	endif
 endfunc
 
@@ -531,6 +535,10 @@ function! s:readline.history_next() abort
 		call self.history_save()
 		let self.index = (self.index <= 0)? (size - 1) : (self.index - 1)
 		call self.set(self.history[self.index])
+		if self.size > 0
+			let self.select = 0
+			let self.cursor = self.size
+		endif
 	endif
 endfunc
 
