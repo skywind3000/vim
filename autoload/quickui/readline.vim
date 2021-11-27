@@ -527,6 +527,7 @@ function! s:readline.history_prev() abort
 		call self.history_save()
 		let self.index = (self.index < size - 1)? (self.index + 1) : 0
 		call self.set(self.history[self.index])
+		call self.update()
 	endif
 endfunc
 
@@ -540,6 +541,7 @@ function! s:readline.history_next() abort
 		call self.history_save()
 		let self.index = (self.index <= 0)? (size - 1) : (self.index - 1)
 		call self.set(self.history[self.index])
+		call self.update()
 	endif
 endfunc
 
@@ -802,6 +804,7 @@ endfunc
 "----------------------------------------------------------------------
 function! quickui#readline#cli(prompt)
 	let rl = quickui#readline#new()
+	let rl.history = ['', 'abcd', '12345']
 	let index = 0
 	let accept = ''
 	let pos = 0
@@ -820,9 +823,11 @@ function! quickui#readline#cli(prompt)
 			call rl.echo(rl.blink(ts), pos, size)
 			echohl Title
 			echon ">"
+			echon " size=" . size
 			echon " cursor=" . rl.cursor
 			echon " pos=". pos
-			echon " blink". rl.blink(ts)
+			echon " blink=". rl.blink(ts)
+			echon " avail=". rl.avail(pos, size)
 		endif
 		" echon rl.display()
 		try
@@ -856,12 +861,17 @@ function! quickui#readline#cli(prompt)
 	return accept
 endfunc
 
-if 1
+if 0
 	" echo quickui#readline#cli(">>> ")
 else
-	let rl = quickui#readline#new()
-	call rl.insert('abad')
-	echo rl.mouse_click(0, 5)
+	let suit = 1
+	if suit == 0
+		let rl = quickui#readline#new()
+		call rl.insert('abad')
+		echo rl.mouse_click(0, 5)
+	elseif suit == 1
+		echo quickui#readline#cli(">>> ")
+	endif
 endif
 
 
