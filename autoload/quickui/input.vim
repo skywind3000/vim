@@ -3,7 +3,7 @@
 " input.vim - 
 "
 " Created by skywind on 2021/11/27
-" Last Modified: 2021/11/27 23:13
+" Last Modified: 2021/11/28 02:24
 "
 "======================================================================
 
@@ -50,6 +50,7 @@ function! s:init_input_box(prompt, opts)
 		let hwnd.rl.select = 0
 	endif
 	let hwnd.pos = 0
+	let hwnd.wait = 0
 	return hwnd
 endfunc
 
@@ -100,7 +101,7 @@ function! s:update_input(hwnd)
 	let size = hwnd.w
 	let ts = float2nr(reltimefloat(reltime()) * 1000)
 	let blink = rl.blink(ts)
-	let blink = 0
+	let blink = (hwnd.wait)? 0 : blink
 	let hwnd.pos = rl.slide(hwnd.pos, size)
 	let display = rl.render(hwnd.pos, size)
 	let cmdlist = ['syn clear']
@@ -108,18 +109,17 @@ function! s:update_input(hwnd)
 	let y = 3
 	let content = []
 	for [attr, text] in display
-		let len = strchars(text)
+		let len = strwidth(text)
 		let content += [text]
-		if attr == 0
-			let color = 'QuickInput'
-		elseif attr == 1
+		let color = 'QuickInput'
+		if attr == 1
 			let color = (blink == 0)? 'QuickCursor' : 'QuickInput'
 		elseif attr == 2
 			let color = 'QuickVisual'
-		else
+		elseif attr == 3
 			let color = (blink == 0)? 'QuickCursor' : 'QuickVisual'
 		endif
-		let cmd = quickui#core#high_region(color, y, x, x + len, y, 0)
+		let cmd = quickui#core#high_region(color, y, x, y, x + len, 1)
 		let cmdlist += [cmd]
 		let x += len
 	endfor
@@ -142,6 +142,7 @@ function! quickui#input#create(prompt, opts)
 		let hwnd = s:vim_create_input(a:prompt, a:opts)
 	else
 	endif
+	" let hwnd.wait = 1
 	let rl = hwnd.rl
 	let accept = 0
 	let result = ''
@@ -149,7 +150,11 @@ function! quickui#input#create(prompt, opts)
 		noautocmd redraw
 		call s:update_input(hwnd)
 		try
-			let code = getchar()
+			if hwnd.wait != 0
+				let code = getchar()
+			else
+				let code = getchar(0)
+			endif
 		catch /^Vim:Interrupt$/
 			let code = "\<C-C>"
 		endtry
