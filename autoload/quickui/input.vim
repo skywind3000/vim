@@ -52,6 +52,7 @@ function! s:init_input_box(prompt, opts)
 	let hwnd.pos = 0
 	let hwnd.wait = 0
 	let hwnd.exit = 0
+	let hwnd.strict = get(a:opts, 'strict', 1)
 	return hwnd
 endfunc
 
@@ -194,9 +195,11 @@ function! quickui#input#create(prompt, opts)
 			break
 		elseif ch == "\<cr>"
 			let result = rl.update()
-			let accept = 1
-			call rl.history_save()
-			break
+			if result != '' || hwnd.strict == 0
+				let accept = 1
+				call rl.history_save()
+				break
+			endif
 		elseif ch == "\<LeftMouse>"
 			let pos = getmousepos()
 			if pos.winid == hwnd.winid
@@ -228,7 +231,7 @@ if 1
 	let opts = {}
 	let opts.title = 'Input'
 	" let opts.w = 50
-	let hwnd = quickui#input#create('Enter your name:', opts)
+	echo quickui#input#create('Enter your name:', opts)
 endif
 
 
