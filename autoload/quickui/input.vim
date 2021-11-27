@@ -151,6 +151,21 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" select all text
+"----------------------------------------------------------------------
+function! s:select_all(hwnd)
+	let hwnd = a:hwnd
+	let rl = hwnd.rl
+	let hwnd.pos = 0
+	call rl.seek(0, 2)
+	if rl.size > 0
+		let rl.select = 0
+	endif
+	let hwnd.pos = rl.slide(hwnd.pos, hwnd.w)
+endfunc
+
+
+"----------------------------------------------------------------------
 " create input box
 "----------------------------------------------------------------------
 function! quickui#input#create(prompt, opts)
@@ -162,9 +177,9 @@ function! quickui#input#create(prompt, opts)
 	let rl = hwnd.rl
 	let accept = 0
 	let result = ''
-	let rl.history += ['']
-	let rl.history += ['5678']
-	let rl.history += ['abcd']
+	" let rl.history += ['']
+	" let rl.history += ['5678']
+	" let rl.history += ['abcd']
 	while hwnd.exit == 0
 		noautocmd redraw
 		call s:update_input(hwnd)
@@ -210,6 +225,16 @@ function! quickui#input#create(prompt, opts)
 						call rl.seek(pos, 0)
 					endif
 				endif
+			endif
+		elseif ch == "\<Up>" || ch == "\<c-p>"
+			if len(rl.history) > 0
+				call rl.feed("\<up>")
+				call s:select_all(hwnd)
+			endif
+		elseif ch == "\<Down>" || ch == "\<c-n>"
+			if len(rl.history) > 0
+				call rl.feed("\<down>")
+				call s:select_all(hwnd)
 			endif
 		elseif ch == "\<c-d>"
 			redraw
