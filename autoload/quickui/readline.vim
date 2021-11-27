@@ -61,7 +61,7 @@ function! s:readline.set(text)
 	let wide = []
 	for cc in code
 		let ch = nr2char(cc)
-		let wide += [strdisplaywidth(cc)]
+		let wide += [strdisplaywidth(ch)]
 	endfor
 	let self.code = code
 	let self.wide = wide
@@ -861,16 +861,27 @@ function! quickui#readline#cli(prompt)
 	return accept
 endfunc
 
+
+"----------------------------------------------------------------------
+" testing suit
+"----------------------------------------------------------------------
 if 0
-	" echo quickui#readline#cli(">>> ")
-else
-	let suit = 1
+	let suit = 2
 	if suit == 0
+		call quickui#readline#test()
+	elseif suit == 1
 		let rl = quickui#readline#new()
 		call rl.insert('abad')
 		echo rl.mouse_click(0, 5)
-	elseif suit == 1
+	elseif suit == 2
 		echo quickui#readline#cli(">>> ")
+	elseif suit == 3
+		let rl = quickui#readline#new()
+		let size = 10
+		echo "avail=" . rl.avail(0, size)
+		call rl.insert("hello")
+		echo "cursor=" . rl.cursor
+		echo "avail=" . rl.avail(0, size)
 	endif
 endif
 
