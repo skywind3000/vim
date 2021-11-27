@@ -811,6 +811,7 @@ function! quickui#readline#cli(prompt)
 			echon ">"
 			echon " cursor=" . rl.cursor
 			echon " pos=". pos
+			echon " blink". rl.blink(ts)
 		endif
 		" echon rl.display()
 		try

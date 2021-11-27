@@ -49,6 +49,7 @@ function! s:init_input_box(prompt, opts)
 		call hwnd.rl.seek(0, 2)
 		let hwnd.rl.select = 0
 	endif
+	let hwnd.pos = 0
 	return hwnd
 endfunc
 
@@ -63,7 +64,7 @@ function! s:vim_create_input(prompt, opts)
 	let opts.maxwidth = hwnd.w
 	let opts.minheight = hwnd.h
 	let opts.minheight = hwnd.h
-	let winid = popup_create(hwnd.image, opts)
+	let winid = popup_create(hwnd.bid, opts)
 	if has_key(a:opts, 'line') == 0 || has_key(a:opts, 'col') == 0
 		call quickui#utils#center(winid)
 	endif
@@ -91,6 +92,49 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" redraw input area
+"----------------------------------------------------------------------
+function! s:update_input(hwnd)
+	let hwnd = a:hwnd
+	let rl = hwnd.rl
+	let size = hwnd.w
+	let ts = float2nr(reltimefloat(reltime()) * 1000)
+	let blink = rl.blink(ts)
+	let blink = 0
+	let hwnd.pos = rl.slide(hwnd.pos, size)
+	let display = rl.render(hwnd.pos, size)
+	let cmdlist = ['syn clear']
+	let x = 1
+	let y = 3
+	let content = []
+	for [attr, text] in display
+		let len = strchars(text)
+		let content += [text]
+		if attr == 0
+			let color = 'QuickInput'
+		elseif attr == 1
+			let color = (blink == 0)? 'QuickCursor' : 'QuickInput'
+		elseif attr == 2
+			let color = 'QuickVisual'
+		else
+			let color = (blink == 0)? 'QuickCursor' : 'QuickVisual'
+		endif
+		let cmd = quickui#core#high_region(color, y, x, x + len, y, 0)
+		let cmdlist += [cmd]
+		let x += len
+	endfor
+	let text = join(content, '')
+	call setbufline(hwnd.bid, 3, text)
+	call quickui#core#win_execute(hwnd.winid, cmdlist)
+	redraw
+	echon 'blink='. blink 
+	echon ' <'
+	call rl.echo(blink, 0, hwnd.w) 
+	echon '>'
+endfunc
+
+
+"----------------------------------------------------------------------
 " create input box
 "----------------------------------------------------------------------
 function! quickui#input#create(prompt, opts)
@@ -99,22 +143,45 @@ function! quickui#input#create(prompt, opts)
 	else
 	endif
 	let rl = hwnd.rl
+	let accept = 0
+	let result = ''
 	while 1
-		redraw
+		noautocmd redraw
+		call s:update_input(hwnd)
 		try
 			let code = getchar()
 		catch /^Vim:Interrupt$/
 			let code = "\<C-C>"
 		endtry
 		let ch = (type(code) == v:t_number)? nr2char(code) : code
+		if type(code) == v:t_number && code == 0
+			try
+				exec 'sleep 15m'
+				continue
+			catch /^Vim:Interrupt$/
+				let code = "\<c-c>"
+			endtry
+		endif
 		if ch == "\<ESC>" || ch == "\<c-c>"
 			break
+		endif
+		if ch == ""
+			continue
+		elseif ch == "\<ESC>"
+			break
+		elseif ch == "\<cr>"
+			let result = rl.update()
+			let accept = 1
+			break
+		else
+			call rl.feed(ch)
 		endif
 	endwhile
 	if s:has_nvim == 0
 		call popup_close(hwnd.winid)
 	else
 	endif
+	return result
 endfunc
 
 
