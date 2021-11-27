@@ -3,7 +3,7 @@
 " input.vim - 
 "
 " Created by skywind on 2021/11/27
-" Last Modified: 2021/11/28 03:52
+" Last Modified: 2021/11/28 04:13
 "
 "======================================================================
 
@@ -219,6 +219,7 @@ function! quickui#input#create(prompt, opts)
 		call popup_close(hwnd.winid)
 	else
 	endif
+	call quickui#core#popup_clear(hwnd.winid)
 	redraw
 	return result
 endfunc
