@@ -211,6 +211,9 @@ function! quickui#input#create(prompt, opts)
 					endif
 				endif
 			endif
+		elseif ch == "\<c-d>"
+			redraw
+			echon "winsize: " . hwnd.w
 		else
 			call rl.feed(ch)
 		endif
