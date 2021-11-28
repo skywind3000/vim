@@ -52,7 +52,7 @@ function! s:init_input_box(prompt, opts)
 	let hwnd.pos = 0
 	let hwnd.wait = 0
 	let hwnd.exit = 0
-	let hwnd.strict = get(a:opts, 'strict', 1)
+	let hwnd.strict = get(a:opts, 'strict', 0)
 	return hwnd
 endfunc
 
@@ -239,6 +239,8 @@ function! quickui#input#create(prompt, opts)
 		elseif ch == "\<c-d>"
 			redraw
 			echon "winsize: " . hwnd.w
+		elseif ch == "\<c-a>"
+			call s:select_all(hwnd)
 		else
 			call rl.feed(ch)
 		endif
