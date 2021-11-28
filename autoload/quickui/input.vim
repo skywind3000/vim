@@ -13,6 +13,7 @@
 " internal variables
 "----------------------------------------------------------------------
 let s:has_nvim = g:quickui#core#has_nvim
+let s:history = {}
 
 
 "----------------------------------------------------------------------
@@ -45,7 +46,7 @@ function! s:init_input_box(prompt, opts)
 	endif
 	let hwnd.rl = quickui#readline#new()
 	if hwnd.opts.text != ''
-		call hwnd.rl.insert(hwnd.opt.text)
+		call hwnd.rl.set(hwnd.opt.text)
 		call hwnd.rl.seek(0, 2)
 		let hwnd.rl.select = 0
 	endif
