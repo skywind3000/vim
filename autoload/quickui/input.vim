@@ -3,7 +3,7 @@
 " input.vim - 
 "
 " Created by skywind on 2021/11/27
-" Last Modified: 2021/11/29 22:35
+" Last Modified: 2021/11/29 23:22
 "
 "======================================================================
 
@@ -198,6 +198,7 @@ function! s:update_input(hwnd)
 	endfor
 	let text = join(content, '')
 	call setbufline(hwnd.bid, y, text)
+	call setbufvar(hwnd.bid, '&modified', 0)
 	call quickui#core#win_execute(hwnd.winid, cmdlist)
 	noautocmd redraw
 	if 0
