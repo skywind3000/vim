@@ -328,7 +328,7 @@ function! quickui#input#open(prompt, ...)
 	if (a:0 >= 2) 
 		let opts.history = a:2
 	endif
-	let opts.wait = 1
+	let opts.wait = get(g:, 'quickui_input_wait', 0)
 	return quickui#input#create(a:prompt, opts)
 endfunc
 
