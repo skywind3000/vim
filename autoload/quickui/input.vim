@@ -3,7 +3,7 @@
 " input.vim - 
 "
 " Created by skywind on 2021/11/27
-" Last Modified: 2021/11/29 21:54
+" Last Modified: 2021/11/29 22:35
 "
 "======================================================================
 
@@ -199,7 +199,7 @@ function! s:update_input(hwnd)
 	let text = join(content, '')
 	call setbufline(hwnd.bid, y, text)
 	call quickui#core#win_execute(hwnd.winid, cmdlist)
-	redraw
+	noautocmd redraw
 	if 0
 		echon 'blink='. blink 
 		echon ' <'
@@ -237,7 +237,6 @@ function! quickui#input#create(prompt, opts)
 	let accept = 0
 	let result = ''
 	while hwnd.exit == 0
-		noautocmd redraw
 		call s:update_input(hwnd)
 		try
 			if hwnd.wait != 0
