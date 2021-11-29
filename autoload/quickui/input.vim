@@ -3,7 +3,7 @@
 " input.vim - 
 "
 " Created by skywind on 2021/11/27
-" Last Modified: 2021/11/30 00:49
+" Last Modified: 2021/11/30 01:50
 "
 "======================================================================
 
@@ -241,6 +241,7 @@ function! quickui#input#create(prompt, opts)
 	let rl = hwnd.rl
 	let accept = 0
 	let result = ''
+	noautocmd exec 'nohl'
 	while hwnd.exit == 0
 		call s:update_input(hwnd)
 		try
