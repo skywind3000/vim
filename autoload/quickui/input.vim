@@ -33,7 +33,11 @@ function! s:init_input_box(prompt, opts)
 	if has_key(a:opts, 'w')
 		let hwnd.w = a:opts.w
 	else
-		let limit = strdisplaywidth(a:prompt)
+		let limit = 50
+		for text in head
+			let width = strdisplaywidth(text)
+			let limit = (limit < width)? width : limit
+		endfor
 		if &columns >= 80
 			let limit = (limit < 50)? 50 : limit
 		endif
