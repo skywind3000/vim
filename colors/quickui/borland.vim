@@ -14,6 +14,6 @@ else
 endif
 
 hi! QuickDefaultInput ctermfg=7 ctermbg=4 guifg=#e4e4e4 guibg=#0000a0
-hi! QuickDefaultCursor ctermfg=238 ctermbg=222 guifg=#444444 guibg=#ffd787
-hi! QuickDefaultVisual ctermfg=31 ctermbg=255 guifg=#0087af guibg=#eeeeee
+hi! QuickDefaultCursor ctermfg=4 ctermbg=7 guifg=#0000a0 guibg=#e4e4e4
+hi! QuickDefaultVisual ctermfg=4 ctermbg=15 guifg=#0000a0 guibg=#f4f4f4
 
