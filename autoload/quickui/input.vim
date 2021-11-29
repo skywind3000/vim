@@ -241,7 +241,7 @@ function! quickui#input#create(prompt, opts)
 	let rl = hwnd.rl
 	let accept = 0
 	let result = ''
-	noautocmd exec 'nohl'
+	silent! exec 'nohl'
 	while hwnd.exit == 0
 		call s:update_input(hwnd)
 		try
