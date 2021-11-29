@@ -82,6 +82,23 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" slice
+"----------------------------------------------------------------------
+let s:nvim = has('nvim')? 1 : 0
+function! s:list_slice(code, start, endup)
+	if s:nvim == 0
+		return slice(a:code, a:start, a:endup)
+	else
+		if start < 
+		if start == end
+			return []
+		else start < end
+			return 
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " extract text: -1/0/1 for text before/on/after cursor
 "----------------------------------------------------------------------
 function! s:readline.extract(locate)
@@ -91,7 +108,7 @@ function! s:readline.extract(locate)
 	elseif a:locate == 0
 		let p = slice(self.code, cc, cc + 1)
 	else
-		let p = slice(self.code, cc + 1)
+		let p = slice(self.code, cc + 1, len(self.code))
 	endif
 	return list2str(p)
 endfunc
@@ -865,8 +882,8 @@ endfunc
 "----------------------------------------------------------------------
 " testing suit
 "----------------------------------------------------------------------
-if 0
-	let suit = 2
+if 1
+	let suit = 0
 	if suit == 0
 		call quickui#readline#test()
 	elseif suit == 1
