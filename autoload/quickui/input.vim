@@ -47,10 +47,6 @@ function! s:init_input_box(prompt, opts)
 	let hwnd.opts.text = get(a:opts, 'text', '')
 	let hwnd.border = border
 	let title = ' Input '
-	if g:quickui#core#has_nvim != 0
-		let back = quickui#utils#make_border(hwnd.w, hwnd.h, border, title, 1)
-		let hwnd.back = back
-	endif
 	let hwnd.rl = quickui#readline#new()
 	if hwnd.opts.text != ''
 		call hwnd.rl.set(hwnd.opts.text)
@@ -66,6 +62,21 @@ function! s:init_input_box(prompt, opts)
 		let key = hwnd.history
 		let hwnd.rl.history = [''] + get(s:history, key, [])
 		" echom hwnd.rl.history
+	endif
+	if has_key(hwnd.opts, 'row') && has_key(hwnd.opts, 'col')
+		" pass
+	else
+		let ww = hwnd.w
+		let hh = hwnd.h
+		let hwnd.opts.col = (&columns - ww) / 2
+		let hwnd.opts.row = (&lines - hh) / 2
+		let limit1 = (&lines - 2) * 82 / 100
+		let limit2 = (&lines - 2)
+		if hh + 8 < limit1
+			let hwnd.opts.row = (limit1 - hh) / 2
+		else
+			let hwnd.opts.row = (limit2 - hh) / 2
+		endif
 	endif
 	return hwnd
 endfunc
@@ -117,6 +128,40 @@ endfunc
 function! s:popup_exit(winid, code)
 	let local = quickui#core#popup_local(a:winid)
 	let local.hwnd.exit = 1
+endfunc
+
+
+"----------------------------------------------------------------------
+" neovim: create input
+"----------------------------------------------------------------------
+function! s:nvim_create_input(prompt, opts)
+	let hwnd = s:init_input_box(a:prompt, a:opts)
+	let opts = {'focusable':1, 'style':'minimal', 'relative':'editor'}
+	let title = 'Input'
+	let border = hwnd.border
+	let back = quickui#utils#make_border(hwnd.w + 2, hwnd.h + 2, border, title, 1)
+	let hwnd.back = back
+	let opts.width = hwnd.w
+	let opts.height = hwnd.h
+	let opts.row = hwnd.opts.row
+	let opts.col = hwnd.opts.col
+	let winid = nvim_open_win(hwnd.bid, 0, opts)
+	let hwnd.winid = winid
+	let background = -1
+	if border > 0 && get(g:, 'quickui_nvim_simulate_border', 1) != 0
+		let nbid = quickui#core#scratch_buffer('inputborder', back)
+		let op = {'relative':'editor', 'focusable':1, 'style':'minimal'}
+		let op.width = hwnd.w + 4
+		let op.height = hwnd.h + 4
+		let op.row = hwnd.opts.row - 2
+		let op.col = hwnd.opts.col - 2
+		let bordercolor = hwnd.opts.bordercolor
+		let background = nvim_open_win(nbid, 0, op)
+		call nvim_win_set_option(background, 'winhl', 'Normal:' . bordercolor)
+	endif
+	let hwnd.background = background
+	call nvim_win_set_option(winid, 'winhl', 'Normal:' . hwnd.opts.color)
+	return hwnd
 endfunc
 
 
@@ -186,8 +231,9 @@ function! quickui#input#create(prompt, opts)
 	if s:has_nvim == 0
 		let hwnd = s:vim_create_input(a:prompt, a:opts)
 	else
+		let hwnd = s:nvim_create_input(a:prompt, a:opts)
 	endif
-	" let hwnd.wait = 1
+	let hwnd.wait = 1
 	let rl = hwnd.rl
 	let accept = 0
 	let result = ''
@@ -260,6 +306,10 @@ function! quickui#input#create(prompt, opts)
 	if s:has_nvim == 0
 		call popup_close(hwnd.winid)
 	else
+		call nvim_win_close(hwnd.winid)
+		if hwnd.background >= 0
+			call nvim_win_close(hwnd.background)
+		endif
 	endif
 	call quickui#core#popup_clear(hwnd.winid)
 	redraw
