@@ -3,7 +3,7 @@
 " input.vim - 
 "
 " Created by skywind on 2021/11/27
-" Last Modified: 2021/11/28 04:13
+" Last Modified: 2021/11/29 17:41
 "
 "======================================================================
 
@@ -13,7 +13,7 @@
 " internal variables
 "----------------------------------------------------------------------
 let s:has_nvim = g:quickui#core#has_nvim
-let s:history = {}
+let s:history = get(s:, 'history', {})
 
 
 "----------------------------------------------------------------------
@@ -22,7 +22,14 @@ let s:history = {}
 function! s:init_input_box(prompt, opts)
 	let border = get(a:opts, 'border', g:quickui#style#border)
 	let hwnd = {}
-	let hwnd.h = 3
+	let head = []
+	if type(a:prompt) == v:t_list
+		let head = deepcopy(a:prompt)
+	else
+		let head = split('' . a:prompt, "\n")
+	endif
+	let hwnd.h = 2 + len(head)
+	let hwnd.ln = 2 + len(head)
 	if has_key(a:opts, 'w')
 		let hwnd.w = a:opts.w
 	else
@@ -32,7 +39,7 @@ function! s:init_input_box(prompt, opts)
 		endif
 		let hwnd.w = limit
 	endif
-	let hwnd.image = [a:prompt, ' ', repeat(' ', hwnd.w)]
+	let hwnd.image = head + [' ', repeat(' ', hwnd.w)]
 	let hwnd.bid = quickui#core#scratch_buffer('input', hwnd.image)
 	let hwnd.opts = deepcopy(a:opts)
 	let hwnd.opts.color = get(a:opts, 'color', 'QuickBG')
@@ -46,14 +53,20 @@ function! s:init_input_box(prompt, opts)
 	endif
 	let hwnd.rl = quickui#readline#new()
 	if hwnd.opts.text != ''
-		call hwnd.rl.set(hwnd.opt.text)
+		call hwnd.rl.set(hwnd.opts.text)
 		call hwnd.rl.seek(0, 2)
 		let hwnd.rl.select = 0
 	endif
 	let hwnd.pos = 0
 	let hwnd.wait = 0
 	let hwnd.exit = 0
-	let hwnd.strict = get(a:opts, 'strict', 0)
+	let hwnd.strict = get(a:opts, 'strict', 1)
+	let hwnd.history = get(hwnd.opts, 'history', '')
+	if hwnd.history != ''
+		let key = hwnd.history
+		let hwnd.rl.history = [''] + get(s:history, key, [])
+		" echom hwnd.rl.history
+	endif
 	return hwnd
 endfunc
 
@@ -121,7 +134,7 @@ function! s:update_input(hwnd)
 	let display = rl.render(hwnd.pos, size)
 	let cmdlist = ['syn clear']
 	let x = 1
-	let y = 3
+	let y = hwnd.ln
 	let content = []
 	for [attr, text] in display
 		let len = strwidth(text)
@@ -139,7 +152,7 @@ function! s:update_input(hwnd)
 		let x += len
 	endfor
 	let text = join(content, '')
-	call setbufline(hwnd.bid, 3, text)
+	call setbufline(hwnd.bid, y, text)
 	call quickui#core#win_execute(hwnd.winid, cmdlist)
 	redraw
 	if 0
@@ -178,9 +191,6 @@ function! quickui#input#create(prompt, opts)
 	let rl = hwnd.rl
 	let accept = 0
 	let result = ''
-	" let rl.history += ['']
-	" let rl.history += ['5678']
-	" let rl.history += ['abcd']
 	while hwnd.exit == 0
 		noautocmd redraw
 		call s:update_input(hwnd)
@@ -224,6 +234,7 @@ function! quickui#input#create(prompt, opts)
 					if x >= 0 && x < hwnd.w
 						let pos = rl.mouse_click(hwnd.pos, x)
 						call rl.seek(pos, 0)
+						let rl.select = -1
 					endif
 				endif
 			endif
@@ -252,7 +263,23 @@ function! quickui#input#create(prompt, opts)
 	endif
 	call quickui#core#popup_clear(hwnd.winid)
 	redraw
+	if hwnd.history != ''
+		let s:history[hwnd.history] = deepcopy(rl.history)
+	endif
 	return result
+endfunc
+
+
+"----------------------------------------------------------------------
+" open input box
+"----------------------------------------------------------------------
+function! quickui#input#open(prompt, ...)
+	let opts = {'title':'Input'}
+	let opts.text = (a:0 >= 1)? (a:1) : ''
+	if (a:0 >= 2) 
+		let opts.history = a:2
+	endif
+	return quickui#input#create(a:prompt, opts)
 endfunc
 
 
@@ -263,7 +290,7 @@ if 1
 	let opts = {}
 	let opts.title = 'Input'
 	" let opts.w = 50
-	echo quickui#input#create('Enter your name:', opts)
+	echo quickui#input#open("Enter your name:", 'haha', 'abc')
 endif
 
 
