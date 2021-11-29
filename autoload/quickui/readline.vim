@@ -3,7 +3,7 @@
 " readline.vim - 
 "
 " Created by skywind on 2021/02/20
-" Last Modified: 2021/11/28 04:20
+" Last Modified: 2021/11/29 21:04
 "
 "======================================================================
 
@@ -86,14 +86,16 @@ endfunc
 "----------------------------------------------------------------------
 let s:nvim = has('nvim')? 1 : 0
 function! s:list_slice(code, start, endup)
+	let start = a:start
+	let endup = a:endup
 	if s:nvim == 0
 		return slice(a:code, a:start, a:endup)
 	else
-		if start < 
-		if start == end
+		if start == endup
 			return []
-		else start < end
-			return 
+		else
+			return a:code[start:endup-1]
+		endif
 	endif
 endfunc
 
@@ -104,11 +106,11 @@ endfunc
 function! s:readline.extract(locate)
 	let cc = self.cursor
 	if a:locate < 0
-		let p = slice(self.code, 0, cc)
+		let p = s:list_slice(self.code, 0, cc)
 	elseif a:locate == 0
-		let p = slice(self.code, cc, cc + 1)
+		let p = s:list_slice(self.code, cc, cc + 1)
 	else
-		let p = slice(self.code, cc + 1, len(self.code))
+		let p = s:list_slice(self.code, cc + 1, len(self.code))
 	endif
 	return list2str(p)
 endfunc
@@ -205,7 +207,7 @@ function! s:readline.visual_text() abort
 		return ''
 	else
 		let [start, end] = self.visual_range()
-		let code = slice(self.code, start, end)
+		let code = s:list_slice(self.code, start, end)
 		return list2str(code)
 	endif
 endfunc
@@ -287,7 +289,7 @@ function! s:readline.read_data(pos, width, what)
 		return []
 	endif
 	let data = (a:what == 0)? self.code : self.wide
-	return slice(data, x, x + w)
+	return s:list_slice(data, x, x + w)
 endfunc
 
 
@@ -360,7 +362,7 @@ function! s:readline.display() abort
 	if (self.select < 0) || (self.select == cursor)
 		" content before cursor
 		if cursor > 0
-			let code = slice(codes, 0, cursor)
+			let code = s:list_slice(codes, 0, cursor)
 			let display += [[0, list2str(code)]]
 		endif
 		" content on cursor
@@ -368,7 +370,7 @@ function! s:readline.display() abort
 		let display += [[1, list2str([code])]]
 		" content after cursor
 		if cursor + 1 < size
-			let code = slice(codes, cursor + 1, size)
+			let code = s:list_slice(codes, cursor + 1, size)
 			let display += [[0, list2str(code)]]
 		endif
 	else
@@ -376,29 +378,29 @@ function! s:readline.display() abort
 		let vis_endup = (cursor > self.select)? cursor : self.select
 		" content befor visual selection
 		if vis_start > 0
-			let code = slice(codes, 0, vis_start)
+			let code = s:list_slice(codes, 0, vis_start)
 			let display += [[0, list2str(code)]]
 		endif
 		" content in visual selection
 		if cursor < self.select
 			let code = [codes[cursor]]
 			let display += [[3, list2str(code)]]
-			let code = slice(codes, cursor + 1, vis_endup)
+			let code = s:list_slice(codes, cursor + 1, vis_endup)
 			let display += [[2, list2str(code)]]
 			if vis_endup < size
-				let code = slice(codes, vis_endup, size)
+				let code = s:list_slice(codes, vis_endup, size)
 				let display += [[0, list2str(code)]]
 			endif
 		else
 			" visual selection
-			let code = slice(codes, vis_start, vis_endup)
+			let code = s:list_slice(codes, vis_start, vis_endup)
 			let display += [[2, list2str(code)]]
 			" content on cursor
 			let code = (cursor < size)? codes[cursor] : char2nr(' ')
 			let display += [[1, list2str([code])]]
 			" content after cursor
 			if cursor + 1 < size
-				let code = slice(codes, cursor + 1, size)
+				let code = s:list_slice(codes, cursor + 1, size)
 				let display += [[0, list2str(code)]]
 			endif
 		endif
@@ -469,7 +471,14 @@ function! s:readline.slide(window_pos, display_width)
 	endif
 	let window_pos = (window_pos < 0)? 0 : window_pos
 	let wides = self.read_data(window_pos, cursor - window_pos, 1)
-	let width = reduce(wides, { acc, val -> acc + val }, 0) + 1
+	if s:nvim == 0
+		let width = reduce(wides, { acc, val -> acc + val }, 0) + 1
+	else
+		let width = 1
+		for w in wides
+			let width += w
+		endfor
+	endif
 	if width <= display_width
 		return window_pos
 	else
@@ -882,7 +891,7 @@ endfunc
 "----------------------------------------------------------------------
 " testing suit
 "----------------------------------------------------------------------
-if 1
+if 0
 	let suit = 0
 	if suit == 0
 		call quickui#readline#test()
