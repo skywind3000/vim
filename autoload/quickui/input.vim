@@ -3,7 +3,7 @@
 " input.vim - 
 "
 " Created by skywind on 2021/11/27
-" Last Modified: 2021/11/29 21:09
+" Last Modified: 2021/11/29 21:54
 "
 "======================================================================
 
@@ -13,7 +13,7 @@
 " internal variables
 "----------------------------------------------------------------------
 let s:has_nvim = g:quickui#core#has_nvim
-let s:input_history = {}
+let s:history = {}
 
 
 "----------------------------------------------------------------------
@@ -54,7 +54,7 @@ function! s:init_input_box(prompt, opts)
 		let hwnd.rl.select = 0
 	endif
 	let hwnd.pos = 0
-	let hwnd.wait = 0
+	let hwnd.wait = get(a:opts, 'wait', 0)
 	let hwnd.exit = 0
 	let hwnd.strict = get(a:opts, 'strict', 1)
 	let hwnd.history = get(hwnd.opts, 'history', '')
@@ -233,7 +233,6 @@ function! quickui#input#create(prompt, opts)
 	else
 		let hwnd = s:nvim_create_input(a:prompt, a:opts)
 	endif
-	let hwnd.wait = 1
 	let rl = hwnd.rl
 	let accept = 0
 	let result = ''
@@ -329,6 +328,7 @@ function! quickui#input#open(prompt, ...)
 	if (a:0 >= 2) 
 		let opts.history = a:2
 	endif
+	let opts.wait = 1
 	return quickui#input#create(a:prompt, opts)
 endfunc
 
