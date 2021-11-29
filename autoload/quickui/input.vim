@@ -3,7 +3,7 @@
 " input.vim - 
 "
 " Created by skywind on 2021/11/27
-" Last Modified: 2021/11/29 17:41
+" Last Modified: 2021/11/29 21:06
 "
 "======================================================================
 
@@ -306,9 +306,9 @@ function! quickui#input#create(prompt, opts)
 	if s:has_nvim == 0
 		call popup_close(hwnd.winid)
 	else
-		call nvim_win_close(hwnd.winid)
+		call nvim_win_close(hwnd.winid, 0)
 		if hwnd.background >= 0
-			call nvim_win_close(hwnd.background)
+			call nvim_win_close(hwnd.background, 0)
 		endif
 	endif
 	call quickui#core#popup_clear(hwnd.winid)
@@ -336,7 +336,7 @@ endfunc
 "----------------------------------------------------------------------
 " testing suit
 "----------------------------------------------------------------------
-if 1
+if 0
 	let opts = {}
 	let opts.title = 'Input'
 	" let opts.w = 50
