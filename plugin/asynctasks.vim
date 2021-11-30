@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2021/11/30 12:50
-" Verision: 1.8.11
+" Last Modified: 2021/11/30 14:04
+" Verision: 1.8.12
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1008,6 +1008,9 @@ function! s:task_option(task)
 		elseif output == 'system'
 			let opts.mode = 'system'
 		endif
+	endif
+	if has_key(task, 'position')
+		let opts.position = task.position
 	endif
 	if has_key(task, 'silent') && task.silent
 		let opts.silent = 1
