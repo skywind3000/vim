@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020
 "
-" Last Modified: 2021/05/12 20:32
-" Verision: 1.8.10
+" Last Modified: 2021/11/30 12:50
+" Verision: 1.8.11
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1769,6 +1769,11 @@ function! asynctasks#finish(what)
 			endif
 		else
 			call s:errmsg('unable to play sound, need +sound feature')
+		endif
+	elseif a:what =~ '^:'
+		let part = s:strip(strpart(a:what, 1))
+		if part != ''
+			exec part
 		endif
 	endif
 endfunc
