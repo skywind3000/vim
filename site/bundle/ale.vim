@@ -30,7 +30,7 @@ let g:airline#extensions#ale#enabled = 1
 " linters
 "----------------------------------------------------------------------
 let g:ale_linters = {
-			\ 'c': ['gcc', 'cppcheck', 'splint'], 
+			\ 'c': ['gcc', 'cppcheck'], 
 			\ 'cpp': ['gcc', 'cppcheck'], 
 			\ 'python': ['flake8', 'pylint'], 
 			\ 'lua': ['luac'], 

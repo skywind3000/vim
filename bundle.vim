@@ -91,6 +91,7 @@ if has_key(s:enabled, 'simple')
 	map gz <Plug>Sneak_s
 	map gZ <Plug>Sneak_S
 
+	IncScript site/bundle/dirvish.vim
 	IncScript site/bundle/cycle.vim
 	IncScript site/bundle/easymotion.vim
 endif
