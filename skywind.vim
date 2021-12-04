@@ -28,6 +28,7 @@ endif
 "----------------------------------------------------------------------
 IncScript site/opt/argtextobj.vim
 IncScript site/opt/indent-object.vim
+IncScript site/opt/after_object.vim
 IncScript site/opt/apc.vim
 
 if has('gui_running')
@@ -36,6 +37,7 @@ endif
 
 runtime! macros/matchit.vim
 
+call after_object#enable('=', ':', '-', '#', ' ')
 
 
 "----------------------------------------------------------------------
