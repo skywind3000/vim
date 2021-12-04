@@ -46,15 +46,21 @@ function! s:lintcfg(name)
 	return shellescape(filereadable(path2)? path2 : path1)
 endfunc
 
+let s:platform = ''
+
+if has('win32')
+	let s:platform = '-Id:/dev/local/include'
+endif
+
 let g:ale_python_flake8_options = '--conf='.s:lintcfg('flake8.conf')
 let g:ale_python_pylint_options = '--rcfile='.s:lintcfg('pylint.conf')
 let g:ale_python_pylint_options .= ' --disable=W'
-let g:ale_c_gcc_options = '-Wall -O2 -std=c99 -Id:/dev/local/include'
-let g:ale_cpp_gcc_options = '-Wall -O2 -std=c++14 -Id:/dev/local/include'
-let g:ale_c_clang_options = '-Wall -O2 -Id:/dev/local/include'
-let g:ale_cpp_clang_options = '-Wall -O2 -Id:/dev/local/include'
-let g:ale_c_cc_options = '-Wall -std=c99 -Id:/dev/local/include'
-let g:ale_cpp_cc_options = '-Wall -std=c++14 -Id:/dev/local/include'
+let g:ale_c_gcc_options = '-Wall -O2 -std=c99 ' . s:platform
+let g:ale_cpp_gcc_options = '-Wall -O2 -std=c++14 ' . s:platform
+let g:ale_c_clang_options = '-Wall -O2 ' . s:platform
+let g:ale_cpp_clang_options = '-Wall -O2 ' . s:platform
+let g:ale_c_cc_options = '-Wall -std=c99 ' . s:platform
+let g:ale_cpp_cc_options = '-Wall -std=c++14 ' . s:platform
 let g:ale_lua_luacheck_options = '-d'
 let g:ale_c_splint_options = '-f '. s:lintcfg('splint.conf')
 
