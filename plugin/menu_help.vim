@@ -52,11 +52,17 @@ endfunc
 
 function! MenuHelp_GrepCode()
 	let p = asyncrun#get_root('%')
-	echohl Type
-	call inputsave()
-	let t = input('Find word in ('. p.'): ', '')
-	call inputrestore()
-	echohl None
+	let t = 'Find word in (' . p . '): '
+	if 0
+		echohl Type
+		call inputsave()
+		let t = input(t, '')
+		call inputrestore()
+		echohl None
+	else
+		let t = quickui#input#open(t, expand('<cword>'))
+	endif
+	let t = substitute(t, '^\s*\(.\{-}\)[\s\r\n]*$', '\1', '')
 	redraw | echo "" | redraw
 	if strlen(t) > 0
 		silent exec "GrepCode! ".fnameescape(t)
