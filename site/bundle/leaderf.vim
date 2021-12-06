@@ -103,7 +103,7 @@ nnoremap <space>fp :<c-u>Leaderf snippet<cr>
 nnoremap <space>fq :<c-u>Leaderf quickfix<cr>
 nnoremap <space>fa :<c-u>Leaderf tasks<cr>
 
-inoremap <c-x><c-j> <c-\><c-o>:Leaderf snippet<cr>
+inoremap <c-x><c-x> <c-\><c-o>:Leaderf snippet<cr>
 
 nnoremap <space>fd :exec 'Leaderf filer ' . shellescape(expand('%:p:h'))<cr>
 
