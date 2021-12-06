@@ -283,6 +283,8 @@ noremap <silent><M-{> :call Tools_QuickfixCursor(4)<cr>
 noremap <silent><M-}> :call Tools_QuickfixCursor(5)<cr>
 noremap <silent><M-u> :call Tools_PreviousCursor(6)<cr>
 noremap <silent><M-d> :call Tools_PreviousCursor(7)<cr>
+noremap <silent><M-U> :call quickui#preview#scroll(-1)<cr>
+noremap <silent><M-D> :call quickui#preview#scroll(1)<cr>
 
 inoremap <silent><M-[> <c-\><c-o>:call Tools_QuickfixCursor(2)<cr>
 inoremap <silent><M-]> <c-\><c-o>:call Tools_QuickfixCursor(3)<cr>
@@ -438,5 +440,6 @@ if has('nvim') && (has('win32') || has('win64'))
 	vnoremap <s-insert> "-d"*P
 	inoremap <s-insert> <c-r><c-o>*
 	vnoremap <c-insert> "*y
+	cnoremap <s-insert> <c-r>*
 endif
 
