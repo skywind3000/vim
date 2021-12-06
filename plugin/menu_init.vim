@@ -232,7 +232,7 @@ let g:help_content_win32 = [
 			\ [ 'Win32 Help', 'd:/dev/help/win32.hlp'],
 			\ [ 'MSDN of VC6', 'd:/dev/help/chm/vc.chm'],
 			\ [ 'Python2 Help', 'd:/dev/help/chm/python2713.chm'],
-			\ [ 'Python3 Help', 'd:/dev/help/chm/python382.chm'],
+			\ [ 'Python3 Help', 'd:/dev/help/chm/python3100.chm'],
 			\ [ 'DirectX 9c', 'd:/dev/help/chm/DirectX9_c.chm'],
 			\ ]
 
