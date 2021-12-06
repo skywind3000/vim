@@ -60,7 +60,7 @@ function! MenuHelp_GrepCode()
 		call inputrestore()
 		echohl None
 	else
-		let t = quickui#input#open(t, expand('<cword>'))
+		let t = quickui#input#open(t, expand('<cword>'), 'grep')
 	endif
 	let t = substitute(t, '^\s*\(.\{-}\)[\s\r\n]*$', '\1', '')
 	redraw | echo "" | redraw
