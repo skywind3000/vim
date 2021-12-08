@@ -86,6 +86,7 @@ function! s:window.open()
 		call popup_show(winid)
 	else
 	endif
+	let self.mode = 1
 endfunc
 
 
