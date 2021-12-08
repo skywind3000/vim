@@ -3,7 +3,7 @@
 " quickui.vim -
 "
 " Created by skywind on 2019/12/26
-" Last Modified: 2019/12/26 18:20:52
+" Last Modified: 2021/12/08 22:28
 "
 "======================================================================
 
@@ -50,6 +50,8 @@ function! QuickThemeChange(theme)
 	let theme = 'borland'
 	if a:theme == 'default'
 		let theme = 'borland'
+	elseif a:theme == 'plain' || a:theme == 'colorless'
+		let theme = 'plain'
 	elseif a:theme == '' || a:theme == 'borland' || a:theme == 'turboc'
 		let theme = 'borland'
 	elseif a:theme == 'colorscheme' || a:theme == 'system' || a:theme == 'vim'
