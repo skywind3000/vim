@@ -3,7 +3,7 @@
 " core.vim - 
 "
 " Created by skywind on 2019/12/18
-" Last Modified: 2021/12/09 00:25
+" Last Modified: 2021/12/09 01:22
 "
 "======================================================================
 
@@ -22,6 +22,7 @@ let g:quickui#core#has_popup = exists('*popup_create') && v:version >= 800
 let g:quickui#core#has_floating = has('nvim-0.4')
 let g:quickui#core#has_nvim_050 = has('nvim-0.5.0')
 let g:quickui#core#has_vim_820 = (has('nvim') == 0 && has('patch-8.2.1'))
+let g:quickui#core#has_win_exe = exists('*win_execute')
 
 
 "----------------------------------------------------------------------
@@ -325,7 +326,7 @@ function! quickui#core#win_execute(winid, command)
 		elseif type(a:command) == v:t_list
 			keepalt call win_execute(a:winid, join(a:command, "\n"))
 		endif
-	else
+	elseif g:quickui#core#has_win_exe == 0
 		let current = nvim_get_current_win()
 		keepalt call nvim_set_current_win(a:winid)
 		if type(a:command) == v:t_string
@@ -334,6 +335,12 @@ function! quickui#core#win_execute(winid, command)
 			exec join(a:command, "\n")
 		endif
 		keepalt call nvim_set_current_win(current)
+	else
+		if type(a:command) == v:t_string
+			keepalt call win_execute(a:winid, a:command, 1)
+		elseif type(a:command) == v:t_list
+			keepalt call win_execute(a:winid, join(a:command, "\n"), 1)
+		endif
 	endif
 endfunc
 
