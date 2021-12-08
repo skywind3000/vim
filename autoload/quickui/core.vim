@@ -3,7 +3,7 @@
 " core.vim - 
 "
 " Created by skywind on 2019/12/18
-" Last Modified: 2019/12/18 15:58:00
+" Last Modified: 2021/12/09 00:25
 "
 "======================================================================
 
@@ -337,6 +337,69 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" alloc a new buffer
+"----------------------------------------------------------------------
+function! quickui#core#buffer_alloc()
+	if !exists('s:buffer_array')
+		let s:buffer_array = {}
+	endif
+	let index = len(s:buffer_array) - 1
+	if index >= 0
+		let bid = s:buffer_array[index]
+		unlet s:buffer_array[index]
+	else
+		if g:quickui#core#has_nvim == 0
+			let bid = bufadd('')
+			call bufload(bid)
+			call setbufvar(bid, '&buflisted', 0)
+			call setbufvar(bid, '&bufhidden', 'hide')
+		else
+			let bid = nvim_create_buf(v:false, v:true)
+		endif
+	endif
+	call setbufvar(bid, '&modifiable', 1)
+	call deletebufline(bid, 1, '$')
+	call setbufvar(bid, '&modified', 0)
+	call setbufvar(bid, '&filetype', '')
+	return bid
+endfunc
+
+
+"----------------------------------------------------------------------
+" free a buffer
+"----------------------------------------------------------------------
+function! quickui#core#buffer_free(bid)
+	if !exists('s:buffer_array')
+		let s:buffer_array = {}
+	endif
+	let index = len(s:buffer_array)
+	let s:buffer_array[index] = a:bid
+	call setbufvar(a:bid, '&modifiable', 1)
+	call deletebufline(a:bid, 1, '$')
+	call setbufvar(a:bid, '&modified', 0)
+endfunc
+
+
+"----------------------------------------------------------------------
+" update content
+"----------------------------------------------------------------------
+function! quickui#core#buffer_update(bid, textlist)
+	call setbufvar(a:bid, '&modifiable', 1)
+	call deletebufline(a:bid, 1, '$')
+	call setbufline(a:bid, 1, a:textlist)
+	call setbufvar(a:bid, '&modified', 0)
+endfunc
+
+
+"----------------------------------------------------------------------
+" clear content
+"----------------------------------------------------------------------
+function! quickui#core#buffer_clear(bid)
+	call quickui#core#buffer_update(a:bid, [])
+endfunc
+
+
+"----------------------------------------------------------------------
 " get a named buffer
 "----------------------------------------------------------------------
 function! quickui#core#scratch_buffer(name, textlist)
@@ -349,24 +412,13 @@ function! quickui#core#scratch_buffer(name, textlist)
 		let bid = -1
 	endif
 	if bid < 0
-		if g:quickui#core#has_nvim == 0
-			let bid = bufadd('')
-			call bufload(bid)
-			call setbufvar(bid, '&buflisted', 0)
-			call setbufvar(bid, '&bufhidden', 'hide')
-		else
-			let bid = nvim_create_buf(v:false, v:true)
-		endif
+		let bid = quickui#core#buffer_alloc()
 		if a:name != ''
 			let s:buffer_cache[a:name] = bid
 		endif
 	endif
-	call setbufvar(bid, '&modifiable', 1)
-	call deletebufline(bid, 1, '$')
-	call setbufline(bid, 1, a:textlist)
-	call setbufvar(bid, '&modified', 0)
+	call quickui#core#buffer_update(bid, a:textlist)
 	call setbufvar(bid, 'current_syntax', '')
-	call setbufvar(bid, '&filetype', '')
 	return bid
 endfunc
 
