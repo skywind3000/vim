@@ -3,7 +3,7 @@
 " quickui.vim -
 "
 " Created by skywind on 2019/12/26
-" Last Modified: 2021/12/08 22:36
+" Last Modified: 2021/12/08 23:01
 "
 "======================================================================
 
@@ -48,7 +48,9 @@ endfunc
 
 function! QuickThemeChange(theme)
 	let theme = 'default'
-	if a:theme == '' || a:theme == 'default'
+	if a:theme == ''
+		let theme = 'default'
+	elseif a:theme == 'default' || a:theme == 'ansi'
 		let theme = 'default'
 	elseif a:theme == 'borland' || a:theme == 'turboc'
 		let theme = 'borland'
