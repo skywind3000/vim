@@ -21,9 +21,10 @@ let s:window.y = 1            " row starting from 0
 let s:window.z = 10           " priority
 let s:window.winid = -1       " window id
 let s:window.dirty = 0        " need update buffer ?
-let s:window.text = []        " buffer id
+let s:window.text = []        " text lines
 let s:window.bid = -1         " allocated buffer id
 let s:window.visible = 1      " visibility
+let s:window.mode = 0         " mode: 0/invalid, 1/valid
 let s:window.opts = {}        " creation options
 
 
@@ -52,6 +53,34 @@ function! s:window.__init__(opts)
 	let self.w = opts.w
 	let self.h = opts.h
 	let self.visible = 0
+	let self.mode = 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" open window
+"----------------------------------------------------------------------
+function! s:window.open()
+	call self.close()
+	if s:has_nvim == 0
+	else
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" close window
+"----------------------------------------------------------------------
+function! s:window.close()
+	if self.winid >= 0
+		if s:has_nvim == 0
+			call popup_close(self.winid)
+		else
+			call nvim_win_close(self.winid, 1)
+		endif
+	endif
+	let self.winid = -1
+	let self.visible = 0
 endfunc
 
 
@@ -67,6 +96,7 @@ function! s:window.show()
 		endif
 		return 0
 	endif
+	let self.visible = 1
 	return 0
 endfunc
 
@@ -75,14 +105,7 @@ endfunc
 " dtor
 "----------------------------------------------------------------------
 function! s:window.release()
-	if self.winid >= 0
-		if s:has_nvim == 0
-			call popup_close(self.winid)
-		else
-			call nvim_win_close(self.winid, 1)
-		endif
-	endif
-	let self.winid = -1
+	call self.close()
 	if self.bid >= 0
 		call quickui#core#buffer_free(self.bid)
 		let self.bid = -1
