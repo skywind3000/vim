@@ -44,14 +44,16 @@ function! s:window.__init__(opts)
 	let opts.z = get(a:opts, 'z', 10)
 	let opts.w = get(a:opts, 'w', 1)
 	let opts.h = get(a:opts, 'h', 1)
+	let opts.wrap = get(a:opts, 'wrap', 0)
+	let opts.color = get(a:opts, 'color', 'QuickBG')
 	let self.opts = opts
 	let self.bid = quickui#core#buffer_alloc()
 	let self.dirty = 1
 	let self.x = opts.x
 	let self.y = opts.y
 	let self.z = opts.z
-	let self.w = opts.w
-	let self.h = opts.h
+	let self.w = (opts.w < 1)? 1 : (opts.w)
+	let self.h = (opts.h < 1)? 1 : (opts.h)
 	let self.visible = 0
 	let self.mode = 0
 endfunc
@@ -63,6 +65,25 @@ endfunc
 function! s:window.open()
 	call self.close()
 	if s:has_nvim == 0
+		let opts = {"hidden":1, "pos": 'topleft'}
+		let opts.hidden = 1
+		let opts.wrap = self.opts.wrap
+		let opts.minwidth = self.w
+		let opts.maxwidth = self.w
+		let opts.minheight = self.h
+		let opts.maxheight = self.h
+		let opts.col = self.x + 1
+		let opts.line = self.y + 1
+		let opts.mapping = 0
+		let opts.cursorline = get(self.opts, 'cursorline', 0)
+		let opts.drag = get(self.opts, 'drag', 0)
+		let self.winid = popup_create(self.bid, opts)
+		let winid = self.winid
+		let init = []
+		let init += ['setlocal nonumber signcolumn=no scrolloff=0']
+		call win_execute(winid, init)
+		call setwinvar(winid, '&wincolor', self.opts.color)
+		call popup_show(winid)
 	else
 	endif
 endfunc
@@ -81,6 +102,7 @@ function! s:window.close()
 	endif
 	let self.winid = -1
 	let self.visible = 0
+	let self.mode = 0
 endfunc
 
 
