@@ -3,7 +3,7 @@
 " quickui.vim -
 "
 " Created by skywind on 2019/12/26
-" Last Modified: 2021/12/08 22:28
+" Last Modified: 2021/12/08 22:36
 "
 "======================================================================
 
@@ -47,13 +47,9 @@ function! s:set_quickui_hi()
 endfunc
 
 function! QuickThemeChange(theme)
-	let theme = 'borland'
-	if a:theme == 'default'
-		let theme = 'plain'
-	elseif a:theme == ''
-		let theme = 'plain'
-	elseif a:theme == 'plain' || a:theme == 'colorless'
-		let theme = 'plain'
+	let theme = 'default'
+	if a:theme == '' || a:theme == 'default'
+		let theme = 'default'
 	elseif a:theme == 'borland' || a:theme == 'turboc'
 		let theme = 'borland'
 	elseif a:theme == 'colorscheme' || a:theme == 'system' || a:theme == 'vim'
@@ -90,3 +86,5 @@ augroup quickui "{{{
 augroup END "}}}
 
 call s:set_quickui_hi()
+
+
