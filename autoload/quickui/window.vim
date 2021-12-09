@@ -73,18 +73,10 @@ function! s:window.__prepare_opts(textlist, opts)
 		let self.opts.tw += 2
 		let self.opts.th += 2
 	endif
-	if type(a:textlist) == v:t_list
-		let textlist = a:textlist
-	else
-		let textlist = split('' . a:textlist, '\n', 1)
-	endif
+	call self.set_text(a:textlist)
 	if opts.h < 0
-		let opts.h = len(textlist)
+		let opts.h = len(self.text)
 	endif
-	if len(textlist) < opts.h
-		let textlist += repeat([''], opts.h - len(textlist))
-	endif
-	let self.text = textlist
 	let cmd = []
 	if has_key(opts, 'tabstop')
 		let cmd += ['setl tabstop=' . get(opts, 'tabstop', 4)]
@@ -121,6 +113,8 @@ function! s:window.__prepare_opts(textlist, opts)
 	let cmd += ['setl nocursorcolumn nospell']
 	let self.info.cmd = cmd
 	let self.info.pending_cmd = []
+	let self.info.border_winid = -1
+	let self.info.border_bid = -1
 endfunc
 
 
@@ -198,7 +192,6 @@ endfunc
 function! s:window.open(textlist, opts)
 	call self.close()
 	call self.__prepare_opts(a:textlist, a:opts)
-	call quickui#core#buffer_update(self.bid, self.text)
 	if s:has_nvim == 0
 		call self.__vim_create()
 	else
@@ -218,12 +211,22 @@ function! s:window.close()
 			call popup_close(self.winid)
 		else
 			call nvim_win_close(self.winid, 1)
+			if self.info.border_winid >= 0
+				call nvim_win_close(self.info.border_winid, 1)
+				let self.info.border_winid = -1
+			endif
 		endif
 	endif
 	let self.winid = -1
 	if self.bid >= 0
 		call quickui#core#buffer_free(self.bid)
 		let self.bid = -1
+	endif
+	if has_key(self.info, 'border_bid')
+		if self.info.border_bid >= 0
+			call quickui#core#buffer_free(self.info.border_bid)
+			let self.info.border_bid = -1
+		endif
 	endif
 	let self.hide = 0
 	let self.mode = 0
@@ -332,6 +335,67 @@ function! s:window.execute(cmdlist)
 			let self.info.pending_cmd += cmd
 		endif
 	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" update text in buffer
+"----------------------------------------------------------------------
+function! s:window.update()
+	if self.bid >= 0
+		call quickui#core#buffer_update(self.bid, self.text)
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" set content
+"----------------------------------------------------------------------
+function! s:window.set_text(textlist)
+	if type(a:textlist) == v:t_list
+		let textlist = deepcopy(a:textlist)
+	else
+		let textlist = split(a:textlist, '\n', 1)
+	endif
+	let self.text = textlist
+	call self.update()
+endfunc
+
+
+"----------------------------------------------------------------------
+" set line
+"----------------------------------------------------------------------
+function! s:window.set_line(index, text, ...)
+	let require = a:index + 1
+	let refresh = (a:0 < 1)? 1 : (a:1)
+	let update = 0
+	if len(self.text) < require
+		let self.text += repeat([''], require - len(self.text))
+		let update = 1
+	endif
+	let self.text[a:index] = a:text
+	if update != 0
+		self.update()
+	elseif refresh != 0
+		let bid = self.bid
+		let index = a:index
+		if bid >= 0
+			call setbufvar(bid, '&modifiable', 1)
+			call setbufline(bid, index + 1, [a:text])
+			call setbufvar(bid, '&modified', 0)
+		endif
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" get line
+"----------------------------------------------------------------------
+function! s:window.get_line(index)
+	if a:index >= len(self.text)
+		return ''
+	endif
+	return self.text[a:index]
 endfunc
 
 
