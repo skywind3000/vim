@@ -301,11 +301,31 @@ endfunc
 "----------------------------------------------------------------------
 " resize
 "----------------------------------------------------------------------
-function! s:window.resize(width, height)
-	let ww = a:width
-	let hh = a:height
-	let self.w = ww
-	let self.h = hh
+function! s:window.resize(w, h)
+	let self.w = a:w
+	let self.h = a:h
+	if self.mode == 0
+		let self.info.tw = self.w
+		let self.info.th = self.h
+		return
+	endif
+	let pad = self.opts.padding
+	let self.opts.tw = self.w + pad[1] + pad[3]
+	let self.opts.th = self.h + pad[0] + pad[2]
+	let self.opts.tw += (self.info.has_border? 2 : 0)
+	let self.opts.th += (self.info.has_border? 2 : 0)
+	if self.winid < 0 
+		return
+	endif
+	if s:has_nvim == 0
+		let opts = {}
+		let opts.minwidth = self.w
+		let opts.maxwidth = self.w
+		let opts.minheight = self.h
+		let opts.maxheight = self.h
+		call popup_move(self.winid, opts)
+	else
+	endif
 endfunc
 
 
