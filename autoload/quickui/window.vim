@@ -23,8 +23,8 @@ let s:window.winid = -1       " window id
 let s:window.dirty = 0        " need update buffer ?
 let s:window.text = []        " text lines
 let s:window.bid = -1         " allocated buffer id
-let s:window.visible = 1      " visibility
-let s:window.mode = 0         " mode: 0/invalid, 1/valid
+let s:window.hide = 0         " visibility
+let s:window.mode = 0         " mode: 0/created, 1/closed
 let s:window.opts = {}        " creation options
 
 
@@ -35,17 +35,19 @@ let s:has_nvim = quickui#core#has_nvim
 
 
 "----------------------------------------------------------------------
-" ctor
+" prepare opts
 "----------------------------------------------------------------------
-function! s:window.__init__(opts)
+function! s:window.__prepare_opts(opts)
 	let opts = deepcopy(a:opts)
 	let opts.x = get(a:opts, 'x', 1)
 	let opts.y = get(a:opts, 'y', 1)
 	let opts.z = get(a:opts, 'z', 10)
 	let opts.w = get(a:opts, 'w', 1)
 	let opts.h = get(a:opts, 'h', 1)
+	let opts.hide = get(a:opts, 'hide', 0)
 	let opts.wrap = get(a:opts, 'wrap', 0)
 	let opts.color = get(a:opts, 'color', 'QuickBG')
+	let opts.border = get(a:opts, 'border', 0)
 	let self.opts = opts
 	let self.bid = quickui#core#buffer_alloc()
 	let self.dirty = 1
@@ -54,40 +56,77 @@ function! s:window.__init__(opts)
 	let self.z = opts.z
 	let self.w = (opts.w < 1)? 1 : (opts.w)
 	let self.h = (opts.h < 1)? 1 : (opts.h)
-	let self.visible = 0
+	let self.hide = opts.hide
 	let self.mode = 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" win filter
+"----------------------------------------------------------------------
+function! s:popup_filter(winid, key)
+endfunc
+
+
+"----------------------------------------------------------------------
+" create window in vim
+"----------------------------------------------------------------------
+function! s:window.__vim_create()
+	let opts = {"hidden":1, "pos": 'topleft'}
+	let opts.hidden = 1
+	let opts.wrap = self.opts.wrap
+	let opts.minwidth = self.w
+	let opts.maxwidth = self.w
+	let opts.minheight = self.h
+	let opts.maxheight = self.h
+	let opts.col = self.x + 1
+	let opts.line = self.y + 1
+	let opts.mapping = 0
+	let opts.fixed = (opts.wrap == 0)? 1 : 0
+	let opts.cursorline = get(self.opts, 'cursorline', 0)
+	let opts.drag = get(self.opts, 'drag', 0)
+	let self.winid = popup_create(self.bid, opts)
+	let self.filter = function('s:popup_filter')
+	let winid = self.winid
+	let init = []
+	let init += ['setlocal nonumber signcolumn=no scrolloff=0']
+	call win_execute(winid, init)
+	let opts = {}
+	let opts.color = self.opts.color
+	let border = get(self.opts, 'border', g:quickui#style#border)
+	let opts.border = [0,0,0,0,0,0,0,0,0]
+	if type(border) == type('')
+	elseif type(border) == type(0)
+	elseif type(border) == type([])
+	endif
+	call popup_setoptions(winid, opts)
+	if self.hide == 0
+		call popup_show(winid)
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" create window in nvim
+"----------------------------------------------------------------------
+function! s:window.__nvim_create()
 endfunc
 
 
 "----------------------------------------------------------------------
 " open window
 "----------------------------------------------------------------------
-function! s:window.open()
+function! s:window.open(opts)
 	call self.close()
+	call self.__prepare_opts(a:opts)
 	if s:has_nvim == 0
-		let opts = {"hidden":1, "pos": 'topleft'}
-		let opts.hidden = 1
-		let opts.wrap = self.opts.wrap
-		let opts.minwidth = self.w
-		let opts.maxwidth = self.w
-		let opts.minheight = self.h
-		let opts.maxheight = self.h
-		let opts.col = self.x + 1
-		let opts.line = self.y + 1
-		let opts.mapping = 0
-		let opts.cursorline = get(self.opts, 'cursorline', 0)
-		let opts.drag = get(self.opts, 'drag', 0)
-		let self.winid = popup_create(self.bid, opts)
-		let winid = self.winid
-		let init = []
-		let init += ['setlocal nonumber signcolumn=no scrolloff=0']
-		call win_execute(winid, init)
-		call setwinvar(winid, '&wincolor', self.opts.color)
-		call popup_show(winid)
+		call self.__vim_create()
 	else
+		call self.__nvim_create()
 	endif
 	let self.mode = 1
 endfunc
+
 
 
 "----------------------------------------------------------------------
@@ -102,7 +141,11 @@ function! s:window.close()
 		endif
 	endif
 	let self.winid = -1
-	let self.visible = 0
+	if self.bid >= 0
+		call quickui#core#buffer_free(self.bid)
+		let self.bid = -1
+	endif
+	let self.hide = 0
 	let self.mode = 0
 endfunc
 
@@ -125,23 +168,10 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" dtor
-"----------------------------------------------------------------------
-function! s:window.release()
-	call self.close()
-	if self.bid >= 0
-		call quickui#core#buffer_free(self.bid)
-		let self.bid = -1
-	endif
-endfunc
-
-
-"----------------------------------------------------------------------
 " constructor
 "----------------------------------------------------------------------
-function! quickui#window#new(opts)
+function! quickui#window#new()
 	let obj = deepcopy(s:window)
-	call obj.__init__(a:opts)
 	return obj
 endfunc
 
