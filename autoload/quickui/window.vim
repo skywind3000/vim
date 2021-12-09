@@ -316,8 +316,8 @@ function! s:window.execute(cmdlist)
 		let cmd = a:cmdlist
 	endif
 	let winid = self.winid
-	let pc = self.info.pending_cmd
 	if winid >= 0
+		let pc = self.info.pending_cmd
 		if len(pc) > 0
 			call quickui#core#win_execute(winid, pc)
 			let self.info.pending_cmd = []
