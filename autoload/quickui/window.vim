@@ -26,6 +26,7 @@ let s:window.bid = -1         " allocated buffer id
 let s:window.hide = 0         " visibility
 let s:window.mode = 0         " mode: 0/created, 1/closed
 let s:window.opts = {}        " creation options
+let s:window.info = {}        " init environment
 
 
 "----------------------------------------------------------------------
@@ -58,6 +59,33 @@ function! s:window.__prepare_opts(opts)
 	let self.h = (opts.h < 1)? 1 : (opts.h)
 	let self.hide = opts.hide
 	let self.mode = 0
+	let cmd = []
+	if has_key(opts, 'tabstop')
+		let cmd += ['setl tabstop=' . get(opts, 'tabstop', 4)]
+	endif
+	if has_key(opts, 'list')
+		let cmd += [(opts.list)? 'setl list' : 'setl nolist']
+	else
+		let cmd += ['setl nolist']
+	endif
+	if get(opts, 'number', 0) != 0
+		let cmd += ['setl number']
+	else
+		let cmd += ['setl nonumber']
+	endif
+	let cmd += ['setl scrolloff=0']
+	if has_key(opts, 'syntax')
+		let cmd += ['set ft=' . fnameescape(opts.syntax)]
+	endif
+	if has_key(opts, 'command')
+		let command = opts.command
+		if type(command) == type([])
+			let cmd += command
+		else
+			let cmd += [''. command]
+		endif
+	endif
+	let self.info.cmd = cmd
 endfunc
 
 
@@ -85,6 +113,8 @@ function! s:window.__vim_create()
 	let opts.fixed = (opts.wrap == 0)? 1 : 0
 	let opts.cursorline = get(self.opts, 'cursorline', 0)
 	let opts.drag = get(self.opts, 'drag', 0)
+	let opts.scrollbar = 0
+	let opts.zindex = self.z + 1
 	let self.winid = popup_create(self.bid, opts)
 	let self.filter = function('s:popup_filter')
 	let winid = self.winid
@@ -92,17 +122,19 @@ function! s:window.__vim_create()
 	let init += ['setlocal nonumber signcolumn=no scrolloff=0']
 	call win_execute(winid, init)
 	let opts = {}
-	let opts.color = self.opts.color
-	let border = get(self.opts, 'border', g:quickui#style#border)
-	let opts.border = [0,0,0,0,0,0,0,0,0]
-	if type(border) == type('')
-		if border == ''
-			let bt = 0
-		elseif border == '
-	elseif type(border) == type(0)
-	elseif type(border) == type([])
+	let opts.highlight = self.opts.color
+	let border = quickui#core#border_auto(self.opts.border)
+	if len(border) > 0
+		let opts.borderchars = border
+		let opts.border = [1,1,1,1,1,1,1,1,1]
+		let bc = get(self.opts, 'bordercolor', 'QuickBorder')
+		let opts.borderhighlight = [bc, bc, bc, bc]
+	endif
+	if has_key(self.opts, 'padding') 
+		let opts.padding = self.opts.padding
 	endif
 	call popup_setoptions(winid, opts)
+	call quickui#core#win_execute(winid, self.info.cmd)
 	if self.hide == 0
 		call popup_show(winid)
 	endif
@@ -119,9 +151,10 @@ endfunc
 "----------------------------------------------------------------------
 " open window
 "----------------------------------------------------------------------
-function! s:window.open(opts)
+function! s:window.open(textlist, opts)
 	call self.close()
 	call self.__prepare_opts(a:opts)
+	call quickui#core#buffer_update(self.bid, a:textlist)
 	if s:has_nvim == 0
 		call self.__vim_create()
 	else

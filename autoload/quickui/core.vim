@@ -395,9 +395,14 @@ endfunc
 " update content
 "----------------------------------------------------------------------
 function! quickui#core#buffer_update(bid, textlist)
+	if type(a:textlist) == v:t_list
+		let textlist = textlist
+	else
+		let textlist = split('' . a:textlist, '\n', 1)
+	endif
 	call setbufvar(a:bid, '&modifiable', 1)
 	call deletebufline(a:bid, 1, '$')
-	call setbufline(a:bid, 1, a:textlist)
+	call setbufline(a:bid, 1, textlist)
 	call setbufvar(a:bid, '&modified', 0)
 endfunc
 
