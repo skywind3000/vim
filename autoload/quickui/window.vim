@@ -68,6 +68,8 @@ function! s:window.__prepare_opts(textlist, opts)
 	let pad = self.opts.padding
 	let self.opts.tw = self.w + pad[1] + pad[3]
 	let self.opts.th = self.h + pad[0] + pad[2]
+	let sum_pad = pad[0] + pad[1] + pad[2] + pad[3]
+	let self.info.has_padding = (sum_pad > 0)? 1 : 0
 	let border = quickui#core#border_auto(self.opts.border)
 	let self.info.has_border = (len(border) > 0)? 1 : 0
 	if self.info.has_border != 0
