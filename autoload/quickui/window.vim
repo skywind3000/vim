@@ -18,7 +18,7 @@ let s:window.w = 1            " window width
 let s:window.h = 1            " window height
 let s:window.x = 1            " column starting from 0
 let s:window.y = 1            " row starting from 0
-let s:window.z = 10           " priority
+let s:window.z = 40           " priority
 let s:window.winid = -1       " window id
 let s:window.dirty = 0        " need update buffer ?
 let s:window.text = []        " text lines
@@ -32,7 +32,8 @@ let s:window.info = {}        " init environment
 "----------------------------------------------------------------------
 " internal 
 "----------------------------------------------------------------------
-let s:has_nvim = quickui#core#has_nvim
+let s:has_nvim = g:quickui#core#has_nvim
+let s:has_nvim_060 = g:quickui#core#has_nvim_060
 
 
 "----------------------------------------------------------------------
@@ -42,7 +43,7 @@ function! s:window.__prepare_opts(textlist, opts)
 	let opts = deepcopy(a:opts)
 	let opts.x = get(a:opts, 'x', 1)
 	let opts.y = get(a:opts, 'y', 1)
-	let opts.z = get(a:opts, 'z', 10)
+	let opts.z = get(a:opts, 'z', 40)
 	let opts.w = get(a:opts, 'w', 1)
 	let opts.h = get(a:opts, 'h', -1)
 	let opts.hide = get(a:opts, 'hide', 0)
@@ -183,6 +184,30 @@ endfunc
 " create window in nvim
 "----------------------------------------------------------------------
 function! s:window.__nvim_create()
+	let opts = {'focusable':1, 'style':'minimal', 'relative':'editor'}
+	let opts.row = self.y
+	let opts.col = self.x
+	let opts.width = self.w
+	let opts.height = self.h
+	if s:has_nvim_060
+		let opts.noautocmd = 1
+		let opts.zindex = self.z + 1
+	endif
+	let self.info.nvim_opts = opts
+endfunc
+
+
+"----------------------------------------------------------------------
+" nvim - show window
+"----------------------------------------------------------------------
+function! s:window.__nvim_show()
+endfunc
+
+
+"----------------------------------------------------------------------
+" nvim - hide window
+"----------------------------------------------------------------------
+function! s:window.__nvim_hide()
 endfunc
 
 
