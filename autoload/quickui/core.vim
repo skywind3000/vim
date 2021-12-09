@@ -396,7 +396,7 @@ endfunc
 "----------------------------------------------------------------------
 function! quickui#core#buffer_update(bid, textlist)
 	if type(a:textlist) == v:t_list
-		let textlist = textlist
+		let textlist = a:textlist
 	else
 		let textlist = split('' . a:textlist, '\n', 1)
 	endif

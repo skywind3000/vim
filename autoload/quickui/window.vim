@@ -38,13 +38,13 @@ let s:has_nvim = quickui#core#has_nvim
 "----------------------------------------------------------------------
 " prepare opts
 "----------------------------------------------------------------------
-function! s:window.__prepare_opts(opts)
+function! s:window.__prepare_opts(textlist, opts)
 	let opts = deepcopy(a:opts)
 	let opts.x = get(a:opts, 'x', 1)
 	let opts.y = get(a:opts, 'y', 1)
 	let opts.z = get(a:opts, 'z', 10)
 	let opts.w = get(a:opts, 'w', 1)
-	let opts.h = get(a:opts, 'h', 1)
+	let opts.h = get(a:opts, 'h', -1)
 	let opts.hide = get(a:opts, 'hide', 0)
 	let opts.wrap = get(a:opts, 'wrap', 0)
 	let opts.color = get(a:opts, 'color', 'QuickBG')
@@ -59,6 +59,18 @@ function! s:window.__prepare_opts(opts)
 	let self.h = (opts.h < 1)? 1 : (opts.h)
 	let self.hide = opts.hide
 	let self.mode = 0
+	if type(a:textlist) == v:t_list
+		let textlist = a:textlist
+	else
+		let textlist = split('' . a:textlist, '\n', 1)
+	endif
+	if opts.h < 0
+		let opts.h = len(textlist)
+	endif
+	if len(textlist) < opts.h
+		let textlist += repeat([''], opts.h - len(textlist))
+	endif
+	let self.text = textlist
 	let cmd = []
 	if has_key(opts, 'tabstop')
 		let cmd += ['setl tabstop=' . get(opts, 'tabstop', 4)]
@@ -74,6 +86,7 @@ function! s:window.__prepare_opts(opts)
 		let cmd += ['setl nonumber']
 	endif
 	let cmd += ['setl scrolloff=0']
+	let cmd += ['setl signcolumn=no']
 	if has_key(opts, 'syntax')
 		let cmd += ['set ft=' . fnameescape(opts.syntax)]
 	endif
@@ -129,6 +142,9 @@ function! s:window.__vim_create()
 		let opts.border = [1,1,1,1,1,1,1,1,1]
 		let bc = get(self.opts, 'bordercolor', 'QuickBorder')
 		let opts.borderhighlight = [bc, bc, bc, bc]
+		if has_key(self.opts, 'title')
+			let opts.title = self.opts.title
+		endif
 	endif
 	if has_key(self.opts, 'padding') 
 		let opts.padding = self.opts.padding
@@ -153,8 +169,8 @@ endfunc
 "----------------------------------------------------------------------
 function! s:window.open(textlist, opts)
 	call self.close()
-	call self.__prepare_opts(a:opts)
-	call quickui#core#buffer_update(self.bid, a:textlist)
+	call self.__prepare_opts(a:textlist, a:opts)
+	call quickui#core#buffer_update(self.bid, self.text)
 	if s:has_nvim == 0
 		call self.__vim_create()
 	else
