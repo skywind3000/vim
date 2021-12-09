@@ -96,6 +96,9 @@ function! s:window.__vim_create()
 	let border = get(self.opts, 'border', g:quickui#style#border)
 	let opts.border = [0,0,0,0,0,0,0,0,0]
 	if type(border) == type('')
+		if border == ''
+			let bt = 0
+		elseif border == '
 	elseif type(border) == type(0)
 	elseif type(border) == type([])
 	endif

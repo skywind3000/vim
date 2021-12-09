@@ -465,24 +465,40 @@ function! quickui#core#border_extract(pattern)
 endfunc
 
 
-function! quickui#core#border_convert(pattern)
+function! quickui#core#border_convert(pattern, nvim_format)
 	if type(a:pattern) == v:t_string
 		let p = quickui#core#border_extract(a:pattern)
 	else
 		let p = a:pattern
 	endif
-	let pattern = [ p[1], p[5], p[7], p[3], p[0], p[2], p[8], p[6] ]
+	if len(p) == 0
+		return []
+	endif
+	if a:nvim_format == 0
+		let pattern = [ p[1], p[5], p[7], p[3], p[0], p[2], p[8], p[6] ]
+	else
+		let pattern = [ p[0], p[1], p[2], p[5], p[8], p[7], p[6], p[3] ]
+	endif
 	return pattern
 endfunc
 
 let s:border_styles = {}
 
+let s:border_styles[0] = quickui#core#border_extract('           ')
 let s:border_styles[1] = quickui#core#border_extract('+-+|-|+-+++')
 let s:border_styles[2] = quickui#core#border_extract('┌─┐│─│└─┘├┤')
 let s:border_styles[3] = quickui#core#border_extract('╔═╗║─║╚═╝╟╢')
-let s:border_styles[4] = quickui#core#border_extract('/-\|-|\-/++')
+let s:border_styles[4] = quickui#core#border_extract('╭─╮│─│╰─╯├┤')
+let s:border_styles[5] = quickui#core#border_extract('/-\|-|\-/++')
 
 let s:border_ascii = quickui#core#border_extract('+-+|-|+-+++')
+
+let s:border_styles['none'] = []
+let s:border_styles['single'] = s:border_styles[2]
+let s:border_styles['double'] = s:border_styles[3]
+let s:border_styles['rounded'] = s:border_styles[4]
+let s:border_styles['solid'] = s:border_styles[0]
+let s:border_styles['ascii'] = s:border_styles[1]
 
 function! quickui#core#border_install(name, pattern)
 	let s:border_styles[a:name] = quickui#core#border_extract(a:pattern)
@@ -497,7 +513,12 @@ endfunc
 
 function! quickui#core#border_vim(name)
 	let border = quickui#core#border_get(a:name)
-	return quickui#core#border_convert(border)
+	return quickui#core#border_convert(border, 0)
+endfunc
+
+function! quickui#core#border_nvim(name)
+	let border = quickui#core#border_get(a:name)
+	return quickui#core#border_convert(border, 1)
 endfunc
 
 

@@ -622,5 +622,3 @@ function! quickui#utils#read_eval(...)
 endfunc
 
 
-
-
