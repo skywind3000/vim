@@ -368,17 +368,19 @@ endfunc
 function! s:window.set_line(index, text, ...)
 	let require = a:index + 1
 	let refresh = (a:0 < 1)? 1 : (a:1)
+	let index = a:index
 	let update = 0
-	if len(self.text) < require
+	if index < 0
+		return
+	elseif len(self.text) < require
 		let self.text += repeat([''], require - len(self.text))
 		let update = 1
 	endif
 	let self.text[a:index] = a:text
 	if update != 0
-		self.update()
+		call self.update()
 	elseif refresh != 0
 		let bid = self.bid
-		let index = a:index
 		if bid >= 0
 			call setbufvar(bid, '&modifiable', 1)
 			call setbufline(bid, index + 1, [a:text])
