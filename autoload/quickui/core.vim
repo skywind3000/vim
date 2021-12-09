@@ -3,7 +3,7 @@
 " core.vim - 
 "
 " Created by skywind on 2019/12/18
-" Last Modified: 2021/12/09 02:37
+" Last Modified: 2021/12/09 21:03
 "
 "======================================================================
 
@@ -519,6 +519,14 @@ endfunc
 function! quickui#core#border_nvim(name)
 	let border = quickui#core#border_get(a:name)
 	return quickui#core#border_convert(border, 1)
+endfunc
+
+function! quickui#core#border_auto(name)
+	if g:quickui#core#has_nvim == 0
+		return quickui#core#border_vim(a:name)
+	else
+		return quickui#core#border_nvim(a:name)
+	endif
 endfunc
 
 
