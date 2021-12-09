@@ -59,6 +59,20 @@ function! s:window.__prepare_opts(textlist, opts)
 	let self.h = (opts.h < 1)? 1 : (opts.h)
 	let self.hide = opts.hide
 	let self.mode = 0
+	if has_key(a:opts, 'padding')
+		let self.opts.padding = a:opts.padding
+	else
+		let self.opts.padding = [0,0,0,0]
+	endif
+	let pad = self.opts.padding
+	let self.opts.tw = self.w + pad[1] + pad[3]
+	let self.opts.th = self.h + pad[0] + pad[2]
+	let border = quickui#core#border_auto(self.opts.border)
+	let self.info.has_border = (len(border) > 0)? 1 : 0
+	if self.info.has_border != 0
+		let self.opts.tw += 2
+		let self.opts.th += 2
+	endif
 	if type(a:textlist) == v:t_list
 		let textlist = a:textlist
 	else
@@ -98,7 +112,15 @@ function! s:window.__prepare_opts(textlist, opts)
 			let cmd += [''. command]
 		endif
 	endif
+	if has_key(opts, 'cursorline')
+		let need = (opts.cursorline)? 'cursorline' : 'nocursorlin'
+		let cmd += ['setl ' . need]
+	else
+		let cmd += ['setl nocursorline']
+	endif
+	let cmd += ['setl nocursorcolumn nospell']
 	let self.info.cmd = cmd
+	let self.info.pending_cmd = []
 endfunc
 
 
@@ -133,7 +155,7 @@ function! s:window.__vim_create()
 	let winid = self.winid
 	let init = []
 	let init += ['setlocal nonumber signcolumn=no scrolloff=0']
-	call win_execute(winid, init)
+	call quickui#core#win_execute(winid, init, 1)
 	let opts = {}
 	let opts.highlight = self.opts.color
 	let border = quickui#core#border_auto(self.opts.border)
@@ -149,8 +171,14 @@ function! s:window.__vim_create()
 	if has_key(self.opts, 'padding') 
 		let opts.padding = self.opts.padding
 	endif
+	call setwinvar(winid, '&wincolor', self.opts.color)
 	call popup_setoptions(winid, opts)
 	call quickui#core#win_execute(winid, self.info.cmd)
+	let pc = self.info.pending_cmd
+	if len(pc) > 0
+		call quickui#core#win_execute(winid, pc)
+		let self.info.pending_cmd = []
+	endif
 	if self.hide == 0
 		call popup_show(winid)
 	endif
@@ -205,17 +233,105 @@ endfunc
 "----------------------------------------------------------------------
 " show the window
 "----------------------------------------------------------------------
-function! s:window.show()
-	if self.winid >= 0
-		if s:has_nvim == 0
-			call popup_show(self.winid)
+function! s:window.show(show)
+	if self.mode == 0
+		return
+	elseif s:has_nvim == 0
+		if a:show == 0
+			if self.winid >= 0
+				call popup_hide(self.winid)
+			endif
 		else
-
+			if self.winid >= 0
+				call popup_show(self.winid)
+			endif
 		endif
-		return 0
+	else
 	endif
-	let self.visible = 1
-	return 0
+	let self.hide = (a:show == 0)? 1 : 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" move window
+"----------------------------------------------------------------------
+function! s:window.move(x, y)
+	let self.x = a:x
+	let self.y = a:y
+	if self.mode == 0
+		return
+	elseif s:has_nvim == 0
+		if self.winid >= 0
+			let opts = {}
+			let opts.col = self.x + 1
+			let opts.line = self.y + 1
+			call popup_move(self.winid, opts)
+		endif
+	else
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" center window
+"----------------------------------------------------------------------
+function! s:window.center()
+	let w = self.w
+	let h = self.h
+	if self.mode != 0
+		let w = self.opts.tw
+		let h = self.opts.th
+	endif
+	let x = (&columns - w) / 2
+	let y = (&lines - h) / 2
+	let limit1 = (&lines - 2) * 80 / 100
+	let limit2 = (&lines - 2)
+	if h + 8 < limit1
+		let y = (limit1 - h) / 2
+	else
+		let y = (limit2 - h) / 2
+	endif
+	call self.move(x, y)
+endfunc
+
+
+"----------------------------------------------------------------------
+" resize
+"----------------------------------------------------------------------
+function! s:window.resize(width, height)
+	let ww = a:width
+	let hh = a:height
+	let self.w = ww
+	let self.h = hh
+endfunc
+
+
+"----------------------------------------------------------------------
+" execute commands
+"----------------------------------------------------------------------
+function! s:window.execute(cmdlist)
+	if type(a:cmdlist) == v:t_string
+		let cmd = split(a:cmdlist, '\n')
+	else
+		let cmd = a:cmdlist
+	endif
+	let winid = self.winid
+	let pc = self.info.pending_cmd
+	if winid >= 0
+		if len(pc) > 0
+			call quickui#core#win_execute(winid, pc)
+			let self.info.pending_cmd = []
+		endif
+		if len(cmd) > 0
+			call quickui#core#win_execute(winid, cmd)
+		endif
+	else
+		if !has_key(self.info, 'pending_cmd')
+			let self.info.pending_cmd = cmd
+		else
+			let self.info.pending_cmd += cmd
+		endif
+	endif
 endfunc
 
 

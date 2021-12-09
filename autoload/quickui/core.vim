@@ -321,27 +321,36 @@ endfunc
 "----------------------------------------------------------------------
 " vim/nvim compatible
 "----------------------------------------------------------------------
-function! quickui#core#win_execute(winid, command)
+function! quickui#core#win_execute(winid, command, ...)
+	let silent = (a:0 < 1)? 0 : (a:1)
 	if g:quickui#core#has_popup != 0
 		if type(a:command) == v:t_string
-			keepalt call win_execute(a:winid, a:command)
+			keepalt call win_execute(a:winid, a:command, silent)
 		elseif type(a:command) == v:t_list
-			keepalt call win_execute(a:winid, join(a:command, "\n"))
+			keepalt call win_execute(a:winid, join(a:command, "\n"), silent)
 		endif
 	elseif g:quickui#core#has_win_exe == 0
 		let current = nvim_get_current_win()
 		keepalt call nvim_set_current_win(a:winid)
 		if type(a:command) == v:t_string
-			exec a:command
+			if silent == 0
+				exec a:command
+			else
+				silent exec a:command
+			endif
 		elseif type(a:command) == v:t_list
-			exec join(a:command, "\n")
+			if silent == 0
+				exec join(a:command, "\n")
+			else
+				silent exec join(a:command, "\n")
+			endif
 		endif
 		keepalt call nvim_set_current_win(current)
 	else
 		if type(a:command) == v:t_string
-			keepalt call win_execute(a:winid, a:command, 1)
+			keepalt call win_execute(a:winid, a:command, silent)
 		elseif type(a:command) == v:t_list
-			keepalt call win_execute(a:winid, join(a:command, "\n"), 1)
+			keepalt call win_execute(a:winid, join(a:command, "\n"), silent)
 		endif
 	endif
 endfunc
