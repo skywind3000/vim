@@ -255,6 +255,7 @@ function! s:window.__nvim_show()
 	elseif self.winid >= 0
 		return
 	endif
+	call self.move(self.x, self.y)
 	let info = self.info
 	let winid = nvim_open_win(self.bid, 0, info.nvim_opts)
 	let self.winid = winid
@@ -374,7 +375,7 @@ endfunc
 "----------------------------------------------------------------------
 " move window
 "----------------------------------------------------------------------
-function! s:window.move(x, y)
+function! s:window.__move(x, y)
 	let self.x = a:x
 	let self.y = a:y
 	if self.mode == 0
@@ -411,6 +412,25 @@ function! s:window.move(x, y)
 			endif
 		endif
 	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" actual move
+"----------------------------------------------------------------------
+function! s:window.move(x, y)
+	let x = a:x
+	let y = a:y
+	let w = self.info.tw
+	let h = self.info.th
+	let sw = &columns
+	let sh = &lines
+	let x = (x + w > sw)? (sw - w) : x
+	let y = (y + h > sh)? (sh - h) : y
+	let x = (x < 0)? 0 : x
+	let y = (y < 0)? 0 : y
+	" unsilent echom ['move', x, a:x, self.opts.x]
+	call self.__move(x, y)
 endfunc
 
 

@@ -1,7 +1,7 @@
 let opts = {}
 let opts.w = 40
 let opts.h = 5
-let opts.x = 4
+let opts.x = 40
 let opts.y = 2
 let opts.title = ' Hello, World '
 let opts.border = 'default'
@@ -17,7 +17,7 @@ call win.open(text, opts)
 
 redraw
 
-echo win.opts
+" echo win.opts
 
 call getchar()
 
