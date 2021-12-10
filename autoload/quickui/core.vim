@@ -514,6 +514,7 @@ let s:border_styles['double'] = s:border_styles[3]
 let s:border_styles['rounded'] = s:border_styles[4]
 let s:border_styles['solid'] = s:border_styles[0]
 let s:border_styles['ascii'] = s:border_styles[1]
+let s:border_styles['default'] = s:border_styles[1]
 
 function! quickui#core#border_install(name, pattern)
 	let s:border_styles[a:name] = quickui#core#border_extract(a:pattern)

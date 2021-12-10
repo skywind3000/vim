@@ -219,7 +219,9 @@ function! s:window.__nvim_create()
 		let opts.col += info.off_x
 		let opts.row += info.off_y
 		let title = get(self.opts, 'title', '')
-		let back = quickui#utils#make_border(tw, th, title, 0)
+		let title = (title != '')? (' ' . title . ' ') : ''
+		let border = self.opts.border
+		let back = quickui#utils#make_border(tw, th, border, title, 0)
 		let info.border_bid = quickui#core#buffer_alloc()
 		call quickui#core#buffer_update(info.border_bid, back)
 		let op = {'relative':'editor', 'focusable':0, 'style':'minimal'}
