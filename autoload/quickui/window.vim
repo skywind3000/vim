@@ -188,7 +188,7 @@ endfunc
 " create window in nvim
 "----------------------------------------------------------------------
 function! s:window.__nvim_create()
-	let opts = {'focusable':1, 'style':'minimal', 'relative':'editor'}
+	let opts = {'focusable':0, 'style':'minimal', 'relative':'editor'}
 	let opts.row = self.y
 	let opts.col = self.x
 	let opts.width = self.w
@@ -218,9 +218,9 @@ function! s:window.__nvim_create()
 		let th = info.th
 		let opts.col += info.off_x
 		let opts.row += info.off_y
-		let title = get(self.opts, 'title', '')
+		let t = get(self.opts, 'title', '')
 		let border = self.opts.border
-		let back = quickui#utils#make_border(tw, th, border, title, 0)
+		let back = quickui#utils#make_border(tw - 2, th - 2, border, t, 0)
 		let info.border_bid = quickui#core#buffer_alloc()
 		call quickui#core#buffer_update(info.border_bid, back)
 		let op = {'relative':'editor', 'focusable':0, 'style':'minimal'}

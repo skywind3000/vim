@@ -1,13 +1,13 @@
 let opts = {}
-let opts.w = 50
-let opts.h = 10
-let opts.x = 1
-let opts.y = 1
+let opts.w = 20
+let opts.h = 5
+let opts.x = 4
+let opts.y = 2
 let opts.title = ' Hello, World '
 let opts.border = 'rounded'
 let opts.padding = [0, 1, 0, 1]
 " let opts.hide = 1
-let text = ['0123456789', '67890']
+let text = ['012345678901234567890123456789', 'abcdef']
 
 let win = quickui#window#new()
 call win.open(text, opts)
@@ -21,22 +21,19 @@ echo win.opts
 
 call getchar()
 
-if has('nvim') == 0
-	call win.show(0)
-	redraw
-	call getchar()
+call win.show(0)
+redraw
+call getchar()
 
-	call win.set_line(4, 'Hello, Vim World !!')
-	call win.move(50, 10)
-	call win.show(1)
-	call win.resize(30, 7)
-	call win.center()
-	redraw
-	call getchar()
-else
-endif
+call win.set_line(4, 'Hello, Vim World !!')
+call win.move(50, 10)
+call win.show(1)
+call win.resize(30, 7)
+call win.center()
+redraw
+call getchar()
 
 call win.close()
 
-
+" echo [win.w, win.h, win.info.tw, win.info.th]
 
