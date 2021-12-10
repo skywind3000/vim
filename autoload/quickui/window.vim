@@ -66,16 +66,16 @@ function! s:window.__prepare_opts(textlist, opts)
 		let self.opts.padding = [0,0,0,0]
 	endif
 	let pad = self.opts.padding
-	let self.opts.tw = self.w + pad[1] + pad[3]
-	let self.opts.th = self.h + pad[0] + pad[2]
-	let sum_pad = pad[0] + pad[1] + pad[2] + pad[3]
 	let info = self.info
+	let info.tw = self.w + pad[1] + pad[3]
+	let info.th = self.h + pad[0] + pad[2]
+	let sum_pad = pad[0] + pad[1] + pad[2] + pad[3]
 	let info.has_padding = (sum_pad > 0)? 1 : 0
 	let border = quickui#core#border_auto(self.opts.border)
 	let info.has_border = (len(border) > 0)? 1 : 0
 	if info.has_border != 0
-		let self.opts.tw += 2
-		let self.opts.th += 2
+		let info.tw += 2
+		let info.th += 2
 	endif
 	call self.set_text(a:textlist)
 	if opts.h < 0
@@ -219,7 +219,6 @@ function! s:window.__nvim_create()
 		let opts.col += info.off_x
 		let opts.row += info.off_y
 		let title = get(self.opts, 'title', '')
-		let title = (title != '')? (' ' . title . ' ') : ''
 		let border = self.opts.border
 		let back = quickui#utils#make_border(tw, th, border, title, 0)
 		let info.border_bid = quickui#core#buffer_alloc()
@@ -265,7 +264,7 @@ function! s:window.__nvim_show()
 		let info.pending_cmd = []
 	endif
 	if info.has_border
-		let bwid = nvim_open_win(info.border_bid, info.border_opts)
+		let bwid = nvim_open_win(info.border_bid, 0, info.border_opts)
 		let info.border_winid = bwid
 		call quickui#core#win_execute(bwid, info.border_init)
 	endif
@@ -377,13 +376,13 @@ function! s:window.move(x, y)
 	let self.y = a:y
 	if self.mode == 0
 		return
+	elseif self.winid < 0
+		return
 	elseif s:has_nvim == 0
-		if self.winid >= 0
-			let opts = {}
-			let opts.col = self.x + 1
-			let opts.line = self.y + 1
-			call popup_move(self.winid, opts)
-		endif
+		let opts = {}
+		let opts.col = self.x + 1
+		let opts.line = self.y + 1
+		call popup_move(self.winid, opts)
 	else
 	endif
 endfunc
@@ -396,8 +395,8 @@ function! s:window.center()
 	let w = self.w
 	let h = self.h
 	if self.mode != 0
-		let w = self.opts.tw
-		let h = self.opts.th
+		let w = self.info.tw
+		let h = self.info.th
 	endif
 	let x = (&columns - w) / 2
 	let y = (&lines - h) / 2
@@ -424,10 +423,10 @@ function! s:window.resize(w, h)
 		return
 	endif
 	let pad = self.opts.padding
-	let self.opts.tw = self.w + pad[1] + pad[3]
-	let self.opts.th = self.h + pad[0] + pad[2]
-	let self.opts.tw += (self.info.has_border? 2 : 0)
-	let self.opts.th += (self.info.has_border? 2 : 0)
+	let self.info.tw = self.w + pad[1] + pad[3]
+	let self.info.th = self.h + pad[0] + pad[2]
+	let self.info.tw += (self.info.has_border? 2 : 0)
+	let self.info.th += (self.info.has_border? 2 : 0)
 	if self.winid < 0 
 		return
 	endif
