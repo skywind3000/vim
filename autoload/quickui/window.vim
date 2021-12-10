@@ -267,6 +267,7 @@ function! s:window.__nvim_show()
 		let info.border_winid = bwid
 		call quickui#core#win_execute(bwid, info.border_init)
 	endif
+	let self.hide = 0
 endfunc
 
 
@@ -279,6 +280,16 @@ function! s:window.__nvim_hide()
 	elseif self.winid < 0
 		return
 	endif
+	let info = self.info
+	if info.border_winid >= 0
+		call nvim_win_close(info.border_winid, 1)
+		let info.border_winid = -1
+	endif
+	if self.winid >= 0
+		call nvim_win_close(self.winid, 1)
+		let self.winid = -1
+	endif
+	let self.hide = 1
 endfunc
 
 
@@ -346,6 +357,11 @@ function! s:window.show(show)
 			endif
 		endif
 	else
+		if a:show == 0
+			call self.__nvim_hide()
+		else
+			call self.__nvim_show()
+		endif
 	endif
 	let self.hide = (a:show == 0)? 1 : 0
 endfunc
