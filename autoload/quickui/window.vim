@@ -69,10 +69,11 @@ function! s:window.__prepare_opts(textlist, opts)
 	let self.opts.tw = self.w + pad[1] + pad[3]
 	let self.opts.th = self.h + pad[0] + pad[2]
 	let sum_pad = pad[0] + pad[1] + pad[2] + pad[3]
-	let self.info.has_padding = (sum_pad > 0)? 1 : 0
+	let info = self.info
+	let info.has_padding = (sum_pad > 0)? 1 : 0
 	let border = quickui#core#border_auto(self.opts.border)
-	let self.info.has_border = (len(border) > 0)? 1 : 0
-	if self.info.has_border != 0
+	let info.has_border = (len(border) > 0)? 1 : 0
+	if info.has_border != 0
 		let self.opts.tw += 2
 		let self.opts.th += 2
 	endif
@@ -99,6 +100,14 @@ function! s:window.__prepare_opts(textlist, opts)
 	if has_key(opts, 'syntax')
 		let cmd += ['set ft=' . fnameescape(opts.syntax)]
 	endif
+	if has_key(opts, 'cursorline')
+		let need = (opts.cursorline)? 'cursorline' : 'nocursorlin'
+		let cmd += ['setl ' . need]
+	else
+		let cmd += ['setl nocursorline']
+	endif
+	let cmd += ['setl nocursorcolumn nospell']
+	let cmd += [opts.wrap? 'setl wrap' : 'setl nowrap']
 	if has_key(opts, 'command')
 		let command = opts.command
 		if type(command) == type([])
@@ -107,17 +116,10 @@ function! s:window.__prepare_opts(textlist, opts)
 			let cmd += [''. command]
 		endif
 	endif
-	if has_key(opts, 'cursorline')
-		let need = (opts.cursorline)? 'cursorline' : 'nocursorlin'
-		let cmd += ['setl ' . need]
-	else
-		let cmd += ['setl nocursorline']
-	endif
-	let cmd += ['setl nocursorcolumn nospell']
-	let self.info.cmd = cmd
-	let self.info.pending_cmd = []
-	let self.info.border_winid = -1
-	let self.info.border_bid = -1
+	let info.cmd = cmd
+	let info.pending_cmd = []
+	let info.border_winid = -1
+	let info.border_bid = -1
 endfunc
 
 
@@ -195,7 +197,51 @@ function! s:window.__nvim_create()
 		let opts.noautocmd = 1
 		let opts.zindex = self.z + 1
 	endif
-	let self.info.nvim_opts = opts
+	let info = self.info
+	let info.nvim_opts = opts
+	let info.sim_border = 0
+	let info.off_x = 0
+	let info.off_y = 0
+	let pad = self.opts.padding
+	if info.has_border
+		let info.sim_border = 1
+		let info.off_x = 1
+		let info.off_y = 1
+		if info.has_padding
+			let info.sim_border = 1
+			let info.off_x += pad[3]
+			let info.off_y += pad[0]
+		endif
+	endif
+	if info.has_border
+		let tw = info.tw
+		let th = info.th
+		let opts.col += info.off_x
+		let opts.row += info.off_y
+		let title = get(self.opts, 'title', '')
+		let back = quickui#utils#make_border(tw, th, title, 0)
+		let info.border_bid = quickui#core#buffer_alloc()
+		call quickui#core#buffer_update(info.border_bid, back)
+		let op = {'relative':'editor', 'focusable':0, 'style':'minimal'}
+		let op.width = tw
+		let op.height = th
+		let op.col = self.x
+		let op.row = self.y
+		if s:has_nvim_060
+			let op.noautocmd = 1
+			let op.zindex = self.z
+		endif
+		let info.border_opts = op
+		let init = []
+		let init += ['setl tabstop=' . get(self.opts, 'tabstop', 4)]
+		let init += ['setl signcolumn=no scrolloff=0 nowrap nonumber']
+		let init += ['setl nocursorline nolist']
+		let info.border_init = init
+	endif
+	let self.mode = 1
+	if self.hide == 0
+		call self.__nvim_show()
+	endif
 endfunc
 
 
@@ -203,6 +249,24 @@ endfunc
 " nvim - show window
 "----------------------------------------------------------------------
 function! s:window.__nvim_show()
+	if self.mode == 0
+		return
+	elseif self.winid >= 0
+		return
+	endif
+	let info = self.info
+	let winid = nvim_open_win(self.bid, 0, info.nvim_opts)
+	let self.winid = winid
+	call quickui#core#win_execute(winid, info.cmd)
+	if len(info.pending_cmd) > 0
+		call quickui#core#win_execute(winid, info.pending_cmd)
+		let info.pending_cmd = []
+	endif
+	if info.has_border
+		let bwid = nvim_open_win(info.border_bid, info.border_opts)
+		let info.border_winid = bwid
+		call quickui#core#win_execute(bwid, info.border_init)
+	endif
 endfunc
 
 
@@ -210,6 +274,11 @@ endfunc
 " nvim - hide window
 "----------------------------------------------------------------------
 function! s:window.__nvim_hide()
+	if self.mode == 0
+		return
+	elseif self.winid < 0
+		return
+	endif
 endfunc
 
 

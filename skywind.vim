@@ -37,7 +37,7 @@ endif
 
 runtime! macros/matchit.vim
 
-call after_object#enable(['f', 't'], '=', ':', '-', '#', ' ', '/', ';')
+call after_object#enable(['r', 'R'], '=', ':', '-', '#', ' ', '/', ';')
 
 
 "----------------------------------------------------------------------
