@@ -376,14 +376,37 @@ function! s:window.move(x, y)
 	let self.y = a:y
 	if self.mode == 0
 		return
-	elseif self.winid < 0
-		return
 	elseif s:has_nvim == 0
-		let opts = {}
-		let opts.col = self.x + 1
-		let opts.line = self.y + 1
-		call popup_move(self.winid, opts)
+		if self.winid >= 0
+			let opts = {}
+			let opts.col = self.x + 1
+			let opts.line = self.y + 1
+			call popup_move(self.winid, opts)
+		endif
 	else
+		let info = self.info
+		let opts = info.nvim_opts
+		let opts.col = self.x + info.off_x
+		let opts.row = self.y + info.off_y
+		if info.has_border != 0
+			let opts = info.border_opts
+			let opts.col = self.x
+			let opts.row = self.y
+		endif
+		if self.winid >= 0
+			let op = {'relative':'editor'}
+			let op.col = info.nvim_opts.col
+			let op.row = info.nvim_opts.row
+			call nvim_win_set_config(self.winid, op)
+		endif
+		if info.has_border != 0
+			if info.border_winid >= 0
+				let op = {'relative':'editor'}
+				let op.col = info.border_opts.col
+				let op.row = info.border_opts.row
+				call nvim_win_set_config(info.border_winid, op)
+			endif
+		endif
 	endif
 endfunc
 

@@ -1,5 +1,5 @@
 let opts = {}
-let opts.w = 20
+let opts.w = 40
 let opts.h = 5
 let opts.x = 4
 let opts.y = 2
