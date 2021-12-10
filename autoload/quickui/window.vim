@@ -258,15 +258,18 @@ function! s:window.__nvim_show()
 	let info = self.info
 	let winid = nvim_open_win(self.bid, 0, info.nvim_opts)
 	let self.winid = winid
+	let color = self.opts.color
 	call quickui#core#win_execute(winid, info.cmd)
 	if len(info.pending_cmd) > 0
 		call quickui#core#win_execute(winid, info.pending_cmd)
 		let info.pending_cmd = []
 	endif
+    call nvim_win_set_option(self.winid, 'winhl', 'Normal:'. color)
 	if info.has_border
 		let bwid = nvim_open_win(info.border_bid, 0, info.border_opts)
 		let info.border_winid = bwid
 		call quickui#core#win_execute(bwid, info.border_init)
+		call nvim_win_set_option(bwid, 'winhl', 'Normal:'. color)
 	endif
 	let self.hide = 0
 endfunc
@@ -440,16 +443,17 @@ endfunc
 function! s:window.resize(w, h)
 	let self.w = a:w
 	let self.h = a:h
+	let info = self.info
 	if self.mode == 0
-		let self.info.tw = self.w
-		let self.info.th = self.h
+		let info.tw = self.w
+		let info.th = self.h
 		return
 	endif
 	let pad = self.opts.padding
-	let self.info.tw = self.w + pad[1] + pad[3]
-	let self.info.th = self.h + pad[0] + pad[2]
-	let self.info.tw += (self.info.has_border? 2 : 0)
-	let self.info.th += (self.info.has_border? 2 : 0)
+	let info.tw = self.w + pad[1] + pad[3]
+	let info.th = self.h + pad[0] + pad[2]
+	let info.tw += (info.has_border? 2 : 0)
+	let info.th += (info.has_border? 2 : 0)
 	if self.winid < 0 
 		return
 	endif
@@ -461,6 +465,30 @@ function! s:window.resize(w, h)
 		let opts.maxheight = self.h
 		call popup_move(self.winid, opts)
 	else
+		let opts = info.nvim_opts
+		let opts.width = self.w
+		let opts.height = self.h
+		if info.has_border
+			let opts = info.border_opts
+			let opts.width = info.tw
+			let opts.height = info.th
+			let t = get(self.opts, 'title', '')
+			let b = self.opts.border
+			let tw = info.tw
+			let th = info.th
+			let back = quickui#utils#make_border(tw - 2, th - 2, b, t, 0)
+			call quickui#core#buffer_update(info.border_bid, back)
+		endif
+		if self.winid >= 0
+			let op = {'width':self.w, 'height':self.h}
+			call nvim_win_set_config(self.winid, op)
+			if info.has_border
+				if info.border_winid >= 0
+					let op = {'width':info.tw, 'height':info.th}
+					call nvim_win_set_config(info.border_winid, op)
+				endif
+			endif
+		endif
 	endif
 endfunc
 
