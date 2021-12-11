@@ -16,7 +16,6 @@
 function! quickui#confirm#build_buttons(choices)
 	let choices = quickui#utils#text_list_normalize(a:choices)
 	let items = []
-	let style = a:style
 	let max_size = 4
 	for choice in choices
 		let item = quickui#utils#item_parse(choice)
@@ -39,6 +38,34 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" synthesis button line
+"----------------------------------------------------------------------
+function! quickui#confirm#synthesis(items, style)
+	let items = a:items
+	let final = ''
+	let start = 0
+	let index = len(a:items) - 1
+	for item in a:items
+		let text = ' ' . item.text . ' '
+		let item.offset = -1
+		if item.key_pos >= 0
+			let item.offset = start + 1 + item.key_pos
+		endif
+		let item.start = start
+		let item.endup = item.text_width + 2
+		let start += item.text_width + 2
+		let final .= text
+		if index > 0
+			let final .= '  '
+			let start += 2
+		endif
+		let index -= 1
+	endfor
+	return final
+endfunc
+
+
+"----------------------------------------------------------------------
 " calculate requirements
 "----------------------------------------------------------------------
 function! s:init(text, choices, index, title)
@@ -48,11 +75,6 @@ function! s:init(text, choices, index, title)
 	let hwnd.index = a:index
 	let btn_size = 4
 	let button = ''
-	let index = len(hwnd.items) - 1
-	for item in hwnd.items
-		let butten += ' '
-		let button += ' ' . item.text . ' '
-	endfor
 	let hwnd.btn_size = btn_size
 	let text_width = 40
 	for text in hwnd.text
