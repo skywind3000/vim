@@ -68,6 +68,7 @@ if has_key(s:enabled, 'simple')
 	Plug 'justinmk/vim-dirvish'
 	Plug 'justinmk/vim-sneak'
 	Plug 'tpope/vim-fugitive'
+	Plug 'rbong/vim-flog'
 	Plug 'tpope/vim-unimpaired'
 	Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
 	Plug 'bootleq/vim-cycle'
@@ -94,6 +95,7 @@ if has_key(s:enabled, 'simple')
 	IncScript site/bundle/dirvish.vim
 	IncScript site/bundle/cycle.vim
 	IncScript site/bundle/easymotion.vim
+	IncScript site/bundle/git.vim
 endif
 
 

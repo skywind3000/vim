@@ -443,3 +443,4 @@ if has('nvim') && (has('win32') || has('win64'))
 	cnoremap <s-insert> <c-r>*
 endif
 
+

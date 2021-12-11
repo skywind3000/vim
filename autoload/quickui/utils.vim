@@ -622,3 +622,22 @@ function! quickui#utils#read_eval(...)
 endfunc
 
 
+"----------------------------------------------------------------------
+" normalize textlist
+"----------------------------------------------------------------------
+function! quickui#utils#text_list_normalize(textlist)
+	if type(a:textlist) == v:t_list
+		let textlist = a:textlist
+	else
+		let textlist = split('' . a:textlist, '\n', 1)
+	endif
+	let out = []
+	for text in textlist
+		let text = substitute(text, '[\r\n\t]', ' ', 'g')
+		let out += [text]
+	endfor
+	return out
+endfunc
+
+
+

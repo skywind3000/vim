@@ -106,6 +106,7 @@ call quickui#menu#install("&Git", [
 			\ ['Fugitive P&ush', 'Gpush'],
 			\ ['Fugitive Fe&tch', 'Gfetch'],
 			\ ['Fugitive R&ead', 'Gread'],
+			\ ["Fugitive Flog\t(vim-flog)", 'Flog'],
 			\ ])
 
 
