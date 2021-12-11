@@ -72,6 +72,7 @@ function! s:init(text, choices, index, title)
 	let hwnd = {}
 	let hwnd.text = quickui#utils#text_list_normalize(a:text)
 	let hwnd.items = quickui#confirm#build_buttons(choices, 0)
+	let hwnd.final = quickui#confirm#synthesis(hwnd.items)
 	let hwnd.index = a:index
 	let btn_size = 4
 	let button = ''
@@ -81,9 +82,9 @@ function! s:init(text, choices, index, title)
 		let ts = strdisplaywidth(text)
 		let text_width = (text_width < ts)? ts : text_width
 	endfor
-	let hwnd.btn_width = (btn_size + 1) * len(hwnd.items)
+	let hwnd.btn_width = strdisplaywidth(hwnd.final)
 	let hwnd.text_width = text_width
-	let hwnd.w = (btn_width > text_width)? btn_width : text_width
+	let hwnd.w = (hwnd.btn_width > text_width)? hwnd.btn_width : text_width
 	let hwnd.h = len(hwnd.text) + 2
 	let hwnd.tw = hwnd.w + 4
 	let hwnd.th = hwnd.h + 4
