@@ -178,6 +178,10 @@ function! s:window.__vim_create()
 		call quickui#core#win_execute(winid, pc)
 		let self.info.pending_cmd = []
 	endif
+	let self.mode = 1
+	if get(self.opts, 'center', 0) != 0
+		call self.center()
+	endif
 	if self.hide == 0
 		call popup_show(winid)
 	endif
@@ -240,6 +244,9 @@ function! s:window.__nvim_create()
 		let info.border_init = init
 	endif
 	let self.mode = 1
+	if get(self.opts, 'center', 0) != 0
+		call self.center()
+	endif
 	if self.hide == 0
 		call self.__nvim_show()
 	endif
