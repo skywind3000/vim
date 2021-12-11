@@ -621,6 +621,49 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" syntax begin
+"----------------------------------------------------------------------
+function! s:window.syntax_begin(...)
+	let info = self.info
+	let info.syntax_cmd = ['syn clear']
+	let info.syntax_mod = (a:0 < 1)? 1 : (a:1)
+endfunc
+
+
+"----------------------------------------------------------------------
+" flush commands
+"----------------------------------------------------------------------
+function! s:window.syntax_end()
+	let info = self.info
+	if has_key(info, 'syntax_cmd') != 0
+		if len(info.syntax_cmd) > 0
+			call self.execute(info.syntax_cmd)
+			let info.syntax_cmd = []
+		endif
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" calculate region
+"----------------------------------------------------------------------
+function! s:window.syntax_region(color, x1, y1, x2, y2)
+	let info = self.info
+	if has_key(info, 'syntax_cmd') != 0
+		let x1 = a:x1 + 1
+		let y1 = a:y1 + 1
+		let x2 = a:x2 + 1
+		let y2 = a:y2 + 1
+		let cc = a:color
+		let mm = info.syntax_mod
+		let cmd = quickui#core#high_region(cc, y1, x1, y2, x2, mm)
+		let info.syntax_cmd += [cmd]
+		" echom cmd
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " constructor
 "----------------------------------------------------------------------
 function! quickui#window#new()

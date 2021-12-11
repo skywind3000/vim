@@ -27,6 +27,8 @@ function! s:button_prepare(choices)
 		let width = item.text_width
 		let pad1 = (max_size - width) / 2
 		let pad2 = max_size - width - pad1
+		" let pad1 += 1
+		" let pad2 += 1
 		let item.text = repeat(' ', pad1) . item.text . repeat(' ', pad2)
 		if item.key_pos >= 0
 			let item.key_pos += pad1
@@ -52,7 +54,7 @@ function! s:button_finalize(items, style)
 			let item.offset = start + 1 + item.key_pos
 		endif
 		let item.start = start
-		let item.endup = item.text_width + 2
+		let item.endup = start + item.text_width + 2
 		let start += item.text_width + 2
 		let final .= text
 		if index > 0
@@ -68,7 +70,7 @@ endfunc
 "----------------------------------------------------------------------
 " calculate requirements
 "----------------------------------------------------------------------
-function! quickui#confirm#init(text, choices, index, title)
+function! s:init(text, choices, index, title)
 	let hwnd = {}
 	let hwnd.text = quickui#utils#text_list_normalize(a:text)
 	let hwnd.items = s:button_prepare(a:choices)
@@ -105,15 +107,49 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" render
+"----------------------------------------------------------------------
+function! s:render(hwnd)
+	let hwnd = a:hwnd
+	let win = hwnd.win
+	let off = hwnd.padding
+	let top = hwnd.h - 1
+	let index = 0
+	let c1 = 'QuickSel'
+	let c2 = 'QuickVisual'
+	let ck = 'QuickKey'
+	let ck = 'QuickUnder'
+	call win.syntax_begin(1)
+	for item in hwnd.items
+		let x = item.start
+		let e = item.endup
+		let color = (index == hwnd.index)? c1 : c2
+		if item.offset >= 0
+			let u = item.offset + off
+			call win.syntax_region(ck, u, top, u + 1, top)
+			" echom 'offset: ' . item.offset . ' x: '. x . ' top: ' . top
+		endif
+		if index == hwnd.index || 1
+			call win.syntax_region(color, off + x, top, off + e, top)
+		endif
+		let index += 1
+	endfor
+	call win.syntax_region(ck, 12, 0, 13, 0)
+	call win.syntax_end()
+endfunc
+
+
+"----------------------------------------------------------------------
 " main entry
 "----------------------------------------------------------------------
 function! quickui#confirm#open(text, choices, ...)
 	let index = (a:0 < 1)? 0 : (a:1)
 	let title = (a:0 < 2)? '' : (a:2)
-	let hwnd = quickui#confirm#init(a:text, a:choices, index, title)
+	let hwnd = s:init(a:text, a:choices, index, title)
 	let win = hwnd.win
 	call win.open(hwnd.content, hwnd.opts)
 	" call win.center(1)
+	call s:render(hwnd)
 	redraw
 	echo getchar()
 	call win.close()
