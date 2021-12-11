@@ -13,7 +13,7 @@
 "----------------------------------------------------------------------
 " build buttons
 "----------------------------------------------------------------------
-function! quickui#confirm#build_buttons(choices)
+function! s:button_prepare(choices)
 	let choices = quickui#utils#text_list_normalize(a:choices)
 	let items = []
 	let max_size = 4
@@ -40,7 +40,7 @@ endfunc
 "----------------------------------------------------------------------
 " synthesis button line
 "----------------------------------------------------------------------
-function! quickui#confirm#synthesis(items, style)
+function! s:button_finalize(items, style)
 	let items = a:items
 	let final = ''
 	let start = 0
@@ -68,23 +68,21 @@ endfunc
 "----------------------------------------------------------------------
 " calculate requirements
 "----------------------------------------------------------------------
-function! s:init(text, choices, index, title)
+function! quickui#confirm#init(text, choices, index, title)
 	let hwnd = {}
 	let hwnd.text = quickui#utils#text_list_normalize(a:text)
-	let hwnd.items = quickui#confirm#build_buttons(choices, 0)
-	let hwnd.final = quickui#confirm#synthesis(hwnd.items)
+	let hwnd.items = s:button_prepare(a:choices)
+	let hwnd.final = s:button_finalize(hwnd.items, 0)
 	let hwnd.index = a:index
-	let btn_size = 4
 	let button = ''
-	let hwnd.btn_size = btn_size
-	let text_width = 40
+	let text_size = 40
 	for text in hwnd.text
 		let ts = strdisplaywidth(text)
-		let text_width = (text_width < ts)? ts : text_width
+		let text_size = (text_size < ts)? ts : text_size
 	endfor
-	let hwnd.btn_width = strdisplaywidth(hwnd.final)
-	let hwnd.text_width = text_width
-	let hwnd.w = (hwnd.btn_width > text_width)? hwnd.btn_width : text_width
+	let hwnd.btn_size = strdisplaywidth(hwnd.final)
+	let hwnd.text_size = text_size
+	let hwnd.w = (hwnd.btn_size > text_size)? hwnd.btn_size : text_size
 	let hwnd.h = len(hwnd.text) + 2
 	let hwnd.tw = hwnd.w + 4
 	let hwnd.th = hwnd.h + 4
@@ -96,7 +94,9 @@ function! s:init(text, choices, index, title)
 	let opts.title = (a:title == '')? '' : (' ' . a:title . ' ')
 	let hwnd.opts = opts
 	let content = deepcopy(hwnd.text)
-	let content += ['']
+	let content += [' ', ' ']
+	let hwnd.padding = hwnd.w - hwnd.btn_size
+	let content += [repeat(' ', hwnd.padding) . hwnd.final]
 	let hwnd.content = content
 	let hwnd.win = quickui#window#new()
 	return hwnd
