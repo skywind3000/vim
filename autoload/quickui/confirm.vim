@@ -83,7 +83,7 @@ function! quickui#confirm#init(text, choices, index, title)
 	let hwnd.btn_size = strdisplaywidth(hwnd.final)
 	let hwnd.text_size = text_size
 	let hwnd.w = (hwnd.btn_size > text_size)? hwnd.btn_size : text_size
-	let hwnd.h = len(hwnd.text) + 2
+	let hwnd.h = len(hwnd.text) + 3
 	let hwnd.tw = hwnd.w + 4
 	let hwnd.th = hwnd.h + 4
 	let opts = {}
@@ -92,6 +92,7 @@ function! quickui#confirm#init(text, choices, index, title)
 	let opts.border = g:quickui#style#border
 	let opts.center = 1
 	let opts.title = (a:title == '')? '' : (' ' . a:title . ' ')
+	let opts.padding = [1, 1, 1, 1]
 	let hwnd.opts = opts
 	let content = deepcopy(hwnd.text)
 	let content += [' ', ' ']
@@ -109,7 +110,14 @@ endfunc
 function! quickui#confirm#open(text, choices, ...)
 	let index = (a:0 < 1)? 0 : (a:1)
 	let title = (a:0 < 2)? '' : (a:2)
-	let hwnd = s:init(text, choices, index, title)
+	let hwnd = quickui#confirm#init(a:text, a:choices, index, title)
+	let win = hwnd.win
+	call win.open(hwnd.content, hwnd.opts)
+	" call win.center(1)
+	redraw
+	echo getchar()
+	call win.close()
+	return hwnd
 endfunc
 
 

@@ -444,21 +444,29 @@ endfunc
 "----------------------------------------------------------------------
 " center window
 "----------------------------------------------------------------------
-function! s:window.center()
+function! s:window.center(...)
 	let w = self.w
 	let h = self.h
+	let style = (a:0 < 1)? 0 : (a:1)
 	if self.mode != 0
 		let w = self.info.tw
 		let h = self.info.th
 	endif
 	let x = (&columns - w) / 2
-	let y = (&lines - h) / 2
-	let limit1 = (&lines - 2) * 80 / 100
-	let limit2 = (&lines - 2)
-	if h + 8 < limit1
-		let y = (limit1 - h) / 2
+	if style == 0
+		let height = &lines - &cmdheight - 1
+		let middle = height * 38 / 100
+		let y = middle - (h + 1) / 2
+		let y = (y < 0)? 0 : y
 	else
-		let y = (limit2 - h) / 2
+		let y = (&lines - h) / 2
+		let limit1 = (&lines - 2) * 80 / 100
+		let limit2 = (&lines - 2)
+		if h + 8 < limit1
+			let y = (limit1 - h) / 2
+		else
+			let y = (limit2 - h) / 2
+		endif
 	endif
 	call self.move(x, y)
 endfunc
