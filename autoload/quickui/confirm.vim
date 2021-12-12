@@ -72,8 +72,8 @@ endfunc
 "----------------------------------------------------------------------
 function! s:hl_prepare(hwnd)
 	let hwnd = a:hwnd
-	let c1 = get(g:, 'quickui_button_color_on', 'QuickCursor')
-	let c2 = get(g:, 'quickui_button_color_off', 'QuickInput')
+	let c1 = get(g:, 'quickui_button_color_on', 'QuickVisual')
+	let c2 = get(g:, 'quickui_button_color_off', 'QuickSel')
 	let ck = get(g:, 'quickui_button_color_key', 'QuickKey')
 	let hwnd.color_on = c1
 	let hwnd.color_off = c2
@@ -83,6 +83,8 @@ function! s:hl_prepare(hwnd)
 		call quickui#highlight#combine('QuickButtonOn2', c1, ck)
 		call quickui#highlight#combine('QuickButtonOff2', c2, ck)
 	else
+		call quickui#highlight#make_underline('QuickButtonOn2', c1)
+		call quickui#highlight#make_underline('QuickButtonOff2', c2)
 	endif
 endfunc
 
