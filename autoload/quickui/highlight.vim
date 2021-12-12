@@ -131,6 +131,18 @@ endfunc
 " combine foreground and background colors
 "----------------------------------------------------------------------
 function! quickui#highlight#combine(newname, background, foreground)
+	let hr1 = hlget(a:background, 1)
+	let hr2 = hlget(a:foreground, 1)
+	let info1 = empty(hr1)? {} : hr1[0]
+	let info2 = empty(hr2)? {} : hr2[0]
+	for key in ['ctermfg', 'guifg']
+		if has_key(info2, key)
+			let info1[key] = info2[key]
+		endif
+	endfor
+	let info1.name = a:newname
+	let info1.force = v:true
+	call hlset([info])
 endfunc
 
 
