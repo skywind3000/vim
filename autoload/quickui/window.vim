@@ -649,7 +649,9 @@ endfunc
 "----------------------------------------------------------------------
 function! s:window.syntax_region(color, x1, y1, x2, y2)
 	let info = self.info
-	if has_key(info, 'syntax_cmd') != 0
+	if a:y1 == a:y2 && a:x1 >= a:x2
+		return
+	elseif has_key(info, 'syntax_cmd') != 0
 		let x1 = a:x1 + 1
 		let y1 = a:y1 + 1
 		let x2 = a:x2 + 1
