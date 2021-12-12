@@ -68,6 +68,26 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" create highlight
+"----------------------------------------------------------------------
+function! s:hl_prepare(hwnd)
+	let hwnd = a:hwnd
+	let c1 = get(g:, 'quickui_button_color_on', 'QuickCursor')
+	let c2 = get(g:, 'quickui_button_color_off', 'QuickInput')
+	let ck = get(g:, 'quickui_button_color_key', 'QuickKey')
+	let hwnd.color_on = c1
+	let hwnd.color_off = c2
+	let hwnd.color_on2 = 'QuickButtonOn2'
+	let hwnd.color_off2 = 'QuickButtonOff2'
+	if 1
+		call quickui#highlight#combine('QuickButtonOn2', c1, ck)
+		call quickui#highlight#combine('QuickButtonOff2', c2, ck)
+	else
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " calculate requirements
 "----------------------------------------------------------------------
 function! s:init(text, choices, index, title)
@@ -102,7 +122,39 @@ function! s:init(text, choices, index, title)
 	let content += [repeat(' ', hwnd.padding) . hwnd.final]
 	let hwnd.content = content
 	let hwnd.win = quickui#window#new()
+	call s:hl_prepare(hwnd)
 	return hwnd
+endfunc
+
+
+"----------------------------------------------------------------------
+" 
+"----------------------------------------------------------------------
+function! s:draw_button(hwnd, index)
+	let hwnd = a:hwnd
+	let item = hwnd.items[a:index]
+	let index = a:index
+	let win = hwnd.win
+	let top = hwnd.h - 1
+	let off = hwnd.padding
+	let x = item.start
+	let e = item.endup
+	if hwnd.index == index
+		let c1 = hwnd.color_on
+		let c2 = hwnd.color_on2
+	else
+		let c1 = hwnd.color_off
+		let c2 = hwnd.color_off2
+	endif
+
+	if item.offset < 0
+		call win.syntax_region(c1, off + x, top, off + e, top)
+	else
+		let u = item.offset + off
+		call win.syntax_region(c1, off + x, top, u, top)
+		call win.syntax_region(c2, u, top, u + 1, top)
+		call win.syntax_region(c1, u + 1, top, off + e, top)
+	endif
 endfunc
 
 
@@ -115,26 +167,12 @@ function! s:render(hwnd)
 	let off = hwnd.padding
 	let top = hwnd.h - 1
 	let index = 0
-	let c1 = 'QuickSel'
-	let c2 = 'QuickVisual'
-	let ck = 'QuickKey'
-	let ck = 'QuickUnder'
 	call win.syntax_begin(1)
 	for item in hwnd.items
-		let x = item.start
-		let e = item.endup
-		let color = (index == hwnd.index)? c1 : c2
-		if item.offset >= 0
-			let u = item.offset + off
-			call win.syntax_region(ck, u, top, u + 1, top)
-			" echom 'offset: ' . item.offset . ' x: '. x . ' top: ' . top
-		endif
-		if index == hwnd.index || 1
-			" call win.syntax_region(color, off + x, top, off + e, top)
-		endif
+		call s:draw_button(hwnd, index)
 		let index += 1
 	endfor
-	call win.syntax_region(ck, 12, 0, 13, 0)
+	" call win.syntax_region(ck, 12, 0, 13, 0)
 	call win.syntax_end()
 endfunc
 

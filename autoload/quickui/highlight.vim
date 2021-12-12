@@ -142,7 +142,7 @@ function! quickui#highlight#combine(newname, background, foreground)
 	endfor
 	let info1.name = a:newname
 	let info1.force = v:true
-	call hlset([info])
+	call hlset([info1])
 endfunc
 
 
