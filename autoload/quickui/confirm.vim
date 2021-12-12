@@ -130,7 +130,7 @@ function! s:render(hwnd)
 			" echom 'offset: ' . item.offset . ' x: '. x . ' top: ' . top
 		endif
 		if index == hwnd.index || 1
-			call win.syntax_region(color, off + x, top, off + e, top)
+			" call win.syntax_region(color, off + x, top, off + e, top)
 		endif
 		let index += 1
 	endfor
