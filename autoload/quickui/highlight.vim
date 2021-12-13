@@ -3,7 +3,7 @@
 " highlight.vim - 
 "
 " Created by skywind on 2021/12/12
-" Last Modified: 2021/12/12 16:09
+" Last Modified: 2021/12/13 18:32
 "
 "======================================================================
 
@@ -20,11 +20,8 @@ let s:has_hlset = exists('*hlset')? 1 : 0
 "----------------------------------------------------------------------
 " get highlighting group
 "----------------------------------------------------------------------
-function! quickui#highlight#get(name)
+function! s:sim_hlget(name)
 	let error = 0
-	if s:has_hlget != 0
-		" return hlget(a:name)
-	endif
 	redir => g:quickui_highlight_tmp
 	try
 		exec 'silent hi ' . a:name
@@ -47,7 +44,6 @@ function! quickui#highlight#get(name)
 		if item.name == ''
 			continue
 		endif
-		echom text
 		let parts = split(text, ' ')
 		if empty(parts)
 			continue
@@ -82,11 +78,96 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" simulate hlset
+"----------------------------------------------------------------------
+function! s:sim_hlset(items)
+	let skip = {'name':1, 'id':1, 'linksto':1, 'force':1}
+	for item in a:items
+		let name = get(item, 'name', '')
+		if name == ''
+			continue
+		endif
+		let force = get(item, 'force', v:false)
+		let cmd = (force == 0)? 'hi ' : 'hi! '
+		if get(item, 'cleared', v:false) == v:true
+			exec cmd . 'clear ' . name
+		else
+			let part = []
+			for key in keys(item)
+				if has_key(skip, key) == 0
+					let val = item[key]
+					if type(val) == v:t_dict
+						let r = join(keys(val), ',')
+					else
+						let r = val
+					endif
+					let part += [key . '=' . r]
+				endif
+			endfor
+			let text = cmd . ' ' . name . ' ' . join(part, ' ')
+			exec text
+		endif
+	endfor
+endfunc
+
+
+"----------------------------------------------------------------------
+" get highlighting info
+"----------------------------------------------------------------------
+function! quickui#highlight#get(name, ...)
+	let resolve = (a:0 > 0)? (a:1) : 0
+	if s:has_hlget
+		" return hlget(a:name, resolve)
+	endif
+	if !resolve
+		return s:sim_hlget(a:name)
+	endif
+	let items = []
+	for item in s:sim_hlget(a:name)
+		if has_key(item, 'linksto') == 0
+			let items += [item]
+			continue
+		endif
+		let info = item
+		while 1
+			if has_key(info, 'linksto') == 0
+				break
+			endif
+			let links = info.linksto
+			let hr = s:sim_hlget(links)
+			if empty(hr)
+				break
+			endif
+			let info = hr[0]
+		endwhile
+		let info.name = item.name
+		let items += [info]
+	endfor
+	return items
+endfunc
+
+
+"----------------------------------------------------------------------
+" set highlight group
+"----------------------------------------------------------------------
+function! quickui#highlight#set(items)
+	if s:has_hlset
+		" return hlset(a:items)
+	endif
+	call s:sim_hlset(a:items)
+endfunc
+
+
+"----------------------------------------------------------------------
 " clear highlight
 "----------------------------------------------------------------------
 function! quickui#highlight#clear(name)
-	let info = {'name': a:name, 'cleared': v:true}
-	call hlset([info])
+	if s:has_hlset
+		let info = {'name': a:name, 'cleared': v:true}
+		call hlset([info])
+	else
+		exec 'hi! clear ' . a:name
+	endif
 endfunc
 
 
@@ -189,7 +270,7 @@ endfunc
 " add underline feature
 "----------------------------------------------------------------------
 function! quickui#highlight#make_underline(newname, name)
-	let hr = hlget(a:name, 1)
+	let hr = quickui#highlight#get(a:name, 1)
 	if len(hr) == 0
 		return -1
 	endif
@@ -202,7 +283,7 @@ function! quickui#highlight#make_underline(newname, name)
 	endif
 	let info.name = a:newname
 	let info.force = v:true
-	call hlset([info])
+	call quickui#highlight#set([info])
 	return info
 endfunc
 
@@ -212,8 +293,8 @@ endfunc
 " combine foreground and background colors
 "----------------------------------------------------------------------
 function! quickui#highlight#overlay(newname, background, foreground)
-	let hr1 = hlget(a:background, 1)
-	let hr2 = hlget(a:foreground, 1)
+	let hr1 = quickui#highlight#get(a:background, 1)
+	let hr2 = quickui#highlight#get(a:foreground, 1)
 	let info1 = empty(hr1)? {} : hr1[0]
 	let info2 = empty(hr2)? {} : hr2[0]
 	for key in ['ctermfg', 'guifg']
@@ -223,7 +304,7 @@ function! quickui#highlight#overlay(newname, background, foreground)
 	endfor
 	let info1.name = a:newname
 	let info1.force = v:true
-	call hlset([info1])
+	call quickui#highlight#set([info1])
 endfunc
 
 

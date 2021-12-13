@@ -3,7 +3,7 @@
 " confirm.vim - 
 "
 " Created by skywind on 2021/12/11
-" Last Modified: 2021/12/11 21:02:59
+" Last Modified: 2021/12/13 18:32
 "
 "======================================================================
 
@@ -238,9 +238,9 @@ function! quickui#confirm#open(text, choices, ...)
 				if hwnd.index < size - 1
 					let hwnd.index += 1
 				endif
-			elseif key == 'HOME' || key == 'UP'
+			elseif key == 'HOME' || key == 'UP' || key == 'PAGEUP'
 				let hwnd.index = 0
-			elseif key == 'END' || key == 'DOWN'
+			elseif key == 'END' || key == 'DOWN' || key == 'PAGEDOWN'
 				let hwnd.index = size - 1
 			elseif key =~ '^ACCEPT:'
 				let key = strpart(key, 7)
