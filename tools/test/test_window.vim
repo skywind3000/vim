@@ -6,6 +6,7 @@ let opts.y = 2
 let opts.title = ' Hello, World '
 let opts.border = 'default'
 let opts.padding = [0, 1, 0, 1]
+let opts.button = 1
 " let opts.center = 1
 " let opts.hide = 1
 let text = ['012345678901234567890123456789', 'abcdef']
@@ -32,6 +33,7 @@ call win.show(1)
 call win.resize(30, 7)
 call win.center()
 redraw
+echo win.quit
 call getchar()
 
 call win.close()

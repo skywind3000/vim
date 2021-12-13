@@ -27,6 +27,7 @@ let s:window.hide = 0         " visibility
 let s:window.mode = 0         " mode: 0/created, 1/closed
 let s:window.opts = {}        " creation options
 let s:window.info = {}        " init environment
+let s:window.quit = 0         " closed by button ? (vim only)
 
 
 "----------------------------------------------------------------------
@@ -127,6 +128,20 @@ endfunc
 " win filter
 "----------------------------------------------------------------------
 function! s:popup_filter(winid, key)
+	let local = quickui#core#popup_local(a:winid)
+	let hwnd = local.window_hwnd
+endfunc
+
+
+"----------------------------------------------------------------------
+" exited
+"----------------------------------------------------------------------
+function! s:popup_exit(winid, code)
+	let local = quickui#core#popup_local(a:winid)
+	let hwnd = local.window_hwnd
+	call quickui#core#popup_clear(a:winid)
+	let hwnd.quit = 1
+	let hwnd.winid = -1
 endfunc
 
 
@@ -149,13 +164,19 @@ function! s:window.__vim_create()
 	let opts.drag = get(self.opts, 'drag', 0)
 	let opts.scrollbar = 0
 	let opts.zindex = self.z + 1
+	if get(self.opts, 'button', 0) != 0
+		let opts.close = 'button'
+	endif
 	let self.winid = popup_create(self.bid, opts)
-	let self.filter = function('s:popup_filter')
 	let winid = self.winid
+	let local = quickui#core#popup_local(winid)
+	let local.window_hwnd = self
 	let init = []
 	let init += ['setlocal nonumber signcolumn=no scrolloff=0']
 	call quickui#core#win_execute(winid, init, 1)
 	let opts = {}
+	let opts.filter = function('s:popup_filter')
+	let opts.callback = function('s:popup_exit')
 	let opts.highlight = self.opts.color
 	let border = quickui#core#border_auto(self.opts.border)
 	if len(border) > 0
@@ -197,6 +218,7 @@ function! s:window.__nvim_create()
 	let opts.col = self.x
 	let opts.width = self.w
 	let opts.height = self.h
+	let opts.focusable = get(self.opts, 'focusable', 0)
 	if s:has_nvim_060
 		let opts.noautocmd = 1
 		let opts.zindex = self.z + 1
@@ -223,11 +245,13 @@ function! s:window.__nvim_create()
 		let opts.col += info.off_x
 		let opts.row += info.off_y
 		let t = get(self.opts, 'title', '')
+		let b = get(self.opts, 'button', 0)
 		let border = self.opts.border
-		let back = quickui#utils#make_border(tw - 2, th - 2, border, t, 0)
+		let back = quickui#utils#make_border(tw - 2, th - 2, border, t, b)
 		let info.border_bid = quickui#core#buffer_alloc()
 		call quickui#core#buffer_update(info.border_bid, back)
 		let op = {'relative':'editor', 'focusable':0, 'style':'minimal'}
+		let op.focusable = get(self.opts, 'focusable', 0)
 		let op.width = tw
 		let op.height = th
 		let op.col = self.x
@@ -511,7 +535,8 @@ function! s:window.resize(w, h)
 			let b = self.opts.border
 			let tw = info.tw
 			let th = info.th
-			let back = quickui#utils#make_border(tw - 2, th - 2, b, t, 0)
+			let btn = get(self.opts, 'button', 0)
+			let back = quickui#utils#make_border(tw - 2, th - 2, b, t, btn)
 			call quickui#core#buffer_update(info.border_bid, back)
 		endif
 		if self.winid >= 0

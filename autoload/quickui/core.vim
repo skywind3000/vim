@@ -221,12 +221,21 @@ endfunc
 "----------------------------------------------------------------------
 " tabpage instance
 "----------------------------------------------------------------------
-function! quickui#core#instance()
-	if exists('t:__quickui__')
+function! quickui#core#instance(local)
+	let local = a:local
+	if local != 0
+		if exists('t:__quickui__')
+			return t:__quickui__
+		endif
+		let t:__quickui__ = {}
 		return t:__quickui__
+	else
+		if exists('g:__quickui__')
+			return g:__quickui__
+		endif
+		let g:__quickui__ = {}
+		return g:__quickui__
 	endif
-	let t:__quickui__ = {}
-	return t:__quickui__
 endfunc
 
 
@@ -252,7 +261,7 @@ endfunc
 " object cache: acquire
 "----------------------------------------------------------------------
 function! quickui#core#popup_alloc(name)
-	let inst = quickui#core#instance()
+	let inst = quickui#core#instance(1)
 	if !has_key(inst, 'popup_cache')
 		let inst.popup_cache = {}
 	endif
@@ -276,7 +285,7 @@ endfunc
 " object cache: release
 "----------------------------------------------------------------------
 function! quickui#core#popup_release(name, winid)
-	let inst = quickui#core#instance()
+	let inst = quickui#core#instance(1)
 	if !has_key(inst, 'popup_cache')
 		let inst.popup_cache = {}
 	endif
@@ -293,7 +302,7 @@ endfunc
 " local object
 "----------------------------------------------------------------------
 function! quickui#core#popup_local(winid)
-	let inst = quickui#core#instance()
+	let inst = quickui#core#instance(0)
 	if !has_key(inst, 'popup_local')
 		let inst.popup_local = {}
 	endif
@@ -308,7 +317,7 @@ endfunc
 " erase local data
 "----------------------------------------------------------------------
 function! quickui#core#popup_clear(winid)
-	let inst = quickui#core#instance()
+	let inst = quickui#core#instance(0)
 	if !has_key(inst, 'popup_local')
 		let inst.popup_local = {}
 	endif
