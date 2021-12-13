@@ -246,13 +246,14 @@ function! quickui#confirm#open(text, choices, ...)
 			let accept = 0
 			break
 		elseif ch == "\<LeftMouse>"
-			let x = v:mouse_col - 1
-			let y = v:mouse_lnum - 1
 			if has('nvim') == 0
-				let x -= 2
-				let y -= 2
+				let pos = getmousepos()
+				let x = pos.column - 1
+				let y = pos.line - 1
+			else
+				let x = v:mouse_col - 1
+				let y = v:mouse_lnum - 1
 			endif
-			echo "winid:" . win.winid . " target:" . v:mouse_winid . ' ' . x. '/' .y
 			if v:mouse_winid == win.winid
 				if y == hwnd.h - 1 && x >= hwnd.padding
 					let u = x - hwnd.padding
@@ -265,6 +266,11 @@ function! quickui#confirm#open(text, choices, ...)
 					if accept > 0
 						break
 					endif
+				endif
+			elseif v:mouse_winid == win.info.border_winid
+				if y == 0 && x == win.info.tw - 1
+					let accept = 0
+					break
 				endif
 			endif
 		else
