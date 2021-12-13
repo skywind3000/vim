@@ -3,7 +3,7 @@
 " confirm.vim - 
 "
 " Created by skywind on 2021/12/11
-" Last Modified: 2021/12/13 21:51
+" Last Modified: 2021/12/13 22:07
 "
 "======================================================================
 
@@ -215,10 +215,11 @@ endfunc
 "----------------------------------------------------------------------
 " main entry
 "----------------------------------------------------------------------
-function! quickui#confirm#open(text, choices, ...)
-	let index = (a:0 < 1)? 0 : (a:1)
-	let title = (a:0 < 2)? '' : (a:2)
-	let hwnd = s:init(a:text, a:choices, index - 1, title)
+function! quickui#confirm#open(text, ...)
+	let choices = (a:0 < 1)? " &OK " : (a:1)
+	let index = (a:0 < 2)? 1 : (a:2)
+	let title = (a:0 < 3)? 'Confirm' : (a:3)
+	let hwnd = s:init(a:text, choices, index - 1, title)
 	let win = hwnd.win
 	let accept = 0
 	let size = len(hwnd.items)
