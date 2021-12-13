@@ -128,6 +128,7 @@ function! s:init(text, choices, index, title)
 	let opts.center = 1
 	let opts.title = (a:title == '')? '' : (' ' . a:title . ' ')
 	let opts.padding = [1, 1, 1, 1]
+	let opts.button = 1
 	let hwnd.opts = opts
 	let content = deepcopy(hwnd.text)
 	let content += [' ', ' ']
@@ -230,8 +231,12 @@ function! quickui#confirm#open(text, choices, ...)
 		elseif ch == "\<space>" || ch == "\<cr>"
 			let accept = hwnd.index + 1
 			break
+		elseif win.quit != 0
+			let accept = 0
+			break
+		elseif ch == "\<LeftMouse>"
 		else
-			let key = get(hwnd.keymap, ch, '')
+			let key = get(hwnd.keymap, ch, ch)
 			if key == 'LEFT'
 				let hwnd.index = (hwnd.index > 0)? (hwnd.index - 1) : 0
 			elseif key == 'RIGHT'
@@ -252,6 +257,13 @@ function! quickui#confirm#open(text, choices, ...)
 			endif
 		endif
 	endwhile
+
+	if accept > 0 && win.quit == 0
+		let hwnd.index = accept - 1
+		call s:render(hwnd)
+		redraw
+		sleep 15m
+	endif
 
 	call win.close()
 
