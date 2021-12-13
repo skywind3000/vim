@@ -48,10 +48,10 @@ function! s:button_finalize(items, style)
 	let start = 0
 	let index = len(a:items) - 1
 	for item in a:items
-		if 1
+		if 0
 			let text = ' ' . item.text . ' '
 		else
-			let text = '[' . item.text . ']'
+			let text = '<' . item.text . '>'
 		endif
 		let item.offset = -1
 		let need = 0
