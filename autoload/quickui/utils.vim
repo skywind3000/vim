@@ -641,3 +641,30 @@ endfunc
 
 
 
+"----------------------------------------------------------------------
+" getchar
+"----------------------------------------------------------------------
+function! quickui#utils#getchar(wait)
+	try
+		if a:wait != 0
+			let code = getchar()
+		else
+			let code = getchar(0)
+		endif
+	catch /^Vim:Interrupt$/
+		let code = "\<C-C>"
+	endtry
+	if type(code) == v:t_number && code == 0
+		try
+			exec 'sleep 15m'
+			continue
+		catch /^Vim:Interrupt$/
+			let code = "\<c-c>"
+		endtry
+	endif
+	let ch = (type(code) == v:t_number)? nr2char(code) : code
+	return ch
+endfunc
+
+
+

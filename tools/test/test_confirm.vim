@@ -9,10 +9,7 @@ if 0
 	endfor
 endif
 
-let hwnd = quickui#confirm#open(question, choices, 0, 'Confirm')
-let off = hwnd.padding
-for item in hwnd.items
-	" echo [off + item.start, off + item.endup]
-	" echo '[' . item.text . ']'
-endfor
+let accept = quickui#confirm#open(question, choices, 1, 'Confirm')
+
+echo accept
 

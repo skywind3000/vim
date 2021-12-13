@@ -135,6 +135,17 @@ function! s:init(text, choices, index, title)
 	let content += [repeat(' ', hwnd.padding) . hwnd.final]
 	let hwnd.content = content
 	let hwnd.win = quickui#window#new()
+	let hwnd.keymap = quickui#utils#keymap()
+	let index = 1
+	for item in hwnd.items
+		if item.key_pos >= 0
+			let ch = tolower(item.key_char)
+			let hwnd.keymap[ch] = 'ACCEPT:' . index
+		endif
+		let index += 1
+	endfor
+	let hwnd.keymap['h'] = 'LEFT'
+	let hwnd.keymap['l'] = 'RIGHT'
 	call s:hl_prepare(hwnd)
 	return hwnd
 endfunc
@@ -198,15 +209,53 @@ endfunc
 function! quickui#confirm#open(text, choices, ...)
 	let index = (a:0 < 1)? 0 : (a:1)
 	let title = (a:0 < 2)? '' : (a:2)
-	let hwnd = s:init(a:text, a:choices, index, title)
+	let hwnd = s:init(a:text, a:choices, index - 1, title)
 	let win = hwnd.win
+	let accept = 0
+	let size = len(hwnd.items)
+
+	if size == 0
+		return 0
+	endif
+
 	call win.open(hwnd.content, hwnd.opts)
-	" call win.center(1)
-	call s:render(hwnd)
-	redraw
-	echo getchar()
+
+	while 1
+		call s:render(hwnd)
+		redraw
+		let ch = quickui#utils#getchar(1)
+		if ch == "\<c-c>" || ch == "\<esc>"
+			let accept = 0
+			break
+		elseif ch == "\<space>" || ch == "\<cr>"
+			let accept = hwnd.index + 1
+			break
+		else
+			let key = get(hwnd.keymap, ch, '')
+			if key == 'LEFT'
+				let hwnd.index = (hwnd.index > 0)? (hwnd.index - 1) : 0
+			elseif key == 'RIGHT'
+				if hwnd.index < size - 1
+					let hwnd.index += 1
+				endif
+			elseif key == 'HOME' || key == 'UP'
+				let hwnd.index = 0
+			elseif key == 'END' || key == 'DOWN'
+				let hwnd.index = size - 1
+			elseif key =~ '^ACCEPT:'
+				let key = strpart(key, 7)
+				let index = str2nr(key)
+				if index > 0 && index <= size
+					let accept = index
+					break
+				endif
+			endif
+		endif
+	endwhile
+
 	call win.close()
-	return hwnd
+
+	return accept
 endfunc
 
 
