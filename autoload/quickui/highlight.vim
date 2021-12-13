@@ -11,6 +11,77 @@
 
 
 "----------------------------------------------------------------------
+" internal
+"----------------------------------------------------------------------
+let s:has_hlget = exists('*hlget')? 1 : 0
+let s:has_hlset = exists('*hlset')? 1 : 0
+
+
+"----------------------------------------------------------------------
+" get highlighting group
+"----------------------------------------------------------------------
+function! quickui#highlight#get(name)
+	let error = 0
+	if s:has_hlget != 0
+		" return hlget(a:name)
+	endif
+	redir => g:quickui_highlight_tmp
+	try
+		exec 'silent hi ' . a:name
+	catch
+		let error = 1
+	endtry
+	redir END
+	if error != 0
+		return []
+	endif
+	let capture = g:quickui_highlight_tmp
+	let items = []
+	for text in split(capture, '\n')
+		let text = quickui#core#string_strip(text)
+		if text == ''
+			continue
+		endif
+		let item = {}
+		let item.name = matchstr(text, '^\w\+')
+		if item.name == ''
+			continue
+		endif
+		echom text
+		let parts = split(text, ' ')
+		if empty(parts)
+			continue
+		endif
+		if text =~ ' cleared$'
+			let item.cleared = v:true
+		elseif text =~ ' links to \w\+$'
+			let links = matchstr(text, ' links to \zs\w\+$')
+			let item.linksto = quickui#core#string_strip(links)
+		else
+			for part in parts[1:]
+				if part =~ '\w\+='
+					let key = matchstr(part, '^\w\+')
+					let val = matchstr(part, '^\w\+=\zs\%(\\.\|\S\)*')
+					if key == 'term' || key == 'cterm' || key == 'gui'
+						let opts = {}
+						for element in split(val, ',')
+							let opts[element] = v:true
+						endfor
+						let item[key] = opts
+					else
+						let item[key] = val
+					endif
+				elseif part == 'cleared'
+				endif
+			endfor
+		endif
+		let items += [item]
+	endfor
+	return items
+endfunc
+
+
+"----------------------------------------------------------------------
 " clear highlight
 "----------------------------------------------------------------------
 function! quickui#highlight#clear(name)

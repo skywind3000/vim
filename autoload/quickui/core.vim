@@ -811,4 +811,21 @@ function! quickui#core#write_script(command, pause)
 endfunc
 
 
+"----------------------------------------------------------------------
+" string replace
+"----------------------------------------------------------------------
+function! quickui#core#string_replace(text, old, new)
+	let data = split(a:text, a:old, 1)
+	return join(data, a:new)
+endfunc
+
+
+"----------------------------------------------------------------------
+" string strip
+"----------------------------------------------------------------------
+function! quickui#core#string_strip(text)
+	return substitute(a:text, '^\s*\(.\{-}\)[\s\r\n]*$', '\1', '')
+endfunc
+
+
 
