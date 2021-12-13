@@ -48,14 +48,23 @@ function! s:button_finalize(items, style)
 	let start = 0
 	let index = len(a:items) - 1
 	for item in a:items
-		let text = ' ' . item.text . ' '
+		if 1
+			let text = ' ' . item.text . ' '
+		else
+			let text = '[' . item.text . ']'
+		endif
 		let item.offset = -1
+		let need = 0
+		if 0
+			let need = 1
+			let text = '[' . text . ']'
+		endif
 		if item.key_pos >= 0
-			let item.offset = start + 1 + item.key_pos
+			let item.offset = start + 1 + item.key_pos + need
 		endif
 		let item.start = start
-		let item.endup = start + item.text_width + 2
-		let start += item.text_width + 2
+		let item.endup = start + item.text_width + 2 + need * 2
+		let start += item.text_width + 2 + need * 2
 		let final .= text
 		if index > 0
 			let final .= '  '
@@ -72,16 +81,18 @@ endfunc
 "----------------------------------------------------------------------
 function! s:hl_prepare(hwnd)
 	let hwnd = a:hwnd
-	let c1 = get(g:, 'quickui_button_color_on', 'QuickVisual')
-	let c2 = get(g:, 'quickui_button_color_off', 'QuickSel')
+	let c1 = get(g:, 'quickui_button_color_on', 'QuickSel')
+	let c2 = get(g:, 'quickui_button_color_off', 'QuickBG')
 	let ck = get(g:, 'quickui_button_color_key', 'QuickKey')
 	let hwnd.color_on = c1
 	let hwnd.color_off = c2
 	let hwnd.color_on2 = 'QuickButtonOn2'
 	let hwnd.color_off2 = 'QuickButtonOff2'
-	if 1
-		call quickui#highlight#combine('QuickButtonOn2', c1, ck)
-		call quickui#highlight#combine('QuickButtonOff2', c2, ck)
+	call quickui#highlight#clear('QuickBUttonOn2')
+	call quickui#highlight#clear('QuickBUttonOff2')
+	if 0
+		call quickui#highlight#overlay('QuickButtonOn2', c1, ck)
+		call quickui#highlight#overlay('QuickButtonOff2', c2, ck)
 	else
 		call quickui#highlight#make_underline('QuickButtonOn2', c1)
 		call quickui#highlight#make_underline('QuickButtonOff2', c2)
@@ -144,11 +155,13 @@ function! s:draw_button(hwnd, index)
 	if hwnd.index == index
 		let c1 = hwnd.color_on
 		let c2 = hwnd.color_on2
+		" let c1 = 'QuickSel'
 	else
 		let c1 = hwnd.color_off
 		let c2 = hwnd.color_off2
+		" let c1 = 'QuickBG'
+		" return
 	endif
-
 	if item.offset < 0
 		call win.syntax_region(c1, off + x, top, off + e, top)
 	else

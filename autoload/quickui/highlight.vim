@@ -9,6 +9,16 @@
 
 " vim: set ts=4 sw=4 tw=78 noet :
 
+
+"----------------------------------------------------------------------
+" clear highlight
+"----------------------------------------------------------------------
+function! quickui#highlight#clear(name)
+	let info = {'name': a:name, 'cleared': v:true}
+	call hlset([info])
+endfunc
+
+
 "----------------------------------------------------------------------
 " term add feature
 "----------------------------------------------------------------------
@@ -130,7 +140,7 @@ endfunc
 "----------------------------------------------------------------------
 " combine foreground and background colors
 "----------------------------------------------------------------------
-function! quickui#highlight#combine(newname, background, foreground)
+function! quickui#highlight#overlay(newname, background, foreground)
 	let hr1 = hlget(a:background, 1)
 	let hr2 = hlget(a:foreground, 1)
 	let info1 = empty(hr1)? {} : hr1[0]
