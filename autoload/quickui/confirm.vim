@@ -3,7 +3,7 @@
 " confirm.vim - 
 "
 " Created by skywind on 2021/12/11
-" Last Modified: 2021/12/13 18:32
+" Last Modified: 2021/12/13 21:51
 "
 "======================================================================
 
@@ -127,10 +127,11 @@ function! s:init(text, choices, index, title)
 	let hwnd.h = len(hwnd.text) + 3
 	let hwnd.tw = hwnd.w + 4
 	let hwnd.th = hwnd.h + 4
+	let border = g:quickui#style#border
 	let opts = {}
 	let opts.w = hwnd.w
 	let opts.h = hwnd.h
-	let opts.border = g:quickui#style#border
+	let opts.border = get(g:, 'quickui_confirm_border', border)
 	let opts.center = 1
 	let opts.title = (a:title == '')? '' : (' ' . a:title . ' ')
 	let opts.padding = [1, 1, 1, 1]
