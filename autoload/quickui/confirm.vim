@@ -16,12 +16,15 @@
 function! s:button_prepare(choices)
 	let choices = quickui#utils#text_list_normalize(a:choices)
 	let items = []
+	let index = 0
 	let max_size = 4
 	for choice in choices
 		let item = quickui#utils#item_parse(choice)
+		let item.index = index
 		let items += [item]
 		let width = item.text_width
 		let max_size = (max_size < width)? width : max_size
+		let index += 1
 	endfor
 	for item in items
 		let width = item.text_width
@@ -115,6 +118,9 @@ function! s:init(text, choices, index, title)
 		let ts = strdisplaywidth(text)
 		let text_size = (text_size < ts)? ts : text_size
 	endfor
+	let limit = &columns * 80 / 100
+	let limit = get(g:, 'quickui_confirm_max_width', limit)
+	let text_size = (text_size < limit)? text_size : limit
 	let hwnd.btn_size = strdisplaywidth(hwnd.final)
 	let hwnd.text_size = text_size
 	let hwnd.w = (hwnd.btn_size > text_size)? hwnd.btn_size : text_size
@@ -129,6 +135,7 @@ function! s:init(text, choices, index, title)
 	let opts.title = (a:title == '')? '' : (' ' . a:title . ' ')
 	let opts.padding = [1, 1, 1, 1]
 	let opts.button = 1
+	let opts.wrap = 1
 	let hwnd.opts = opts
 	let content = deepcopy(hwnd.text)
 	let content += [' ', ' ']
@@ -219,6 +226,10 @@ function! quickui#confirm#open(text, choices, ...)
 		return 0
 	endif
 
+	if has('nvim')
+		let hwnd.opts.focusable = 1
+	endif
+
 	call win.open(hwnd.content, hwnd.opts)
 
 	while 1
@@ -235,6 +246,27 @@ function! quickui#confirm#open(text, choices, ...)
 			let accept = 0
 			break
 		elseif ch == "\<LeftMouse>"
+			let x = v:mouse_col - 1
+			let y = v:mouse_lnum - 1
+			if has('nvim') == 0
+				let x -= 2
+				let y -= 2
+			endif
+			echo "winid:" . win.winid . " target:" . v:mouse_winid . ' ' . x. '/' .y
+			if v:mouse_winid == win.winid
+				if y == hwnd.h - 1 && x >= hwnd.padding
+					let u = x - hwnd.padding
+					for item in hwnd.items
+						if u >= item.start && u < item.endup
+							let accept = item.index + 1
+							break
+						endif
+					endfor
+					if accept > 0
+						break
+					endif
+				endif
+			endif
 		else
 			let key = get(hwnd.keymap, ch, ch)
 			if key == 'LEFT'
