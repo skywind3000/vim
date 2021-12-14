@@ -62,6 +62,10 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" 
+" init hook
 "----------------------------------------------------------------------
+function! g:asynctasks_api_hook.init()
+	" unsilent echom "fuck asynctasks"
+endfunc
+
 

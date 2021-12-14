@@ -4,7 +4,7 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/14 17:55
+" Last Modified: 2021/12/15 04:21
 " Verision: 1.8.13
 "
 " for more information, please visit:
@@ -21,6 +21,7 @@
 let s:windows = has('win32') || has('win64') || has('win16') || has('win95')
 let s:scriptname = expand('<sfile>:p')
 let s:scripthome = fnamemodify(s:scriptname, ':h:h')
+let s:inited = 0
 
 
 "----------------------------------------------------------------------
@@ -835,6 +836,19 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" call init api
+"----------------------------------------------------------------------
+function! s:api_init()
+	if has_key(g:asynctasks_api_hook, 'init')
+		if get(s:, 'inited', 0) == 0
+			call g:asynctasks_api_hook.init()
+			let s:inited = 1
+		endif
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " api: input text
 "----------------------------------------------------------------------
 function! s:api_input(msg, ...)
@@ -1283,6 +1297,7 @@ endfunc
 function! asynctasks#list(path)
 	let path = (a:path == '')? expand('%:p') : a:path
 	let path = (path == '')? getcwd() : path
+	call s:api_init()
 	if asynctasks#collect_config(path, 1) != 0
 		return -1
 	endif
@@ -1692,6 +1707,7 @@ endfunc
 " command AsyncTask
 "----------------------------------------------------------------------
 function! asynctasks#cmd(bang, args, ...)
+	call s:api_init()
 	if s:requirement('asyncrun') == 0
 		return -1
 	endif
@@ -1723,6 +1739,8 @@ function! asynctasks#cmd(bang, args, ...)
 		return 0
 	elseif args ==# '-M'
 		call s:task_macro(1)
+		return 0
+	elseif args ==# '-Z'
 		return 0
 	endif
 	let [args, opts] = s:ExtractOpt(args)
