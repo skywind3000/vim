@@ -1779,6 +1779,9 @@ function! asyncrun#run(bang, opts, args, ...)
 		let l:macros['VIM_FILEEXT'] = ''
 	endif
 
+	" fire AsyncRunInit autocmd
+	call s:AutoCmd('Init')
+
 	" extract options
 	let [l:command, l:opts] = s:ExtractOpt(s:StringStrip(a:args))
 
@@ -1820,9 +1823,6 @@ function! asyncrun#run(bang, opts, args, ...)
 			let l:opts.range_buf = bufnr('%')
 		endif
 	endif
-
-	" fire AsyncRunInit autocmd
-	call s:AutoCmd('Init')
 
 	" check cwd
 	if l:opts.cwd != ''
