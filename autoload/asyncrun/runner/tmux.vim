@@ -11,7 +11,7 @@
 
 function! asyncrun#runner#tmux#run(opts)
 	if exists('*VimuxRunCommand') == 0
-		return s:errmsg('require benmills/vimux')
+		return asyncrun#utils#errmsg('require benmills/vimux')
 	endif
 	let cwd = getcwd()
 	call VimuxRunCommand('cd ' . shellescape(cwd) . '; ' . a:opts.cmd)
