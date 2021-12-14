@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016-2021
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2021/12/15 03:45
+" Last Modified: 2021/12/15 04:38
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1821,6 +1821,9 @@ function! asyncrun#run(bang, opts, args, ...)
 		endif
 	endif
 
+	" fire AsyncRunInit autocmd
+	call s:AutoCmd('Init')
+
 	" check cwd
 	if l:opts.cwd != ''
 		for [l:key, l:val] in items(l:macros)
@@ -1918,7 +1921,7 @@ endfunc
 " asyncrun - version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.8.7'
+	return '2.8.8'
 endfunc
 
 
