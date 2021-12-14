@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016-2021
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2021/12/15 04:38
+" Last Modified: 2021/12/15 04:45
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1780,7 +1780,10 @@ function! asyncrun#run(bang, opts, args, ...)
 	endif
 
 	" fire AsyncRunInit autocmd
-	call s:AutoCmd('Init')
+	if get(s:, 'asyncrun_init', 0) == 0
+		call s:AutoCmd('Init')
+		let s:asyncrun_init = 1
+	endif
 
 	" extract options
 	let [l:command, l:opts] = s:ExtractOpt(s:StringStrip(a:args))
