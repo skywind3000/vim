@@ -1,11 +1,11 @@
 "======================================================================
 "
-" asynctasks.vim - 
+" asynctasks.vim - Modern Task System for Vim
 "
-" Maintainer: skywind3000 (at) gmail.com, 2020
+" Maintainer: skywind3000 (at) gmail.com, 2020, 2021
 "
-" Last Modified: 2021/11/30 14:04
-" Verision: 1.8.12
+" Last Modified: 2021/12/14 17:55
+" Verision: 1.8.13
 "
 " for more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -86,9 +86,6 @@ let g:asynctasks_strict = get(g:, 'asynctasks_strict', 1)
 " notify when finished (output=quickfix), can be: '', 'echo', 'bell'
 let g:asynctasks_notify = get(g:, 'asynctasks_notify', '')
 
-" set to zero to create .tasks without template
-let g:asynctasks_template = get(g:, 'asynctasks_template', 1)
-
 " set to 1 to remember last user input for each variable
 let g:asynctasks_remember = get(g:, 'asynctasks_remember', 0)
 
@@ -97,6 +94,10 @@ let g:asynctasks_history = get(g:, 'asynctasks_history', {})
 
 " control how to open a split window in AsyncTaskEdit
 let g:asynctasks_edit_split = get(g:, 'asynctasks_edit_split', '')
+
+" callbacks: replace input() / confirm() and so on
+let g:asynctasks_api_hook = get(g:, 'asynctasks_api_hook', {})
+
 
 " Add highlight colors if they don't exist.
 if !hlexists('AsyncRunSuccess')
@@ -834,6 +835,60 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" api: input text
+"----------------------------------------------------------------------
+function! s:api_input(msg, ...)
+	let text = (a:0 < 1)? '' : (a:1)
+	let history = (a:0 < 2)? '' : (a:2)
+	if has_key(g:asynctasks_api_hook, 'input')
+		return g:asynctasks_api_hook.input(a:msg, text, history)
+	else
+		call inputsave()
+		try
+			if a:0 < 3
+				let hr = input(a:msg, text) 
+			else
+				let hr = input(a:msg, text, a:3)
+			endif
+		catch /^Vim:Interrupt$/
+			let hr = ''
+		endtry
+		call inputrestore()
+		return hr
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" confirm
+"----------------------------------------------------------------------
+function! s:api_confirm(msg, ...)
+	let choices = (a:0 < 1)? '' : (a:1)
+	let default = (a:0 < 2)? 1 : (a:2)
+	if has_key(g:asynctasks_api_hook, 'confirm')
+		return g:asynctasks_api_hook.confirm(a:msg, choices, default)
+	else
+		call inputsave()
+		try
+			if a:0 < 1
+				let hr = confirm(a:msg)
+			elseif a:0 < 2
+				let hr = confirm(a:msg, choices)
+			elseif a:0 < 3
+				let hr = confirm(a:msg, choices, default)
+			else
+				let hr = confirm(a:msg, choices, default, a:3)
+			endif
+		catch /^Vim:Interrupt$/
+			let hr = 0
+		endtry
+		call inputrestore()
+		return hr
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " ask user what to do
 "----------------------------------------------------------------------
 function! s:command_input(command, taskname, remember)
@@ -879,29 +934,20 @@ function! s:command_input(command, taskname, remember)
 			endfor
 			let lastid = str2nr(get(g:asynctasks_history, ikey, ''))
 		endif
-		call inputsave()
 		if len(select) == 0
 			echohl Type
-			try
-				let t = input('Input argument (' . name . '): ', text)
-			catch /^Vim:Interrupt$/
-				let t = ""
-			endtry
+			let t = s:api_input('Input argument (' . name . '): ', text)
 			echohl None
 			let g:asynctasks_history[rkey] = t
 		else
 			let items = join(select, "\n")
 			let t = ''
-			try
-				let choice = confirm('Choose argument (' . name . ')', items, lastid)
-				if choice > 0
-					let g:asynctasks_history[ikey] = choice
-					let t = s:replace(select[choice - 1], '&', '')
-				endif
-			catch /^Vim:Interrupt$/
-			endtry
+			let choice = s:api_confirm('Choice argument (' . name . ')', items, lastid)
+			if choice > 0
+				let g:asynctasks_history[ikey] = choice
+				let t = s:replace(select[choice - 1], '&', '')
+			endif
 		endif
-		call inputrestore()
 		if t == ''
 			return ''
 		endif
@@ -1334,18 +1380,19 @@ let s:template = [
 " returns a dictionary of {'name': [template-content], ... }
 "----------------------------------------------------------------------
 function! s:template_load()
-	if type(g:asynctasks_template) == 0
+	let temp = get(g:, 'asynctasks_template', 1)
+	if type(temp) == 0
 		return {}
-	elseif type(g:asynctasks_template) == type({})
-		return g:asynctasks_template
-	elseif type(g:asynctasks_template) != type('')
+	elseif type(temp) == type({})
+		return temp
+	elseif type(temp) != type('')
 		return {}
 	endif
 	let template = {}
 	if has_key(s:private, 'template') == 0
 		let s:private.template = {}
 	endif
-	let fname = g:asynctasks_template
+	let fname = temp
 	let fname = (strpart(fname, 0, 1) == '~')? expand(fname) : fname
 	if filereadable(fname)
 		let ts = getftime(fname)
@@ -1430,9 +1477,7 @@ function! s:task_edit(mode, path, template)
 	endif
 	let name = fnamemodify(expand(name), ':p')
 	if g:asynctasks_confirm
-		call inputsave()
-		let r = input('(Edit task config): ', name)
-		call inputrestore()
+		let r = s:api_input('(Edit task config): ', name)
 		if r == ''
 			return -1
 		endif
@@ -1456,8 +1501,9 @@ function! s:task_edit(mode, path, template)
 		endif
 	endfor
 	let template = s:template
-	if type(g:asynctasks_template) == 0
-		if g:asynctasks_template == 0
+	let temp = get(g:, 'asynctasks_template', 1)
+	if type(temp) == 0
+		if temp == 0
 			let template = ['# vim: set fenc=utf-8 ft=dosini:', '']
 		endif
 	else
@@ -1476,7 +1522,7 @@ function! s:task_edit(mode, path, template)
 				let options = join(choices, "\n")
 				if len(choices) > 1 && newfile
 					let t = 'Select a template (ESC to quit):'
-					let choice = confirm(t, options)
+					let choice = s:api_confirm(t, options)
 					if choice == 0
 						return 0
 					elseif choice > 1
@@ -1702,11 +1748,7 @@ function! asynctasks#cmd(bang, args, ...)
 					let candidates += ['&' . (ii + 1) . ' ' . parts[ii]]
 				endfor
 				let prompt = 'Change profile to: '
-				try
-					let choice = confirm(prompt, join(candidates, "\n"), index)
-				catch /^Vim:Interrupt$/
-					return 0
-				endtry
+				let choice = s:api_confirm(prompt, join(candidates, "\n"), index)
 				if choice < 1 || choice > len(parts)
 					return 0
 				endif
