@@ -29,7 +29,25 @@ endfunction
 "----------------------------------------------------------------------
 " 
 "----------------------------------------------------------------------
-function! s:check_quickui()
+function! s:require_quickui()
+	if get(g:, 'quickui_version', '') == ''
+		call s:errmsg('skywind3000/vim-quickui 1.4.3+ is required')
+		return v:false
+	endif
+	let c1 = g:quickui#core#has_popup
+	let c2 = g:quickui#core#has_floating
+	if c1 || c2
+		return v:true
+	endif
+	return v:true
+endfunc
+
+
+
+"----------------------------------------------------------------------
+" 
+"----------------------------------------------------------------------
+function! s:api_input(msg, text, history)
 endfunc
 
 
