@@ -11,7 +11,7 @@
 
 
 "----------------------------------------------------------------------
-" utils
+" output msg
 "----------------------------------------------------------------------
 function! asyncrun#utils#errmsg(msg)
 	redraw
@@ -19,6 +19,14 @@ function! asyncrun#utils#errmsg(msg)
 	echom 'ERROR: ' . a:msg
 	echohl NONE
 	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" display require message
+"----------------------------------------------------------------------
+function! asyncrun#utils#require(what)
+	call asyncrun#utils#errmsg('require: ' . a:what . ' ')
 endfunc
 
 
