@@ -15,22 +15,50 @@
 "----------------------------------------------------------------------
 let g:asyncrun_event = get(g:, 'asyncrun_event', {})
 let g:asyncrun_runner = get(g:, 'asyncrun_runner', {})
+let s:script_time = {}
+
+
+"----------------------------------------------------------------------
+" find script 
+"----------------------------------------------------------------------
+function! s:find_script(name)
+	let test = 'autoload/asyncrun/runner/' . a:name . '.vim'
+	let fn = findfile(test, &rtp)
+	if fn == ''
+		return ''
+	endif
+	let fn = fnamemodify(fn, ':p')
+	let fn = substitute(fn, '\\', '/', 'g')
+	return fn
+endfunc
+
+
+"----------------------------------------------------------------------
+" load runner
+"----------------------------------------------------------------------
+function! s:load_runner(name)
+	let name = a:name
+	let load = s:find_script(name)
+	let test = 'asyncrun#runner#' . name . '#run'
+	if filereadable(load) && load != ''
+		let mtime = getftime(load)
+		let ltime = get(s:script_time, load, 0)
+		if mtime > ltime
+			exec 'source ' . fnameescape(load)
+			let s:script_time[load] = mtime
+		endif
+		if exists('*' . test)
+			let g:asyncrun_runner[name] = test
+		endif
+	endif
+endfunc
 
 
 "----------------------------------------------------------------------
 " init runner
 "----------------------------------------------------------------------
 function! g:asyncrun_event.runner(name)
-	let name = a:name
-	if has_key(g:asyncrun_runner, name)
-		return
-	endif
-	let test = 'asyncrun#runner#' . name . '#run'
-	let load = 'autoload/asyncrun/runner/' . name . '.vim'
-	silent exec 'runtime ' . fnameescape(load)
-	if exists('*' . test)
-		let g:asyncrun_runner[name] = test
-	endif
+	call s:load_runner(a:name)
 endfunc
 
 
