@@ -9,7 +9,7 @@
 
 " vim: set ts=4 sw=4 tw=78 noet :
 
-function! asyncrun#runner#floater_reuse#run(opts)
+function! asyncrun#runner#floaterm_reuse#run(opts)
 	let curr_bufnr = floaterm#curr()
 	if has_key(a:opts, 'silent') && a:opts.silent == 1
 		FloatermHide!
