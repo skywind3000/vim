@@ -2,7 +2,7 @@
 "
 " asynctasks.vim - Modern Task System for Vim
 "
-" Maintainer: skywind3000 (at) gmail.com, 2020, 2021
+" Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
 " Last Modified: 2021/12/14 17:55
 " Verision: 1.8.13
