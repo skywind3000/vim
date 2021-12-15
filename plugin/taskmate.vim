@@ -62,10 +62,29 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" api confirm
+"----------------------------------------------------------------------
+function! s:api_confirm(msg, choices, index)
+	if s:require_check() == 0
+		return 0
+	endif
+	let index = (a:index == 0)? 1 : a:index
+	return quickui#confirm#open(a:msg, a:choices, index)
+endfunc
+
+
+"----------------------------------------------------------------------
 " init hook
 "----------------------------------------------------------------------
 function! g:asynctasks_api_hook.init()
-	" unsilent echom "fuck asynctasks"
+	if get(g:, 'quickui_version', '') != ''
+		let c1 = g:quickui#core#has_popup
+		let c2 = g:quickui#core#has_floating
+		if c1 || c2
+			let g:asynctasks_api_hook.input = function('s:api_input')
+			let g:asynctasks_api_hook.confirm = function('s:api_confirm')
+		endif
+	endif
 endfunc
 
 
