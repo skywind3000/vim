@@ -4,10 +4,10 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/15 04:21
-" Verision: 1.8.13
+" Last Modified: 2021/12/16 02:28
+" Verision: 1.8.14
 "
-" for more information, please visit:
+" For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
 "
 "======================================================================
@@ -80,6 +80,9 @@ let g:asynctasks_term_listed = get(g:, 'asynctasks_term_listed', 1)
 
 " set to 1 to pass arguments in a safe way (intermediate script)
 let g:asynctasks_term_safe = get(g:, 'asynctasks_term_safe', 0)
+
+" set to 1 to close terminal when task finished
+let g:asynctasks_term_close = get(g:, 'asynctasks_term_close', 0)
 
 " strict to detect $(VIM_CWORD) to avoid empty string
 let g:asynctasks_strict = get(g:, 'asynctasks_strict', 1)
@@ -1097,6 +1100,8 @@ function! s:task_option(task)
 	endif
 	if has_key(task, 'close')
 		let opts.close = task.close
+	else
+		let opts.close = g:asynctasks_term_close
 	endif
 	let opts.safe = g:asynctasks_term_safe
 	let opts.reuse = g:asynctasks_term_reuse
