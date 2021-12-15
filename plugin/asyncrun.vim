@@ -1,9 +1,9 @@
 " asyncrun.vim - Run shell commands in background and output to quickfix
 "
 " Maintainer: skywind3000 (at) gmail.com, 2016-2021
-" Homepage: http://www.vim.org/scripts/script.php?script_id=5431
+" Homepage: https://github.com/skywind3000/asyncrun.vim
 "
-" Last Modified: 2021/12/15 05:24
+" Last Modified: 2021/12/15 23:59
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1282,8 +1282,9 @@ function! s:terminal_exit(...)
 		exec opts.post
 	endif
 	if has_key(opts, 'exit')
-		let F = function(opts.exit)
-		call F(opts.name, code)
+		let l:F = function(opts.exit)
+		call l:F(opts.name, code)
+		unlet l:F
 	endif
 endfunc
 
@@ -1953,7 +1954,7 @@ endfunc
 " asyncrun - version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.8.9'
+	return '2.8.10'
 endfunc
 
 
