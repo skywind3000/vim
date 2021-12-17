@@ -1,6 +1,6 @@
 "======================================================================
 "
-" runner_load.vim - 
+" script_load.vim - load scripts in autoload/asyncrun/{runner,program}
 "
 " Created by skywind on 2021/12/15
 " Last Modified: 2021/12/15 05:40:55
