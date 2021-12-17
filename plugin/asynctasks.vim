@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/18 04:31
-" Verision: 1.8.15
+" Last Modified: 2021/12/18 05:09
+" Verision: 1.8.16
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1087,7 +1087,7 @@ function! s:task_option(task)
 	if has_key(task, 'strip')
 		let opts.strip = task.strip
 	endif
-	for key in ['pos', 'rows', 'cols', 'focus', 'option']
+	for key in ['pos', 'rows', 'cols', 'focus', 'option', 'scroll']
 		if has_key(task, key)
 			let opts[key] = task[key]
 		endif
