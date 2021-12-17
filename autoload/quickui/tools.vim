@@ -482,6 +482,11 @@ function! quickui#tools#terminal(name)
 			let opts.pause = 1
 		endif
 	endif
+	if has_key(tools, 'close')
+		if tools.close
+			let opts.close = 1
+		endif
+	endif
 	call quickui#terminal#dialog(cmd, opts)
 	return 0
 endfunc
