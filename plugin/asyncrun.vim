@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016-2021
 " Homepage: https://github.com/skywind3000/asyncrun.vim
 "
-" Last Modified: 2021/12/18 20:36
+" Last Modified: 2021/12/18 03:57
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -1487,9 +1487,8 @@ function! s:run(opts)
 	endif
 
 	" mode alias
-	let l:modemap = {'async':0, 'quickfix':0, 'make':1, 'bang':2, 'python':3,
-				\ 'os':4, 'hide':5, 'terminal': 6, 'execute':1, 'term':6,
-				\ 'system':4}
+	let l:modemap = {'async':0, 'make':1, 'bang':2, 'python':3, 'os':4,
+				\ 'hide':5, 'terminal': 6, 'execute':1, 'term':6, 'system':4}
 
 	let l:modemap['external'] = 4
 	let l:modemap['quickfix'] = 0
@@ -2002,7 +2001,7 @@ endfunc
 " asyncrun - version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.9.3'
+	return '2.9.2'
 endfunc
 
 
