@@ -1045,8 +1045,6 @@ function! s:task_option(task)
 				let opts.mode = 'term'
 				let opts.pos = 'hide'
 				let opts.safe = 1
-			elseif pos == 'hidden'
-				let opts.mode = 'hide'
 			elseif pos != 'external' && pos != 'system' && pos != 'os'
 				let opts.mode = 'term'
 				let opts.pos = pos
