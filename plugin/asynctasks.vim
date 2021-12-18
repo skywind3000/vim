@@ -54,7 +54,7 @@ let g:asynctasks_environ = get(g:, 'asynctasks_environ', {})
 " features
 let g:asynctasks_feature = get(g:, 'asynctasks_feature', {})
 
-" confirm file name in :AsyncEdit ?
+" confirm file name in :AsyncTaskEdit ?
 let g:asynctasks_confirm = get(g:, 'asynctasks_confirm', 1)
 
 " terminal mode: tab/curwin/top/bottom/left/right/quickfix/external

@@ -373,6 +373,14 @@ if has_key(s:enabled, 'vista')
 	Plug 'liuchengxu/vista.vim'
 endif
 
+if has_key(s:enabled, 'editorconfig')
+	Plug 'editorconfig/editorconfig-vim'
+endif
+
+if has_key(s:enabled, 'neoterm')
+	Plug 'kassio/neoterm'
+endif
+
 if has_key(s:enabled, 'clap')
 	Plug 'liuchengxu/vim-clap'
 	IncScript site/bundle/clap.vim
@@ -461,6 +469,10 @@ endif
 if has_key(s:enabled, 'cursorword')
 	Plug 'itchyny/vim-cursorword'
 	let g:cursorword_delay = 100
+endif
+
+if has_key(s:enabled, 'anyjump')
+	Plug 'pechorin/any-jump.vim'
 endif
 
 
