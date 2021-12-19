@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/19 04:19
-" Verision: 1.8.18
+" Last Modified: 2021/12/20 07:33
+" Verision: 1.8.19
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1016,18 +1016,11 @@ endfunc
 function! s:task_option(task)
 	let task = a:task
 	let opts = {'mode':''}
-	if has_key(task, 'cwd')
-		let opts.cwd = task.cwd
-	endif
-	if has_key(task, 'mode')
-		let opts.mode = task.mode
-	endif
-	if has_key(task, 'raw')
-		let opts.raw = task.raw
-	endif
-	if has_key(task, 'save')
-		let opts.save = task.save
-	endif
+	for key in ['cwd', 'mode', 'raw', 'save']
+		if has_key(task, key)
+			let opts[key] = task[key]
+		endif
+	endfor
 	if has_key(task, 'output')
 		let output = task.output
 		let opts.mode = 'async'
@@ -1085,20 +1078,16 @@ function! s:task_option(task)
 			let opts.raw = 1
 		endif
 	endif
-	if has_key(task, 'strip')
-		let opts.strip = task.strip
-	endif
-	for key in ['pos', 'rows', 'cols', 'focus', 'option', 'scroll']
+	for key in ['strip', 'pos', 'rows', 'cols', 'focus', 'safe']
 		if has_key(task, key)
 			let opts[key] = task[key]
 		endif
 	endfor
-	if has_key(task, 'program')
-		let opts.program = task.program
-	endif
-	if has_key(task, 'auto')
-		let opts.auto = task.auto
-	endif
+	for key in ['option', 'scroll', 'program', 'auto', 'once']
+		if has_key(task, key)
+			let opts[key] = task[key]
+		endif
+	endfor
 	if has_key(task, 'close')
 		let opts.close = task.close
 	else
@@ -1117,9 +1106,6 @@ function! s:task_option(task)
 	endif
 	if listed == 0
 		let opts.listed = 0
-	endif
-	if has_key(task, 'safe')
-		let opts.safe = task.safe
 	endif
 	let notify = g:asynctasks_notify
 	if has_key(task, 'notify')
