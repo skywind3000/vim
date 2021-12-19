@@ -120,7 +120,7 @@ hi! default link AtHint Identifier
 "----------------------------------------------------------------------
 let g:cppman_open_mode = '<auto>'
 
-command! -bang -nargs=* -complete=file Make AsyncRun -program=make @ <args>
+command! -bang -nargs=* -complete=file Make AsyncRun -program=make -once=1 -strip=1 @ <args>
 
 command! -bang -bar -nargs=* Gpush execute 'AsyncRun<bang> -cwd=' .
 	  \ fnameescape(FugitiveGitDir()) 'git push' <q-args>
