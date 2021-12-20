@@ -444,3 +444,18 @@ if has('nvim') && (has('win32') || has('win64'))
 endif
 
 
+"----------------------------------------------------------------------
+" Transferring blocks of text between vim sessions
+" http://www.drchip.org/astronaut/vim/index.html#Maps
+"----------------------------------------------------------------------
+nmap <Leader>xr   :r $HOME/.vim/xfer<CR>
+nmap <Leader>xw   :'a,.w! $HOME/.vim/xfer<CR>
+vmap <Leader>xw   :w! $HOME/.vim/xfer<CR>
+nmap <Leader>xa   :'a,.w>> $HOME/.vim/xfer<CR>
+vmap <Leader>xa   :w>> $HOME/.vim/xfer<CR>
+nmap <Leader>xS   :so $HOME/.vim/xfer<CR>
+nmap <Leader>xy   :'a,.y *<CR>
+vmap <Leader>xy   :y *<CR>
+
+
+

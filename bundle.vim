@@ -181,6 +181,7 @@ if has_key(s:enabled, 'inter')
 	Plug 'skywind3000/vimoutliner', { 'for': 'votl' }
 	Plug 'mattn/webapi-vim'
 	Plug 'mattn/gist-vim'
+	Plug 'hrj/vim-DrawIt'
 	Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
 
 	if 1

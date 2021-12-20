@@ -187,7 +187,7 @@ endfunc
 "----------------------------------------------------------------------
 augroup VinegarGroup
 	autocmd!
-	autocmd FileType netrw call s:setup_vinegar()
+	" autocmd FileType netrw call s:setup_vinegar()
 	autocmd FileType nerdtree call s:setup_vinegar()
 	autocmd FileType dirvish call s:setup_vinegar()
 augroup END
