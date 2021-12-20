@@ -99,14 +99,14 @@ call quickui#menu#install("&Build", [
 
 call quickui#menu#install("&Git", [
 			\ ['&View Diff', 'call svnhelp#svn_diff("%")'],
-			\ ['&Show Log', 'call svnhelp#svn_log("%")'],
+			\ ['S&how Log', 'call svnhelp#svn_log("%")'],
 			\ ['File &Add', 'call svnhelp#svn_add("%")'],
 			\ ['-'],
-			\ ['&Fugitive Status', 'Git'],
-			\ ['Fugitive P&ush', 'Gpush'],
-			\ ['Fugitive Fe&tch', 'Gfetch'],
-			\ ['Fugitive R&ead', 'Gread'],
-			\ ["Fugitive Flog\t(vim-flog)", 'Flog'],
+			\ ["Git &Stage\t(Fugitive)", 'Git'],
+			\ ["Git P&ush\t(Fugitive)", 'Gpush'],
+			\ ["Git Fe&tch\t(Fugitive)", 'Gfetch'],
+			\ ["Git R&ead\t(Fugitive)", 'Gread'],
+			\ ["Git &Flog\t(vim-flog)", 'Flog'],
 			\ ])
 
 
