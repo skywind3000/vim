@@ -98,11 +98,7 @@ call quickui#menu#install("&Build", [
 			\ ])
 
 call quickui#menu#install("&Git", [
-			\ ['&View Diff', 'call svnhelp#svn_diff("%")'],
-			\ ['S&how Log', 'call svnhelp#svn_log("%")'],
-			\ ['File &Add', 'call svnhelp#svn_add("%")'],
-			\ ['-'],
-			\ ["Git &Stage\t(Fugitive)", 'Git'],
+			\ ["Git &Status\t(Fugitive)", 'Git'],
 			\ ["Git P&ush\t(Fugitive)", 'Gpush'],
 			\ ["Git Fe&tch\t(Fugitive)", 'Gfetch'],
 			\ ["Git R&ead\t(Fugitive)", 'Gread'],
