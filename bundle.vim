@@ -453,6 +453,12 @@ if has_key(s:enabled, 'colors')
 	Plug 'romainl/Apprentice'
 	Plug 'arzg/vim-colors-xcode'
     Plug 'wuelnerdotexe/vim-enfocado'
+	let g:enfocado_style = "neon"
+endif
+
+if has_key(s:enabled, 'games')
+	Plug 'iqxd/vim-mine-sweeping'
+	Plug 'vim-scripts/Mines'
 endif
 
 if has_key(s:enabled, 'which_key')

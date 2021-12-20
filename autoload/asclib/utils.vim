@@ -269,12 +269,15 @@ function! asclib#utils#open_url(url, ...)
 	let browser = get(g:, 'asc_browser', '')
 	let browser = (bang == '!')? '' : browser
 	if has('win32') || has('win64') || has('win16') || has('win95')
-		let browser = (browser == '')? 'start' : browser
-		silent exec '!start /b cmd /c ' . browser . ' ' . url
-		" echo browser
+		if browser == ''
+			silent exec '!start /b cmd /c start ' . url . ''
+		else
+			silent exec '!start /b cmd /c call ' . browser . ' "' . a:url . '"'
+		endif
+		unsilent echo browser
 	elseif has('mac') || has('macunix') || has('gui_macvim')
 		let browser = (browser == '')? 'open' : browser
-		call system(browser . ' ' . url . ' &')
+		call system(browser . " " . url . " &")
 	else
 		let cmd = '/mnt/c/Windows/System32/cmd.exe'
 		if $WSL_DISTRO_NAME != '' && executable(cmd)

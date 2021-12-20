@@ -24,7 +24,10 @@ function! s:setup_dirvish()
 	call search(name, 'wc')
 	noremap <silent><buffer> ~ :Dirvish ~<cr>
 	noremap <buffer> % :e %
-	" setlocal cursorline
+	setlocal cursorline
+	if exists('+cursorlineopt')
+		setlocal cursorlineopt=both
+	endif
 endfunc
 
 function! DirvishSetup()
