@@ -149,10 +149,10 @@ function! s:init_cbs(task) abort
 		let self.task.__private.id = 0
 		let self.task.__private.state = 0
 		let self.task.state = self.task.__private.state
-		let self.task.id = self.task.__private.id
 		if has_key(self.task, 'cb')
 			call self.task.cb(self.task, 'exit', self.task.__private.code)
 		endif
+		let self.task.id = self.task.__private.id
 	endfunc
 	function! obj.neovim_dispatch(event, data)
 		if has_key(self.task, 'cb')
@@ -164,7 +164,8 @@ function! s:init_cbs(task) abort
 			else
 				let cache = self.task.__private.nvim_stderr
 			endif
-			for index in range(size)
+			let index = 0
+			while index < size
 				let cache .= a:data[index]
 				if l:index + 1 < size
 					let text = cache
@@ -174,7 +175,8 @@ function! s:init_cbs(task) abort
 					endif
 					call task.cb(task, a:event, text)
 				endif
-			endfor
+				let index += 1
+			endwhile
 			if a:event == 'stdout'
 				let self.task.__private.nvim_stdout = cache
 			else
@@ -265,6 +267,7 @@ function! s:task_start(task, cmd, opts) abort
 	if s:support != 0
 		if s:nvim == 0
 			let callback = s:init_cbs(task)
+			let task.__private.handle = callback
 			let opts = {}
 			let opts['out_io'] = 'pipe'
 			let opts['err_io'] = task.__private.err2out? 'out' : 'pipe'
@@ -285,13 +288,22 @@ function! s:task_start(task, cmd, opts) abort
 			let opts['on_stderr'] = opts.neovim_cb
 			let opts['on_exit'] = opts.neovim_cb
 			let opts['task'] = task
+			let task.__private.need_close = 0
+			if task.__private.in_null
+				if has('nvim-0.6.0')
+					let opts['stdin'] = 'null'
+					let task.__private.need_close = 0
+				else
+					let task.__private.need_close = 1
+				endif
+			endif
 			" echo keys(opts.task)
 			let task.__private.nvim_stdout = ''
 			let task.__private.nvim_stderr = ''
 			let task.__private.job = jobstart(task.__private.args, opts)
 			let success = (task.__private.job > 0)? 1 : 0
 			if success
-				if task.__private.in_null
+				if task.__private.need_close
 					if exists('*chanclose')
 						call chanclose(task.__private.job, 'stdin')
 					elseif exists('*jobclose')

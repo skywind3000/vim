@@ -66,7 +66,7 @@ if has('patch-7.4.500') || v:version >= 800
 endif
 
 " enable new-style cursorline (for numbers only)
-if has('nvim') == 0 && has('patch-8.1.2020')
+if exists('+cursorlineopt')
 	set cursorlineopt=number cursorline
 endif
 

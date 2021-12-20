@@ -176,6 +176,8 @@ if has('gui_running') || (has('nvim') && (has('win32') || has('win64')))
 	noremap <M-Right> :call Tab_MoveRight()<cr>
 	inoremap <M-Left> <ESC>:call Tab_MoveLeft()<cr>
 	inoremap <M-Right> <ESC>:call Tab_MoveRight()<cr>
+	tnoremap <M-Left> <c-\><c-N>:call Tab_MoveLeft()<cr>
+	tnoremap <M-Right> <c-\><c-N>:call Tab_MoveRight()<cr>
 	if has('gui_macvim')
 		noremap <m-\|> :call Toggle_Transparency(9)<cr>
 	else

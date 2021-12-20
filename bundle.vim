@@ -452,6 +452,7 @@ if has_key(s:enabled, 'colors')
 	Plug 'arcticicestudio/nord-vim'
 	Plug 'romainl/Apprentice'
 	Plug 'arzg/vim-colors-xcode'
+    Plug 'wuelnerdotexe/vim-enfocado'
 endif
 
 if has_key(s:enabled, 'which_key')
