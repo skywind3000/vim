@@ -7,6 +7,10 @@ elseif has('win32') || has('win64') || has('win95') || has('win16')
 	let s:uname = 'windows'
 elseif has('win32unix')
 	let s:uname = 'cygwin'
+elseif has('linux')
+	let s:uname = 'linux'
+elseif has('bsd')
+	let s:uname = 'bsd'
 elseif has('unix')
 	let s:uname = substitute(system("uname"), '\s*\n$', '', 'g')
 	if !v:shell_error && s:uname == "Linux"

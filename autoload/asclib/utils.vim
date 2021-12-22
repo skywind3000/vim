@@ -17,7 +17,7 @@ function! asclib#utils#log(text, ...) abort
 	if !isdirectory(home)
 		silent! call mkdir(home, 'p')
 	endif
-	call writefile([text . "\n"], name, 'a')
+	silent! call writefile([text . "\n"], name, 'a')
 	return 1
 endfunc
 
@@ -266,7 +266,7 @@ endfunc
 function! asclib#utils#open_url(url, ...)
 	let url = escape(a:url, "%|*#")
 	let bang = (a:0 > 0)? (a:1) : ''
-	let browser = get(g:, 'asc_browser', '')
+	let browser = asclib#setting#get('browser', '')
 	let browser = (bang == '!')? '' : browser
 	if has('win32') || has('win64') || has('win16') || has('win95')
 		if browser == ''
@@ -365,6 +365,36 @@ function! asclib#utils#git_browse(name, ...)
 	return ''
 endfunc
 
+
+"----------------------------------------------------------------------
+" switch file
+"----------------------------------------------------------------------
+function! asclib#utils#file_switch(args)
+	let filename = ''
+	let opts = {}
+	let cmds = []
+	for p in a:args
+		let p = asclib#string#strip(p)
+		if strpart(p, 0, 1) == '-'
+			let text = strpart(p, 1)
+			let [opt, sep, val] = asclib#string#partition(text, '=')
+			let opt = asclib#string#strip(opt)
+			let opts[opt] = asclib#string#strip(val)
+		elseif strpart(p, 0, 1) == '+'
+			let cmds += [strpart(p, 1)]
+		else
+			let filename = p
+		endif
+	endfor
+	if filename == ''
+		call asclib#core#errmsg('require file name')
+		return 0
+	endif
+	if !empty(cmds)
+		let opts.command = cmds
+	endif
+	call asclib#core#switch(expand(filename), opts)
+endfunc
 
 
 

@@ -337,3 +337,130 @@ function! asclib#core#text_replace(bid, lnum, end, program) abort
 endfunc
 
 
+"----------------------------------------------------------------------
+" extract opts+command
+"----------------------------------------------------------------------
+function! asclib#core#extract(command)
+	let cmd = substitute(a:command, '^\s*\(.\{-}\)[\s\r\n]*$', '\1', '')
+	let opts = {}
+	while cmd =~# '^-\%(\w\+\)\%([= ]\|$\)'
+		let opt = matchstr(cmd, '^-\zs\w\+')
+		if cmd =~ '^-\w\+='
+			let val = matchstr(cmd, '^-\w\+=\zs\%(\\.\|\S\)*')
+		else
+			let val = ''
+		endif
+		let opts[opt] = substitute(val, '\\\(\s\)', '\1', 'g')
+		let cmd = substitute(cmd, '^-\w\+\%(=\%(\\.\|\S\)*\)\=\s*', '', '')
+	endwhile
+	let cmd = substitute(cmd, '^\s*\(.\{-}\)\s*$', '\1', '')
+	let cmd = substitute(cmd, '^@\s*', '', '')
+	return [cmd, opts]
+endfunc
+
+
+"----------------------------------------------------------------------
+" switch buffer
+"----------------------------------------------------------------------
+function! asclib#core#switch(filename, opts)
+	let switch = get(g:, 'asclib#core#switch_mode', &switchbuf)
+	let switch = get(a:opts, 'switch', switch)
+	let method = split(switch, ',')
+	let goto = get(a:opts, 'goto', -1)
+	let cmds = get(a:opts, 'command', [])
+	if type(a:filename) == type('')
+		if filereadable(a:filename) == 0
+			if get(a:opts, 'exist', 0) != 0
+				echohl ErrorMsg
+				echom "E484: Can't open file " . (a:filename)
+				echohl None
+				return 0
+			endif
+		endif
+		let bid = bufadd(a:filename)
+		call bufload(bid)
+	else
+		let bid = a:filename
+	endif
+	if index(method, 'useopen') >= 0
+		for wid in range(winnr('$'))
+			let b = winbufnr(wid + 1)
+			if b == bid
+				silent exec ''. (wid + 1) . 'wincmd w'
+				if goto > 0
+					silent exec ':' . goto
+				endif
+				for cmd in cmds
+					exec cmd
+				endfor
+				return 1
+			endif
+		endfor
+	endif
+	if index(method, 'usetab') >= 0
+		for tid in range(tabpagenr('$'))
+			let buflist = tabpagebuflist(tid + 1)
+			for wid in range(len(buflist))
+				if bid == buflist[wid]
+					silent exec 'tabn ' . (tid + 1)
+					silent exec '' . (wid + 1) . 'wincmd w'
+					if goto > 0
+						silent exec ':' . goto
+					endif
+					for cmd in cmds
+						exec cmd
+					endfor
+					return 1
+				endif
+			endfor
+		endfor
+	endif
+	if index(method, 'newtab') >= 0
+		silent exec 'tab split'
+	elseif index(method, 'uselast') >= 0
+		silent exec 'wincmd p'
+	elseif index(method, 'edit') >= 0
+		silent exec ''
+	elseif index(method, 'drop') >= 0
+	else
+		if &buftype != ''
+			silent exec 'wincmd p'
+		endif
+		for i in range(winnr('$'))
+			if &buftype == ''
+				break
+			endif
+			silent exec 'wincmd w'
+		endfor
+		let mods = get(a:opts, 'mods', '')
+		if index(method, 'auto') >= 0
+			if winwidth(0) >= 160
+				exec mods . ' vsplit'
+			else
+				exec mods . ' split'
+			endif
+		elseif index(method, 'split') >= 0
+			exec mods . ' split'
+		elseif index(method, 'vsplit') >= 0
+			exec mods . ' vsplit'
+		endif
+	endif
+	try
+		exec 'b' . ((get(a:opts, 'force', 0) != 0)? '!' : '') . ' ' . bid
+	catch /^Vim\%((\a\+)\)\=:E37:/ 
+		echohl ErrorMsg
+		echo 'E37: No write since last change (set force=1 to override)'
+		echohl None
+		return 0
+	endtry
+	if goto > 0
+		exec ':' . goto
+	endif
+	for cmd in cmds
+		exec cmd
+	endfor
+	return 1
+endfunc
+
+
+

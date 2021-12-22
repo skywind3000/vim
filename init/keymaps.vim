@@ -46,11 +46,6 @@ noremap <silent><space>- :resize -3<cr>
 noremap <silent><space>, :vertical resize -3<cr>
 noremap <silent><space>. :vertical resize +3<cr>
 
-nnoremap <silent><c-w><c-e> :ExpSwitch edit<cr>
-nnoremap <silent><c-w>e :ExpSwitch edit<cr>
-nnoremap <silent><c-w>m :ExpSwitch vs<cr>
-nnoremap <silent><c-w>M :ExpSwitch tabedit<cr>
-
 noremap <silent><space>hh :nohl<cr>
 noremap <silent><bs> :nohl<cr>:redraw!<cr>
 noremap <silent><tab>, :call Tab_MoveLeft()<cr>
@@ -318,43 +313,39 @@ noremap <silent><leader>cw :call Change_DirectoryToFile()<cr>
 "----------------------------------------------------------------------
 " space + h : fast open files
 "----------------------------------------------------------------------
-noremap <space>hp :FileSwitch tabe ~/.vim/project.txt<cr>
-noremap <space>hl :FileSwitch tabe ~/.vim/cloud/Documents/agenda.otl<cr>
+noremap <space>hp :FileSwitch ~/.vim/project.txt<cr>
+noremap <space>hl :FileSwitch ~/.vim/cloud/Documents/agenda.otl<cr>
 noremap <space>hf <c-w>gf
 noremap <space>he :call Show_Explore()<cr>
-noremap <space>hb :FileSwitch tabe ~/.vim/bundle.vim<cr>
-noremap <space>hq :FileSwitch tabe ~/.vim/quicknote.txt<cr>
-noremap <space>hg :FileSwitch tabe ~/.vim/scratch.txt<cr>
-noremap <space>hd :FileSwitch tabe ~/Dropbox/Documents/notes.txt<cr>
-noremap <space>ho :FileSwitch tabe ~/.vim/cloud/Documents/cloudnote.txt<cr>
-noremap <space>hi :FileSwitch tabe ~/.vim/tasks.ini<cr>
+noremap <space>hb :FileSwitch ~/.vim/bundle.vim<cr>
+noremap <space>hq :FileSwitch ~/.vim/quicknote.txt<cr>
+noremap <space>hg :FileSwitch ~/.vim/scratch.txt<cr>
+noremap <space>hd :FileSwitch ~/Dropbox/Documents/notes.txt<cr>
+noremap <space>ho :FileSwitch ~/.vim/cloud/Documents/cloudnote.txt<cr>
+noremap <space>hi :FileSwitch ~/.vim/tasks.ini<cr>
 noremap <space>h; :call asclib#nextcloud_sync()<cr>
 
 if (!has('nvim')) && (has('win32') || has('win64'))
-	noremap <space>hr :FileSwitch tabe ~/_vimrc<cr>
+	noremap <space>hr :FileSwitch ~/_vimrc<cr>
 elseif !has('nvim')
-	noremap <space>hr :FileSwitch tabe ~/.vimrc<cr>
+	noremap <space>hr :FileSwitch ~/.vimrc<cr>
 else
-	noremap <space>hr :FileSwitch tabe ~/.config/nvim/init.vim<cr>
+	noremap <space>hr :FileSwitch ~/.config/nvim/init.vim<cr>
 endif
 
-let s:filename = expand('<sfile>:p')
-exec 'nnoremap <space>hk :FileSwitch tabe '.fnameescape(s:filename).'<cr>'
-let s:skywind = fnamemodify(s:filename, ':h:h'). '/skywind.vim'
-exec 'nnoremap <space>hs :FileSwitch tabe '.fnameescape(s:skywind).'<cr>'
-let s:bundle = fnamemodify(s:filename, ':h:h'). '/bundle.vim'
-exec 'nnoremap <space>hv :FileSwitch tabe '.fnameescape(s:bundle).'<cr>'
-let s:asclib = fnamemodify(s:filename, ':h:h'). '/autoload/asclib.vim'
-exec 'nnoremap <space>hc :FileSwitch tabe '.fnameescape(s:asclib).'<cr>'
-let s:auxlib = fnamemodify(s:filename, ':h:h'). '/autoload/auxlib.vim'
-exec 'nnoremap <space>hu :FileSwitch tabe '.fnameescape(s:auxlib).'<cr>'
-let s:tasks = fnamemodify(s:filename, ':h:h'). '/tasks.ini'
-exec 'nnoremap <space>ht :FileSwitch tabe '.fnameescape(s:tasks).'<cr>'
+let $RTP = expand('<sfile>:p:h:h')
+nnoremap <space>hk :FileSwitch $RTP/init/keymaps.vim<cr>
+nnoremap <space>hs :FileSwitch $RTP/skywind.vim<cr>
+nnoremap <space>hv :FileSwitch $RTP/bundle.vim<cr>
+nnoremap <space>hc :FileSwitch $RTP/autoload/asclib.vim<cr>
+nnoremap <space>hu :FileSwitch $RTP/autoload/auxlib.vim<cr>
+nnoremap <space>ht :FileSwitch $RTP/tasks.ini<cr>
+
 let s:nvimrc = expand("~/.config/nvim/init.vim")
 if has('win32') || has('win16') || has('win95') || has('win64')
 	let s:nvimrc = expand("~/AppData/Local/nvim/init.vim")
 endif
-exec 'nnoremap <space>hn :FileSwitch tabe '.fnameescape(s:nvimrc).'<cr>'
+exec 'nnoremap <space>hn :FileSwitch '.fnameescape(s:nvimrc).'<cr>'
 
 
 

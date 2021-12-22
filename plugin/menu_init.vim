@@ -3,7 +3,7 @@
 " menu_init.vim -
 "
 " Created by skywind on 2019/12/26
-" Last Modified: 2019/12/26 16:23:48
+" Last Modified: 2021/12/22 22:47
 "
 "======================================================================
 
@@ -46,7 +46,7 @@ call quickui#menu#install("&File", [
 call quickui#menu#install("&Edit", [
 			\ ['Copyright &Header', 'call feedkeys("\<esc> ec")', 'Insert copyright information at the beginning'],
 			\ ['&Trailing Space', 'call StripTrailingWhitespace()', ''],
-			\ ['Update &ModTime', 'call UpdateLastModified()', ''],
+			\ ['Update &ModTime', 'UpdateLastModified', ''],
 			\ ['&Paste Mode Line', 'PasteVimModeLine', ''],
 			\ ['Format J&son', '%!python -m json.tool', ''],
 			\ ['--'],
@@ -126,8 +126,8 @@ if has('win32') || has('win64') || has('win16') || has('win95')
 endif
 
 call quickui#menu#install("&C/C++", [
-			\ ["&Switch Header/Source\t<spc>fw", "call Open_HeaderFile(-1)"],
-			\ ["S&plit Header/Source\t<spc>fw", "call Open_HeaderFile(1)"],
+			\ ["&Switch Header/Source\t<spc>fw", "SwitchHeader edit"],
+			\ ["S&plit Header/Source\t<spc>fw", "SwitchHeader vsplit"],
 			\ ])
 
 call quickui#menu#install('&Tools', [
@@ -203,7 +203,7 @@ let g:context_menu_k = [
 			\ ['Dash &Help', 'call asclib#utils#dash_ft(&ft, expand("<cword>"))'],
 			\ ['Cpp&man', 'exec "Cppman " . expand("<cword>")', '', "c,cpp"],
 			\ ['P&ython Doc', 'call quickui#tools#python_help("")', '', 'python'],
-			\ ["S&witch Header\t<SPC>fw", 'SwitchHeaderEdit', '', "c,cpp"],
+			\ ["S&witch Header\t<SPC>fw", 'SwitchHeader vsplit', '', "c,cpp"],
 			\ ["Display Highlight", 'call feedkeys(":hi \<c-r>\<c-w>\<cr>")', '', 'vim'],
 			\ ]
 

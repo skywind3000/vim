@@ -50,7 +50,7 @@ endfunc
 let s:cfg_loaded = 0
 let s:cfg_config = {}
 let s:cfg_dirty = 0
-let s:cfg_name = expand('~/.vim/asclib.ini')
+let s:cfg_name = get(g:, 'asclib_ini', expand('~/.vim/asclib.ini'))
 
 function! s:cfg_init()
 	if s:cfg_loaded == 0

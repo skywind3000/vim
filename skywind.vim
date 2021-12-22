@@ -7,6 +7,10 @@ elseif has('win32unix')
 	let g:asc_uname = 'cygwin'
 elseif has('unix') && (has('mac') || has('macunix'))
 	let g:asc_uname = 'darwin'
+elseif has('linux')
+	let g:asc_uname = 'linux'
+elseif has('bsd')
+	let g:asc_uname = 'bsd'
 elseif has('unix')
 	let s:uname = substitute(system("uname"), '\s*\n$', '', 'g')
 	if v:shell_error == 0 && match(s:uname, 'Linux') >= 0
@@ -45,6 +49,10 @@ call after_object#enable(['r', 'R'], '=', ':', '-', '#', ' ', '/', ';', '(', ')'
 "----------------------------------------------------------------------
 let g:asyncrun_msys = 'd:/software/msys32'
 
+if isdirectory(g:asyncrun_msys)
+	let g:asyncrun_msys = 'd:/Linux'
+endif
+
 if has('patch-8.0.0')
 	set shortmess+=c
 endif
@@ -53,7 +61,7 @@ set cpt=.,w,k
 
 
 "----------------------------------------------------------------------
-" config
+" asclib settings
 "----------------------------------------------------------------------
 let s:settings = {  
 	\ 'cygwin': 'd:/linux',
@@ -63,6 +71,7 @@ let s:settings = {
 let s:settings_win = {
 	\ 'emacs': 'd:/dev/emacs/bin/runemacs.exe',
 	\ 'gdb' : 'd:/dev/mingw32/bin/gdb.exe',
+	\ 'browser' : '"C:\Program Files\Mozilla Firefox\firefox"',
 	\ }
 
 call asclib#setting#update(s:settings)

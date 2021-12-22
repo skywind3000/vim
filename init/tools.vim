@@ -17,149 +17,6 @@ set wildmenu
 set wcm=<C-Z>
 "set splitbelow
 
-" show content in a new vertical split window
-function! s:Show_Content(title, width, content)
-	let l:width = a:width
-	if l:width == 0
-		let l:width = winwidth(0) / 2
-		if l:width < 25 | let l:width = 25 | endif
-	endif
-	exec '' . l:width . 'vnew '. fnameescape(a:title)
-	setlocal buftype=nofile bufhidden=delete noswapfile winfixwidth
-	setlocal noshowcmd nobuflisted wrap nonumber
-	if has('syntax')
-		sy clear
-		sy match ShowCmd /<press q to close>/
-		hi clear ShowCmd
-		hi def ShowCmd ctermfg=green
-	endif
-	1s/^/\=a:content/g
-	call append(line('.') - 1, '')
-	call append(line('.') - 1, '<press q to close>')
-	"call append(0, '<press q to close>')
-	setlocal nomodifiable
-	noremap <silent><buffer> <space> :close!<cr>
-	noremap <silent><buffer> <cr> :close!<cr>
-	noremap <silent><buffer> <tab> :close!<cr>
-	noremap <silent><buffer> q :close!<cr>
-	noremap <silent><buffer> c :close!<cr>
-endfunc
-
-" Open file in new tab if it hasn't been open, or reuse the existant tab
-function! Tools_FileSwitch(how, ...)
-	if a:0 == 0 | return | endif
-	let l:tabcc = tabpagenr()
-	let l:wincc = winnr()
-	let l:filename = fnamemodify(a:{a:0}, ':p')
-	let l:params = []
-	for i in range(a:0 - 1)
-		let l:params += [a:{i + 1}]
-	endfor
-	if has('win32') || has('win16') || has('win64') || has('win95')
-		let l:filename = substitute(l:filename, "\\", '/', 'g')
-	endif
-	for i in range(tabpagenr('$'))
-		let l:buflist = tabpagebuflist(i + 1)
-		for j in range(len(l:buflist))
-			let l:bufnr = l:buflist[j]
-			if !getbufvar(l:bufnr, '&modifiable')
-				continue
-			endif
-			let l:buftype = getbufvar(l:bufnr, '&buftype')
-			if l:buftype == 'quickfix' || l:buftype == 'nofile'
-				continue
-			endif
-			let l:name = fnamemodify(bufname(l:bufnr), ':p')
-			if has('win32') || has('win16') || has('win64') || has('win95')
-				let l:name = substitute(l:name, "\\", '/', 'g')
-			endif
-			if l:filename == l:name
-				silent exec 'tabn '.(i + 1)
-				silent exec ''.(j + 1).'wincmd w'
-				for item in l:params
-					if strpart(item, 0, 2) == '+:'
-						silent exec strpart(item, 2)
-					endif
-				endfor
-				return
-			endif
-		endfor
-	endfor
-	if (a:how == 'edit') || (a:how == 'e')
-		exec 'e '.fnameescape(l:filename)
-	elseif (a:how == 'tabedit') || (a:how == 'tabe') || (a:how == 'tabnew')
-		exec 'tabe '.fnameescape(l:filename)
-	elseif (a:how == 'split') || (a:how == 'sp')
-		exec 'split '.fnameescape(l:filename)
-	elseif (a:how == 'vsplit') || (a:how == 'vs')
-		exec 'vsplit '.fnameescape(l:filename)
-	elseif (a:how == 'drop')
-		exec 'drop '.fnameescape(l:filename)
-	else
-		echohl ErrorMsg
-		echom "unknow command: ".a:how
-		echohl NONE
-		return
-	endif
-	for item in l:params
-		if strpart(item, 0, 2) == '+:'
-			silent exec strpart(item, 2)
-		endif
-	endfor
-endfunc
-
-command! -nargs=+ FileSwitch call Tools_FileSwitch(<f-args>)
-
-
-
-function! Open_Dictionary(word)
-	let l:expl = system('sdcv --utf8-input --utf8-output -n "'. a:word .'"')
-	call s:Show_Content('[StarDict]', 28, l:expl)
-endfunc
-
-" switch header
-function! Open_HeaderFile(where)
-	let l:main = expand('%:p:r')
-	let l:fext = expand('%:e')
-	if index(['c', 'cpp', 'm', 'mm', 'cc'], l:fext) >= 0
-		let l:altnames = ['h', 'hpp', 'hh']
-	elseif index(['h', 'hh', 'hpp'], l:fext) >= 0
-		let l:altnames = ['c', 'cpp', 'cc', 'm', 'mm']
-	else
-		echo 'switch failed, not a c/c++ source'
-		return
-	endif
-	if a:where < 0 || a:where == 0
-		if &modified
-			if &hidden == 0 && &bufhidden != 'hide'
-				echo 'file is modified'
-				return
-			endif
-		endif
-	endif
-	for l:next in l:altnames
-		let l:newname = l:main . '.' . l:next
-		if filereadable(l:newname)
-			if a:where < 0
-				exec 'e ' . fnameescape(l:newname)
-			elseif a:where == 0
-				call Tools_FileSwitch('e', l:newname)
-			elseif a:where == 1
-				call Tools_FileSwitch('vs', l:newname)
-			elseif a:where == 2
-				call Tools_FileSwitch('split', l:newname)
-			elseif a:where == 3
-				call Tools_FileSwitch('tabnew', l:newname)
-			endif
-			return
-		endif
-	endfor
-	echo 'switch failed, can not find another part of c/c++ source'
-endfunc
-
-command! -nargs=0 SwitchHeaderEdit call Open_HeaderFile(-1)
-command! -nargs=0 SwitchHeaderSplit call Open_HeaderFile(1)
-command! -nargs=0 SwitchHeaderTab call Open_HeaderFile(3)
 
 " Open Explore in new tab with current directory
 function! Open_Explore(where)
@@ -359,35 +216,9 @@ function! Change_DirectoryToFile()
 endfunc
 
 
-" log file
-function! s:LogAppend(filename, text)
-	let l:ts = strftime("[%Y-%m-%d %H:%M:%S] ")
-	if 1
-		call writefile([l:ts . a:text], a:filename, 'a')
-	else
-		exec "redir >> ".fnameescape(a:filename)
-		silent echon l:ts.a:text."\n"
-		silent exec "redir END"
-	endif
-endfunc
-
-
 " write a log
 function! LogWrite(text)
-	if !exists('s:logname')
-		let s:logname = expand("~/.vim/tmp/record.log")
-		let l:path = expand("~/.vim/tmp")
-		try
-			silent call mkdir(l:path, "p", 0755)
-		catch /^Vim\%((\a\+)\)\=:E/
-		finally
-		endtry
-	endif
-	try
-		call s:LogAppend(s:logname, a:text)
-	catch /^Vim\%((\a\+)\)\=:E/
-	finally
-	endtry
+	call asclib#utils#log(a:text)
 endfunc
 
 
@@ -404,19 +235,6 @@ function! Show_Explore()
 		exec "!start /b cmd.exe /C explorer.exe ".shellescape(l:locate)
 	endif
 endfunc
-
-" Search pydoc
-function! Tools_Pydoc(word, where)
-	let l:text = system('python -m pydoc ' . shellescape(a:word))
-	if a:where == '0' || a:where == 'quickfix'
-		cexpr l:text
-	else
-		call s:Show_Content('PyDoc: '.a:word, 0, l:text)
-	endif
-endfunc
-
-
-command! -nargs=1 PyDoc call Tools_Pydoc("<args>", '1')
 
 
 function! Tools_BellUnix()
@@ -572,89 +390,13 @@ function! Tools_ProfileStop()
 endfunc
 
 
-
-function! Tools_ExpSwitch(cmd) abort
-	let filename = expand('%:t')
-	function! s:seek(file) abort
-		if get(b:, 'netrw_liststyle') == 2
-			let pattern = '\%(^\|\s\+\)\zs'.escape(a:file, '.*[]~\').'[/*|@=]\=\%($\|\s\+\)'
-		elseif get(b:, 'netrw_liststyle') == 1
-			let pattern = '^'.escape(a:file, '.*[]~\').'[/*|@=]\=\%($\|\s\+\)'
-		else
-			let pattern = '^\%(| \)*'.escape(a:file, '.*[]~\').'[/*|@=]\=\%($\|\t\)'
-		endif
-		if has('win32') || has('win16') || has('win95') || has('win64')
-			let savecase = &l:ignorecase
-			setlocal ignorecase
-			if &buftype == 'nofile' && &filetype == 'nerdtree'
-				let pattern = '^ *\%(▸ \)\?'.escape(a:file, '.*[]~\').'\>'
-			endif
-			call search(pattern, 'wc')
-			let l:ignorecase = savecase
-		else
-			if &buftype == 'nofile' && &filetype == 'nerdtree'
-				let pattern = '^ *\%(▸ \)\?'.escape(a:file, '.*[]~\').'\>'
-			endif
-			call search(pattern, 'wc')
-		endif
-		return pattern
-	endfunc
-	if &buftype == "nofile" || &buftype == "quickfix"
-		return
-	elseif &filetype ==# 'netrw'
-		return
-	elseif filename == ""
-		exec a:cmd '.'
-	elseif expand('%') =~# '^$\|^term:[\/][\/]'	
-		exec a:cmd '.'
-	else
-		exec a:cmd '%:p:h'
-		call s:seek(filename)
-	endif
-endfunc
-
-
-command! -nargs=1 ExpSwitch call Tools_ExpSwitch(<f-args>)
-
-
-function! s:run_python(redraw, script)
-	let script = expand(a:script)
-	" echo 'running:'. script
-	pyx import vim
-	pyx execfile(vim.eval('script'))
-	if a:redraw
-		call input("press enter to continue")
-		redraw!
-	endif
-endfunc
-
-command! -bang -nargs=1 PythonRun call s:run_python(<bang>0, <f-args>)
-
-
-
 function! Tools_SwitchMakeFile()
 	let root = asclib#path#get_root('%')
 	let name = asclib#path#join(root, 'Makefile')
-	exec 'FileSwitch tabe '. fnameescape(name)
+	exec 'FileSwitch '. fnameescape(name)
 endfunc
 
 
-function! s:paste_mode_line()
-	let l:modeline = printf(" vim: set ts=%d sw=%d tw=%d %set :",
-		\ &tabstop, &shiftwidth, &textwidth, &expandtab ? '' : 'no')
-	if &commentstring != ""
-		let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
-	else
-		let l:modeline = substitute(l:modeline, '^ ', '', 'g')
-	endif
-	let l:save = @0
-	let @0 = l:modeline
-	exec 'normal! "0P'
-	let @0 = l:save
-endfunc
-
-
-command! -nargs=0 PasteVimModeLine call s:paste_mode_line()
 
 
 "----------------------------------------------------------------------
@@ -681,44 +423,6 @@ function! GetPatternAtCursor(pat)
 		return ""
 	endif
 endfunc
-
-
-"----------------------------------------------------------------------
-" https://github.com/asins/vim 
-"----------------------------------------------------------------------
-function! StripTrailingWhitespace()
-	" Preparation: save last search, and cursor position.
-	let _s=@/
-	let l = line(".")
-	let c = col(".")
-	" do the business:
-	exec '%s/\r$\|\s\+$//e'
-	" clean up: restore previous search history, and cursor position
-	let @/=_s
-	call cursor(l, c)
-endfunc
-
-
-"----------------------------------------------------------------------
-" update last change time
-"----------------------------------------------------------------------
-function! UpdateLastModified()
-	" preparation: save last search, and cursor position.
-	let _s=@/
-	let l = line(".")
-	let c = col(".")
-
-	let n = min([10, line('$')]) " check head
-	let timestamp = strftime('%Y/%m/%d %H:%M') " time format
-	let timestamp = substitute(timestamp, '%', '\%', 'g')
-	let pat = substitute('Last Modified:\s*\zs.*\ze', '%', '\%', 'g')
-	keepjumps silent execute '1,'.n.'s%^.*'.pat.'.*$%'.timestamp.'%e'
-
-	" clean up: restore previous search history, and cursor position
-	let @/=_s
-	call cursor(l, c)
-endfunc
-
 
 "----------------------------------------------------------------------
 " Align cheatsheet
@@ -758,21 +462,17 @@ function! s:RemovePath(path) abort
 	let path = a:path
 	let sep = ':'
 	let parts = []
-	function! s:StringReplace(text, old, new)
-		let l:data = split(a:text, a:old, 1)
-		return join(l:data, a:new)
-	endfunc
 	if has('win32') || has('win64') || has('win32unix') || has('win95')
 		let windows = 1
 		let path = tolower(path)
-		let path = s:StringReplace(path, '\', '/')
+		let path = asclib#string#replace(path, '\', '/')
 		let sep = ';'
 	endif
 	for n in split($PATH, sep)
 		let key = n
 		if windows != 0 
 			let key = tolower(key)
-			let key = s:StringReplace(key, '\', '/')
+			let key = asclib#string#replace(key, '\', '/')
 		endif
 		if key != path 
 			let parts += [n]
@@ -785,76 +485,5 @@ endfunc
 command! -nargs=1 EnvPathRemove call s:RemovePath(<q-args>)
 
 
-
-"----------------------------------------------------------------------
-" open terminal
-"----------------------------------------------------------------------
-function! s:OpenTerminal(pos)
-	let shell = get(g:, 'terminal_shell', split(&shell, ' ')[0])
-	exec 'AsyncRun -mode=term -pos='. (a:pos) . ' -cwd=<root> ' . shell
-endfunc
-
-command! -nargs=1 OpenTerminal call s:OpenTerminal(<q-args>)
-
-
-"----------------------------------------------------------------------
-" break long lines to small lines of 76 characters.
-"----------------------------------------------------------------------
-function! s:LineBreaker(width)
-	let width = &textwidth
-	let p1 = &g:formatprg
-	let p2 = &l:formatprg
-	let &textwidth = str2nr(a:width)
-	set formatprg=
-	setlocal formatprg=
-	exec 'normal ggVGgq'
-	let &textwidth = width
-	let &g:formatprg = p1
-	let &l:formatprg = p2
-endfunc
-
-command! -nargs=1 LineBreaker call s:LineBreaker(<q-args>)
-
-
-"----------------------------------------------------------------------
-" OpenURL[!] [url]
-" - open url in default browser (change this by g:browser_cmd)
-" - when bang (!) is included, ignore g:browser_cmd
-" - when url is omitted, use the current url under cursor
-" - vim-plug format "Plug 'xxx'" can also be accepted.
-"----------------------------------------------------------------------
-function! s:OpenURL(url, bang)
-	let url = a:url
-	if url == ''
-		let t = matchstr(getline('.'), '^\s*Plug\s*''\zs\(.\{-}\)*\ze''')
-		if t != ''
-			let github = 'https://github.com/'
-			let url = (t =~ '^\(http\|https\):\/\/')? t : (github . t)
-		else
-			let url = expand('<cfile>')
-		endif
-	endif
-	if url != ''
-		call asclib#utils#open_url(url, a:bang)
-	endif
-endfunc
-
-command! -nargs=* -bang OpenURL call s:OpenURL(<q-args>, '<bang>')
-command! -nargs=0 -bang PlugBrowse call s:OpenURL('', '<bang>')
-
-
-"----------------------------------------------------------------------
-" browse code in github or gitlab
-"----------------------------------------------------------------------
-function! s:BrowseGit(name, bang, ...)
-	let name = asclib#string#strip(a:name)
-	let raw = (a:0 > 0)? (a:1) : 0
-	let url = asclib#utils#git_browse(name, raw)
-	if url != ''
-		call s:OpenURL(url, a:bang)
-	endif
-endfunc
-
-command! -nargs=* -bang BrowseGit call s:BrowseGit(<q-args>, '<bang>')
 
 
