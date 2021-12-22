@@ -20,7 +20,7 @@ endfunc
 "----------------------------------------------------------------------
 " Switch cpp/h file
 "----------------------------------------------------------------------
-command! -nargs=? SwitchHeader call minibox#cpp#switch_header(<f-args>) 
+command! -nargs=? SwitchHeader call module#cpp#switch_header(<f-args>) 
 
 
 "----------------------------------------------------------------------
@@ -148,5 +148,18 @@ function! s:BrowseGit(name, bang, ...)
 	endif
 endfunc
 
+
+"----------------------------------------------------------------------
+" Insert Class Name
+"----------------------------------------------------------------------
+command! -nargs=0 -range CppClassInsert 
+			\ call module#cpp#class_insert(<line1>, <line2>)
+
+
+"----------------------------------------------------------------------
+" expand brace
+"----------------------------------------------------------------------
+command! -nargs=0 -range CppBraceExpand
+			\ call module#cpp#brace_expand(<line1>, <line2>)
 
 

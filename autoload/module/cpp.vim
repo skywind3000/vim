@@ -7,8 +7,11 @@
 "
 "======================================================================
 
+
+"----------------------------------------------------------------------
 " switch header
-function! minibox#cpp#switch_header(...)
+"----------------------------------------------------------------------
+function! module#cpp#switch_header(...)
 	let l:main = expand('%:p:r')
 	let l:fext = expand('%:e')
 	if index(['c', 'cpp', 'm', 'mm', 'cc'], l:fext) >= 0
@@ -40,6 +43,29 @@ function! minibox#cpp#switch_header(...)
 		let t = 'switch failed, can not find another part of c/c++ source'
 		call asclib#core#errmsg(t)
 	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" insert a class name
+"----------------------------------------------------------------------
+function! module#cpp#class_insert(line1, line2)
+	let msg = 'Enter a class name to insert: '
+	let clsname = asclib#ui#input(msg, '', 'clsname')
+	if clsname != ''
+		let clsname = escape(clsname, '/\[*~^')
+		let text = 's/\~\=\w\+\s*(/' . clsname . '::&/'
+		exec a:line1 . ',' . a:line2 . text
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" expand brace
+"----------------------------------------------------------------------
+function! module#cpp#brace_expand(line1, line2)
+	let cmd = 's/;\s*$/\r{\r}\r\r/'
+	exec a:line1 . ',' . a:line2 . cmd
 endfunc
 
 

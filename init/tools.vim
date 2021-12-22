@@ -442,19 +442,6 @@ command! -nargs=? -range MyCheatSheetAlign <line1>,<line2>call s:Tools_CheatShee
 
 
 "----------------------------------------------------------------------
-" add class name to function
-"----------------------------------------------------------------------
-function! s:Tools_ClassInsert(clsname)
-	let clsname = escape(a:clsname, '/\[*~^')
-	let text = 's/\~\=\w\+\s*(/' . clsname . '::&/'
-	silent! keepjumps exec text
-endfunc
-
-command! -nargs=1 -range ClassInsert <line1>,<line2>call s:Tools_ClassInsert(<q-args>)
-command! -nargs=0 -range BraceExpand <line1>,<line2>s/;\s*$/\r{\r}\r\r/
-
-
-"----------------------------------------------------------------------
 " Remove some path from $PATH
 "----------------------------------------------------------------------
 function! s:RemovePath(path) abort

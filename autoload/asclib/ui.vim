@@ -10,6 +10,45 @@
 " vim: set ts=4 sw=4 tw=78 noet :
 
 "----------------------------------------------------------------------
-" ui
+" internal
 "----------------------------------------------------------------------
+let g:asclib_ui = get(g:, 'asclib_ui', {})
+
+
+"----------------------------------------------------------------------
+" input
+"----------------------------------------------------------------------
+function! asclib#ui#input(prompt, text, name)
+	if has_key(g:asclib_ui, 'input')
+		return g:asclib_ui.input(a:prompt, a:text, a:name)
+	endif
+	call inputsave()
+	try
+		let t = input(a:prompt, a:text)
+	catch /^Vim:Interrupt$/
+		let t = ""
+	endtry
+	call inputrestore()
+	return t
+endfunc
+
+
+"----------------------------------------------------------------------
+" confirm
+"----------------------------------------------------------------------
+function! asclib#ui#confirm(msg, choices, default)
+	if has_key(g:asclib_ui, 'confirm')
+		return g:asclib_ui.confirm(a:msg, a:choices, a:default)
+	endif
+	call inputsave()
+	try
+		let hr = confirm(a:msg, choices, default)
+	catch /^Vim:Interrupt$/
+		let hr = 0
+	endtry
+	call inputrestore()
+	return hr
+endfunc
+
+
 
