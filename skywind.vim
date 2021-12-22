@@ -72,6 +72,7 @@ let s:settings_win = {
 	\ 'emacs': 'd:/dev/emacs/bin/runemacs.exe',
 	\ 'gdb' : 'd:/dev/mingw32/bin/gdb.exe',
 	\ 'browser' : '"C:\Program Files\Mozilla Firefox\firefox"',
+	\ 'junk' : '~/OneDrive/Documents/notes/VimJunk',
 	\ }
 
 call asclib#setting#update(s:settings)

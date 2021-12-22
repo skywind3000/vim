@@ -208,14 +208,6 @@ endfunction
 
 command! -bang -nargs=? BufferClose call s:BufferClose('<bang>', '<args>')
 
-function! Change_DirectoryToFile()
-	let l:filename = expand("%:p")
-	if l:filename == "" | return | endif
-	silent exec 'cd '.expand("%:p:h")
-	exec 'pwd'
-endfunc
-
-
 " write a log
 function! LogWrite(text)
 	call asclib#utils#log(a:text)

@@ -163,3 +163,27 @@ command! -nargs=0 -range CppBraceExpand
 			\ call module#cpp#brace_expand(<line1>, <line2>)
 
 
+"----------------------------------------------------------------------
+" cd to file directory
+"----------------------------------------------------------------------
+command! -nargs=0 CdToFileDir call s:CdToFileDir()
+function! s:CdToFileDir()
+	if &buftype == '' && expand('%') != ''
+		silent exec 'cd ' . fnameescape(expand('%:p:h'))
+		exec 'pwd'
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" cd to project root
+"----------------------------------------------------------------------
+command! -nargs=0 CdToProjectRoot call s:CdToProjectRoot()
+function! s:CdToProjectRoot()
+	if &buftype == '' && expand('%') != ''
+		let root = asclib#path#get_root(expand('%:p'))
+		silent exec 'cd ' . fnameescape(root)
+		exec 'pwd'
+	endif
+endfunc
+

@@ -307,7 +307,8 @@ endfor
 " leader + b/c : buffer
 "----------------------------------------------------------------------
 noremap <silent><leader>bc :BufferClose<cr>
-noremap <silent><leader>cw :call Change_DirectoryToFile()<cr>
+noremap <silent><leader>cw :CdToFileDir<cr>
+noremap <silent><leader>cr :CdToProjectRoot<cr>
 
 
 "----------------------------------------------------------------------
