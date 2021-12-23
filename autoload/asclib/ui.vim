@@ -51,4 +51,21 @@ function! asclib#ui#confirm(msg, choices, default)
 endfunc
 
 
+"----------------------------------------------------------------------
+" inputlist
+"----------------------------------------------------------------------
+function! asclib#ui#inputlist(textlist)
+	if has_key(g:asclib_ui, 'inputlist')
+		return g:asclib_ui.inputlist(a:textlist)
+	endif
+	call inputsave()
+	try
+		let hr = inputlist(a:textlist)
+	catch /^Vim:Interrupt$/
+		let hr = -1
+	endtry
+	call inputrestore()
+	return hr
+endfunc
+
 
