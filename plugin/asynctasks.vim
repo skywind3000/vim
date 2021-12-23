@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/20 07:33
-" Verision: 1.8.19
+" Last Modified: 2021/12/24 03:35
+" Verision: 1.8.20
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1016,7 +1016,7 @@ endfunc
 function! s:task_option(task)
 	let task = a:task
 	let opts = {'mode':''}
-	for key in ['cwd', 'mode', 'raw', 'save']
+	for key in ['cwd', 'mode', 'raw', 'save', 'encoding']
 		if has_key(task, key)
 			let opts[key] = task[key]
 		endif
