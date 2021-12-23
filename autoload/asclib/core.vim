@@ -115,7 +115,7 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" call system
+" call system: system(cmd [, cwd [, encoding]])
 "----------------------------------------------------------------------
 function! asclib#core#system(cmd, ...)
 	let cwd = ((a:0) > 0)? (a:1) : ''
@@ -129,7 +129,13 @@ function! asclib#core#system(cmd, ...)
 	endif
 	let g:asclib#core#shell_error = s:shell_error
 	if (a:0) > 1 && has('iconv')
-		let hr = iconv(hr, a:2, &encoding)
+		let encoding = a:2
+		if encoding != '' && encoding != &encoding
+			try
+				let hr = iconv(hr, a:2, &encoding)
+			catch /.*/
+			endtry
+		endif
 	endif
 	return hr
 endfunc
@@ -282,12 +288,17 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" prototype: 
+"     text_process(command, stdin [, cwd [, encoding]])
+"
 " run text filter: stdin is a string list which will pass to the 
 " stdin of command. returns the command output.
 "----------------------------------------------------------------------
 function! asclib#core#text_process(command, stdin, ...) abort
 	let tmpname = tempname()
 	let cwd = (a:0 > 0)? (a:1) : ''
+	let encoding = (a:0 > 1)? (a:2) : ''
+	let encoding = (encoding == &encoding)? '' : encoding
 	let input = []
 	if type(a:stdin) == 1
 		let input = split(a:stdin, "\n")
@@ -305,11 +316,22 @@ function! asclib#core#text_process(command, stdin, ...) abort
 	let script = asclib#core#script_write('vim_pipe', a:command, 0)
 	let cmd = script . ' < ' . shellescape(tmpname) 
 	let cmd = cmd . ' > ' . shellescape(outname) . ' 2>&1'
-	let hr = asclib#core#system(cmd, cwd)
+	let hr = asclib#core#system(cmd, cwd, encoding)
 	let hr = readfile(outname)
 	silent! call delete(tmpname)
 	silent! call delete(outname)
-	return hr
+	let textlist = []
+	for text in hr
+		if encoding != ''
+			try
+				let text = iconv(text, encoding, &encoding)
+			catch /.*/
+			endtry
+		endif
+		let text = substitute(text, '\r$', '', 'g')
+		let textlist += [text]
+	endfor
+	return textlist
 endfunc
 
 
