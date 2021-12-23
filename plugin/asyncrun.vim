@@ -924,7 +924,7 @@ function! s:ExtractOpt(command)
 		if cmd =~ '^-\w\+='
 			let val = matchstr(cmd, '^-\w\+=\zs\%(\\.\|\S\)*')
 		else
-			let val = (opt == 'cwd' || opts == 'encoding')? '' : 1
+			let val = (opt == 'cwd' || opt == 'encoding')? '' : 1
 		endif
 		let opts[opt] = substitute(val, '\\\(\s\)', '\1', 'g')
 		let cmd = substitute(cmd, '^-\w\+\%(=\%(\\.\|\S\)*\)\=\s*', '', '')
