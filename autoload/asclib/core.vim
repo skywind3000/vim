@@ -369,7 +369,8 @@ function! asclib#core#switch(filename, opts)
 	let goto = get(a:opts, 'goto', -1)
 	let cmds = get(a:opts, 'command', [])
 	if type(a:filename) == type('')
-		if filereadable(a:filename) == 0
+		let filename = expand(a:filename)
+		if filereadable(filename) == 0
 			if get(a:opts, 'exist', 0) != 0
 				echohl ErrorMsg
 				echom "E484: Can't open file " . (a:filename)
@@ -377,7 +378,7 @@ function! asclib#core#switch(filename, opts)
 				return 0
 			endif
 		endif
-		let bid = bufadd(a:filename)
+		let bid = bufadd(filename)
 		call bufload(bid)
 	else
 		let bid = a:filename
@@ -453,6 +454,9 @@ function! asclib#core#switch(filename, opts)
 		echohl None
 		return 0
 	endtry
+	if type(a:filename) == type('')
+		exec 'edit ' . fnameescape(expand(a:filename))
+	endif
 	if goto > 0
 		exec ':' . goto
 	endif
