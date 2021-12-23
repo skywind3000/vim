@@ -277,7 +277,10 @@ let g:quickui#palette#colors = [
 " color index to RGB
 "----------------------------------------------------------------------
 let g:quickui#palette#rgb = []
+let g:quickui#palette#number = get(g:, 'quickui_color_num', 256)
+
 let s:palette = []
+let s:matched = {}
 let s:diff_lookup = repeat([0], 512 * 3)
 
 for color in g:quickui#palette#colors
@@ -365,12 +368,60 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" consider config
+"----------------------------------------------------------------------
+function! quickui#palette#bestfit(r, g, b)
+	return s:bestfit_color(a:r, a:g, a:b, g:quickui#palette#number)
+endfunc
+
+
+"----------------------------------------------------------------------
+" matched
+"----------------------------------------------------------------------
+function! quickui#palette#match(r, g, b)
+	let r = (a:r < 256)? (a:r) : 255
+	let g = (a:g < 256)? (a:g) : 255
+	let b = (a:b < 256)? (a:b) : 255
+	let key = (r * 4096 / 4) + (g * 64 / 4) + (b / 4)
+	if !has_key(s:matched, key)
+		let n = g:quickui#palette#number
+		let s:matched[key] = s:bestfit_color(a:r, a:g, a:b, n)
+	endif
+	return s:matched[key]
+endfunc
+
+
+"----------------------------------------------------------------------
+" convert #112233 to [0x11, 0x22, 0x33]
+"----------------------------------------------------------------------
+function! quickui#palette#hex2rgb(hex)
+	if strpart(a:hex, 0, 1) == '#'
+		let cc = str2nr(strpart(a:hex, 1), 16)
+		let r = and(cc / 0x10000, 0xff)
+		let g = and(cc / 0x100, 0xff)
+		let b = and(cc, 0xff)
+		return [r, g, b]
+	endif
+	return [0, 0, 0]
+endfunc
+
+
+"----------------------------------------------------------------------
+" hex to palette index
+"----------------------------------------------------------------------
+function! quickui#palette#hex2index(hex)
+	let [r, g, b] = quickui#palette#hex2rgb(a:hex)
+	return quickui#palette#match(r, g, b)
+endfunc
+
+
+"----------------------------------------------------------------------
 " benchmark
 "----------------------------------------------------------------------
 function! quickui#palette#timing()
 	let ts = reltime()
 	for i in range(256)
-		call quickui#palette#bestfit256(i, i, i)
+		call quickui#palette#match(i, i, i)
 	endfor
 	let tt = reltime(ts)
 	return reltimestr(tt)
