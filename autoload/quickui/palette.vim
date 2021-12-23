@@ -277,10 +277,12 @@ let g:quickui#palette#colors = [
 " color index to RGB
 "----------------------------------------------------------------------
 let g:quickui#palette#rgb = []
+let g:quickui#palette#name = {}
 let g:quickui#palette#number = get(g:, 'quickui_color_num', 256)
 
 let s:palette = []
 let s:matched = {}
+let s:names = {}
 let s:diff_lookup = repeat([0], 512 * 3)
 
 for color in g:quickui#palette#colors
@@ -290,6 +292,8 @@ for color in g:quickui#palette#colors
 	let b = and(cc, 0xff)
 	let g:quickui#palette#rgb += [[r, g, b]]
 	let s:palette += [[r, g, b]]
+	let g:quickui#palette#name[tolower(color.name)] = color.color
+	let s:names[tolower(color.name)] = color.color
 endfor
 
 
@@ -412,6 +416,34 @@ endfunc
 function! quickui#palette#hex2index(hex)
 	let [r, g, b] = quickui#palette#hex2rgb(a:hex)
 	return quickui#palette#match(r, g, b)
+endfunc
+
+
+"----------------------------------------------------------------------
+" search name
+"----------------------------------------------------------------------
+function! quickui#palette#name2index(name, ...)
+	let head = strpart(a:name, 0, 1)
+	if head == '#'
+		return quickui#palette#hex2index(a:name)
+	elseif head == '('
+		let head = strpart(a:name, 1, len(a:name) - 2)
+		let part = split(head, ',')
+		let r = str2nr(part[0])
+		let g = str2nr(part[1])
+		let b = str2nr(part[2])
+		return quickui#palette#match(r, g, b)
+	else
+		let default = (a:0 < 1)? 0 : (a:1)
+		let name = tolower(a:name)
+		if exists('v:colornames')
+			if has_key(v:colornames, name)
+				let hex = v:colornames[name]
+				return quickui#palette#hex2index(hex)
+			endif
+		endif
+		return get(s:names, tolower(a:name), default)
+	endif
 endfunc
 
 
