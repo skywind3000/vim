@@ -760,11 +760,11 @@ function! quickui#utils#switch(filename, opts)
 		endif
 	endif
 	try
+		let force = ((get(a:opts, 'force', 0) != 0)? '!' : '')
 		if bid >= 0
-			let cmd = 'b' . ((get(a:opts, 'force', 0) != 0)? '!' : '')
-			exec cmd . ' ' . bid
+			exec 'b' . force . ' ' . bid
 		else
-			exec 'edit ' . fnameescape(expand(a:filename))
+			exec 'edit' . force . ' ' . fnameescape(expand(a:filename))
 		endif
 	catch /^Vim\%((\a\+)\)\=:E37:/ 
 		echohl ErrorMsg
