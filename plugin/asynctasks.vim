@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/24 06:26
-" Verision: 1.8.21
+" Last Modified: 2021/12/25 05:16
+" Verision: 1.8.22
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1235,47 +1235,6 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" save compiler
-"----------------------------------------------------------------------
-function! s:compiler_save()
-	let saved = {}
-	let saved.l_makeprg = &l:makeprg
-	let saved.g_makeprg = &g:makeprg
-	let saved.l_errorformat = &l:errorformat
-	let saved.g_errorformat = &g:errorformat
-	let saved.bid = bufnr()
-	if exists('b:current_compiler')
-		let saved.old_compiler = b:current_compiler
-	endif
-	return saved
-endfunc
-
-
-"----------------------------------------------------------------------
-" restore compiler
-"----------------------------------------------------------------------
-function! s:compiler_restore(saved)
-	let saved = a:saved
-	let bid = saved.bid
-	let &g:makeprg = saved.g_makeprg
-	let &g:errorformat = saved.g_errorformat
-	call setbufvar(bid, '&makeprg', saved.l_makeprg)
-	call setbufvar(bid, '&errorformat', saved.l_errorformat)
-	if has_key(saved, 'old_compiler')
-		call setbufvar(bid, 'current_compiler', saved.old_compiler)
-	else
-		if bufnr() == bid
-			if exists('b:current_compiler')
-				unlet b:current_compiler
-			endif
-		else
-			call setbufvar(bid, 'current_compiler', '')
-		endif
-	endif
-endfunc
-
-
-"----------------------------------------------------------------------
 " run task
 "----------------------------------------------------------------------
 function! asynctasks#start(bang, taskname, path, ...)
@@ -1333,14 +1292,6 @@ function! asynctasks#start(bang, taskname, path, ...)
 	let opts = s:task_option(task)
 	let opts.name = a:taskname
 	let skip = g:asyncrun_skip
-	let compiler = get(opts, 'compiler', '')
-	if compiler != ''
-		let saved = s:compiler_save()
-		try
-			exec 'compiler ' . fnameescape(compiler)
-		catch /.*/
-		endtry
-	endif
 	if opts.mode == 'bang' || opts.mode == 2
 		" let g:asyncrun_skip = or(g:asyncrun_skip, 2)
 	endif
@@ -1351,9 +1302,6 @@ function! asynctasks#start(bang, taskname, path, ...)
 		call asyncrun#run(a:bang, opts, command, a:1, a:2, a:3)
 	endif
 	let g:asyncrun_skip = skip
-	if compiler != ''
-		call s:compiler_restore(saved)
-	endif
 	return 0
 endfunc
 
