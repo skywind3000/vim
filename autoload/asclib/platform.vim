@@ -39,11 +39,39 @@ endif
 
 
 "----------------------------------------------------------------------
+" gui detection
+"----------------------------------------------------------------------
+let s:gui_running = 0
+
+if has('gui_running')
+	let s:gui_running = 1
+elseif has('nvim')
+	if exists('g:GuiLoaded')
+		if g:GuiLoaded != 0
+			let s:gui_running = 1
+		endif
+	elseif exists('*nvim_list_uis') && len(nvim_list_uis()) > 0
+		let uis = nvim_list_uis()[0]
+		let s:gui_running = get(uis, 'ext_termcolors', 0)? 0 : 1
+	elseif exists("+termguicolors") && (&termguicolors) != 0
+		let s:gui_running = 1
+	endif
+endif
+
+
+"----------------------------------------------------------------------
 " ostype
 "----------------------------------------------------------------------
 function! asclib#platform#uname()
 	return s:uname
 endfunc
 
+
+"----------------------------------------------------------------------
+" check gui
+"----------------------------------------------------------------------
+function! asclib#platform#gui_running()
+	return s:gui_running
+endfunc
 
 
