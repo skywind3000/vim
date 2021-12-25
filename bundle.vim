@@ -1,30 +1,7 @@
 "----------------------------------------------------------------------
 " system detection 
 "----------------------------------------------------------------------
-if exists('g:asc_uname')
-	let s:uname = g:asc_uname
-elseif has('win32') || has('win64') || has('win95') || has('win16')
-	let s:uname = 'windows'
-elseif has('win32unix')
-	let s:uname = 'cygwin'
-elseif has('linux')
-	let s:uname = 'linux'
-elseif has('bsd')
-	let s:uname = 'bsd'
-elseif has('unix')
-	let s:uname = substitute(system("uname"), '\s*\n$', '', 'g')
-	if !v:shell_error && s:uname == "Linux"
-		let s:uname = 'linux'
-	elseif v:shell_error == 0 && match(s:uname, 'Darwin') >= 0
-		let s:uname = 'darwin'
-	else
-		let s:uname = 'posix'
-	endif
-else
-	let s:uname = 'posix'
-endif
-
-
+let s:uname = asclib#platform#uname()
 let g:bundle#uname = s:uname
 let g:bundle#windows = (s:uname == 'windows')? 1 : 0
 
