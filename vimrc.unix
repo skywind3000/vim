@@ -16,7 +16,7 @@ if !exists('g:bundle_group')
 	let g:bundle_group = []
 endif
 
-let g:vim_startup = get(g:, 'vim_startup', '')
+let g:vim_startup = get(g:, 'vim_startup', 0)
 
 if g:vim_startup != 0 || has('gui_running')
 	call Tools_SwitchLayout()
