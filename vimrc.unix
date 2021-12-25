@@ -1,4 +1,4 @@
-" vim: set ts=4 sw=4 tw=78 noet :
+" vim: set ts=4 sw=4 tw=78 noet ft=vim :
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 
 exec 'so '.fnameescape(s:home).'/init.vim'
@@ -18,7 +18,7 @@ endif
 
 let g:vim_startup = get(g:, 'vim_startup', '')
 
-if g:vim_startup != '' || has('gui_running')
+if g:vim_startup != 0 || has('gui_running')
 	call Tools_SwitchLayout()
 endif
 
