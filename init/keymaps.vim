@@ -315,7 +315,6 @@ noremap <silent><leader>cr :CdToProjectRoot<cr>
 " space + h : fast open files
 "----------------------------------------------------------------------
 noremap <space>hp :FileSwitch ~/.vim/project.txt<cr>
-noremap <space>hl :FileSwitch ~/.vim/cloud/Documents/agenda.otl<cr>
 noremap <space>hf <c-w>gf
 noremap <space>he :call Show_Explore()<cr>
 noremap <space>hb :FileSwitch ~/.vim/bundle.vim<cr>
@@ -332,6 +331,12 @@ elseif !has('nvim')
 	noremap <space>hr :FileSwitch ~/.vimrc<cr>
 else
 	noremap <space>hr :FileSwitch ~/.config/nvim/init.vim<cr>
+endif
+
+if has('nvim') == 0
+	nnoremap <space>hl :FileSwitch ~/.vim/local.vim<cr>
+else
+	nnoremap <space>hl :FileSwitch ~/.config/nvim/local.vim<cr>
 endif
 
 let $RTP = expand('<sfile>:p:h:h')

@@ -22,4 +22,5 @@ tags
 /tools/scratch
 /tools/samples
 /doc/tags
+/autoload/module/test_*
 

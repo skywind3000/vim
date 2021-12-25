@@ -1,3 +1,4 @@
+" vim: set ts=4 sw=4 tw=78 noet :
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 
 exec 'so '.fnameescape(s:home).'/init.vim'
@@ -8,9 +9,6 @@ color desert256
 
 hi! CursorLineNr cterm=none
 
-let g:vimmake_cflags = ["-lstdc++"]
-let g:vimmake_build_name = "make"
-let g:escope_gtags_label = 'pygments'
 let g:terminal_skip_key_init = 1
 let g:altmeta_num_shift = get(g:, 'vim_num_shift', 0)
 
@@ -26,9 +24,9 @@ endif
 
 if get(g:, 'vim_manual', 0) == 0
 	let g:bundle_group += ['simple', 'basic']
-	if g:vim_startup == 'nvim'
+	if g:vim_startup == 1
 		let g:bundle_group += ['inter']
-	elseif g:vim_startup == 'mvim'
+	elseif g:vim_startup == 2
 		let g:bundle_group += ['basic', 'inter', 'high', 'opt']
 		let g:bundle_group += ['ale']
 	endif
