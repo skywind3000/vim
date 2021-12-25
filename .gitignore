@@ -22,5 +22,8 @@ tags
 /tools/scratch
 /tools/samples
 /doc/tags
+
 /autoload/module/test_*
+/autoload/asyncrun/runner/test_*
+/autoload/asyncrun/program/test_*
 
