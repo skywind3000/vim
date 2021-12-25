@@ -25,7 +25,7 @@ IncScript init/unix.vim
 
 if has('nvim') == 0
 	let name = expand('~/.vim/local.vim')
-elseif
+else
 	if $XDG_CONFIG_HOME != ''
 		let name = $XDG_CONFIG_HOME . '/nvim/local.vim'
 	else
