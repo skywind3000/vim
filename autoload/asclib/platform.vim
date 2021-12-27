@@ -10,6 +10,26 @@
 " vim: set ts=4 sw=4 tw=78 noet :
 
 "----------------------------------------------------------------------
+" uname -a
+"----------------------------------------------------------------------
+function! asclib#platform#system_uname(...)
+	let force = (a:0 >= 1)? (a:1) : 0
+	if exists('s:system_uname') == 0 || force != 0
+		if has('win32') || has('win64') || has('win95') || has('win16')
+			let uname = asclib#core#system('call cmd.exe /c ver')
+			let uname = substitute(uname, '\s*\n$', '', 'g')
+			let uname = substitute(uname, '^\s*\n', '', 'g')
+			let uname = join(split(uname, '\n'), '')
+		else
+			let uname = substitute(system("uname -a"), '\s*\n$', '', 'g')
+		endif
+		let s:system_uname = uname
+	endif
+	return s:system_uname
+endfunc
+
+
+"----------------------------------------------------------------------
 " system detection 
 "----------------------------------------------------------------------
 if has('win32') || has('win64') || has('win95') || has('win16')
@@ -23,7 +43,7 @@ elseif has('unix') && (has('mac') || has('macunix') || has('macvim'))
 elseif has('bsd')
 	let s:uname = 'bsd'
 elseif has('unix')
-	let s:uname = substitute(system("uname"), '\s*\n$', '', 'g')
+	let s:uname = asclib#platform#system_uname()
 	if v:shell_error == 0 && match(s:uname, 'Linux') >= 0
 		let s:uname = 'linux'
 	elseif v:shell_error == 0 && match(s:uname, 'FreeBSD') >= 0
@@ -73,5 +93,23 @@ endfunc
 function! asclib#platform#gui_running()
 	return s:gui_running
 endfunc
+
+
+"----------------------------------------------------------------------
+" check wsl
+"----------------------------------------------------------------------
+function! asclib#platform#has_wsl()
+	if exists('s:has_wsl') == 0
+		let s:has_wsl = 0
+		if s:uname == 'linux'
+			let uname = asclib#platform#system_uname()
+			if match(uname, 'Microsoft') >= 0
+				let s:has_wsl = 1
+			endif
+		endif
+	endif
+	return s:has_wsl
+endfunc
+
 
 

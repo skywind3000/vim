@@ -84,7 +84,10 @@ endif
 " keymaps 
 "----------------------------------------------------------------------
 if has('win32') || has('win16') || has('win64') || has('win95')
-	noremap <space>hw :FileSwitch tabe e:/svn/doc/linwei/GTD.otl<cr>
+	noremap <space>hw :FileSwitch e:/svn/doc/linwei/GTD.otl<cr>
+	noremap <silent><space>hq :FileSwitch ~/OneDrive/Documents/notes/quicknote.txt<cr>
+	noremap <silent><space>hp :FileSwitch ~/OneDrive/Documents/notes/personal.gpg<cr>
+	noremap <silent><space>gl :silent !start /b cmd /C c:\drivers\Clink\clink.cmd<cr>
 endif
 
 
@@ -172,8 +175,5 @@ let g:quickui_tags_indent = {
 			\ 'm': '  ',
 			\ }
 
-"----------------------------------------------------------------------
-" module list
-"----------------------------------------------------------------------
 
 
