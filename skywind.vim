@@ -84,14 +84,14 @@ endif
 " keymaps 
 "----------------------------------------------------------------------
 if has('win32') || has('win16') || has('win64') || has('win95')
-	noremap <space>hw :FileSwitch ~/OneDrive/Documents/notes/Vim/GTD.otl<cr>
+	noremap <silent><space>hw :FileSwitch ~/OneDrive/Documents/notes/Vim/GTD.otl<cr>
 	noremap <silent><space>hq :FileSwitch ~/OneDrive/Documents/notes/Vim/quicknote.txt<cr>
 	noremap <silent><space>hp :FileSwitch ~/OneDrive/Documents/notes/Vim/personal.gpg<cr>
 	noremap <silent><space>gl :silent !start /b cmd /C c:\drivers\Clink\clink.cmd<cr>
 elseif isdirectory('/mnt/c/Users/Linwei/OneDrive/Documents/notes/Vim') 
-	noremap <space>hw :FileSwitch /mnt/c/Users/Linwei/OneDrive/Documents/notes/Vim/GTD.otl<cr>
-	noremap <space>hq :FileSwitch /mnt/c/Users/Linwei/OneDrive/Documents/notes/Vim/quicknote.txt<cr>
-	noremap <space>hp :FileSwitch /mnt/c/Users/Linwei/OneDrive/Documents/notes/Vim/personal.gpg<cr>
+	noremap <silent><space>hw :FileSwitch /mnt/c/Users/Linwei/OneDrive/Documents/notes/Vim/GTD.otl<cr>
+	noremap <silent><space>hq :FileSwitch /mnt/c/Users/Linwei/OneDrive/Documents/notes/Vim/quicknote.txt<cr>
+	noremap <silent><space>hp :FileSwitch /mnt/c/Users/Linwei/OneDrive/Documents/notes/Vim/personal.gpg<cr>
 endif
 
 
