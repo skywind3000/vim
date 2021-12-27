@@ -314,38 +314,39 @@ noremap <silent><leader>cr :CdToProjectRoot<cr>
 "----------------------------------------------------------------------
 " space + h : fast open files
 "----------------------------------------------------------------------
-noremap <space>hp :FileSwitch ~/.vim/project.txt<cr>
-noremap <space>hf <c-w>gf
-noremap <space>he :call Show_Explore()<cr>
-noremap <space>hb :FileSwitch ~/.vim/bundle.vim<cr>
-noremap <space>hq :FileSwitch ~/.vim/quicknote.txt<cr>
-noremap <space>hg :FileSwitch ~/.vim/scratch.txt<cr>
-noremap <space>hd :FileSwitch ~/Dropbox/Documents/notes.txt<cr>
-noremap <space>ho :FileSwitch ~/.vim/cloud/Documents/cloudnote.txt<cr>
-noremap <space>hi :FileSwitch ~/.vim/tasks.ini<cr>
-noremap <space>h; :call asclib#nextcloud_sync()<cr>
+noremap <silent><space>hp :FileSwitch ~/.vim/project.txt<cr>
+noremap <silent><space>hf <c-w>gf
+noremap <silent><space>he :call Show_Explore()<cr>
+noremap <silent><space>hb :FileSwitch ~/.vim/bundle.vim<cr>
+noremap <silent><space>hq :FileSwitch ~/.vim/quicknote.txt<cr>
+noremap <silent><space>hm :FileSwitch +setl\ ft=markdown ~/.vim/quicknote.md<cr>
+noremap <silent><space>hg :FileSwitch ~/.vim/scratch.txt<cr>
+noremap <silent><space>hd :FileSwitch ~/.vim/notes.md<cr>
+noremap <silent><space>ho :FileSwitch ~/.vim/cloud/Documents/cloudnote.txt<cr>
+noremap <silent><space>hi :FileSwitch ~/.vim/tasks.ini<cr>
+noremap <silent><space>h; :call asclib#nextcloud_sync()<cr>
 
 if (!has('nvim')) && (has('win32') || has('win64'))
-	noremap <space>hr :FileSwitch ~/_vimrc<cr>
+	noremap <silent><space>hr :FileSwitch ~/_vimrc<cr>
 elseif !has('nvim')
-	noremap <space>hr :FileSwitch ~/.vimrc<cr>
+	noremap <silent><space>hr :FileSwitch ~/.vimrc<cr>
 else
-	noremap <space>hr :FileSwitch ~/.config/nvim/init.vim<cr>
+	noremap <silent><space>hr :FileSwitch ~/.config/nvim/init.vim<cr>
 endif
 
 if has('nvim') == 0
-	nnoremap <space>hl :FileSwitch ~/.vim/local.vim<cr>
+	nnoremap <silent><space>hl :FileSwitch ~/.vim/local.vim<cr>
 else
-	nnoremap <space>hl :FileSwitch ~/.config/nvim/local.vim<cr>
+	nnoremap <silent><space>hl :FileSwitch ~/.config/nvim/local.vim<cr>
 endif
 
 let $RTP = expand('<sfile>:p:h:h')
-nnoremap <space>hk :FileSwitch $RTP/init/keymaps.vim<cr>
-nnoremap <space>hs :FileSwitch $RTP/skywind.vim<cr>
-nnoremap <space>hv :FileSwitch $RTP/bundle.vim<cr>
-nnoremap <space>hc :FileSwitch $RTP/autoload/asclib.vim<cr>
-nnoremap <space>hu :FileSwitch $RTP/autoload/auxlib.vim<cr>
-nnoremap <space>ht :FileSwitch $RTP/tasks.ini<cr>
+nnoremap <silent><space>hk :FileSwitch $RTP/init/keymaps.vim<cr>
+nnoremap <silent><space>hs :FileSwitch $RTP/skywind.vim<cr>
+nnoremap <silent><space>hv :FileSwitch $RTP/bundle.vim<cr>
+nnoremap <silent><space>hc :FileSwitch $RTP/autoload/asclib.vim<cr>
+nnoremap <silent><space>hu :FileSwitch $RTP/autoload/auxlib.vim<cr>
+nnoremap <silent><space>ht :FileSwitch $RTP/tasks.ini<cr>
 
 let s:nvimrc = expand("~/.config/nvim/init.vim")
 if has('win32') || has('win16') || has('win95') || has('win64')
