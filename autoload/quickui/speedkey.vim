@@ -14,4 +14,10 @@
 " speedkey class
 "----------------------------------------------------------------------
 let s:speedkey = {}
+let s:speedkey.mode = 0
+let s:speedkey.bid = -1
+let s:speedkey.winid = -1
+let s:speedkey.leader = ''
+let s:speedkey.visual = 0
+
 
