@@ -76,6 +76,37 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" 
+"----------------------------------------------------------------------
+function! s:api_sound_play(filename)
+	let cmd = ''
+endfunc
+
+
+"----------------------------------------------------------------------
+" play file
+"----------------------------------------------------------------------
+function! PlaySound22(wav)
+	if !filereadable(a:wav)
+		return -1
+	elseif exists('*sound_playfile')
+		return sound_playfile(a:wav)
+	elseif executable('afplay')
+		let cmd = 'afplay %s'
+	elseif executable('aplay')
+		let cmd = 'aplay %s'
+	elseif executable('sndrec32')
+		let cmd = 'sndrec32 /embedding /play /close %s'
+	else
+		return -1
+	endif
+	let cmd = printf(cmd, shellescape(a:wav))
+	call asyncrun#run('', cmd, {'mode': 'hide'})
+	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
 " init hook
 "----------------------------------------------------------------------
 function! g:asynctasks_api_hook.init()
