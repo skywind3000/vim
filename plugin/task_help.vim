@@ -79,6 +79,10 @@ endfunc
 " init hook
 "----------------------------------------------------------------------
 function! g:asynctasks_api_hook.init()
+	let ui = get(g:, 'asynctasks_use_quickui', 1)
+	if ui == 0
+		return -1
+	endif
 	if get(g:, 'quickui_version', '') != ''
 		let c1 = g:quickui#core#has_popup
 		let c2 = g:quickui#core#has_floating
@@ -87,6 +91,7 @@ function! g:asynctasks_api_hook.init()
 			let g:asynctasks_api_hook.confirm = function('s:api_confirm')
 		endif
 	endif
+	return 0
 endfunc
 
 
