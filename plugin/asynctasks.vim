@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/30 06:09
-" Verision: 1.8.26
+" Last Modified: 2021/12/30 06:39
+" Verision: 1.8.27
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1401,9 +1401,9 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" task info
+" task config
 "----------------------------------------------------------------------
-function! asynctasks#info(path, name)
+function! asynctasks#inspect(path, name)
 	let path = (a:path == '')? expand('%:p') : a:path
 	let path = (path == '')? getcwd() : path
 	if asynctasks#collect_config(path, 1) != 0
@@ -2057,6 +2057,36 @@ function! asynctasks#source(maxwidth)
 		let row[0] = row[0] . repeat(' ', maxsize - len(row[0]))
 	endfor
 	return rows
+endfunc
+
+
+"----------------------------------------------------------------------
+" return ini content 
+"----------------------------------------------------------------------
+function! asynctasks#content(path, name)
+	let task = asynctasks#inspect(a:path, a:name)
+	let textlist = []
+	if empty(task)
+		return ''
+	endif
+	let textlist += ['[' . a:name . ']']
+	let names = ['command', 'cwd', 'output', 'pos', 'option', 'program']
+	let names += ['encoding', 'notify']
+	let protected = {}
+	for name in names
+		let protected[name] = 1
+		if has_key(task, name)
+			let textlist += [name . '=' . task[name]]
+		endif
+	endfor
+	for key in keys(task)
+		if has_key(protected, key) == 0
+			if strpart(key, 0, 2) != '__'
+				let textlist += [key . '=' . task[key]]
+			endif
+		endif
+	endfor
+	return join(textlist, "\n")
 endfunc
 
 

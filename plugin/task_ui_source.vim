@@ -102,7 +102,7 @@ endfunction
 "----------------------------------------------------------------------
 let g:clap_provider_tasks = {}
 let g:clap_provider_tasks.description = 'Navigate available tasks from asynctasks.vim'
-" let g:clap_provider_tasks.preview = 0
+let g:clap_provider_tasks.preview = 0
 let g:clap_provider_tasks.syntax = 'clap_tasks'
 
 function! g:clap_provider_tasks.source() abort
@@ -122,6 +122,19 @@ function! g:clap_provider_tasks.sink(what)
 		let name = substitute(name, '^\s*\(.\{-}\)\s*$', '\1', '')
 		if name != ''
 			exec "AsyncTask ". fnameescape(name)
+		endif
+	endif
+endfunc
+
+function! g:clap_provider_tasks.on_move()
+	let curline = g:clap.display.getcurline()
+	let p1 = stridx(curline, '<')
+	if p1 >= 0
+		let name = strpart(curline, 0, p1)
+		let name = substitute(name, '^\s*\(.\{-}\)\s*$', '\1', '')
+		let text = asynctasks#content('', name)
+		if text != ''
+			call g:clap.preview.show(split(text, '\n'))
 		endif
 	endif
 endfunc
