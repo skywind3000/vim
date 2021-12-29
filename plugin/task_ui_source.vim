@@ -102,7 +102,7 @@ endfunction
 "----------------------------------------------------------------------
 let g:clap_provider_tasks = {}
 let g:clap_provider_tasks.description = 'Navigate available tasks from asynctasks.vim'
-let g:clap_provider_tasks.preview = 0
+" let g:clap_provider_tasks.preview = 0
 let g:clap_provider_tasks.syntax = 'clap_tasks'
 
 function! g:clap_provider_tasks.source() abort

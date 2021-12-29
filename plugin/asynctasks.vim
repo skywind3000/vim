@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/29 18:01
-" Verision: 1.8.25
+" Last Modified: 2021/12/30 06:09
+" Verision: 1.8.26
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -1397,6 +1397,24 @@ function! asynctasks#list(path)
 		endif
 	endfor
 	return rows
+endfunc
+
+
+"----------------------------------------------------------------------
+" task info
+"----------------------------------------------------------------------
+function! asynctasks#info(path, name)
+	let path = (a:path == '')? expand('%:p') : a:path
+	let path = (path == '')? getcwd() : path
+	if asynctasks#collect_config(path, 1) != 0
+		return {}
+	endif
+	let tasks = s:private.tasks
+	if has_key(tasks.config, a:name) != 0
+		let item = tasks.config[a:name]
+		return deepcopy(item)
+	endif
+	return {}
 endfunc
 
 

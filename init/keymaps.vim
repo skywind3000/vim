@@ -47,7 +47,7 @@ noremap <silent><space>, :vertical resize -3<cr>
 noremap <silent><space>. :vertical resize +3<cr>
 
 noremap <silent><space>hh :nohl<cr>
-noremap <silent><bs> :nohl<cr>:redraw!<cr>
+noremap <silent><bs><bs> :nohl<cr>:redraw!<cr>
 noremap <silent><tab>, :call Tab_MoveLeft()<cr>
 noremap <silent><tab>. :call Tab_MoveRight()<cr>
 noremap <silent><tab>6 :VinegarOpen leftabove vs<cr>
