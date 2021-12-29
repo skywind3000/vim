@@ -15,4 +15,10 @@ augroup MyFloatermTheme
 	au! VimEnter * call s:setup_highlight()
 augroup END
 
+let g:floaterm_borderchars = '─│─│┌┐┘└'
+
+if has('gui_running') && (has('win32') || has('win64') || has('win95'))
+	let g:floaterm_borderchars = '-|-|++++'
+endif
+
 
