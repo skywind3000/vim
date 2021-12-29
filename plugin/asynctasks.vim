@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/25 05:16
-" Verision: 1.8.22
+" Last Modified: 2021/12/29 18:01
+" Verision: 1.8.23
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -80,6 +80,12 @@ let g:asynctasks_term_listed = get(g:, 'asynctasks_term_listed', 1)
 
 " set to 1 to pass arguments in a safe way (intermediate script)
 let g:asynctasks_term_safe = get(g:, 'asynctasks_term_safe', 0)
+
+" options passing to runner
+let g:asynctasks_term_option = get(g:, 'asynctasks_term_option', '')
+
+" extra options passing to runner
+let g:asynctasks_term_opts = get(g:, 'asynctasks_term_opts', {})
 
 " set to 1 to close terminal when task finished
 let g:asynctasks_term_close = get(g:, 'asynctasks_term_close', 0)
@@ -1016,9 +1022,16 @@ endfunc
 function! s:task_option(task)
 	let task = a:task
 	let opts = {'mode':''}
-	for key in ['cwd', 'mode', 'raw', 'save', 'encoding']
+	let protected = {}
+	for key in ['mode', 'pos', 'output', 'cwd', 'raw', 'save']
+		let protected[key] = 1
 		if has_key(task, key)
 			let opts[key] = task[key]
+		endif
+	endfor
+	for key in keys(g:asynctasks_term_opts)
+		if has_key(protected, key) == 0
+			let opts[key] = g:asynctasks_term_opts[key]
 		endif
 	endfor
 	if has_key(task, 'output')
@@ -1078,12 +1091,15 @@ function! s:task_option(task)
 			let opts.raw = 1
 		endif
 	endif
+	if g:asynctasks_term_option != ''
+		let opts.option = g:asynctasks_term_option
+	endif
 	for key in ['strip', 'pos', 'rows', 'cols', 'focus', 'safe']
 		if has_key(task, key)
 			let opts[key] = task[key]
 		endif
 	endfor
-	for key in ['option', 'scroll', 'program', 'auto', 'once']
+	for key in ['option', 'scroll', 'program', 'auto', 'once', 'encoding']
 		if has_key(task, key)
 			let opts[key] = task[key]
 		endif
