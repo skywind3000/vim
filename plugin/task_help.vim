@@ -76,18 +76,12 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" 
-"----------------------------------------------------------------------
-function! s:api_sound_play(filename)
-	let cmd = ''
-endfunc
-
-
-"----------------------------------------------------------------------
 " play file
 "----------------------------------------------------------------------
 function! PlaySound22(wav)
-	if !filereadable(a:wav)
+	if get(g:, 'asynctasks_sound', 1) == 0
+		return -1
+	elseif !filereadable(a:wav)
 		return -1
 	elseif exists('*sound_playfile')
 		return sound_playfile(a:wav)
@@ -95,13 +89,16 @@ function! PlaySound22(wav)
 		let cmd = 'afplay %s'
 	elseif executable('aplay')
 		let cmd = 'aplay %s'
+	elseif executable('powershell') && (has('win32') || has('win64'))
+		let cmd = 'powershell -c (New-Object Media.SoundPlayer %s).PlaySync()'
 	elseif executable('sndrec32')
 		let cmd = 'sndrec32 /embedding /play /close %s'
 	else
 		return -1
 	endif
-	let cmd = printf(cmd, shellescape(a:wav))
-	call asyncrun#run('', cmd, {'mode': 'hide'})
+	let name = fnamemodify(a:wav, ':p')
+	let cmd = printf(cmd, shellescape(name))
+	call asyncrun#run('', {'mode': 'hide'}, cmd)
 	return 0
 endfunc
 
@@ -122,6 +119,7 @@ function! g:asynctasks_api_hook.init()
 			let g:asynctasks_api_hook.confirm = function('s:api_confirm')
 		endif
 	endif
+	let g:asynctasks_api_hook.sound_play = function('PlaySound22')
 	return 0
 endfunc
 
