@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/30 06:39
-" Verision: 1.8.27
+" Last Modified: 2021/12/30 06:49
+" Verision: 1.8.28
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -2070,9 +2070,19 @@ function! asynctasks#content(path, name)
 		return ''
 	endif
 	let textlist += ['[' . a:name . ']']
-	let names = ['command', 'cwd', 'output', 'pos', 'option', 'program']
-	let names += ['encoding', 'notify']
 	let protected = {}
+	if has_key(task, 'command')
+		let textlist += ['command=' . task.command]
+		let protected.command = 1
+	endif
+	for key in keys(task)
+		if key =~ '^command[:\/]'
+			let protected[key] = 1
+			let textlist += [key . '=' . task[key]]
+		endif
+	endfor
+	let names = ['cwd', 'output', 'pos', 'option', 'program']
+	let names += ['encoding', 'notify']
 	for name in names
 		let protected[name] = 1
 		if has_key(task, name)
