@@ -57,7 +57,9 @@ function! s:api_input(msg, text, history)
 	if s:require_check() == 0
 		return ''
 	endif
-	return quickui#input#open(a:msg, a:text, a:history)
+	let msg = a:msg
+	let msg = a:msg . "\n(Enter to confirm, ESC to cancel)" 
+	return quickui#input#open(msg, a:text, a:history)
 endfunc
 
 
