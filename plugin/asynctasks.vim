@@ -5,7 +5,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
 " Last Modified: 2021/12/29 18:01
-" Verision: 1.8.24
+" Verision: 1.8.25
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -907,6 +907,29 @@ function! s:api_confirm(msg, ...)
 		endtry
 		call inputrestore()
 		return hr
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" notify text
+"----------------------------------------------------------------------
+function! s:api_notify(msg, mode)
+	if has_key(g:asynctasks_api_hook, 'notify')
+		call g:asynctasks_api_hook.notify(a:msg, a:mode)
+	elseif has('nvim') != 0 && has('nvim-0.6.0')
+		let msg = a:msg
+		let mode = a:mode
+		lua vim.notify(vim.api.nvim_eval('msg'), vim.api.nvim_eval('mode'))
+	else
+		redraw
+		if a:mode == 'info'
+			echohl AsyncRunSuccess
+		elseif a:mode == 'error'
+			echohl AsyncRunFailure
+		endif
+		echom a:msg
+		echohl None
 	endif
 endfunc
 
@@ -1865,6 +1888,13 @@ function! asynctasks#finish(what)
 		endif
 		echom t . ((g:asyncrun_code != 0)? 'failure' : 'success')
 		echohl None
+	elseif a:what == 'true'
+		let t = 'Task finished: '
+		if g:asyncrun_name != ''
+			let t = 'Task [' . g:asyncrun_name . '] finished: '
+		endif
+		let t .= ((g:asyncrun_code != 0)? 'failure' : 'success')
+		call s:api_notify(t, ((g:asyncrun_code == 0)? 'info' : 'error'))
 	elseif a:what =~ '^sound:'
 		let previous = get(s:, 'sound_id', '')	
 		if previous
