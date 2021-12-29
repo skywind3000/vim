@@ -722,9 +722,6 @@ function! quickui#utils#switch(filename, opts)
 					if goto > 0
 						silent exec ':' . goto
 					endif
-					if ft != ''
-						exec 'setlocal ft=' . fnameescape(ft)
-					endif
 					for cmd in cmds
 						exec cmd
 					endfor
