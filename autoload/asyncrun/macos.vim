@@ -59,6 +59,49 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" open system terminal
+"----------------------------------------------------------------------
+function! macos#open_system(title, script, profile)
+	let content = ['#! /bin/sh']
+	let content = ['clear']
+	let content += [asyncrun#utils#set_title(a:title, 0)]
+	let content += a:script
+	let tmpname = macos#script_write('runner1.sh', content)
+	let cmd = 'open -a Terminal ' . shellescape(tmpname)
+	call system(cmd . ' &')
+endfunc
+
+
+"----------------------------------------------------------------------
+" open terminal
+"----------------------------------------------------------------------
+function! macos#open_terminal(title, script, profile, active)
+	let content = ['#! /bin/sh']
+	let content += ['clear']
+	let content += [asyncrun#utils#set_title(a:title, 0)]
+	let content += a:script
+	let tmpname = macos#script_write('runner2.sh', content)
+	let osascript = []
+	let osascript += ['tell application "Terminal"']
+	let osascript += ['  if it is running then']
+	let osascript += ['     do script "' . tmpname . '; exit"']
+	let osascript += ['  else']
+	let osascript += ['     do script "' . tmpname . '; exit" in window 1']
+	let osascript += ['  end if']
+	let x = '  set current settings of selected tab of '
+	let x = x . 'window 1 to settings set "' . a:profile . '"'
+	if a:profile != ''
+		let osascript += [x]
+	endif
+	if a:active
+		let osascript += ['  activate']
+	endif
+	let osascript += ['end tell']
+	call macos#osascript(osascript, 1)
+endfunc
+
+
+"----------------------------------------------------------------------
 " utils 
 "----------------------------------------------------------------------
 function! s:osascript(...) abort
@@ -164,19 +207,6 @@ function! asyncrun#macos#iterm_spawn(command, opts)
 	endif
 endfunc
 
-
-"----------------------------------------------------------------------
-" open system terminal
-"----------------------------------------------------------------------
-function! macos#open_system(title, script, profile)
-	let content = ['#! /bin/sh']
-	let content = ['clear']
-	let content += [asyncrun#utils#set_title(a:title, 0)]
-	let content += a:script
-	let tmpname = macos#script_write('runner1.sh', content)
-	let cmd = 'open -a Terminal ' . shellescape(tmpname)
-	call system(cmd . ' &')
-endfunc
 
 
 
