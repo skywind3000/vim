@@ -116,7 +116,7 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" select template
+" select template: returns empty string for discard, '!' for new file
 "----------------------------------------------------------------------
 function! s:api_template(templates, preset)
 	return '!'
