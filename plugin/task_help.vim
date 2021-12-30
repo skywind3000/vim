@@ -380,6 +380,6 @@ function! s:fuzzy_complete(ArgLead, CmdLine, CursorPos)
 endfunc
 
 command! -nargs=? -range=0 -complete=customlist,s:fuzzy_complete
-			\ TaskFinder call s:fuzzy_finder(<q-args>)
+			\ AsyncTaskFinder call s:fuzzy_finder(<q-args>)
 
 
