@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/30 06:49
-" Verision: 1.8.28
+" Last Modified: 2021/12/30 15:10
+" Verision: 1.8.30
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -962,6 +962,18 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" detect project type
+"----------------------------------------------------------------------
+function! s:api_detect(path, templates)
+	if has_key(g:asynctasks_api_hook, 'detect')
+		return g:asynctasks_api_hook.detect(a:path, a:templates)
+	else
+		return ''
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " ask user what to do
 "----------------------------------------------------------------------
 function! s:command_input(command, taskname, remember)
@@ -1464,6 +1476,7 @@ endfunc
 "----------------------------------------------------------------------
 let s:template = [
 			\ '# vim: set fenc=utf-8 ft=dosini:',
+			\ '# see: https://github.com/skywind3000/asynctasks.vim/wiki/Task-Config',
 			\ '',
 			\ '# define a new task named "file-build"',
 			\ '[file-build]',
@@ -1616,32 +1629,54 @@ function! s:task_edit(mode, path, template)
 	endfor
 	let template = s:template
 	let temp = get(g:, 'asynctasks_template', 1)
+	let wiki = 'https://github.com/skywind3000/asynctasks.vim/wiki/Task-Config'
 	if type(temp) == 0
 		if temp == 0
-			let template = ['# vim: set fenc=utf-8 ft=dosini:', '']
+			let t = 'https://github.com/skywind3000/asynctasks.vim/wiki/Task-Config'
+			let template = ['# vim: set fenc=utf-8 ft=dosini:']
+			let template += ['# see: ' . wiki, '']
 		endif
 	else
 		let templates = s:template_load()
-		let template = ['# vim: set fenc=utf-8 ft=dosini:', '']
+		let template = ['# vim: set fenc=utf-8 ft=dosini:']
+		let template += ['# see: ' . wiki, '']
 		if a:template == ''
 			if get(g:, 'asynctasks_template_ask', 1) != 0
 				let choices = ['&0 empty']
 				let names = keys(templates)
-				for key in names
-					if len(choices) < 10
-						let idx = len(choices)
-						let choices += ['&'.idx . ' ' . key]
-					endif
-				endfor
-				let options = join(choices, "\n")
-				if len(choices) > 1 && newfile
-					let t = 'Select a template (ESC to quit):'
-					let choice = s:api_confirm(t, options)
-					if choice == 0
+				let index = 1
+				let detect = ''
+				if a:mode ==# '-e'
+					let path = asyncrun#get_root('%')
+					let detect = s:api_detect(path, templates)
+				endif
+				if has_key(g:asynctasks_api_hook, 'template')
+					let k = g:asynctasks_api_hook.template(templates, detect)
+					if k == ''
 						return 0
-					elseif choice > 1
-						let key = names[choice - 2]
-						let template += templates[key]
+					elseif has_key(templates, k)
+						let template += templates[k]
+					endif
+				else
+					for key in names
+						if len(choices) < 10
+							let idx = len(choices)
+							let choices += ['&'.idx . ' ' . key]
+							if key == detect && empty(detect) == 0
+								let index = len(choices)
+							endif
+						endif
+					endfor
+					let options = join(choices, "\n")
+					if len(choices) > 1 && newfile
+						let t = 'Select a template (ESC to quit):'
+						let choice = s:api_confirm(t, options, index)
+						if choice == 0
+							return 0
+						elseif choice > 1
+							let key = names[choice - 2]
+							let template += templates[key]
+						endif
 					endif
 				endif
 			endif

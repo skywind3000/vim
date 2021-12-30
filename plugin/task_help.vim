@@ -108,6 +108,22 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" detect project type
+"----------------------------------------------------------------------
+function! s:api_detect(path, templates)
+	return ''
+endfunc
+
+
+"----------------------------------------------------------------------
+" select template
+"----------------------------------------------------------------------
+function! s:api_template(templates, preset)
+	return '!'
+endfunc
+
+
+"----------------------------------------------------------------------
 " init hook
 "----------------------------------------------------------------------
 function! g:asynctasks_api_hook.init()
@@ -124,6 +140,9 @@ function! g:asynctasks_api_hook.init()
 		endif
 	endif
 	let g:asynctasks_api_hook.sound_play = function('PlaySound22')
+	let g:asynctasks_api_hook.detect = function('s:api_detect')
+	" let g:asynctasks_api_hook.template = function('s:api_template')
 	return 0
 endfunc
+
 
