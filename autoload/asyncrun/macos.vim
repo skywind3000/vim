@@ -13,7 +13,7 @@
 "----------------------------------------------------------------------
 " script name
 "----------------------------------------------------------------------
-function! macos#script_name(name)
+function! asyncrun#macos#script_name(name)
 	let tmpname = fnamemodify(tempname(), ':h') . '/' . a:name
 	return tmpname
 endfunc
@@ -22,7 +22,7 @@ endfunc
 "----------------------------------------------------------------------
 " write script 
 "----------------------------------------------------------------------
-function! macos#script_write(name, content)
+function! asyncrun#macos#script_write(name, content)
 	let tmpname = fnamemodify(tempname(), ':h') . '/' . a:name
 	call writefile(a:content, tmpname)
 	silent! call setfperm(tmpname, 'rwxrwxrws')
@@ -33,7 +33,7 @@ endfunc
 "----------------------------------------------------------------------
 " return pause script
 "----------------------------------------------------------------------
-function! macos#pause_script()
+function! asyncrun#macos#pause_script()
 	let lines = []
 	if executable('bash')
 		let pause = 'read -n1 -rsp "press any key to continue ..."'
@@ -52,7 +52,7 @@ endfunc
 function! macos#osascript(content, wait)
 	let content = ['#! /usr/bin/osascript', '']
 	let content += a:content
-	let tmpname = macos#script_write('runner1.scpt', content)
+	let tmpname = asyncrun#macos#script_write('runner1.scpt', content)
 	let cmd = '/usr/bin/osascript ' . shellescape(tmpname) 
 	call system(cmd . ((a:wait)? '' : ' &'))
 endfunc
@@ -66,7 +66,7 @@ function! macos#open_system(title, script, profile)
 	let content = ['clear']
 	let content += [asyncrun#utils#set_title(a:title, 0)]
 	let content += a:script
-	let tmpname = macos#script_write('runner1.sh', content)
+	let tmpname = asyncrun#macos#script_write('runner1.sh', content)
 	let cmd = 'open -a Terminal ' . shellescape(tmpname)
 	call system(cmd . ' &')
 endfunc
@@ -80,7 +80,7 @@ function! macos#open_terminal(title, script, profile, active)
 	let content += ['clear']
 	let content += [asyncrun#utils#set_title(a:title, 0)]
 	let content += a:script
-	let tmpname = macos#script_write('runner2.sh', content)
+	let tmpname = asyncrun#macos#script_write('runner2.sh', content)
 	let osascript = []
 	let osascript += ['tell application "Terminal"']
 	let osascript += ['  if it is running then']
@@ -143,9 +143,9 @@ endfunction
 "----------------------------------------------------------------------
 " spawn2
 "----------------------------------------------------------------------
-function! asyncrun#macos#iterm_spawn2(command, opts, activate) abort
+function! asyncrun#macos#iterm_spawn2(script, opts, activate) abort
 	let script = asyncrun#utils#isolate(a:opts, [],
-				\ asyncrun#utils#set_title(a:opts.title, a:opts.expanded), a:command)
+				\ asyncrun#utils#set_title(a:opts.title, a:opts.expanded), a:script)
 	return s:osascript(
 				\ 'if application "iTerm" is not running',
 				\   'error',
@@ -157,7 +157,7 @@ function! asyncrun#macos#iterm_spawn2(command, opts, activate) abort
 				\       'set name to ' . s:escape(a:opts.title),
 				\       'set title to ' . s:escape(a:opts.expanded),
 				\       'exec command ' . s:escape(script),
-				\       a:request.background || !has('gui_running') ? 'select oldsession' : '',
+				\       a:opts.background || !has('gui_running') ? 'select oldsession' : '',
 				\     'end tell',
 				\   'end tell',
 				\   a:activate ? 'activate' : '',
@@ -168,9 +168,9 @@ endfunc
 "----------------------------------------------------------------------
 " spawn3 
 "----------------------------------------------------------------------
-function! asyncrun#macos#iterm_spawn3(command, opts, activate) abort
+function! asyncrun#macos#iterm_spawn3(script, opts, activate) abort
 	let script = asyncrun#utils#isolate(a:opts, [],
-				\ asyncrun#utils#set_title(a:opts.title, a:opts.expanded), a:command)
+				\ asyncrun#utils#set_title(a:opts.title, a:opts.expanded), a:script)
 	return s:osascript(
 				\ 'if application "iTerm" is not running',
 				\   'error',
@@ -193,20 +193,34 @@ endfunc
 "----------------------------------------------------------------------
 " spawn new iterm
 "----------------------------------------------------------------------
-function! asyncrun#macos#iterm_spawn(command, opts)
+function! asyncrun#macos#iterm_spawn(script, opts)
 	let opts = {}
 	let opts.title = get(a:opts, 'title', 'AsyncRun')
 	let opts.expanded = get(a:opts, 'expanded', 1)
 	let opts.background = get(a:opts, 'background', 0)
 	let opts.file = expand('%:t')
 	let active = get(a:opts, 'active', 1)
+	let script = deepcopy(a:script)
+	if get(a:opts, 'pause', 0) != 0
+		let script += asyncrun#macos#pause_script()
+	endif
 	if asyncrun#macos#iterm_new_version()
-		return asyncrun#macos#iterm_spawn3(a:command, opts, active)
+		return asyncrun#macos#iterm_spawn3(script, opts, active)
 	else
-		return asyncrun#macos#iterm_spawn2(a:command, opts, active)
+		return asyncrun#macos#iterm_spawn2(script, opts, active)
 	endif
 endfunc
 
+
+"----------------------------------------------------------------------
+" start_command
+"----------------------------------------------------------------------
+function! asyncrun#macos#start_command(runner, opts)
+	let script = []
+	let script += ['cd ' . shellescape(getcwd())]
+	let script += [opts.cmd]
+
+endfunc
 
 
 

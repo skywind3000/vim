@@ -76,7 +76,15 @@ function! asyncrun#utils#isolate(request, keep, ...) abort
 			endif
 		endif
 	endfor
-	let command += a:000
+	for cmd in a:000
+		if type(cmd) == type('')
+			let command += [cmd]
+		elseif type(cmd) == type(0)
+			let command += [cmd]
+		elseif type(cmd) == type([])
+			let command += cmd
+		endif
+	endfor
 	let temp = type(a:request) == type({}) ? a:request.file . '.script' : asyncrun#utils#tempname()
 	call writefile(command, temp)
 	return 'env -i ' . join(map(copy(keep), 'v:val."=". asyncrun#utils#shellescape(eval("$".v:val))." "'), '') . &shell . ' ' . temp
