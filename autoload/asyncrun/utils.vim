@@ -83,4 +83,13 @@ function! asyncrun#utils#isolate(request, keep, ...) abort
 endfunction
 
 
+"----------------------------------------------------------------------
+" set title
+"----------------------------------------------------------------------
+function! asyncrun#utils#set_title(title, expanded)
+	return asyncrun#utils#shellescape('printf',
+				\ '\033]1;%s\007\033]2;%s\007',
+				\ a:title, a:expanded)
+endfunction
+
 
