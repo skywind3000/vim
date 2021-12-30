@@ -9,6 +9,22 @@
 
 
 "----------------------------------------------------------------------
+" utils
+"----------------------------------------------------------------------
+function! s:errmsg(msg)
+	redraw
+	echohl ErrorMsg
+	echom 'ERROR: ' . a:msg
+	echohl NONE
+	return 0
+endfunction
+
+function! s:strip(text)
+	return substitute(a:text, '^\s*\(.\{-}\)\s*$', '\1', '')
+endfunction
+
+
+"----------------------------------------------------------------------
 " For LeaderF
 "----------------------------------------------------------------------
 function! s:lf_task_source(...)
