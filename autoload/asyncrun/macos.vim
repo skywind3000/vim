@@ -172,6 +172,7 @@ endfunc
 function! asyncrun#macos#iterm_spawn3(script, opts, activate) abort
 	let script = asyncrun#utils#isolate(a:opts, [],
 				\ asyncrun#utils#set_title(a:opts.title, a:opts.expanded), a:script)
+	" echom 'name: '. script
 	return s:osascript(
 				\ 'if application "iTerm" is not running',
 				\   'error',
@@ -199,7 +200,7 @@ function! asyncrun#macos#open_iterm(script, opts)
 	let opts.title = get(a:opts, 'title', 'AsyncRun')
 	let opts.expanded = get(a:opts, 'expanded', 1)
 	let opts.background = get(a:opts, 'background', 0)
-	let opts.file = expand('%:t')
+	let opts.file = asyncrun#macos#script_name(expand('%:t'))
 	let active = get(a:opts, 'active', 1)
 	let script = deepcopy(a:script)
 	if asyncrun#macos#iterm_new_version()
