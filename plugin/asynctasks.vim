@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/30 15:10
-" Verision: 1.8.30
+" Last Modified: 2021/12/31 00:46
+" Verision: 1.8.31
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -140,6 +140,7 @@ let g:asyncrun_skip = 1
 let s:private = { 'cache':{}, 'rtp':{}, 'local':{}, 'tasks':{} }
 let s:error = ''
 let s:index = 0
+let s:last_task = ''
 
 
 "----------------------------------------------------------------------
@@ -1380,6 +1381,7 @@ function! asynctasks#start(bang, taskname, path, ...)
 		call asyncrun#run(a:bang, opts, command, a:1, a:2, a:3)
 	endif
 	let g:asyncrun_skip = skip
+	let s:last_task = a:taskname
 	return 0
 endfunc
 
@@ -1860,6 +1862,7 @@ function! asynctasks#cmd(bang, args, ...)
 		echo '    :AsyncTask -e              - edit local task in project root'
 		echo '    :AsyncTask -E              - edit global task in ~/.vim'
 		echo '    :AsyncTask -m              - display command macros'
+		echo '    :AsyncTask -s              - run last task'
 		echo '    :AsyncTask -p <profile>    - switch current profile'
 		return 0
 	elseif args ==# '-l'
@@ -1911,6 +1914,13 @@ function! asynctasks#cmd(bang, args, ...)
 		echo 'Current profile: '. g:asynctasks_profile
 		echohl None
 		return 0
+	endif
+	if has_key(opts, 's')
+		if s:last_task == ''
+			call s:errmsg('no task history')
+			return -1
+		endif
+		let args = s:last_task
 	endif
 	if args == ''
 		call s:errmsg('require task name, use :AsyncTask -h for help')
@@ -1985,7 +1995,7 @@ endfunc
 function! s:complete(ArgLead, CmdLine, CursorPos)
 	let candidate = []
 	if a:ArgLead =~ '^-'
-		let flags = ['-l', '-h', '-e', '-E', '-m', '-p']
+		let flags = ['-l', '-h', '-e', '-E', '-m', '-p', '-s']
 		for flag in flags
 			if stridx(flag, a:ArgLead) == 0
 				let candidate += [flag]
@@ -2052,6 +2062,9 @@ command! -bang -nargs=0 AsyncTaskMacro
 
 command! -nargs=? AsyncTaskProfile
 			\ AsyncTask -p <args>
+
+command! -bang -nargs=0 AsyncTaskLast
+			\ AsyncTask -s
 
 
 "----------------------------------------------------------------------
