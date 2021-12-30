@@ -12,6 +12,7 @@ function! asyncrun#runner#macos#run(opts)
 		return asyncrun#utils#errmsg('require macOS !')
 	endif
 	call asyncrun#macos#start_command('terminal', a:opts)
+	redraw!
 endfunc
 
 

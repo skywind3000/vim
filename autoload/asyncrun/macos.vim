@@ -108,11 +108,18 @@ endfunc
 function! s:osascript(...) abort
 	call system('osascript'.join(map(copy(a:000), '" -e ".shellescape(v:val)'), ''))
 	return !v:shell_error
-endfunction
+endfunc
 
 function! s:escape(string) abort
 	return '"'.escape(a:string, '"\').'"'
-endfunction
+endfunc
+
+function! s:iterm_new_version() abort
+	if !exists('s:iterm_is_new')
+		let s:iterm_is_new = asyncrun#macos#iterm_new_version()
+	endif
+	return s:iterm_is_new
+endfunc
 
 
 "----------------------------------------------------------------------
@@ -158,7 +165,7 @@ function! asyncrun#macos#iterm_spawn2(script, opts, activate) abort
 				\       'set name to ' . s:escape(a:opts.title),
 				\       'set title to ' . s:escape(a:opts.expanded),
 				\       'exec command ' . s:escape(script),
-				\       a:opts.background || !has('gui_running') ? 'select oldsession' : '',
+				\       a:opts.background ? 'select oldsession' : '',
 				\     'end tell',
 				\   'end tell',
 				\   a:activate ? 'activate' : '',
@@ -185,7 +192,7 @@ function! asyncrun#macos#iterm_spawn3(script, opts, activate) abort
 				\       'set name to ' . s:escape(a:opts.title),
 				\       'set title to ' . s:escape(a:opts.expanded),
 				\     'end tell',
-				\     a:opts.background || !has('gui_running') ? 'select oldtab' : '',
+				\     a:opts.background ? 'select oldtab' : '',
 				\   'end tell',
 				\   a:activate ? 'activate' : '',
 				\ 'end tell')
@@ -203,15 +210,49 @@ function! asyncrun#macos#open_iterm(script, opts)
 	let opts.file = asyncrun#macos#script_name(expand('%:t'))
 	let active = get(a:opts, 'active', 1)
 	let script = deepcopy(a:script)
-	if !exists('s:iterm_is_new')
-		let s:iterm_is_new = asyncrun#macos#iterm_new_version()
-	endif
-	if s:iterm_is_new
+	if s:iterm_new_version()
 		return asyncrun#macos#iterm_spawn3(script, opts, active)
 	else
 		return asyncrun#macos#iterm_spawn2(script, opts, active)
 	endif
 endfunc
+
+function! asyncrun#macos#iterm_activate(pid)
+	if s:iterm_new_version()
+		let tty = matchstr(system('ps -p '.a:pid), 'tty\S\+')
+		if !empty(tty)
+			return s:osascript(
+						\ 'if application "iTerm" is not running',
+						\   'error',
+						\ 'end if') && s:osascript(
+						\ 'tell application "iTerm"',
+						\   'activate',
+						\   'tell the current window',
+						\     'repeat with atab in tabs',
+						\       'repeat with asession in sessions',
+						\         'if (tty) = ' . tty,
+						\         'select atab',
+						\       'end repeat',
+						\     'end repeat',
+						\   'end tell',
+						\ 'end tell')
+		endif
+	else
+		let tty = matchstr(system('ps -p '.a:pid), 'tty\S\+')
+		if !empty(tty)
+			return s:osascript(
+						\ 'if application "iTerm" is not running',
+						\   'error',
+						\ 'end if') && s:osascript(
+						\ 'tell application "iTerm"',
+						\   'activate',
+						\   'tell the current terminal',
+						\      'select session id "/dev/'.tty.'"',
+						\   'end tell',
+						\ 'end tell')
+		endif
+	endif
+endfunction
 
 
 "----------------------------------------------------------------------
