@@ -119,25 +119,25 @@ endfunction
 " check version
 "----------------------------------------------------------------------
 function! asyncrun#macos#iterm_new_version() abort
-  return s:osascript(
-      \ 'on modernversion(version)',
-      \   'set olddelimiters to AppleScript''s text item delimiters',
-      \   'set AppleScript''s text item delimiters to "."',
-      \   'set thearray to every text item of version',
-      \   'set AppleScript''s text item delimiters to olddelimiters',
-      \   'set major to item 1 of thearray',
-      \   'set minor to item 2 of thearray',
-      \   'set veryminor to item 3 of thearray',
-      \   'if major < 2 then return false',
-      \   'if major > 2 then return true',
-      \   'if minor < 9 then return false',
-      \   'if minor > 9 then return true',
-      \   'if veryminor < 20140903 then return false',
-      \   'return true',
-      \ 'end modernversion',
-      \ 'tell application "iTerm"',
-      \   'if not my modernversion(version) then error',
-      \ 'end tell')
+	return s:osascript(
+				\ 'on modernversion(version)',
+				\   'set olddelimiters to AppleScript''s text item delimiters',
+				\   'set AppleScript''s text item delimiters to "."',
+				\   'set thearray to every text item of version',
+				\   'set AppleScript''s text item delimiters to olddelimiters',
+				\   'set major to item 1 of thearray',
+				\   'set minor to item 2 of thearray',
+				\   'set veryminor to item 3 of thearray',
+				\   'if major < 2 then return false',
+				\   'if major > 2 then return true',
+				\   'if minor < 9 then return false',
+				\   'if minor > 9 then return true',
+				\   'if veryminor < 20140903 then return false',
+				\   'return true',
+				\ 'end modernversion',
+				\ 'tell application "iTerm"',
+				\   'if not my modernversion(version) then error',
+				\ 'end tell')
 endfunction
 
 
@@ -203,7 +203,10 @@ function! asyncrun#macos#open_iterm(script, opts)
 	let opts.file = asyncrun#macos#script_name(expand('%:t'))
 	let active = get(a:opts, 'active', 1)
 	let script = deepcopy(a:script)
-	if asyncrun#macos#iterm_new_version()
+	if !exists('s:iterm_is_new')
+		let s:iterm_is_new = asyncrun#macos#iterm_new_version()
+	endif
+	if s:iterm_is_new
 		return asyncrun#macos#iterm_spawn3(script, opts, active)
 	else
 		return asyncrun#macos#iterm_spawn2(script, opts, active)
