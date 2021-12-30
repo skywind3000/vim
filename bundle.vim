@@ -159,7 +159,8 @@ if has_key(s:enabled, 'inter')
 	Plug 'vim-scripts/L9'
 	Plug 'honza/vim-snippets'
 	Plug 'xolox/vim-notes', { 'on': ['Note', 'SearchNotes', 'DeleteNotes', 'RecentNotes'] }
-	Plug 'skywind3000/vimoutliner', { 'for': 'votl' }
+	" Plug 'skywind3000/vimoutliner', { 'for': 'votl' }
+	Plug 'vimoutliner/vimoutliner', { 'for': 'votl' }
 	Plug 'mattn/webapi-vim'
 	Plug 'mattn/gist-vim'
 	Plug 'hrj/vim-DrawIt'
@@ -173,6 +174,8 @@ if has_key(s:enabled, 'inter')
 	endif
 
 	" Plug 'Yggdroot/indentLine'
+	" IncScript site/bundle/outliner.vim
+	let g:maplocalleader = "\<c-\>"
 
 	if get(g:, 'asc_usnip', 0) == 0 || (has('python3') == 0 && has('python') == 0)
 		Plug 'MarcWeber/vim-addon-mw-utils'
