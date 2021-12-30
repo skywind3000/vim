@@ -49,7 +49,7 @@ endfunc
 "----------------------------------------------------------------------
 " write a scpt file 
 "----------------------------------------------------------------------
-function! macos#osascript(content, wait)
+function! asyncrun#macos#osascript(content, wait)
 	let content = ['#! /usr/bin/osascript', '']
 	let content += a:content
 	let tmpname = asyncrun#macos#script_write('runner1.scpt', content)
@@ -61,7 +61,7 @@ endfunc
 "----------------------------------------------------------------------
 " open system terminal
 "----------------------------------------------------------------------
-function! macos#open_system(title, script, profile)
+function! asyncrun#macos#open_system(title, script, profile)
 	let content = ['#! /bin/sh']
 	let content = ['clear']
 	let content += [asyncrun#utils#set_title(a:title, 0)]
@@ -75,7 +75,7 @@ endfunc
 "----------------------------------------------------------------------
 " open terminal
 "----------------------------------------------------------------------
-function! macos#open_terminal(title, script, profile, active)
+function! asyncrun#macos#open_terminal(title, script, profile, active)
 	let content = ['#! /bin/sh']
 	let content += ['clear']
 	let content += [asyncrun#utils#set_title(a:title, 0)]
@@ -97,7 +97,8 @@ function! macos#open_terminal(title, script, profile, active)
 		let osascript += ['  activate']
 	endif
 	let osascript += ['end tell']
-	call macos#osascript(osascript, 1)
+	call asyncrun#macos#osascript(osascript, 1)
+	return 1
 endfunc
 
 
@@ -193,7 +194,7 @@ endfunc
 "----------------------------------------------------------------------
 " spawn new iterm
 "----------------------------------------------------------------------
-function! asyncrun#macos#iterm_spawn(script, opts)
+function! asyncrun#macos#open_iterm(script, opts)
 	let opts = {}
 	let opts.title = get(a:opts, 'title', 'AsyncRun')
 	let opts.expanded = get(a:opts, 'expanded', 1)
@@ -201,9 +202,6 @@ function! asyncrun#macos#iterm_spawn(script, opts)
 	let opts.file = expand('%:t')
 	let active = get(a:opts, 'active', 1)
 	let script = deepcopy(a:script)
-	if get(a:opts, 'pause', 0) != 0
-		let script += asyncrun#macos#pause_script()
-	endif
 	if asyncrun#macos#iterm_new_version()
 		return asyncrun#macos#iterm_spawn3(script, opts, active)
 	else
@@ -218,9 +216,34 @@ endfunc
 function! asyncrun#macos#start_command(runner, opts)
 	let script = []
 	let script += ['cd ' . shellescape(getcwd())]
-	let script += [opts.cmd]
-
+	let script += [a:opts.cmd]
+	let op = {}
+	let op.title = a:opts.cmd
+	let op.active = get(a:opts, 'focus', 1)
+	let op.background = get(a:opts, 'focus', 1)? 0 : 1
+	if get(a:opts, 'close', 0) == 0
+		let script += ['echo ""']
+		let script += asyncrun#macos#pause_script()
+	endif
+	if a:runner == 'terminal'
+		let p = get(a:opts, 'option', '')
+		return asyncrun#macos#open_terminal(op.title, script, p, op.active)
+	elseif a:runner == 'iterm' || a:runner == 'iterm2'
+		return asyncrun#macos#open_iterm(script, op)
+	endif
 endfunc
 
+
+"----------------------------------------------------------------------
+" check environ
+"----------------------------------------------------------------------
+function! asyncrun#macos#check()
+	if has('mac') || has('macunix') || has('osx') || has('osxdarwin')
+		return 1
+	elseif has('gui_macvim') || has('macvim')
+		return 1
+	endif
+	return 0
+endfunc
 
 

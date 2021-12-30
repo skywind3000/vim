@@ -431,6 +431,12 @@ noremap <m-i> :call quickui#tools#list_function()<cr>
 noremap <m-I> :call quickui#tools#list_function()<cr>
 noremap <m-y> :call quickui#tools#list_function()<cr>
 
+if has('gui_macvim')
+	noremap <d-i> :call quickui#tools#list_function()<cr>
+	noremap <d-I> :call quickui#tools#list_function()<cr>
+	noremap <d-y> :call quickui#tools#list_function()<cr>
+endif
+
 
 "----------------------------------------------------------------------
 " neovim system clipboard
