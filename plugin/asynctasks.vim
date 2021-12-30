@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/31 00:46
-" Verision: 1.8.31
+" Last Modified: 2021/12/31 01:05
+" Verision: 1.8.32
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -2003,7 +2003,9 @@ function! s:complete(ArgLead, CmdLine, CursorPos)
 		endfor
 		return candidate
 	endif
-	if asynctasks#collect_config('', 1) != 0
+	let path = expand('%:p')
+	let path = (path == '')? getcwd() : path
+	if asynctasks#collect_config(path, 1) != 0
 		return -1
 	endif
 	let tasks = s:private.tasks
