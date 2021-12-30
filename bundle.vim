@@ -174,8 +174,8 @@ if has_key(s:enabled, 'inter')
 	endif
 
 	" Plug 'Yggdroot/indentLine'
-	" IncScript site/bundle/outliner.vim
-	let g:maplocalleader = "\<c-\>"
+	
+	IncScript site/bundle/outliner.vim
 
 	if get(g:, 'asc_usnip', 0) == 0 || (has('python3') == 0 && has('python') == 0)
 		Plug 'MarcWeber/vim-addon-mw-utils'
