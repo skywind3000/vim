@@ -30,3 +30,57 @@ function! asyncrun#utils#require(what)
 endfunc
 
 
+"----------------------------------------------------------------------
+" shellescape 
+"----------------------------------------------------------------------
+function! asyncrun#utils#shellescape(...) abort
+	let args = []
+	for arg in a:000
+		if arg =~# '^[A-Za-z0-9_/.-]\+$'
+			let args += [arg]
+		elseif &shell =~# 'c\@<!sh'
+			let args += [substitute(shellescape(arg), '\\\n', '\n', 'g')]
+		else
+			let args += [shellescape(arg)]
+		endif
+	endfor
+	return join(args, ' ')
+endfunction
+
+
+"----------------------------------------------------------------------
+" tempname
+"----------------------------------------------------------------------
+function! asyncrun#utils#tempname() abort
+	let temp = tempname()
+	if has('win32')
+		return fnamemodify(fnamemodify(temp, ':h'), ':p').fnamemodify(temp, ':t')
+	endif
+	return temp
+endfunction
+
+
+"----------------------------------------------------------------------
+" isolate environ
+"----------------------------------------------------------------------
+function! asyncrun#utils#isolate(request, keep, ...) abort
+	let keep = ['SHELL', 'HOME'] + a:keep
+	let command = ['cd ' . shellescape(getcwd())]
+	for line in split(system('env'), "\n")
+		let var = matchstr(line, '^\w\+\ze=')
+		if !empty(var) && var !~# '^\%(_\|SHLVL\|PWD\|VIM\|VIMRUNTIME\|MYG\=VIMRC\)$' && index(keep, var) < 0
+			if &shell =~# 'csh'
+				let command += split('setenv '.var.' '.shellescape(eval('$'.var)), "\n")
+			else
+				let command += split('export '.var.'='.asyncrun#utils#shellescape(eval('$'.var)), "\n")
+			endif
+		endif
+	endfor
+	let command += a:000
+	let temp = type(a:request) == type({}) ? a:request.file . '.script' : asyncrun#utils#tempname()
+	call writefile(command, temp)
+	return 'env -i ' . join(map(copy(keep), 'v:val."=". asyncrun#utils#shellescape(eval("$".v:val))." "'), '') . &shell . ' ' . temp
+endfunction
+
+
+
