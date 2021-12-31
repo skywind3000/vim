@@ -259,9 +259,10 @@ if has('autocmd')
 			set showmode
 		endif
 	endfunc
-	augroup AscQuickfix
+	augroup AscKeymapsAu
 		autocmd!
 		autocmd FileType qf call s:quickfix_keymap()
+		autocmd FileType vim noremap <buffer><F4> :so %<cr>
 		autocmd InsertLeave * call s:insert_leave()
 		" autocmd InsertLeave * set showmode
 	augroup END
