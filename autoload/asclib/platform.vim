@@ -38,7 +38,7 @@ elseif has('win32unix')
 	let s:uname = 'cygwin'
 elseif has('linux') || has('wsl')
 	let s:uname = 'linux'
-elseif has('unix') && (has('mac') || has('macunix') || has('macvim'))
+elseif has('mac') || has('macunix') || has('macvim') || has('gui_macvim')
 	let s:uname = 'darwin'
 elseif has('bsd')
 	let s:uname = 'bsd'
