@@ -262,7 +262,7 @@ if has('autocmd')
 	augroup AscKeymapsAu
 		autocmd!
 		autocmd FileType qf call s:quickfix_keymap()
-		autocmd FileType vim noremap <buffer><F4> :<c-u>update<cr>:so %<cr>
+		autocmd FileType vim noremap <buffer><F4> :<c-u>silent update<cr>:so %<cr>
 		autocmd InsertLeave * call s:insert_leave()
 		" autocmd InsertLeave * set showmode
 	augroup END
