@@ -423,6 +423,17 @@ function! s:pathcase(path)
 endfunc
 
 
+" parse task args into [task, opts, args]
+function! s:task_extract(command)
+	let cmd = s:strip(a:command)
+	let name = matchstr(cmd, '^\w\+')
+	let text = matchstr(cmd, '^\w\+\zs.*')
+	let [args, opts] = s:ExtractOpt(text)
+	let args = s:strip(args)
+	return [name, opts, args]
+endfunc
+
+
 "----------------------------------------------------------------------
 " read ini in cache
 "----------------------------------------------------------------------
