@@ -397,7 +397,7 @@ endfunc
 
 " extract: [cmd, options]
 function! s:ExtractOpt(command)
-	let cmd = a:command
+	let cmd = substitute(a:command, '^\s*\(.\{-}\)\s*$', '\1', '')
 	let opts = {}
 	while cmd =~# '^-\%(\w\+\)\%([= ]\|$\)'
 		let opt = matchstr(cmd, '^-\zs\w\+')
@@ -1381,7 +1381,6 @@ function! asynctasks#start(bang, taskname, path, ...)
 		call asyncrun#run(a:bang, opts, command, a:1, a:2, a:3)
 	endif
 	let g:asyncrun_skip = skip
-	let s:last_task = a:taskname
 	return 0
 endfunc
 
@@ -1926,6 +1925,7 @@ function! asynctasks#cmd(bang, args, ...)
 		call s:errmsg('require task name, use :AsyncTask -h for help')
 		return -1
 	endif
+	let s:last_task = args
 	if (a:0 < 3) || (a:0 >= 3 && a:1 <= 0)
 		call asynctasks#start(a:bang, args, '')
 	else
