@@ -428,8 +428,8 @@ endfunc
 " parse task args into [task, opts, args]
 function! s:task_extract(command)
 	let cmd = s:strip(a:command)
-	let name = matchstr(cmd, '^\w\+')
-	let text = matchstr(cmd, '^\w\+\zs.*')
+	let name = matchstr(cmd, '^\S\+')
+	let text = matchstr(cmd, '^\S\+\zs.*')
 	let [args, opts] = s:ExtractOpt(text)
 	let args = s:strip(args)
 	return [name, opts, args]
