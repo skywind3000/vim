@@ -1271,14 +1271,8 @@ def main(args = None):
     if len(args) == 0:
         pretty.error('require task name, use %s -h for help'%prog)
         return 1
-    taskname = ''
-    if args[0][:1] not in ('+', '-'):
-        taskname = args[0]
-        args = args[1:]
-    if taskname == '':
-        pretty.error('require task name, use %s -h for help'%prog)
-        return 1
-    opt2, extra = getopt(args)
+    taskname = args[0]
+    opt2, extra = getopt(args[1:])
     path = (len(extra) > 0) and extra[-1] or ''
     path = path.strip('\r\n\t ')
     if path and (not os.path.exists(path)):
