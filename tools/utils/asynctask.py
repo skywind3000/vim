@@ -340,7 +340,7 @@ class PrettyText (object):
                 if avail <= 0:
                     break
                 size = len(output)
-                pretty.echo(color, output[:avail])
+                self.echo(color, output[:avail])
                 avail -= size
             sys.stdout.write('\n')
         self.set_color(-1)
@@ -427,8 +427,10 @@ class configure (object):
         self.filetype = None
         self.tasks = {}
         self.environ = {}
+        self.setting = {}
         self.config = {}
         self.avail = []
+        self.reserved = ['*', '+', '-', '%', '#']
         self._load_config()
         if self.target == 'file':
             self.filetype = self.match_ft(self.path)
@@ -589,22 +591,23 @@ class configure (object):
 
     def config_merge (self, target, source, ininame, mode):
         special = []
+        setting = self.reserved
         for key in source:
             if ':' in key:
                 special.append(key)
             elif '/' in key:
                 special.append(key)
-            elif key != '*':
+            elif key not in setting:
                 target[key] = source[key]
                 if ininame:
                     target[key]['__name__'] = ininame
                 if mode:
                     target[key]['__mode__'] = mode
-            elif key == '*':
-                if '*' not in target:
-                    target['*'] = {}
-                for name in source['*']:
-                    target['*'][name] = source['*'][name]
+            else:
+                if key not in target:
+                    target[key] = {}
+                for name in source[key]:
+                    target[key][name] = source[key][name]
         for key in special:
             parts = self.trinity_split(key)
             parts = [ n.strip('\r\n\t ') for n in parts ]
@@ -680,11 +683,16 @@ class configure (object):
         self.collect_rtp_config()
         self.collect_local_config()
         self.environ = self.tasks.get('*', {})
+        self.environ.update(self.tasks.get('+', {}))
+        self.setting = {}
+        setting = self.reserved
+        for name in setting:
+            self.setting[name] = self.tasks.get(name, {})
         self.avail = []
         keys = list(self.tasks.keys())
         keys.sort()
         for key in keys:
-            if key == '*':
+            if key in setting:
                 continue
             self.avail.append(key)
         return 0
@@ -769,9 +777,7 @@ class configure (object):
         text = text.replace('<cwd>', macros.get('VIM_CWD', ''))
         return text
 
-    def environ_replace (self, text):
-        mark_open = '$(VIM:'
-        mark_close = ')'
+    def mark_replace (self, text, mark_open, mark_close, handler):
         size_open = len(mark_open)
         while True:
             p1 = text.find(mark_open)
@@ -782,9 +788,35 @@ class configure (object):
                 break
             name = text[p1 + size_open:p2]
             mark = mark_open + name + mark_close
-            name = name.strip()
-            data = self.environ.get(name, '')
+            data = handler(name.strip('\r\n\t '))
+            if data is None:
+                return ''
+            elif isinstance(data, list):
+                if len(data) > 0:
+                    pretty.error(data[0])
+                return ''
             text = text.replace(mark, data)
+        return text
+
+    def _handle_environ (self, text):
+        key, sep, default = text.strip().partition(':')
+        key = key.strip()
+        if key not in self.environ:
+            if sep == '':
+                return ['Internal variable "' + key + '" is undefined']
+            else:
+                return default
+        return self.environ[key]
+
+    def _handle_osenv (self, text):
+        key, sep, default = text.strip().partition(':')
+        key = key.strip()
+        return os.environ.get(key, default.strip())
+
+    def environ_replace (self, text):
+        text = self.mark_replace(text, '$(+', ')', self._handle_environ)
+        text = self.mark_replace(text, '$(VIM:', ')', self._handle_environ)
+        text = self.mark_replace(text, '$(%', ')', self._handle_osenv)
         return text
 
 
@@ -904,7 +936,6 @@ class TaskManager (object):
                     text = tail.strip()
             else:
                 select = []
-                names = []
                 for part in tail.split(','):
                     part = part.replace('&', '').strip()
                     if part:
