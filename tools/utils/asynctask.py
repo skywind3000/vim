@@ -1275,6 +1275,9 @@ def main(args = None):
     if args[0][:1] not in ('+', '-'):
         taskname = args[0]
         args = args[1:]
+    if taskname == '':
+        pretty.error('require task name, use %s -h for help'%prog)
+        return 1
     opt2, extra = getopt(args)
     path = (len(extra) > 0) and extra[-1] or ''
     path = path.strip('\r\n\t ')
