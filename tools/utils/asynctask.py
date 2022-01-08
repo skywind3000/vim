@@ -6,8 +6,8 @@
 #
 # Maintainer: skywind3000 (at) gmail.com, 2020
 #
-# Last Modified: 2021/03/02 23:01
-# Verision: 1.1.3
+# Last Modified: 2022/01/09 05:57
+# Verision: 1.2.0
 #
 # for more information, please visit:
 # https://github.com/skywind3000/asynctasks.vim
@@ -1271,14 +1271,24 @@ def main(args = None):
     if len(args) == 0:
         pretty.error('require task name, use %s -h for help'%prog)
         return 1
-    taskname = args[0]
-    path = ''
-    if len(args) >= 2:
-        path = args[1]
+    taskname = ''
+    if args[0][:1] not in ('+', '-'):
+        taskname = args[0]
+        args = args[1:]
+    opt2, extra = getopt(args)
+    path = (len(extra) > 0) and extra[-1] or ''
+    path = path.strip('\r\n\t ')
     if path and (not os.path.exists(path)):
         pretty.error('path not exists: %s'%path)
         return 2
     tm = TaskManager(path)
+    tm.config.shadow['+'] = {}
+    tm.config.shadow['-'] = {}
+    for key in opt2:
+        if key.startswith('+'):
+            tm.config.shadow['+'][key[1:]] = opt2[key]
+        else:
+            tm.config.shadow['-'][key] = opt2[key]
     tm.setup(opts)
     hr = tm.task_run(taskname)
     return hr
