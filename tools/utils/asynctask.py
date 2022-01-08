@@ -39,43 +39,43 @@ UNIX = (sys.platform[:3] != 'win') and True or False
 # macros
 #----------------------------------------------------------------------
 MACROS_HELP = {
-	'VIM_FILEPATH': 'File name of current buffer with full path',
-	'VIM_FILENAME': 'File name of current buffer without path',
-	'VIM_FILEDIR': 'Full path of current buffer without the file name',
-	'VIM_FILEEXT': 'File extension of current buffer',
-	'VIM_FILETYPE': 'File type (value of &ft in vim)',
+    'VIM_FILEPATH': 'File name of current buffer with full path',
+    'VIM_FILENAME': 'File name of current buffer without path',
+    'VIM_FILEDIR': 'Full path of current buffer without the file name',
+    'VIM_FILEEXT': 'File extension of current buffer',
+    'VIM_FILETYPE': 'File type (value of &ft in vim)',
     'VIM_FILENOEXT': # noqa: E261
-      'File name of current buffer without path and extension',
-	'VIM_PATHNOEXT':
-      'Current file name with full path but without extension',
-	'VIM_CWD': 'Current directory',
-	'VIM_RELDIR': 'File path relativize to current directory',
-	'VIM_RELNAME': 'File name relativize to current directory',
-	'VIM_ROOT': 'Project root directory',
-	'VIM_PRONAME': 'Name of current project root directory',
-	'VIM_DIRNAME': "Name of current directory",
-	'VIM_CWORD': 'Current word under cursor',
-	'VIM_CFILE': 'Current filename under cursor',
-	'VIM_CLINE': 'Cursor line number in current buffer',
-	'VIM_GUI': 'Is running under gui ?',
-	'VIM_VERSION': 'Value of v:version',
-	'VIM_COLUMNS': "How many columns in vim's screen",
-	'VIM_LINES': "How many lines in vim's screen",
-	'VIM_SVRNAME': 'Value of v:servername for +clientserver usage',
+    'File name of current buffer without path and extension',
+    'VIM_PATHNOEXT':
+    'Current file name with full path but without extension',
+    'VIM_CWD': 'Current directory',
+    'VIM_RELDIR': 'File path relativize to current directory',
+    'VIM_RELNAME': 'File name relativize to current directory',
+    'VIM_ROOT': 'Project root directory',
+    'VIM_PRONAME': 'Name of current project root directory',
+    'VIM_DIRNAME': "Name of current directory",
+    'VIM_CWORD': 'Current word under cursor',
+    'VIM_CFILE': 'Current filename under cursor',
+    'VIM_CLINE': 'Cursor line number in current buffer',
+    'VIM_GUI': 'Is running under gui ?',
+    'VIM_VERSION': 'Value of v:version',
+    'VIM_COLUMNS': "How many columns in vim's screen",
+    'VIM_LINES': "How many lines in vim's screen",
+    'VIM_SVRNAME': 'Value of v:servername for +clientserver usage',
     'VIM_PROFILE': 'Current building profile (debug/release/...)',
-	'WSL_FILEPATH': '(WSL) File name of current buffer with full path',
-	'WSL_FILENAME': '(WSL) File name of current buffer without path',
-	'WSL_FILEDIR': '(WSL) Full path of current buffer without the file name',
-	'WSL_FILEEXT': '(WSL) File extension of current buffer',
+    'WSL_FILEPATH': '(WSL) File name of current buffer with full path',
+    'WSL_FILENAME': '(WSL) File name of current buffer without path',
+    'WSL_FILEDIR': '(WSL) Full path of current buffer without the file name',
+    'WSL_FILEEXT': '(WSL) File extension of current buffer',
     'WSL_FILENOEXT':  # noqa: E261
-      '(WSL) File name of current buffer without path and extension',
-	'WSL_PATHNOEXT':
-	  '(WSL) Current file name with full path but without extension',
-	'WSL_CWD': '(WSL) Current directory',
-	'WSL_RELDIR': '(WSL) File path relativize to current directory',
-	'WSL_RELNAME': '(WSL) File name relativize to current directory',
-	'WSL_ROOT': '(WSL) Project root directory',
-	'WSL_CFILE': '(WSL) Current filename under cursor',
+    '(WSL) File name of current buffer without path and extension',
+    'WSL_PATHNOEXT':
+    '(WSL) Current file name with full path but without extension',
+    'WSL_CWD': '(WSL) Current directory',
+    'WSL_RELDIR': '(WSL) File path relativize to current directory',
+    'WSL_RELNAME': '(WSL) File name relativize to current directory',
+    'WSL_ROOT': '(WSL) Project root directory',
+    'WSL_CFILE': '(WSL) Current filename under cursor',
 }
 
 
@@ -801,6 +801,10 @@ class configure (object):
     def _handle_environ (self, text):
         key, sep, default = text.strip().partition(':')
         key = key.strip()
+        if '++' in self.setting:
+            shadow = self.setting['++']
+            if key in shadow:
+                return shadow[key]
         if key not in self.environ:
             if sep == '':
                 return ['Internal variable "' + key + '" is undefined']
@@ -909,57 +913,51 @@ class TaskManager (object):
             return ''
         return text
 
-    def command_input (self, command):
-        mark_open = '$(?'
-        mark_close = ')'
-        size_open = len(mark_open)
-        if '$(VIM_CWORD)' in command:
-            command = command.replace('$(VIM_CWORD)', '$(?CWORD)')
-        while True:
-            p1 = command.find(mark_open)
-            if p1 < 0:
-                break
-            p2 = command.find(mark_close, p1)
-            if p2 < 0:
-                break
-            name = command[p1 + size_open:p2]
-            mark = mark_open + name + mark_close
-            tail = ''
-            p3 = name.find(':')
-            if p3 >= 0:
-                tail = name[p3 + 1:].strip()
-                name = name[:p3].strip()
-            if ',' not in tail:
+    def _handle_input (self, varname):
+        name, sep, tail = varname.strip().partition(':')
+        name = name.strip()
+        tail = tail.strip()
+        if '--' in self.config.setting:
+            shadow = self.config.setting['--']
+            if name in shadow:
+                return shadow[name]
+        if ',' not in tail:
+            prompt = 'Input argument (%s): '%name
+            text = self.raw_input(prompt)
+            if not text:
+                text = tail.strip()
+        else:
+            select = []
+            for part in tail.split(','):
+                part = part.replace('&', '').strip()
+                if part:
+                    select.append(part)
+            if len(select) == 0:
                 prompt = 'Input argument (%s): '%name
                 text = self.raw_input(prompt)
-                if not text:
-                    text = tail.strip()
             else:
-                select = []
-                for part in tail.split(','):
-                    part = part.replace('&', '').strip()
-                    if part:
-                        select.append(part)
-                if len(select) == 0:
-                    prompt = 'Input argument (%s): '%name
-                    text = self.raw_input(prompt)
-                else:
-                    print('Select argument (%s): '%name)
-                    for index, part in enumerate(select):
-                        print('%d. %s'%(index + 1, part))
-                    text = ''
-                    if len(select) > 0:
-                        index = self.raw_input('Type number: ')
-                        try:
-                            index = int(index)
-                        except:
-                            index = 0
-                        if index > 0 and index <= len(select):
-                            text = select[index - 1]
-            text = text.strip()
-            if not text:
-                return ''
-            command = command.replace(mark, text)
+                print('Select argument (%s): '%name)
+                for index, part in enumerate(select):
+                    print('%d. %s'%(index + 1, part))
+                text = ''
+                if len(select) > 0:
+                    index = self.raw_input('Type number: ')
+                    try:
+                        index = int(index)
+                    except:
+                        index = 0
+                    if index > 0 and index <= len(select):
+                        text = select[index - 1]
+        text = text.strip()
+        if not text:
+            return None
+        return text
+
+    def command_input (self, command):
+        if '$(VIM_CWORD)' in command:
+            command = command.replace('$(VIM_CWORD)', '$(?CWORD)')
+        command = self.config.mark_replace(command, '$(-', ')', self._handle_input)
+        command = self.config.mark_replace(command, '$(?', ')', self._handle_input)
         return command
 
     def task_option (self, task):
