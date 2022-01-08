@@ -2017,11 +2017,26 @@ function! asynctasks#cmd(bang, args, ...)
 		call s:errmsg('require task name, use :AsyncTask -h for help')
 		return -1
 	endif
+	let [name, opts, profile] = s:task_extract(args)
+	let name = s:strip(name)
+	let profile = s:strip(profile)
+	let s:private.shadow = {}
+	let s:private.shadow['+'] = {}
+	let s:private.shadow['-'] = {}
+	for key in keys(opts)
+		if key =~ '^+'
+			let value = opts[key]
+			let key = strpart(key, 1)
+			let s:private.shadow['+'][key] = value
+		else
+			let s:private.shadow['-'][key] = opts[key]
+		endif
+	endfor
 	let s:last_task = args
 	if (a:0 < 3) || (a:0 >= 3 && a:1 <= 0)
-		call asynctasks#start(a:bang, args, '')
+		call asynctasks#start(a:bang, name, '')
 	else
-		call asynctasks#start(a:bang, args, '', a:1, a:2, a:3)
+		call asynctasks#start(a:bang, name, '', a:1, a:2, a:3)
 	endif
 endfunc
 
