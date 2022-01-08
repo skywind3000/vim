@@ -430,6 +430,7 @@ class configure (object):
         self.setting = {}
         self.config = {}
         self.avail = []
+        self.shadow = {}
         self.reserved = ['*', '+', '-', '%', '#']
         self._load_config()
         if self.target == 'file':
@@ -793,7 +794,8 @@ class configure (object):
                 return ''
             elif isinstance(data, list):
                 if len(data) > 0:
-                    pretty.error(data[0])
+                    msg = 'in ' + mark + ': '
+                    pretty.error(msg + data[0])
                 return ''
             text = text.replace(mark, data)
         return text
@@ -801,8 +803,8 @@ class configure (object):
     def _handle_environ (self, text):
         key, sep, default = text.strip().partition(':')
         key = key.strip()
-        if '++' in self.setting:
-            shadow = self.setting['++']
+        if '+' in self.shadow:
+            shadow = self.shadow['+']
             if key in shadow:
                 return shadow[key]
         if key not in self.environ:
@@ -917,8 +919,8 @@ class TaskManager (object):
         name, sep, tail = varname.strip().partition(':')
         name = name.strip()
         tail = tail.strip()
-        if '--' in self.config.setting:
-            shadow = self.config.setting['--']
+        if '-' in self.config.shadow:
+            shadow = self.config.shadow['-']
             if name in shadow:
                 return shadow[name]
         if ',' not in tail:
@@ -1192,7 +1194,7 @@ def getopt (argv):
         arg = argv[index]
         if arg != '':
             head = arg[:1]
-            if head != '-':
+            if head not in ('-', '+'):
                 break
             if arg == '-':
                 break

@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2021/12/31 01:05
-" Verision: 1.8.32
+" Last Modified: 2022/01/09 04:27
+" Verision: 2.0.0
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -399,15 +399,17 @@ endfunc
 function! s:ExtractOpt(command)
 	let cmd = substitute(a:command, '^\s*\(.\{-}\)\s*$', '\1', '')
 	let opts = {}
-	while cmd =~# '^-\%(\w\+\)\%([= ]\|$\)'
-		let opt = matchstr(cmd, '^-\zs\w\+')
-		if cmd =~ '^-\w\+='
-			let val = matchstr(cmd, '^-\w\+=\zs\%(\\.\|\S\)*')
+	while cmd =~# '^[-+]\%(\w\+\)\%([= ]\|$\)'
+		let opt = matchstr(cmd, '^[-+]\zs\w\+')
+		let opt = ((cmd =~ '^+')? '+' : '') . opt
+		if cmd =~ '^[-+]\w\+='
+			let val = matchstr(cmd, '^[-+]\w\+=\zs\%(\\.\|\S\)*')
 		else
-			let val = (opt == 'cwd')? '' : 1
+			let val = (opt == 'cwd' || opt == 'encoding')? '' : 1
 		endif
 		let opts[opt] = substitute(val, '\\\(\s\)', '\1', 'g')
-		let cmd = substitute(cmd, '^-\w\+\%(=\%(\\.\|\S\)*\)\=\s*', '', '')
+		let pattern = '^[-+]\w\+\%(=\%(\\.\|\S\)*\)\=\s*'
+		let cmd = substitute(cmd, pattern, '', '')
 	endwhile
 	return [cmd, opts]
 endfunc
@@ -1065,6 +1067,12 @@ function! s:handle_input(text)
 	let ikey = rkey . ':<pos>'
 	let select = []
 	let lastid = -1
+	if has_key(s:private, 'shadow')
+		let shadow = get(s:private.shadow, '-', {})
+		if has_key(shadow, name)
+			return shadow[name]
+		endif
+	endif
 	if remember && text == ''
 		let text = get(g:asynctasks_history, rkey, '')
 		" echom 'remember: <' . text . '>'
@@ -1104,6 +1112,12 @@ endfunc
 function! s:handle_environ(text)
 	let [name, sep, default] = s:partition(a:text, ':')
 	let key = s:strip(name)
+	if has_key(s:private, 'shadow')
+		let shadow = get(s:private.shadow, '+', {})
+		if has_key(shadow, key)
+			return shadow[key]
+		endif
+	endif
 	if has_key(g:asynctasks_environ, key) == 0
 		if has_key(s:private.tasks.environ, key) == 0
 			if s:strip(sep) == ''
