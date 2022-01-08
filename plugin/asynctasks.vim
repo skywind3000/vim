@@ -2017,9 +2017,8 @@ function! asynctasks#cmd(bang, args, ...)
 		call s:errmsg('require task name, use :AsyncTask -h for help')
 		return -1
 	endif
-	let [name, opts, profile] = s:task_extract(args)
+	let [name, opts, extra] = s:task_extract(args)
 	let name = s:strip(name)
-	let profile = s:strip(profile)
 	let s:private.shadow = {}
 	let s:private.shadow['+'] = {}
 	let s:private.shadow['-'] = {}
