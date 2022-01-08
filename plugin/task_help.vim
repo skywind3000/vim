@@ -143,3 +143,12 @@ function! g:asynctasks_api_hook.init()
 endfunc
 
 
+"----------------------------------------------------------------------
+" autocmd
+"----------------------------------------------------------------------
+augroup TaskHelpAuto
+	au!
+	au BufNewFile,BufRead .tasks setlocal filetype=dosini
+augroup end
+
+
