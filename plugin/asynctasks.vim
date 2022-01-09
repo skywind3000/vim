@@ -4,8 +4,8 @@
 "
 " Maintainer: skywind3000 (at) gmail.com, 2020-2021
 "
-" Last Modified: 2022/01/09 05:36
-" Verision: 1.9.1
+" Last Modified: 2022/01/09 13:40
+" Verision: 1.9.2
 "
 " For more information, please visit:
 " https://github.com/skywind3000/asynctasks.vim
@@ -833,10 +833,10 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" extract correct command
+" extract correct option
 "----------------------------------------------------------------------
-function! s:command_select(config, ft)
-	let command = get(a:config, 'command', '')
+function! s:option_select(config, name, ft)
+	let command = get(a:config, a:name, '')
 	for key in keys(a:config)
 		let p1 = stridx(key, ':')
 		let p2 = stridx(key, '/')
@@ -845,7 +845,7 @@ function! s:command_select(config, ft)
 		endif
 		let part = s:trinity_split(key)
 		let head = s:strip(part[0])
-		if head != 'command'
+		if head != a:name
 			continue
 		endif
 		let text = s:strip(part[1])
@@ -871,6 +871,14 @@ function! s:command_select(config, ft)
 		return a:config[key]
 	endfor
 	return command
+endfunc
+
+
+"----------------------------------------------------------------------
+" return right command
+"----------------------------------------------------------------------
+function! s:command_select(config, ft)
+	return s:option_select(a:config, 'command', a:ft)
 endfunc
 
 
@@ -1427,6 +1435,10 @@ function! asynctasks#start(bang, taskname, path, ...)
 	if command == ''
 		call s:errmsg('no command defined in ' . source)
 		return -3
+	endif
+	let precmd = s:option_select(task, 'precmd', &ft)
+	if precmd != ''
+		let command = precmd . ' && ' . command
 	endif
 	if exists(':AsyncRun') == 0
 		let t = 'asyncrun is required, install from '
@@ -2231,8 +2243,15 @@ function! asynctasks#content(path, name)
 		let textlist += ['command=' . task.command]
 		let protected.command = 1
 	endif
+	if has_key(task, 'precmd')
+		let textlist += ['precmd=' . task.precmd]
+		let protected.precmd = 1
+	endif
 	for key in keys(task)
 		if key =~ '^command[:\/]'
+			let protected[key] = 1
+			let textlist += [key . '=' . task[key]]
+		if key =~ '^precmd[:\/]'
 			let protected[key] = 1
 			let textlist += [key . '=' . task[key]]
 		endif

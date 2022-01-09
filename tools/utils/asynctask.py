@@ -6,8 +6,8 @@
 #
 # Maintainer: skywind3000 (at) gmail.com, 2020
 #
-# Last Modified: 2022/01/09 05:57
-# Verision: 1.2.0
+# Last Modified: 2022/01/09 13:40
+# Verision: 1.2.1
 #
 # for more information, please visit:
 # https://github.com/skywind3000/asynctasks.vim
@@ -836,15 +836,15 @@ class TaskManager (object):
         self.code = 0
         self.verbose = False
 
-    def command_select (self, task):
-        command = task.get('command', '')
+    def option_select (self, task, name):
+        command = task.get(name, '')
         filetype = self.config.filetype
         for key in task:
             if (':' not in key) and ('/' not in key):
                 continue
             parts = self.config.trinity_split(key)
             parts = [ n.strip('\r\n\t ') for n in parts ]
-            if parts[0] != 'command':
+            if parts[0] != name:
                 continue
             if parts[1]:
                 check = 0
@@ -860,6 +860,9 @@ class TaskManager (object):
                     continue
             return task[key]
         return command
+
+    def command_select (self, task):
+        return self.option_select(task, 'command')
 
     def command_check (self, command, task):
         disable = ['FILEPATH', 'FILENAME', 'FILEDIR', 'FILEEXT', 'FILETYPE']
@@ -1015,6 +1018,11 @@ class TaskManager (object):
             if ininame:
                 pretty.perror('white', 'from ' + ininame)
             return -3
+        precmd = self.option_select(task, 'precmd')
+        if precmd:
+            precmd = precmd.strip()
+            if precmd:
+                command = precmd + ' && ' + command
         hr = self.command_check(command, task)
         if hr != 0:
             return -4
