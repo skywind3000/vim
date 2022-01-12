@@ -21,7 +21,7 @@ endif
 if exists('+completepopup')
 	set completepopup=align:menu,border:off,highlight:WildMenu
 	set completepopup=align:menu,border:off,highlight:QuickPreview
-	set completeopt+=popup
+	" set completeopt+=popup
 endif
 
 
