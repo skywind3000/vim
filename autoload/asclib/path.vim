@@ -115,14 +115,6 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" full file name
-"----------------------------------------------------------------------
-function! asclib#path#fullname(f)
-	return asclib#path#abspath(a:f)
-endfunc
-
-
-"----------------------------------------------------------------------
 " dirname
 "----------------------------------------------------------------------
 function! asclib#path#dirname(path)
@@ -239,7 +231,7 @@ endfunc
 "----------------------------------------------------------------------
 function! s:find_root(path, markers, strict)
 	function! s:guess_root(filename, markers)
-		let fullname = asclib#path#fullname(a:filename)
+		let fullname = asclib#path#abspath(a:filename)
 		if fullname =~ '^fugitive:/'
 			if exists('b:git_dir')
 				return fnamemodify(b:git_dir, ':h')
@@ -327,6 +319,30 @@ function! asclib#path#exists(path)
 		return 1
 	endif
 	return 0
+endfunc
+
+
+"----------------------------------------------------------------------
+" split ext
+"----------------------------------------------------------------------
+function! asclib#path#splitext(path)
+	let path = a:path
+	let size = strlen(path)
+	let pos = strridx(path, '.')
+	if pos < 0
+		return [path, '']
+	endif
+	let p1 = strridx(path, '/')
+	if s:windows
+		let p2 = strridx(path, '\')
+		let p1 = (p1 > p2)? p1 : p2
+	endif
+	if p1 > pos
+		return [path, '']
+	endif
+	let main = strpart(path, 0, pos)
+	let ext = strpart(path, pos)
+	return [main, ext]
 endfunc
 
 
