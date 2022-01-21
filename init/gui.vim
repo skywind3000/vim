@@ -160,6 +160,7 @@ if has('nvim') && (has('win32') || has('win64'))
 	set mouse=a
 	set showtabline=2
 	set laststatus=2
+	set signcolumn=yes
 	set number
 	set t_Co=256
 	let g:config_vim_tab_style = 3
