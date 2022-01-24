@@ -38,7 +38,7 @@ endfunc
 function! s:script_list()
 	let root = s:script_root()
 	let filelist = globpath(root, '*', 1, 1)
-	let select = []
+	let select = {}
 	let check = {}
 	let marks = ['py', 'lua', 'pl']
 	if s:windows == 0
@@ -59,18 +59,23 @@ function! s:script_list()
 			let fn = substitute(fn, '\/', '\\', 'g')
 		endif
 		if has_key(check, ext)
-			let select += [[main, fn]]
+			let select[main] = fn
 		endif
 	endfor
 	return select
 endfunc
 
-echo s:script_list()
+" echo s:script_list()
 
 "----------------------------------------------------------------------
-" 
+" run script
 "----------------------------------------------------------------------
-function! s:script_run(name, line1, line2, count, debug)
+function! s:script_run(name, lnum, count, debug)
+	if a:count <= 0
+		return 0
+	endif
+	let scripts = s:script_list()
+	return 0
 endfunc
 
 
