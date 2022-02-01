@@ -25,6 +25,8 @@ endif
 
 noremap <tab>/ :emenu <C-Z>
 
+let g:freepascal_delphi = 1
+
 
 "----------------------------------------------------------------------
 " Include Scripts

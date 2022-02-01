@@ -11,9 +11,10 @@ if exists('b:did_ftplugin')
 	let b:did_ftplugin = 2
 endif
 
-
 setlocal shiftwidth=2
 setlocal tabstop=2
 setlocal sts=2
 setlocal expandtab
+
+let g:pascal_delphi = 1
 
