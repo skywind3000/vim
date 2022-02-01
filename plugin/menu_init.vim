@@ -90,6 +90,7 @@ call quickui#menu#install("&Build", [
 			\ ["Project &Run\tShift+F5", 'AsyncTask project-run'],
 			\ ["Project &Test\tShift+F6", 'AsyncTask project-test'],
 			\ ["Project &Init\tShift+F7", 'AsyncTask project-init'],
+			\ ["Project I&nstall\tShift+F8", 'AsyncTask project-install'],
 			\ ['--', ''],
 			\ ["T&ask List\tCtrl+F10", 'TaskFinder'],
 			\ ['E&dit Task', 'AsyncTask -e'],
