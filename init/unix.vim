@@ -26,7 +26,8 @@ endif
 noremap <tab>/ :emenu <C-Z>
 
 " syntax highlighting for delphi/freepascal keywords
-let g:freepascal_delphi = 1
+let g:pascal_delphi = 1
+let g:pascal_fpc = 1
 
 
 "----------------------------------------------------------------------
