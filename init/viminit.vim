@@ -270,6 +270,8 @@ nnoremap <silent>[A :first<cr>
 nnoremap <silent>]A :last<cr>
 nnoremap <silent>[b :bprevious<cr>
 nnoremap <silent>]b :bnext<cr>
+nnoremap <silent>[B :bfirst<cr>
+nnoremap <silent>]B :blast<cr>
 nnoremap <silent>[w :tabprevious<cr>
 nnoremap <silent>]w :tabnext<cr>
 nnoremap <silent>[W :tabfirst<cr>
