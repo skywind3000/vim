@@ -36,6 +36,13 @@ endif
 
 set cpt=.,w,k
 
+if has('patch-8.2.4365')
+	set wildoptions+=pum
+	set wildmode=longest,full
+	" cnoremap <expr> <cr> pumvisible() ? "\<c-y>" : "\<cr>"
+	" cnoremap <expr> <esc>   pumvisible() ? "\<c-e>" : "\<esc>"
+endif
+
 
 "----------------------------------------------------------------------
 " asclib settings
