@@ -100,6 +100,7 @@ if has_key(s:enabled, 'basic')
 	Plug 'vim-python/python-syntax', { 'for': ['python'] }
 	Plug 'pboettch/vim-cmake-syntax', { 'for': ['cmake'] }
 	Plug 'beyondmarc/hlsl.vim'
+	Plug 'peterhoeg/vim-qml'
 	Plug 'tpope/vim-eunuch'
 	Plug 'dag/vim-fish'
 	Plug 'jamessan/vim-gnupg'
