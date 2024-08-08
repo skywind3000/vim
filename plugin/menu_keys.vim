@@ -344,6 +344,8 @@ let g:navigator_insert.i = {
 			\ 'b': [':CodeSnipExpand block', 'insert-block'],
 			\ }
 
+let g:navigator_insert.j = [':ToggleJapaneseKeymap', 'toggle-japanese-keymap']
+
 
 "----------------------------------------------------------------------
 " trigger

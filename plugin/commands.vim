@@ -540,3 +540,17 @@ command! -nargs=0 ModeSelect call module#mode#select()
 
 
 
+"----------------------------------------------------------------------
+" toggle keymap
+"----------------------------------------------------------------------
+command! -nargs=0 ToggleJapaneseKeymap call s:ToggleJapaneseKeymap()
+function! s:ToggleJapaneseKeymap()
+	if &keymap == ''
+		exec 'set keymap=kana'
+		call asclib#common#echo('Title', 'Keymap: kana')
+	else
+		exec 'set keymap='
+		call asclib#common#echo('Title', 'Keymap: none')
+	endif
+endfunction
+
