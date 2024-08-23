@@ -1,0 +1,33 @@
+- Connection Validation
+
+  # test target port available, v for verbose, z for no data sending
+  nc -vz 192.168.1.2 8080    
+
+  # test a port range
+  nc -v -v -w3 -z 192.168.1.2 8080-8083
+
+- Server / Client Test
+
+  # Start this in your server
+  nc -l -p 8080
+
+  # Start this in your client
+  nc 192.168.1.2 8080
+
+- UDP Validation
+
+  # For server
+  nc -u -l -p 8080
+
+  # For client
+  nc -u 192.168.1.2 8080
+
+- File Transfer
+
+  # For server
+  nc -l -p 8080 > image.jpg
+
+  # For client
+  nc 192.168.1.2 8080 < image.jpg
+
+

@@ -1,0 +1,24 @@
+snippet main user information
+	[user]
+		name = skywind3000
+		email = skywind3000@163.com
+	[credential]
+		helper = store
+	[credential "https://github.com"]
+		helper = store
+		username = skywind3000
+		useHttpPath = true
+	
+
+snippet proxy
+	[http "https://github.com"]
+		proxy = socks5://127.0.0.1:1080
+	[https "https://github.com"]
+		proxy = socks5://127.0.0.1:1080
+
+
+snippet gitlab
+	[credential "https://gitlab.com"]
+		provider = generic
+
+

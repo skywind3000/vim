@@ -1,0 +1,15 @@
+// created on `%YEAR%`-`%MONTH%`-`%DAY%` by `%USER%`
+
+#include <stdio.h>
+
+int test1()
+{
+    return 0;
+}
+
+int main(void)
+{
+    test1();
+    return 0;
+}
+

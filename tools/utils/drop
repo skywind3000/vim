@@ -1,0 +1,52 @@
+#! /bin/sh
+
+if [ -z "$1" ]; then
+	echo "usage: drop {filename}"
+	exit 0
+fi
+
+if [ -z "$VIM_EXE" ]; then
+	echo "Must be called inside vim/neovim"
+	exit 1
+fi
+
+absolute_path() {
+	local result=""
+	if [ -x "$(which realpath 2> /dev/null)" ]; then
+		result="$(realpath -s """$1""" 2> /dev/null)"
+	fi
+	if [ -z "$result" ] && [ -x "$(which perl 2> /dev/null)" ]; then
+		result="$(perl -MCwd -e 'print Cwd::realpath($ARGV[0])' """$1""")"
+	fi
+	if [ -z "$result" ] && [ -x "$(which python 2> /dev/null)" ]; then
+		result="$(python -c 'import sys, os;sys.stdout.write(os.path.abspath(sys.argv[1]))' """$1""")"
+	fi
+	if [ -z "$result" ] && [ -x "$(which python3 2> /dev/null)" ]; then
+		result="$(python3 -c 'import sys, os;sys.stdout.write(os.path.abspath(sys.argv[1]))' """$1""")"
+	fi
+	if [ -z "$result" ] && [ -x "$(which python2 2> /dev/null)" ]; then
+		result="$(python2 -c 'import sys, os;sys.stdout.write(os.path.abspath(sys.argv[1]))' """$1""")"
+	fi
+	if [ -z "$result" ] && [ -x "$(which realpath 2> /dev/null)" ]; then
+		result="$(realpath """$1""")"
+	fi
+	if [ -z "$result" ]; then
+		result="$1"
+	fi
+	echo $result
+}
+
+name="$(absolute_path """$1""")"
+
+if [ -z "$NVIM_LISTEN_ADDRESS" ]; then
+	printf '\033]51;["call", "Tapi_TerminalEdit", ["%s"]]\007' "$name"
+else
+	if [ -x "$(which nvr 2> /dev/null)" ]; then
+		nvr --servername "$VIM_SERVERNAME" --remote-expr "Tapi_TerminalEdit(0, '$name')"
+	else
+		echo "cannot find nvr executable, please install neovim-remote"
+		exit 2
+	fi
+fi
+
+

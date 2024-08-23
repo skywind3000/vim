@@ -1,0 +1,9 @@
+Hello, 
+
+	I am writing this letter in the purpose of 
+	testing template engine.
+
+Yours,
+	`%USER%`
+	`%DATE%`
+

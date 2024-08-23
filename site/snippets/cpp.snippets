@@ -1,0 +1,37 @@
+extends c
+
+snippet gtest
+	#include <stdio.h>
+	#include <gtest/gtest.h>
+
+	TEST(suit1, test0)
+	{
+		ASSERT_TRUE(0 == 0);
+	}
+
+	int main(int argc, char *argv[]) 
+	{
+		testing::InitGoogleTest(&argc, argv);
+		return RUN_ALL_TESTS();
+	}
+
+snippet class
+	class ${1:`snippet#filename('$1', 'ClassName')`}
+	{
+	public:
+		virtual ~${1}();
+		${1}();
+
+	public:
+	};
+	${0}
+
+snippet class-no-virtual
+	class ${1:ClassName}
+	{
+	public:
+		~${1}();
+		${1}();
+	};
+	${0}
+

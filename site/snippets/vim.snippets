@@ -1,0 +1,41 @@
+snippet head
+	" vim: set ts=4 sw=4 tw=78 noet :
+	"======================================================================
+	"
+	" `expand('%:t')` - ${1}
+	"
+	" Created by `g:snips_author` on `strftime('%Y/%m/%d')`
+	" Last Modified: `strftime('%Y/%m/%d %H:%M:%S')`
+	"
+	"======================================================================
+	${0}
+
+snippet frame
+	"======================================================================
+	" ${1}
+	"======================================================================
+	${0}
+
+snippet windows
+	let s:windows = has('win32') || has('win64') || has('win95') || has('win16')
+	${0}
+
+snippet scripthome
+	let s:scripthome = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+	${0}
+
+snippet errmsg
+	echohl ErrorMsg
+	echo ${0:"ERROR"}
+	echohl None
+
+snippet try
+	try
+		${0}
+	catch
+	endtry
+
+snippet while
+	while ${0}
+	endwhile
+

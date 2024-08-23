@@ -1,0 +1,4 @@
+#! /bin/sh
+
+mount d:/dev/mingw32 /mingw32
+

@@ -1,0 +1,45 @@
+" vim: set ts=4 sw=4 tw=78 noet ft=vim :
+let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+
+exec 'so '.fnameescape(s:home).'/init.vim'
+exec 'so '.fnameescape(s:home).'/skywind.vim'
+
+set t_Co=256
+color desert256
+
+hi! CursorLineNr cterm=none
+
+let g:terminal_skip_key_init = 1
+let g:altmeta_num_shift = get(g:, 'vim_num_shift', 0)
+
+if !exists('g:bundle_group')
+	let g:bundle_group = []
+endif
+
+let g:vim_startup = get(g:, 'vim_startup', 0)
+
+if g:vim_startup != 0 || has('gui_running')
+	call Tools_SwitchLayout()
+endif
+
+if get(g:, 'vim_manual', 0) == 0
+	let g:bundle_group += ['simple', 'basic']
+	if g:vim_startup == 1
+		let g:bundle_group += ['inter']
+	elseif g:vim_startup == 2
+		let g:bundle_group += ['basic', 'inter', 'high', 'opt']
+		let g:bundle_group += ['ale']
+	endif
+	let g:bundle_group += ['nerdtree']
+endif
+
+if len(g:bundle_group) > 0
+	IncScript bundle.vim
+endif
+
+hi LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
+hi SignColumn ctermbg=0
+
+
+
+

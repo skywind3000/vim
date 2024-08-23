@@ -1,0 +1,12 @@
+snippet scriptpath
+	local scriptpath = debug.getinfo(1, 'S').source:sub(2)
+
+snippet ifmain
+	-----------------------------------------------------------------------
+	-- if __name__ == '__main__':
+	-----------------------------------------------------------------------
+	if not pcall(debug.getlocal, 4, 1) then
+		${1}
+	end
+
+

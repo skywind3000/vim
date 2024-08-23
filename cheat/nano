@@ -1,0 +1,42 @@
+                               Overview of nano's shortcuts
+                       The editor's keystrokes and their functions
+
+ ---------------------------------------------------------------------------------------
+ File handling                               Moving around
+ Ctrl+S   Save current file                  Ctrl+B     One character backward
+ Ctrl+O   Offer to write file ("Save as")    Ctrl+F     One character forward
+ Ctrl+R   Insert a file into current one     Ctrl+LEFT  One word backward
+ Ctrl+X   Close buffer, exit from nano       Ctrl+RIGHT One word forward
+                                             Ctrl+A     To start of line
+ Editing                                     Ctrl+E     To end of line
+ Ctrl+K   Cut current line into cutbuffer    Ctrl+P     One line up
+ Alt+6    Copy current line into cutbuffer   Ctrl+N     One line down
+ Ctrl+U   Paste contents of cutbuffer        Ctrl+UP    To previous block
+ Alt+T    Cut until end of buffer            Ctrl+DOWN  To next block
+ Ctrl+]   Complete current word              Ctrl+Y     One page up
+ Alt+3    Comment/uncomment line/region      Ctrl+V     One page down
+ Alt+U    Undo last action                   Alt+\      To top of buffer
+ Alt+E    Redo last undone action            Alt+/      To end of buffer
+
+ Search and replace                          Special movement
+ Ctrl+Q   Start backward search              Alt+G      Go to specified line
+ Ctrl+W   Start forward search               Alt+]      Go to complementary bracket
+ Alt+Q    Find next occurrence backward      Alt+UP     Scroll viewport up
+ Alt+W    Find next occurrence forward       Alt+DOWN   Scroll viewport down
+ Alt+R    Start a replacing session          Alt+<      Switch to preceding buffer
+                                             Alt+>      Switch to succeeding buffer
+ Deletion
+ Ctrl+H   Delete character before cursor     Information
+ Ctrl+D   Delete character under cursor      Ctrl+C     Report cursor position
+ Alt+Bsp  Delete word to the left            Alt+D      Report line/word/character count
+ Ctrl+Del Delete word to the right           Ctrl+G     Display help text
+ Alt+Del  Delete current line
+                                             Various
+ Operations                                  Alt+A      Turn the mark on/off
+ Ctrl+T   Execute some command               Tab        Indent marked region
+ Ctrl+J   Justify paragraph or region        Shift+Tab  Unindent marked region
+ Alt+J    Justify entire buffer              Alt+V      Enter next keystroke verbatim
+ Alt+B    Run a syntax check                 Alt+N      Turn line numbers on/off
+ Alt+F    Run a formatter/fixer/arranger     Alt+P      Turn visible whitespace on/off
+ Alt+:    Start/stop recording of macro      Alt+X      Hide or unhide the help lines
+ Alt+;    Replay macro                       Ctrl+L     Refresh the screen

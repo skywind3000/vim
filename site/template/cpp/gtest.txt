@@ -1,0 +1,22 @@
+#include <stdio.h>
+#include <gtest/gtest.h>
+
+TEST(suit1, test0)
+{
+	ASSERT_TRUE(0 == 0);
+}
+
+TEST(suit1, test1)
+{
+	ASSERT_TRUE(0 == 0);
+}
+
+
+//! exe:
+int main(int argc, char *argv[]) 
+{
+	testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}
+
+

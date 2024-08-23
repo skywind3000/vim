@@ -1,0 +1,52 @@
+#======================================================================
+#
+# c.snippets - C Language Code Snippets
+#
+# Created by skywind on 2023/07/31
+# Last Modified: 2023/07/31 01:51:11
+#
+#======================================================================
+
+snippet frame
+	//---------------------------------------------------------------------
+	// ${1:COMMENTS}
+	//---------------------------------------------------------------------
+	${0}
+
+snippet ?
+	(${1})? (${2}) : (${3})${0}
+
+snippet main
+	int main(void)
+	{
+		${0}
+		return 0;
+	}
+
+snippet mainarg
+	int main(int argc, const char *argv[])
+	{
+		${0}
+		return 0;
+	}
+
+snippet headguard
+	#ifndef _`toupper(expand('%:t:r'))`_H_
+	#define _`toupper(expand('%:t:r'))`_H_
+
+	${0}
+
+	#endif
+	
+snippet ifwin32
+	#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+	${0}
+	#endif
+
+snippet emake-profile
+	//! \$release/flag: -O3
+	//! \$debug/flag: -Og, -g3, -D_DEBUG=1
+
+snippet emake-start
+	//! exe:
+

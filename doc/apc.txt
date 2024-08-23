@@ -1,0 +1,128 @@
+*apc*  vim-auto-popmenu
+
+===============================================================================
+Contents ~
+
+ 1. Introduction                                             |apc-introduction|
+ 2. What Is It ?                                               |apc-what-is-it|
+ 3. Features                                                     |apc-features|
+ 4. Usage                                                           |apc-usage|
+ 5. Commands                                                     |apc-commands|
+  1. ApcEnable                                                      |apcenable|
+  2. ApcDisable                                                    |apcdisable|
+ 6. Cooperative                                               |apc-cooperative|
+ 7. Credit                                                         |apc-credit|
+ 8. References                                                 |apc-references|
+
+===============================================================================
+                                                             *apc-introduction*
+Introduction ~
+
+A tiny and portable script (169 lines) to provide you 'YouCompleteMe' like
+experience for 'buffer', 'dictionary' and 'tags' completion without installing
+heavy completion engines and building background servers.
+
+===============================================================================
+                                                               *apc-what-is-it*
+What Is It ? ~
+
+Semantic completion is great, but sometimes, when you are coding in an obscure
+laguange which is lack of LSP support, or you are working in a temporary system
+and you don't want waste time to set up a heavyweight completion engine and
+build a background server.
+
+In these circumstances, vim's built-in completion system is good enough for
+you, it can collect keywords from buffers and dictionary or ctag files, but
+requires you to press '<c-n>' or '<c-x><c-k>' manually.
+
+This tiny little script will help you to trigger the completion menu when you
+have entered 1 or 2 alphabets and provide you exactly the same experience like
+'YouCompleteMe':
+
+  Image: (see reference [1])
+
+===============================================================================
+                                                                 *apc-features*
+Features ~
+
+- Popup the completion menu automatically.
+- 'Tab' or 'shift'+'TAB' to cycle keywords, '<c-e>' to cancel.
+- Same experience like 'YouCompleteMe' for 'buffer', 'dict' and 'tags'
+  completion.
+- Green, everything is local to buffer, will not pollute your vim or disturb
+  other plugins.
+- Capable to co-exist with other completion plugins.
+- No heavy engines, no need to build background servers.
+- Faster and more handy than the old famous 'AutoComplPop'.
+- Portable, just a simple 'apc.vim' script, easy to be distributed.
+- Only **169 lines**, you can even copy it to your 'vimrc'.
+- Convenience as a backup way for big completion plugins.
+
+===============================================================================
+                                                                    *apc-usage*
+Usage ~
+
+That's all you need:
+>
+  Plug 'skywind3000/vim-auto-popmenu'
+  
+  " enable this plugin for filetypes, '*' for all files.
+  let g:apc_enable_ft = {'text':1, 'markdown':1, 'php':1}
+  
+  " source for dictionary, current or other loaded buffers, see ':help cpt'
+  set cpt=.,k,w,b
+  
+  " don't select the first item.
+  set completeopt=menu,menuone,noselect
+  
+  " suppress annoy messages.
+  set shortmess+=c
+<
+And perhaps a dictionary database plugin for many languages:
+>
+  Plug 'skywind3000/vim-dict'
+<
+Then you go.
+
+===============================================================================
+                                                                 *apc-commands*
+Commands ~
+
+-------------------------------------------------------------------------------
+                                                                    *apcenable*
+ApcEnable ~
+
+Enable plugin for the current buffer. Useful when you didn't set
+'g:apc_enable_ft'.
+
+-------------------------------------------------------------------------------
+                                                                   *apcdisable*
+ApcDisable ~
+
+Disable plugin for the current buffer.
+
+===============================================================================
+                                                              *apc-cooperative*
+Cooperative ~
+
+If you are using 'YouCompleteMe', disable it for certain filetypes:
+>
+  let g:ycm_filetype_blacklist = {'text':1, 'markdown':1, 'php':1}
+<
+and enable this plugin for these files:
+>
+  let g:apc_enable_ft = {'text':1, 'markdown':1, 'php':1}
+<
+===============================================================================
+                                                                   *apc-credit*
+Credit ~
+
+- https://github.com/othree/vim-autocomplpop.
+
+===============================================================================
+                                                               *apc-references*
+References ~
+
+[1] https://skywind3000.github.io/images/p/auto-popmenu/demo.gif
+
+vim: ft=help

@@ -1,0 +1,4 @@
+#! /bin/sh
+
+PATH="/home/linuxbrew/.linuxbrew/bin:$PATH" /home/linuxbrew/.linuxbrew/bin/brew "$@"
+

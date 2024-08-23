@@ -1,0 +1,7 @@
+# https://clangd.llvm.org/config
+# https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started
+CompileFlags:
+  Add: 
+    - "-ID:/dev/local/include"
+    - "-ID:/dev/mingw32/include"
+

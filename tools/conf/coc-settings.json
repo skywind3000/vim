@@ -1,0 +1,81 @@
+{
+	"suggest.floatConfig": {
+		"border": true,
+		"rounded": true,
+		"focusable": false
+	},
+
+	"signature.floatConfig": {
+		"border": true,
+		"rounded": true,
+		"focusable": false
+	},
+
+	"hover.floatConfig": {
+		"border": true,
+		"rounded": false,
+		"focusable": false
+	},
+
+	"suggest.autoTrigger": "always",
+	"suggest.noselect": true,
+	"suggest.enablePreview": true,
+	"suggest.timeout": 5000,
+
+	"signature.target": "echo",
+
+	"diagnostic.enable": false,
+	"inlayHint.enable": false,
+
+	"coc.source.coc-snippets.enable": false,
+
+    "list.autoResize": false,
+    "list.maxHeight": 15,
+    "list.source.grep.defaultArgs": ["-smartcase", "-regex"],
+    "list.source.grep.defaultOptions": ["--interactive", "--no-sort", "--regex"],
+
+	"languageserver": {
+		"clangd": {
+			"command": "clangd",
+			"rootPatterns": [".git", ".svn", ".hg", ".root", ".project"],
+			"filetypes": ["c", "cc", "cpp", "c++", "objc", "objcpp"],
+			"initializationOptions": {
+				"fallbackFlags": [
+					"-Ie:/local/vcpkg/installed/x86-mingw-dynamic/include",
+					"-Wall"
+				]
+			}
+		}
+	},
+
+	"suggest.completionItemKindLabels": {
+		"keyword": "\uf1de Keyword",
+		"variable": "\ue79b Variable",
+		"value": "\uf4f7 Value",
+		"operator": "\ueb64 Operator",
+		"function": "\u0192 Function",
+		"reference": "\uf4bd Reference",
+		"constant": "\ue22c Constant",
+		"method": "\uf09a Method",
+		"struct": "\ufb44 Struct",
+		"class": "\uf0e8 Class",
+		"interface": "\uf417 Interface",
+		"text": "\ue612 Text",
+		"enum": "\uf435 Enum",
+		"enumMember": "\uf02b EnumMember",
+		"module": "\uf40d Module",
+		"color": "\ue22b Color",
+		"property": "\ue624 Property",
+		"field": "\ueb5f Field",
+		"unit": "\uf475 Unit",
+		"event": "\uea86 Event",
+		"file": "\uf15c File",
+		"folder": "\uf114 Folder",
+		"snippet": "\ue60b Snippet",
+		"typeParameter": "\ueaa8 Parameter",
+		"default": "\uf29c Default"
+	}
+}
+
+
+

@@ -1,0 +1,10 @@
+- Hot keys
+
+  Win+Shift+s     - capture screen to the clipboard
+  Win+Ctrl+d      - create virtual desktop
+  Win+Ctrl+F4     - destroy virtual desktop
+  Win+Ctrl+Left   - previous virtual desktop
+  Win+Ctrl+Right  - next virtual desktop
+  Win+Ctrl+Up     - maximize current window
+
+

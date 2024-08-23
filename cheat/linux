@@ -1,0 +1,110 @@
+- Hot keys:
+
+  <c-s>        - start stream flow
+  <c-s><c-q>   - stop stream flow
+
+- Fix LOC not find:
+  
+  localedef -i en_US -f UTF-8 en_US.UTF-8
+
+- List of commands you use most often:
+
+  history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head
+
+- Mount folder/filesystem through SSH:
+
+  sshfs name@server:/path/to/folder /path/to/mount/point
+
+- Display the top ten running processes - sorted by memory usage:
+
+  ps aux | sort -nk +4 | tail    
+
+- Put a console clock in top right corner:
+
+  while sleep 1;do tput sc;tput cup 0 $(($(tput cols)-29));date;tput rc;done&
+
+- Copy your SSH public key on a remote machine for passwordless login:
+
+  ssh-copy-id username@hostname
+
+- Extract tarball from internet without local saving:
+
+  wget -qO - "http://www.tarball.com/tarball.gz" | tar zxvf -
+
+- Benchmark: CPU and Memory Bandwidth:
+
+  python -c "import test.pystone;print(test.pystone.pystones())"
+  dd if=/dev/zero of=/dev/null bs=1M count=32768
+
+- Mount a .iso file in UNIX/Linux:
+
+  mount /path/to/file.iso /mnt/cdrom -oloop
+
+- Directly ssh to host B that is only accessible through host A:
+
+  ssh -t hostA ssh hostB
+
+- Download all images from a site:
+
+  wget -r -l1 --no-parent -nH -nd -P/tmp -A".gif,.jpg" http://example.com/images
+
+- Make directory tree:
+
+  mkdir -p work/{d1,d2}/{src,bin,bak}
+
+- find files in a date range:
+
+  find . -type f -newermt "2010-01-01" ! -newermt "2010-06-01"
+
+- Show apps that use internet connection at the moment:
+
+  lsof -P -i -n | cut -f 1 -d " "| uniq | tail -n +2
+
+- Save a file you edited in vim without the needed permissions (no echo):
+
+  :w !sudo tee > /dev/null %
+
+- apt-get upgrade: The following packages have been kept back
+
+  sudo apt-get --with-new-pkgs upgrade
+
+- Bash arguments:
+
+  $0,$1,$2  Positional parameters, passed from command line or function caller
+  $*        Creates one argument separated by the $IFS variable
+  $@        Expand into separate arguments
+  $#        Argument count
+  $?        Number of command-line arguments [4] or positional parameters
+
+- Tips:
+
+  man hier           # Show file system hierarchy
+  man test           # Show posix sh condition test
+  man ascii          # Quick access to the ascii table
+  getconf LONG_BIT   # 32 bits or 64 bits ?
+  reset              # Salvage a borked terminal
+  bind -P            # List all bash shortcuts
+  mount | column -t  # Currently mounted filesystems in nice layout
+  curl ifconfig.me   # Get your external IP address
+  disown -a && exit  # Close shell keeping all subprocess running
+  cat /etc/issue     # Display which distro is installed
+  lsof -i tcp:80     # Which program is this port belongs to ?
+  showkey -a         # Quick access to ASCII code of a key
+  CTRL + T           # Check the status of 'dd' in progress (OS X)
+  svn diff | view -  # Use vim to get colorful diff output
+
+- Tricks:
+
+  mv filename.{old,new}          # Quickly rename a file
+  time read (ctrl-d to stop)     # A very simple and useful stopwatch
+  telnet towel.blinkenlights.nl  # Watch Star Wars via telnet
+  cp file.txt{,.bak}             # Quickly backup files
+  sudo touch /forcefsck          # Run a file system check on your next boot.
+  sudo find / -mmin 60 -type f   # Find files modified in the past 60 minutes
+  curl wttr.in/beijing           # Nice weather forecast on your shell
+  echo ${SSH_CLIENT%% *}         # Get the IP of the host your coming from
+  echo $[RANDOM%X+1]             # Random Number Between 1 And X
+  bind -x '"\C-l":ls -l'         # Bind a key with a command
+  find / -type f -size +500M     # Find all file larger than 500M
+  chmod --reference file1 file2  # Makes the permissions the same as file1
+

@@ -1,0 +1,10 @@
+#! /bin/sh
+
+x=$PATH:
+while [ -n "$x" ]; do
+	y=${x%%:*}
+	echo $y
+	x=${x#*:}
+done
+
+

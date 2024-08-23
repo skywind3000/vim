@@ -1,0 +1,35 @@
+- Debian source for ustc:
+
+  deb http://mirrors.ustc.edu.cn/debian bullseye main
+  deb http://mirrors.ustc.edu.cn/debian bullseye-updates main
+  deb http://mirrors.ustc.edu.cn/debian-security bullseye-security main
+  deb http://mirrors.ustc.edu.cn/debian bullseye-backports main
+
+- Python pip:
+
+  https://bootstrap.pypa.io/get-pip.py
+  https://bootstrap.pypa.io/pip/2.7/get-pip.py
+
+- Public key:
+
+  ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEA2yNZF/SKiYaFKHlpi4HoSxDMIDJfJsjL4+ZbdkNxxscSY02O95txYkwNrQJNLRPVCMy+d5027AuKvT/yKptzJ1POszxUGXqCE/cAb8idAptYu2r1FpWvPzdK1l7UmDrUzr0frvk64hlyeOPjvQ7bFko96NI5UuCFnCpFcC8oTnM= skywind
+
+- WSL init:
+
+  #! /bin/sh
+  /etc/init.d/cron $1
+  /etc/init.d/ssh $1
+  /etc/init.d/supervisor $1
+
+- WSL debian.vbs:
+
+  Set ws = CreateObject("Wscript.Shell")
+  ws.run "wsl -d debian -u root /etc/init.wsl start", vbhide
+
+- Build Packages:
+
+  sudo apt-get install build-essential automake autoconf make pkg-config 
+  sudo apt-get install libncursesw5-dev libncurses5-dev libssl-dev libevent-dev
+  sudo apt-get install libuv1-dev libev-dev python2-dev python3-dev swig
+
+

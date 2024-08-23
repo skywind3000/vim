@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.5)
+
+project(`%DIRNAME%`)
+
+set(CMAKE_CXX_STANDARD 17)
+
+
+set(SOURCES
+	hello.c
+	)
+
+add_executable(`%DIRNAME%` ${SOURCES})
+
