@@ -2867,11 +2867,14 @@ class iparser (object):
             if (color & 128): result |= 128
             SetConsoleTextAttribute(handle, result)
         else:
-            if color >= 0:
+            if color >= 0:  # noqa
                 foreground = color & 7
                 background = (color >> 4) & 7
                 bold = color & 8
-                sys.stdout.write("\033[%s3%d;4%dm"%(bold and "01;" or "", foreground, background))
+                if background != 0:
+                    sys.stdout.write(" \033[%s3%d;4%dm"%(bold and "01;" or "", foreground, background))
+                else:
+                    sys.stdout.write(" \033[%s3%dm"%(bold and "01;" or "", foreground))
                 sys.stdout.flush()
             else:
                 sys.stdout.write("\033[0m")
