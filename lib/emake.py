@@ -3,7 +3,7 @@
 #  vim: set ts=4 sw=4 tw=0 et :
 #======================================================================
 #
-# emake.py - emake version 3.7.1
+# emake.py - emake version 3.7.2
 #
 # history of this file:
 # 2009.08.20   skywind   create this file
@@ -901,6 +901,7 @@ class configure(object):
         self.replace['target'] = self.target
         self.replace['profile'] = self.profile
         self._reset_path()
+        self._reset_environ()
         self.inited = True
         return 0
 
@@ -931,6 +932,13 @@ class configure(object):
         t = sep.join(finalize)
         self._new_os_path = t + sep + os.environ.get('PATH', '')
         os.environ['PATH'] = self._new_os_path
+        return 0
+
+    # reset environment variables
+    def _reset_environ (self):
+        PKG_CONFIG_PATH = self._getitem('default', 'pcpath', '').strip()
+        if PKG_CONFIG_PATH:
+            os.environ['PKG_CONFIG_PATH'] = PKG_CONFIG_PATH
         return 0
 
     # 取得替换了$(HOME)变量的路径
