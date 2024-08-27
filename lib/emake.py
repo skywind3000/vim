@@ -3,7 +3,7 @@
 #  vim: set ts=4 sw=4 tw=0 et :
 #======================================================================
 #
-# emake.py - emake version 3.7.2
+# emake.py - emake version 3.7.3
 #
 # history of this file:
 # 2009.08.20   skywind   create this file
@@ -52,7 +52,7 @@ else:
 #----------------------------------------------------------------------
 # version info
 #----------------------------------------------------------------------
-EMAKE_VERSION = '3.7.2'
+EMAKE_VERSION = '3.7.3'
 EMAKE_DATE = 'Aug.27 2024'
 
 
@@ -622,38 +622,29 @@ class configure(object):
         return 0
     
     # initialize environment for command tool
-    def _cmdline_init (self, envname, exename):
-        if envname not in self.config:
-            return -1
-        config = self._env_config(envname)
-        PATH = []
-        EXEC = ''
+    def _cmdline_init (self, envname):
+        config = self._env_config('environ:' + envname)
+        # print('config', config)
+        output = []
         sep = self.unix and ':' or ';'
-        envpath = config.get('PATH', '') + sep + self.environ.get('PATH', '')
-        if os.path.exists(exename):
-            EXEC = exename
+        PATH = config.get('PATH', '').strip().replace(';', ',')
+        if self.unix:
+            PATH = PATH.replace(':', ',')
+        envpath = PATH + sep + self.environ.get('PATH', '')
         for path in envpath.split(sep):
             if path.strip('\r\n\t ') == '':
                 continue
             path = os.path.abspath(path)
             if os.path.exists(path):
-                if path not in PATH:
-                    PATH.append(path)
-            if not EXEC:
-                name = os.path.join(path, exename)
-                if os.path.exists(name):
-                    EXEC = name
-        if not EXEC:
-            return -2
-        config['PATH'] = sep.join(PATH)
+                if path not in output:
+                    output.append(path)
+        config['PATH'] = sep.join(output)
         for n in config:
             v = config[n]
-            if n not in ('PATH',):
+            if n.strip():
                 os.environ[n] = v
         os.environ['PATH'] = config['PATH']
-        if not self.unix:
-            EXEC = self.pathshort(EXEC)
-        return EXEC
+        return 0
     
     # environment configuration for cmdline tool
     def _env_config (self, section):
@@ -661,8 +652,15 @@ class configure(object):
         if section in self.config:
             for n in self.config[section]:
                 config[n.upper()] = self.config[section][n]
+        replace = {}
+        replace['$(INIROOT)'] = os.path.dirname(self.iniload)
+        replace['$(INIPATH)'] = os.path.abspath(self.iniload)
+        replace['$(TARGET)'] = self.target
         for n in config:
-            config[n] = config[n].replace('$(INIROOT)', os.path.dirname(self.iniload))
+            text = config[n]
+            for key in replace:
+                text = text.replace(key, replace[key])
+            config[n] = text
         for n in config:
             config[n] = self._expand(config, self.environ, n)
         return config
@@ -916,7 +914,10 @@ class configure(object):
             return -1
         sep = self.unix and ':' or ';'
         pathout = []
-        for path in PATH.split(sep):
+        PATH = PATH.replace(';', ',')
+        if self.unix:
+            PATH = PATH.replace(':', ',')
+        for path in PATH.split(','):
             if os.path.isabs(path):
                 pathout.append(path)
             elif os.path.exists(self.inipath):
@@ -939,6 +940,14 @@ class configure(object):
         PKG_CONFIG_PATH = self._getitem('default', 'pcpath', '').strip()
         if PKG_CONFIG_PATH:
             os.environ['PKG_CONFIG_PATH'] = PKG_CONFIG_PATH
+        ENVIRON = self._getitem('default', 'environ', '').strip()
+        if ENVIRON:
+            for item in ENVIRON.split(','):
+                if not item: continue
+                name, value = (item.split('=') + ['', ''])[:2]
+                name, value = name.strip(), value.strip()
+                if name:
+                    os.environ[name] = value
         return 0
 
     # 取得替换了$(HOME)变量的路径
@@ -1476,19 +1485,25 @@ class configure(object):
         return 0
 
     # run tool
-    def cmdtool (self, sectname, exename, parameters, printcmd = False):
+    def cmdtool (self, sectname, args, printcmd = False):
         envsave = [ (n, os.environ[n]) for n in os.environ ]
-        hr = self._cmdline_init(sectname, exename)
-        if type(hr) != type(''):   # noqa: E721
-            if hr == -1:
-                msg = 'cmdtool error: can not find %s env !!'%(sectname)
-            else:
-                msg = 'cmdtool error: can not find %s exe !!'%(exename)
-            sys.stderr.write(msg + '\n')
-            sys.stderr.flush()
-            return -2
-        path = hr
-        cmd = '%s %s'%(path, parameters)
+        self._cmdline_init(sectname)
+        if isinstance(args, str):
+            cmd = args
+        elif isinstance(args, list) or isinstance(args, tuple):
+            replace = { ' ':'\\ ', '\\':'\\\\', '\"':'\\\"', '\t':'\\t',
+                '\n':'\\n', '\r':'\\r' }
+            parameters = []
+            for n in args:
+                if self.unix:
+                    text = ''.join([ replace.get(ch, ch) for ch in n ])
+                    parameters.append(text)
+                else:
+                    if (' ' in n) or ('\t' in n) or ('"' in n): 
+                        parameters.append('"%s"'%(n.replace('"', ' ')))
+                    else:
+                        parameters.append(n)
+            cmd = ' '.join(parameters)
         if printcmd:
             print('>', cmd)
         sys.stdout.flush()
@@ -1931,7 +1946,7 @@ class coremake(object):
         msvclib = self.config.pathtext(self.config.pathrel(msvclib))
         parameters = '-nologo ' + machine + ' /def:' + defname
         parameters += ' /out:' + msvclib
-        self.config.cmdtool('msvc', 'LIB.EXE', parameters, False)
+        self.config.cmdtool('msvc', 'LIB.EXE ' + parameters, False)
         return 0
     
     # 单核编译：skipexist(是否需要跳过已有的obj文件)
@@ -3712,9 +3727,8 @@ def main(argv = None):
         config.init()
         argv += ['', '', '', '', '']
         envname = argv[2]
-        exename = argv[3]
         parameters = ''
-        for n in [ argv[i] for i in range(4, len(argv)) ]:
+        for n in [ argv[i] for i in range(3, len(argv)) ]:
             if cmd in ('-m',):
                 if n[:2] == '${' and n[-1:] == '}':
                     n = extract(n)
@@ -3727,7 +3741,8 @@ def main(argv = None):
                 if ' ' in n:
                     n = '"' + n + '"'
             parameters += n + ' '
-        config.cmdtool(envname, exename, parameters)
+        hr = config.cmdtool(envname, parameters.rstrip(' '))
+        sys.exit(hr)
         return 0
 
     if cmd in ('-g', '-cygwin'):
@@ -3762,6 +3777,17 @@ def main(argv = None):
         cmds = '"%s" %s'%(exename, parameters)
         config.cygwin_execute(envname, '', cmds)
         return 0
+
+    if cmd in ('-z', '-shell'):
+        config = configure()
+        config.init()
+        args = []
+        args.extend(argv[2:])
+        execute(args, True, False)
+        code = os.shell_return
+        if code < 0:
+            code = 128
+        return sys.exit(code)
 
     if cmd == '-dump':
         if not name: name = '.'
@@ -3859,10 +3885,10 @@ if __name__ == '__main__':
         make.mkdir(r'e:\lab\malloc\obj list')
         make.mkdir(r'e:\lab\malloc\abc c\01 2\3 4\5\6')
         make.init('mainmod', 'exe', 'malloc/obj')
-        make.push('malloc/main.c')
-        make.push('malloc/mod1.c')
-        make.push('malloc/mod2.c')
-        make.push('malloc/mod3.c')
+        make.push('malloc/main.c', '', {})
+        make.push('malloc/mod1.c', '', {})
+        make.push('malloc/mod2.c', '', {})
+        make.push('malloc/mod3.c', '', {})
         make.build(printmode = 7)
         print(os.path.getmtime('malloc/main.c'))
     def test2():
