@@ -1559,7 +1559,7 @@ class configure(object):
     # 运行 Cygwin 命令行
     def cygwin_execute (self, sect, exename, parameters = '', capture = 0):
         capture = capture and True or False
-        sect = sect.lower()
+        sect = 'environ:' + sect.lower()
         home = self.win2cyg(os.getcwd())  # noqa: F841
         cmds = 'export LANG=C\n'
         if sect in self.config:
