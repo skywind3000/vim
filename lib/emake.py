@@ -1508,7 +1508,7 @@ class configure(object):
             print('>', cmd)
         sys.stdout.flush()
         sys.stderr.flush()
-        os.system(cmd)
+        code = os.system(cmd)
         envflag = {}
         remove = []
         for n, v in envsave:
@@ -1519,7 +1519,7 @@ class configure(object):
                 remove.append(n)
         for n in remove:
             del os.environ[n]
-        return 0
+        return code
     
     # 调用 Cygwin Bash
     def cygwin_bash (self, cmds, capture = False):
