@@ -3171,7 +3171,9 @@ class emake (object):
             return 0
         flags = ' '.join([n[0] for n in self.parser.pkgflag])
         pkgs = ' '.join([n[0] for n in self.parser.pkg])
-        parameter = flags + ' ' + pkgs
+        text = self.config._getitem('default', 'pcflag', '').strip()
+        conf = ' '.join([t.strip() for t in text.split(',')])
+        parameter = flags + ' ' + conf.strip() + ' ' + pkgs
         p1 = '--cflags-only-I ' + parameter
         p2 = '--libs ' + parameter
         fname = self.parser.pkg[0][1]
