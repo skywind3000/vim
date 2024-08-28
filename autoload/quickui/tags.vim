@@ -410,7 +410,7 @@ function! quickui#tags#function_list(bid, ft)
 		let output = []
 		for ni in items
 			if ni.mode == 'f'
-				if ni.text =~ '\v<lambda>\s.*\:'
+				if ni.text =~ '\v<lambda>\s.*\:\s*\S+'
 					continue
 				endif
 			endif
