@@ -42,6 +42,7 @@ import os
 if sys.version_info.major == 2:
     import ConfigParser as configparser
     import cStringIO as cio 
+    # pylint: disable=undefined-variable
     range = xrange   # noqa: F821
 else:
     import configparser
@@ -572,6 +573,7 @@ class configure(object):
         self.dirpath = os.path.split(os.path.abspath(__file__))[0]
         self.current = os.getcwd()
         if not ininame:
+            # pylint: disable=simplify-boolean-expression
             ininame = ININAME and ININAME or 'emake.ini'
         self.ininame = ininame
         self.inipath = os.path.join(self.dirpath, self.ininame)
@@ -1473,8 +1475,8 @@ class configure(object):
                     names[last] = 1
                     shutil.copyfile(fn, os.path.join(outpath, last))
         os.chdir(outpath)
-        args = ['crv', self.pathrel(output)]
-        args = ' '.join(args + [self.pathrel(n) for n in names])
+        argv = ['crv', self.pathrel(output)]
+        args = ' '.join(argv + [self.pathrel(n) for n in names])
         try: os.remove(output)
         except: pass
         self.execute(self.exename['ar'], args, printcmd, capture)
