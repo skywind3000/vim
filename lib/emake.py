@@ -3,7 +3,7 @@
 #  vim: set ts=4 sw=4 tw=0 et :
 #======================================================================
 #
-# emake.py - emake version 3.7.3
+# emake.py - emake version 3.7.4
 #
 # history of this file:
 # 2009.08.20   skywind   create this file
@@ -52,8 +52,8 @@ else:
 #----------------------------------------------------------------------
 # version info
 #----------------------------------------------------------------------
-EMAKE_VERSION = '3.7.3'
-EMAKE_DATE = 'Aug.27 2024'
+EMAKE_VERSION = '3.7.4'
+EMAKE_DATE = 'Aug.28 2024'
 
 
 #----------------------------------------------------------------------
@@ -873,19 +873,17 @@ class configure(object):
             self.name['win'] = 1
         if 'win' in self.name:
             self.name['nt'] = 1
-        self.target = self._getitem('default', 'target')
-        names = self._getitem('default', 'name')
+        self.target = self._getitem('default', 'target').strip()
+        if not self.target:
+            self.target = sys.platform
+        self.name[self.target] = 1
+        names = self._getitem('default', 'name').strip()
         if names:
             self.name = {}
             for name in names.replace(';', ',').split(','):
                 name = name.strip('\r\n\t ').lower()
                 if not name: continue
                 self.name[name] = 1
-                if not self.target:
-                    self.target = name
-        if not self.target:
-            self.target = sys.platform
-        self.target = self.target.strip('\r\n\t ')
         if sys.platform[:3] in ('win', 'cyg'):
             self.fpic = False
         else:
