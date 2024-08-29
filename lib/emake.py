@@ -2126,6 +2126,7 @@ class coremake(object):
         environ['EMAKE_OUT_NOEXT'] = os.path.splitext(self._out)[0]
         environ['EMAKE_OUT_EXT'] = os.path.splitext(self._out)[1]
         environ['EMAKE_OUT_PATH'] = os.path.dirname(self._out)
+        environ['EMAKE_TARGET'] = self.config.target
         for name in ('gcc', 'ar', 'ld', 'as', 'nasm', 'yasm', 'dllwrap'):
             environ['EMAKE_BIN_' + name.upper()] = self.config.getname(name)
         inipath = ''
