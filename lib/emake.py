@@ -3,7 +3,7 @@
 #  vim: set ts=4 sw=4 tw=0 et :
 #======================================================================
 #
-# emake.py - emake version 3.7.4
+# emake.py - emake version 3.7.5
 #
 # history of this file:
 # 2009.08.20   skywind   create this file
@@ -3487,7 +3487,7 @@ def getemake():
                 success = False
                 print('failed ')
                 print(e)
-        if signature[:22] != '#! /usr/bin/env python':
+        if not signature.startswith('#! /usr/bin/env python'):
             if success:
                 print('error')
             success = False
@@ -3963,8 +3963,8 @@ if __name__ == '__main__':
         update()
         return 0
     
-    test11()
-    # sys.exit( main() )
+    # test11()
+    sys.exit( main() )
     #install()
 
 
