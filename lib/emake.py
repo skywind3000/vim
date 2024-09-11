@@ -3435,17 +3435,21 @@ def __update_file(name, content):
         return 0
     __updated_files[name] = 1
     try: 
-        fp = open(name, 'r')
+        fp = open(name, 'rb')
         source = fp.read()
         fp.close()
     except:
         source = ''
-    if content == source:
+    if not isinstance(content, bytes):
+        rawdata = content.encoding('utf-i', 'ignore')
+    else:
+        rawdata = content
+    if rawdata == source:
         print('%s up-to-date'%name)
         return 0
     try:
-        fp = open(name, 'w')
-        fp.write(content)
+        fp = open(name, 'wb')
+        fp.write(rawdata)
         fp.close()
     except:
         print('can not write to %s'%name)
@@ -3454,23 +3458,36 @@ def __update_file(name, content):
     return 1
 
 def getemake():
-    import urllib2
-    url1 = 'http://skywind3000.github.io/emake/emake.py'
-    url2 = 'http://www.skywind.me/php/getemake.php'
+    url1 = 'https://skywind3000.github.io/emake/emake.py'
+    url2 = 'https://www.skywind.me/php/getemake.php'
     success = True
     content = ''
+    signature = ''
     for url in (url1, url2):
         print('fetching', url, ' ...',)
         sys.stdout.flush()
         success = True
-        try:
-            content = urllib2.urlopen(url).read()
-        except urllib2.URLError as e:
-            success = False
-            print('failed ')
-            print(e)
-        head = content.split('\n')[0].strip('\r\n\t ')
-        if head[:22] != '#! /usr/bin/env python':
+        if sys.version_info[0] < 3:
+            import urllib2
+            try:
+                content = urllib2.urlopen(url).read()
+                signature = content.split('\n')[0].strip('\r\n\t ')
+            except urllib2.URLError as e:
+                success = False
+                print('failed ')
+                print(e)
+        else:
+            import urllib.request
+            try:
+                with urllib.request.urlopen(url) as response:
+                    content = response.read()
+                    t = content.split(b'\n')[0].strip(b'\r\n\t ')
+                    signature = t.decode('ascii', 'ignore')
+            except urllib.error.URLError as e:
+                success = False
+                print('failed ')
+                print(e)
+        if signature[:22] != '#! /usr/bin/env python':
             if success:
                 print('error')
             success = False
@@ -3942,9 +3959,12 @@ if __name__ == '__main__':
     def test10():
         sys.argv = [sys.argv[0], '-g', 'default', 'd:/dev/flash/alchemy5/tutorials/01_HelloWorld/hello.exe', '--version']
         main()
+    def test11():
+        update()
+        return 0
     
-    #test10()
-    sys.exit( main() )
+    test11()
+    # sys.exit( main() )
     #install()
 
 
