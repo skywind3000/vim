@@ -53,8 +53,8 @@ else:
 #----------------------------------------------------------------------
 # version info
 #----------------------------------------------------------------------
-EMAKE_VERSION = '3.7.4'
-EMAKE_DATE = 'Aug.28 2024'
+EMAKE_VERSION = '3.7.5'
+EMAKE_DATE = 'Sep.11 2024'
 
 
 #----------------------------------------------------------------------
@@ -1371,6 +1371,9 @@ class configure(object):
             srcname = self.pathtext(os.path.abspath(srcname))
         else:
             srcname = self.pathrel(srcname)
+        cond = self.cond_flags(srcname)
+        if cond:
+            cflags = cflags + ' ' + (' '.join(cond))
         cmd = '-MM %s %s'%(srcname, cflags)
         hr = self.gcc(cmd, False, False, True)
         if os.shell_return != 0:
