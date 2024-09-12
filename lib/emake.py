@@ -3,7 +3,7 @@
 #  vim: set ts=4 sw=4 tw=0 et :
 #======================================================================
 #
-# emake.py - emake version 3.7.5
+# emake.py - emake version 3.7.6
 #
 # history of this file:
 # 2009.08.20   skywind   create this file
@@ -53,8 +53,8 @@ else:
 #----------------------------------------------------------------------
 # version info
 #----------------------------------------------------------------------
-EMAKE_VERSION = '3.7.5'
-EMAKE_DATE = 'Sep.11 2024'
+EMAKE_VERSION = '3.7.6'
+EMAKE_DATE = 'Sep.12 2024'
 
 
 #----------------------------------------------------------------------
@@ -3444,7 +3444,7 @@ def __update_file(name, content):
     except:
         source = ''
     if not isinstance(content, bytes):
-        rawdata = content.encoding('utf-i', 'ignore')
+        rawdata = content.encoding('utf-8', 'ignore')
     else:
         rawdata = content
     if rawdata.rstrip(b'\r\n\t ') == source.rstrip(b'\r\n\t '):
