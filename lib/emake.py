@@ -3447,7 +3447,7 @@ def __update_file(name, content):
         rawdata = content.encoding('utf-i', 'ignore')
     else:
         rawdata = content
-    if rawdata == source:
+    if rawdata.rstrip(b'\r\n\t ') == source.rstrip(b'\r\n\t '):
         print('%s up-to-date'%name)
         return 0
     try:

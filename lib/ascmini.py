@@ -458,7 +458,7 @@ class __PosixKit (object):
         root = os.path.normpath(os.path.abspath(root))
         names = None   # noqa
         if not recursive:
-            for fn in os.listdir(root):
+            for fn in fnmatch.filter(os.listdir(root), pattern):
                 path = os.path.join(root, fn)
                 if (mode & 3) == 0:
                     matched.append(path)
