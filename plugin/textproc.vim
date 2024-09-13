@@ -44,10 +44,10 @@
 " Settings:
 "     
 "     g:textproc_home    - sub-directory name, default to "text"
-"     g:textproc_root    - a list of extra search path.
-"     b:textproc_root    - local list of extra search path.
+"     g:textproc_root    - a list of script search path.
+"     b:textproc_root    - local list of script search path.
 "     g:textproc_split   - preview split mode: "auto", "vert" or ""
-"     g:textproc_runner  - a directory of filter runners
+"     g:textproc_runner  - a dictionary of filter runners
 "
 " If a filter program name is starting with a underscore "_" it will 
 " not be included, like "_textlib.py", disable this behavior by 
@@ -279,7 +279,8 @@ function! s:script_runner(script) abort
 			endfor
 		endif
 	elseif ext == 'lua'
-		let t = ['lua', 'lua5.4', 'lua5.3', 'lua5.2', 'lua5.1', 'luajit']
+		let t = ['lua', 'lua5.5', 'lua5.4', 'lua5.3', 'lua5.2', 'lua5.1']
+		let t += ['luajit']
 		for name in t
 			if executable(name)
 				return name
@@ -304,6 +305,9 @@ function! s:script_runner(script) abort
 				return name . ' -f'
 			endif
 		endfor
+		if executable('busybox')
+			return 'busybox awk -f'
+		endif
 	endif
 	let ext_runners = {
 				\ 'pl' : 'perl',
@@ -313,6 +317,8 @@ function! s:script_runner(script) abort
 				\ 'bash' : 'bash',
 				\ 'sh' : 'sh',
 				\ 'fish' : 'fish',
+				\ 'js' : 'node',
+				\ 'ts' : 'ts-node',
 				\ }
 	if has_key(ext_runners, ext)
 		let runner = ext_runners[ext]
@@ -331,7 +337,6 @@ function! s:script_runner(script) abort
 	return ''
 endfunc
 
-" echo s:script_runner('c:/share/vim/lib/ascmini.awk')
 
 
 "----------------------------------------------------------------------
