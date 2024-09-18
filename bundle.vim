@@ -267,6 +267,7 @@ if has_key(s:enabled, 'opt')
 	" Plug 'mh21/errormarker.vim'
 
 	let g:pangu_rule_date = 1
+	let g:pangu_enabled = 1
 
 	if 1
 		" vimscript development
