@@ -261,9 +261,12 @@ if has_key(s:enabled, 'opt')
 	Plug 'voldikss/vim-translator'
 	Plug 'jreybert/vimagit'
 	Plug 'cohama/agit.vim'
+	Plug 'hotoo/pangu.vim'
 
 	" Plug 'tpope/vim-apathy'
 	" Plug 'mh21/errormarker.vim'
+
+	let g:pangu_rule_date = 1
 
 	if 1
 		" vimscript development
