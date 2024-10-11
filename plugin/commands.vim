@@ -554,3 +554,14 @@ function! s:ToggleJapaneseKeymap()
 	endif
 endfunction
 
+
+"----------------------------------------------------------------------
+" 
+"----------------------------------------------------------------------
+command! -nargs=* -bang DumpArgs call s:DumpArgs('<bang>', <f-args>)
+
+function! s:DumpArgs(bang, ...)
+	echo printf('DumpArgs[%s]: %s', a:bang, a:000)
+endfunc
+
+
