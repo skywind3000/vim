@@ -48,6 +48,9 @@
 		}
 	},
 
+	"http.proxy": "http://192.168.1.11:1082",
+	"http.proxyStrictSSL": false,
+
 	"suggest.completionItemKindLabels": {
 		"keyword": "\uf1de Keyword",
 		"variable": "\ue79b Variable",
