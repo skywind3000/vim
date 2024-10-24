@@ -576,6 +576,7 @@ endif
 if has_key(s:enabled, 'colors')
 	Plug 'mhartington/oceanic-next'
 	Plug 'soft-aesthetic/soft-era-vim'
+	Plug 'wolandark/sahara-vim'
 	Plug 'sonph/onehalf', {'rtp': 'vim/'}
 	Plug 'sainnhe/sonokai'
 	Plug 'sainnhe/everforest'
