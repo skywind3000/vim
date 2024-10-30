@@ -1,0 +1,80 @@
+"----------------------------------------------------------------------
+" initialize
+"----------------------------------------------------------------------
+let g:vim_manual = 1
+so ~/.vim/vim/vimrc.unix
+
+
+"----------------------------------------------------------------------
+" plugin setup
+"----------------------------------------------------------------------
+let g:bundle_group = ['simple', 'basic']
+
+if g:vim_startup == 1
+        let g:bundle_group += ['inter', 'high', 'opt']
+        let g:bundle_group += ['ale']
+        let g:bundle_group += ['floaterm']
+        let g:bundle_group += ['matchup']
+        let g:bundle_group += ['cursorword']
+        let g:bundle_group += ['snipmate']
+elseif g:vim_startup == 2
+        let g:bundle_group += ['inter', 'high', 'opt']
+        let g:bundle_group += ['ale']
+        let g:bundle_group += ['floaterm']
+        let g:bundle_group += ['matchup']
+        let g:bundle_group += ['cursorword']
+        let g:bundle_group += ['snipmate']
+        let g:bundle_group += ['games']
+        let g:bundle_group += ['coc']
+        let g:bundle_group += ['copilot']
+        let g:bundle_group += ['echodoc']
+        let g:bundle_group += ['nerdtree']
+endif
+
+let g:bundle_group += ['colors']
+
+
+"----------------------------------------------------------------------
+" plugin post
+"----------------------------------------------------------------------
+let g:bundle_post = []
+let g:bundle_post += ["Plug 'leafOfTree/vim-project'"]
+let g:bundle_post += ["Plug 'lambdalisue/fern.vim'"]
+
+
+"----------------------------------------------------------------------
+" plugin finalize
+"----------------------------------------------------------------------
+IncScript bundle.vim
+
+
+"----------------------------------------------------------------------
+" local settings
+"----------------------------------------------------------------------
+hi! NonText ctermbg=none
+hi! Normal ctermbg=none
+
+let g:gutentags_define_advanced_commands = 1
+
+let $GTAGSCONF = asclib#utils#gtags_search_conf()
+let $GTAGSLABEL = 'native-pygments'
+let $GTAGSFORCECPP = '1'
+
+let g:gpt_commit_key = 'your-key'
+let g:gpt_commit_url = 'https://api.v3.cm'
+let g:gpt_commit_ollama_model = 'llama2'
+
+let g:module_go_post_format = 1
+call module#variable#set('gotest_flags', '-v -cover')
+
+
+"----------------------------------------------------------------------
+" style
+"----------------------------------------------------------------------
+if g:vim_startup != 0
+        " color OceanicNext
+		color borland256
+        set cursorline cursorlineopt=both
+endif
+
+
