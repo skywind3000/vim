@@ -68,7 +68,7 @@ call module#variable#set('gotest_flags', '-v -cover')
 " style
 "----------------------------------------------------------------------
 if g:vim_startup != 0
-		color desert256
+	color desert256
 endif
 
 
