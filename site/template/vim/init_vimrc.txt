@@ -25,10 +25,10 @@ elseif g:vim_startup == 2
         let g:bundle_group += ['cursorword']
         let g:bundle_group += ['snipmate']
         let g:bundle_group += ['games']
-        let g:bundle_group += ['coc']
         let g:bundle_group += ['copilot']
-        let g:bundle_group += ['echodoc']
         let g:bundle_group += ['nerdtree']
+        " let g:bundle_group += ['coc']
+        " let g:bundle_group += ['echodoc']
 endif
 
 let g:bundle_group += ['colors']
