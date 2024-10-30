@@ -39,7 +39,6 @@ let g:bundle_group += ['colors']
 "----------------------------------------------------------------------
 let g:bundle_post = []
 let g:bundle_post += ["Plug 'leafOfTree/vim-project'"]
-let g:bundle_post += ["Plug 'lambdalisue/fern.vim'"]
 
 
 "----------------------------------------------------------------------
