@@ -35,7 +35,7 @@ let g:bundle_group += ['colors']
 " plugin post
 "----------------------------------------------------------------------
 let g:bundle_post = []
-let g:bundle_post += ["Plug 'leafOfTree/vim-project'"]
+" let g:bundle_post += ["Plug 'leafOfTree/vim-project'"]
 
 
 "----------------------------------------------------------------------
@@ -68,7 +68,7 @@ call module#variable#set('gotest_flags', '-v -cover')
 " style
 "----------------------------------------------------------------------
 if g:vim_startup != 0
-	color desert256
+	" color desert256
 endif
 
 
