@@ -69,7 +69,6 @@ call module#variable#set('gotest_flags', '-v -cover')
 "----------------------------------------------------------------------
 if g:vim_startup != 0
 		color desert256
-        set cursorline cursorlineopt=both
 endif
 
 
