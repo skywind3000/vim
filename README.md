@@ -192,3 +192,11 @@ ESC 离开目录，按对应字母触发功能，CTRL+j/k 翻页，BackSpace 可
 当文件浏览器打开以后，按 `~` 键，返回用户目录（$HOME）；按 `反引号`（1左边那个键），返回项目根目录，详细见：[Vinegar](https://github.com/skywind3000/vim/wiki/Vim-Vinegar-and-Oil)。
 
 
+### Credit
+
+欢迎关注：
+
+- [博客](https://skywind.me/blog)
+- [推特](https://x.com/skywind3000)
+
+
