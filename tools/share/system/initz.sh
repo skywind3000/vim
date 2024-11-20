@@ -4,7 +4,7 @@
 # initz.sh - initialization script for shell
 #
 # Created by skywind on 2024/11/20
-# Last Modified: 2024/11/20 21:38:23
+# Last Modified: 2024/11/21 00:49:31
 #
 #======================================================================
 
