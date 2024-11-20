@@ -36,7 +36,7 @@ initz_start() {
 		for f in $INITZ_HOME/S*; do
 			[ -x "$f" ] && "$f" start
 		done
-		[ -e "$INITZ_HOME/rc.local" ] && . "$INITZ_HOME/rc.local"
+		[ -x "$INITZ_HOME/rc.local" ] && "$INITZ_HOME/rc.local"
 	else
 		echo "error: %s directory not found" 1>&2
 		exit 1
@@ -76,7 +76,7 @@ initz_execute() {
 		for f in $INITZ_HOME/E*; do
 			[ -x "$f" ] && "$f"
 		done
-		[ -e "$INITZ_HOME/rc.local" ] && . "$INITZ_HOME/rc.local"
+		[ -x "$INITZ_HOME/rc.local" ] && "$INITZ_HOME/rc.local"
 	else
 		echo "error: %s directory not found" 1>&2
 		exit 1
