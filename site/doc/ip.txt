@@ -1,6 +1,6 @@
 ##############################################################################
 # IP CHEATSHEET (中文速查表)  -  by skywind (created on 2024/11/12)
-# Version: 1, Last Modified: 2020/10/10 11:02
+# Version: 2, Last Modified: 2024/11/23 02:19:05
 # https://github.com/skywind3000/awesome-cheatsheets
 ##############################################################################
 
@@ -68,6 +68,25 @@ ip route flush table 520                      # 清空编号为 520 的路由表
 
 # 显示当前定义了哪些路由表
 ip route show table all | grep -Eo 'table [^ ]+ ' | sort | uniq
+
+
+##############################################################################
+# ip rule
+##############################################################################
+
+ip rule                                       # 显示路由规则
+ip rule add table 520                         # 所有包走一下 520 路由表
+ip rule add from 0/0 lookup 520               # 所有包走一下 520 路由表
+ip rule add from 0/0 table 520                # 同上
+ip rule add from 0/0 blackhole                # 所有包丢弃
+ip rule add from 0/0 prohibit                 # 所有包拒绝，通信被管理员禁止
+ip rule add from 0/0 unreachable              # 返回 network unreachable
+ip rule del table 520                         # 删除所有包走 520 路由表的规则
+ip rule add from 10.8.1.0/24 table 520        # 来自特定网络的包走 520 路由表
+ip rule add to 10.8.2.0/24 table 521          # 发往某网络的包走 521 路由表
+ip rule add fwmark 588 table 520              # 标记为 588 的包走 520 路由表
+ip rule add not fwmark 588 table 51820        # 没有标记为 588 的包走该路由表
+ip rule add from 8.8.3.2/32 tos 10 table ２   # 来自特定 IP 且 TOS 为 10 的包
 
 
 ##############################################################################
