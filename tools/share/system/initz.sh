@@ -4,7 +4,7 @@
 # initz.sh - initialization script for shell
 #
 # Created by skywind on 2024/11/20
-# Last Modified: 2024/11/21 00:49:31
+# Last Modified: 2024/11/22 21:50:24
 #
 #======================================================================
 
@@ -74,7 +74,7 @@ initz_execute() {
 			[ -e "$f" ] && . "$f"
 		done
 		for f in $INITZ_HOME/E*; do
-			[ -x "$f" ] && "$f"
+			[ -x "$f" ] && "$f" start
 		done
 		[ -x "$INITZ_HOME/rc.local" ] && "$INITZ_HOME/rc.local"
 	else
