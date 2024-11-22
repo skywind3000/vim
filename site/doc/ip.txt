@@ -1,0 +1,84 @@
+##############################################################################
+# IP CHEATSHEET (中文速查表)  -  by skywind (created on 2024/11/12)
+# Version: 1, Last Modified: 2020/10/10 11:02
+# https://github.com/skywind3000/awesome-cheatsheets
+##############################################################################
+
+
+##############################################################################
+# 辅助参数
+##############################################################################
+
+ip -c link                                    # 彩色显示接口
+ip -c addr                                    # 彩色显示地址
+ip -c route                                   # 彩色显示路由
+ip -brief link                                # 简洁显示接口
+ip -brief addr                                # 简洁显示地址
+ip -brief -c link                             # 彩色简洁显示接口
+
+
+##############################################################################
+# ip addr
+##############################################################################
+
+ip addr                                       # 查看地址
+ip addr add 192.168.1.1/24 dev eth0           # 给指定设备添加地址
+ip addr del 192.168.1.1/24 dev eth0           # 删除指定设备的地址
+ip addr flush dev eth0                        # 删除指定设备的所有地址
+
+
+##############################################################################
+# ip link
+##############################################################################
+
+ip link                                       # 显示所有网络接口
+ip link show dev eth0                         # 显示指定设备的信息
+ip link set eth0 up                           # 把 eth0 接口设备开启
+ip link set eth0 down                         # 把 eth0 接口设备关闭
+ip link set eth0 mtu 1450                     # 设置设备的 MTU
+ip link add br0 type bridge                   # 添加一个网桥设备
+ip link del br0                               # 删除一个网桥设备
+ip link set eth0 master br0                   # 把 eth0 添加到网桥 br0
+ip link set eth0 nomaster                     # 从网桥中删除 eth0
+
+
+##############################################################################
+# ip route
+##############################################################################
+
+ip route                                      # 显示主路由表
+ip route show table [local|main|default|num]  # 显示路由表
+ip route show table main                      # 显示主路由表
+ip route show table 520                       # 显示编号为 520 的路由表
+ip route get 8.8.8.8                          # 查询一个地址经过的路由
+ip route add default via 10.8.1.1 dev eth0    # 添加默认路由
+ip route add 10.8.1.0/24 via 10.8.1.1         # 添加静态路由
+ip route add 10.8.1.0/24 dev eth0             # 添加直连路由
+ip route add 10.8.1.0/24 dev eth0 table 520   # 添加路由到编号 520 的路由表
+ip route add 10.8.1.1/24 dev eth0 metric 10   # 添加带有 metric 的直连路由
+ip route delete 10.8.1.0/24 via 10.8.1.1      # 删除静态路由
+ip route replace 10.8.1.0/24 dev eth0         # 替换路由
+ip route flush cache                          # 路由表立即生效
+ip route flush table 520                      # 清空编号为 520 的路由表
+
+# 显示当前定义了哪些路由表
+ip route show table all | grep -Eo 'table [^ ]+ ' | sort | uniq
+
+
+##############################################################################
+# ip rule
+##############################################################################
+
+
+
+
+##############################################################################
+# Reference
+##############################################################################
+
+https://access.redhat.com/sites/default/files/attachments/rh_ip_command_cheatsheet_1214_jcs_print.pdf
+
+
+
+# vim: set ts=4 sw=4 tw=0 et ft=bash :
+
