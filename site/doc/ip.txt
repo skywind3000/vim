@@ -44,6 +44,7 @@ ip link set eth0 nomaster                     # 从网桥中删除 eth0
 ip link add veth0 type veth peer name veth1   # 添加虚拟以太网设备
 ip link set veth0 netns s1                    # 把 veth0 移动到网络命名空间
 ip link set veth1 netns s2                    # 把 veth1 移动到网络命名空间
+ip link set veth0 netns 1                     # 把设备移动到全局网络命名空间
 
 
 ##############################################################################
@@ -78,6 +79,9 @@ ip netns add s1                               # 创建一个网络命名空间
 ip netns del s1                               # 删除一个网络命名空间
 ip netns attach NAME PID                      # 改变进程网络命名空间
 ip netns exec s1 command                      # 在网络命名空间中执行命令
+ip netns identify                             # 查看当前进程的网络命名空间
+ip netns identify PID                         # 查看指定进程的网络命名空间
+ip netns pids NAME                            # 查看网络命名空间中的进程
 ip -n s1 addr add 192.168.64.1/24 dev veth0   # 在网络命名空间中添加地址
 
 
@@ -85,6 +89,7 @@ ip -n s1 addr add 192.168.64.1/24 dev veth0   # 在网络命名空间中添加�
 # Reference
 ##############################################################################
 
+https://cheatography.com/tme520/cheat-sheets/iproute2/
 https://access.redhat.com/sites/default/files/attachments/rh_ip_command_cheatsheet_1214_jcs_print.pdf
 
 
