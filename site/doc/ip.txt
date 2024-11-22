@@ -9,6 +9,7 @@
 # 辅助参数
 ##############################################################################
 
+ip -n s1 ip addr                              # 在网络命名空间中执行 ip addr
 ip -c link                                    # 彩色显示接口
 ip -c addr                                    # 彩色显示地址
 ip -c route                                   # 彩色显示路由
@@ -40,6 +41,9 @@ ip link add br0 type bridge                   # 添加一个网桥设备
 ip link del br0                               # 删除一个网桥设备
 ip link set eth0 master br0                   # 把 eth0 添加到网桥 br0
 ip link set eth0 nomaster                     # 从网桥中删除 eth0
+ip link add veth0 type veth peer name veth1   # 添加虚拟以太网设备
+ip link set veth0 netns s1                    # 把 veth0 移动到网络命名空间
+ip link set veth1 netns s2                    # 把 veth1 移动到网络命名空间
 
 
 ##############################################################################
@@ -66,10 +70,15 @@ ip route show table all | grep -Eo 'table [^ ]+ ' | sort | uniq
 
 
 ##############################################################################
-# ip rule
+# ip netns
 ##############################################################################
 
-
+ip netns                                      # 显示网络命名空间
+ip netns add s1                               # 创建一个网络命名空间
+ip netns del s1                               # 删除一个网络命名空间
+ip netns attach NAME PID                      # 改变进程网络命名空间
+ip netns exec s1 command                      # 在网络命名空间中执行命令
+ip -n s1 addr add 192.168.64.1/24 dev veth0   # 在网络命名空间中添加地址
 
 
 ##############################################################################
