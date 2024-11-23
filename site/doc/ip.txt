@@ -1,6 +1,6 @@
 ##############################################################################
 # IP CHEATSHEET (中文速查表)  -  by skywind (created on 2024/11/12)
-# Version: 2, Last Modified: 2024/11/23 02:19:05
+# Version: 3, Last Modified: 2024/11/23 20:47:35
 # https://github.com/skywind3000/awesome-cheatsheets
 ##############################################################################
 
@@ -56,11 +56,13 @@ ip route show table [local|main|default|num]  # 显示路由表
 ip route show table main                      # 显示主路由表
 ip route show table 520                       # 显示编号为 520 的路由表
 ip route get 8.8.8.8                          # 查询一个地址经过的路由
+ip route get 8.8.8.8 mark 666                 # 查询经过的路由（带标记）
 ip route add default via 10.8.1.1 dev eth0    # 添加默认路由
 ip route add 10.8.1.0/24 via 10.8.1.1         # 添加静态路由
 ip route add 10.8.1.0/24 dev eth0             # 添加直连路由
-ip route add 10.8.1.0/24 dev eth0 table 520   # 添加路由到编号 520 的路由表
 ip route add 10.8.1.1/24 dev eth0 metric 10   # 添加带有 metric 的直连路由
+ip route add 10.8.1.0/24 dev eth0 table 520   # 添加路由到编号 520 的路由表
+ip route add table 520 10.8.1.0/24 dev eth0   # 另一种写法，突出表名
 ip route delete 10.8.1.0/24 via 10.8.1.1      # 删除静态路由
 ip route replace 10.8.1.0/24 dev eth0         # 替换路由
 ip route flush cache                          # 路由表立即生效
@@ -87,6 +89,7 @@ ip rule add to 10.8.2.0/24 table 521          # 发往某网络的包走 521 路
 ip rule add fwmark 588 table 520              # 标记为 588 的包走 520 路由表
 ip rule add not fwmark 588 table 51820        # 没有标记为 588 的包走该路由表
 ip rule add from 8.8.3.2/32 tos 10 table ２   # 来自特定 IP 且 TOS 为 10 的包
+ip rule add prio 100 fwmark 1 lookup 100      # 优先级 100 的规则
 
 
 ##############################################################################
