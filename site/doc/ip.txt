@@ -109,7 +109,7 @@ ip -n s1 addr add 192.168.64.1/24 dev veth0   # 在网络命名空间中添加�
 
 
 ##############################################################################
-# quick reference
+# quick reference (busybox ip)
 ##############################################################################
 
 # Usage: ip [OPTIONS] address|route|link|tunnel|neigh|rule [ARGS]
