@@ -15,7 +15,7 @@ More information: https://www.tcpdump.org.
 - Capture the traffic from or to a host:
   tcpdump host www.example.com
 
-- Capture the traffic from a specific interface, source, destination and destination port:
+- Capture the traffic from a specific interface, source, destination and port:
   tcpdump -i eth0 src 192.168.1.1 and dst 192.168.1.2 and dst port 80
 
 - Capture the traffic of a network:
