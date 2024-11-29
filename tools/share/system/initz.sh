@@ -1,4 +1,12 @@
 #! /bin/sh
+#======================================================================
+#
+# initz.sh - initialization script for shell
+#
+# Created by skywind on 2024/11/20
+# Last Modified: 2024/11/22 21:50:24
+#
+#======================================================================
 
 
 #----------------------------------------------------------------------
@@ -28,6 +36,7 @@ initz_start() {
 		for f in $INITZ_HOME/S*; do
 			[ -x "$f" ] && "$f" start
 		done
+		[ -x "$INITZ_HOME/rc.local" ] && "$INITZ_HOME/rc.local"
 	else
 		echo "error: %s directory not found" 1>&2
 		exit 1
@@ -65,8 +74,9 @@ initz_execute() {
 			[ -e "$f" ] && . "$f"
 		done
 		for f in $INITZ_HOME/E*; do
-			[ -x "$f" ] && "$f"
+			[ -x "$f" ] && "$f" start
 		done
+		[ -x "$INITZ_HOME/rc.local" ] && "$INITZ_HOME/rc.local"
 	else
 		echo "error: %s directory not found" 1>&2
 		exit 1
