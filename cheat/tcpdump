@@ -12,6 +12,12 @@ More information: https://www.tcpdump.org.
 - Capture all ICMP traffic without DNS:
   tcpdump -i any -n icmp
 
+- Capture all ICMP and print link level header:
+  tcpdump -i any -e icmp
+
+- Capture all ICMP and print more information:
+  tcpdump -i any -v icmp
+
 - Capture the traffic from or to a host:
   tcpdump host www.example.com
 
@@ -26,4 +32,5 @@ More information: https://www.tcpdump.org.
 
 - Read from a given dump file:
   tcpdump -r dumpfile.pcap
+
 
