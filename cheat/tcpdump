@@ -24,6 +24,9 @@ More information: https://www.tcpdump.org.
 - Capture the traffic from a specific interface, source, destination and port:
   tcpdump -i eth0 src 192.168.1.1 and dst 192.168.1.2 and dst port 80
 
+- Capture all UDP traffic from or to port 5000:
+  tcpdump -i any udp and port 5000
+
 - Capture the traffic of a network:
   tcpdump net 192.168.1.0/24
 
