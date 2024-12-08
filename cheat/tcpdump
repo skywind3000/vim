@@ -36,4 +36,3 @@ More information: https://www.tcpdump.org.
 - Read from a given dump file:
   tcpdump -r dumpfile.pcap
 
-
