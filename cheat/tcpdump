@@ -1,4 +1,5 @@
-More information: https://www.tcpdump.org.
+More information: https://www.tcpdump.org
+BPF syntax: https://biot.com/capstats/bpf.html
 
 - List available network interfaces:
   tcpdump -D
@@ -29,6 +30,9 @@ More information: https://www.tcpdump.org.
 
 - Capture the traffic of a network:
   tcpdump net 192.168.1.0/24
+
+- Complex BPF syntax (https://biot.com/capstats/bpf.html):
+  tcpdump -i any 'icmp and (host 8.8.8.8 or host 8.8.4.4)'
 
 - Capture all traffic except traffic over port 22 and save to a dump file:
   tcpdump -w dumpfile.pcap port not 22
