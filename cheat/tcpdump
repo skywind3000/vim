@@ -1,5 +1,4 @@
 More information: https://www.tcpdump.org
-BPF syntax: https://biot.com/capstats/bpf.html
 
 - List available network interfaces:
   tcpdump -D
