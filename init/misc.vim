@@ -89,7 +89,7 @@ function! <SID>snip_copyright(author)
 	let l:t = strftime("%Y/%m/%d")
 	let l:text = []
 	if &filetype == 'python'
-		let l:text += ['#! /usr/bin/env python']
+		let l:text += ['#! /usr/bin/env python3']
 		let l:text += ['# -*- coding: utf-8 -*-']
 	elseif &filetype == 'sh'
 		let l:text += ['#! /bin/sh']
