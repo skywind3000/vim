@@ -279,8 +279,8 @@ function! asclib#buffer#open_named(name) abort
 	if !exists('s:buffer_names')
 		let s:buffer_names = {}
 	endif
-	if has_key(s:buffer_names, a:name)
-		let bid = s:buffer_names[a:name]
+	let bid = get(s:buffer_names, a:name, -1)
+	if bid >= 0 && bufexists(bid)
 		exec 'b ' . bid
 	else
 		exec 'enew'
