@@ -9,7 +9,7 @@ def errno_to_string(errno_value):
 
 if len(sys.argv) < 2:
     print('usage: %s {errno}' % sys.argv[0])
-    print('alternative: use errno command from moreutils (apt install)')
+    print('alternative: use "errno" command in linux (apt install moreutils)')
     sys.exit(1)
 
 num = int(sys.argv[1])
