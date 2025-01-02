@@ -1,0 +1,17 @@
+#! /usr/bin/env python3
+import sys
+import os
+import errno
+
+def errno_to_string(errno_value):
+    """Convert errno value to human-readable string."""
+    return os.strerror(errno_value)
+
+if len(sys.argv) < 2:
+    print('usage: %s {errno}' % sys.argv[0])
+    print('alternative: use errno command from moreutils (apt install)')
+    sys.exit(1)
+
+num = int(sys.argv[1])
+print('%d: %s' % (num, errno_to_string(num)))
+
