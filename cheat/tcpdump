@@ -9,6 +9,9 @@ More information: https://www.tcpdump.org
 - Capture all TCP traffic showing contents (ASCII) in console:
   tcpdump -A tcp
 
+- Capture all TCP traffic showing contents (HEX) in console:
+  tcpdump -X tcp
+
 - Capture all ICMP traffic without DNS:
   tcpdump -i any -n icmp
 
