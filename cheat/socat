@@ -47,7 +47,6 @@
 
   socat TCP4-LISTEN:8000,fork,reuseaddr EXEC:/bin/cat
   socat -T180 UDP4-LISTEN:8000,fork,reuseaddr EXEC:/bin/cat
-  socat -T180 UDP4-LISTEN:8000,fork,reuseaddr PIPE
 
 - File Receiving
 
