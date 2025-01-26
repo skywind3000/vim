@@ -56,6 +56,15 @@ else:
 EMAKE_VERSION = '3.7.6'
 EMAKE_DATE = 'Sep.12 2024'
 
+#----------------------------------------------------------------------
+# constant value
+#----------------------------------------------------------------------
+PRINT_MODE_SHOWFILE = 1
+PRINT_MODE_SHOWSTAT = 2
+PRINT_MODE_SHOWCMD  = 4
+
+PRINT_MODE_BASIC = PRINT_MODE_SHOWFILE | PRINT_MODE_SHOWSTAT
+PRINT_MODE_ALL = PRINT_MODE_BASIC | PRINT_MODE_SHOWCMD
 
 #----------------------------------------------------------------------
 # posix shell tools
@@ -168,7 +177,6 @@ class posix (object):
             try:
                 hr = text.decode(name)
                 return hr
-                break
             except:
                 pass
         hr = text.decode('utf-8', errors = 'ignore')
@@ -1965,7 +1973,7 @@ class coremake(object):
                 continue
             try: os.remove(os.path.abspath(objname))
             except: pass
-            if printmode & 1:
+            if printmode & PRINT_MODE_SHOWFILE:
                 name = self.config.pathrel(srcname)
                 if name[:1] == '"':
                     name = name[1:-1]
@@ -2038,7 +2046,7 @@ class coremake(object):
                 mutex.release()
                 result = False   # noqa: F841
             mutex.acquire()
-            if printmode & 1:
+            if printmode & PRINT_MODE_SHOWFILE:
                 name = self.config.pathrel(srcname)
                 if name[:1] == '"':
                     name = name[1:-1]
@@ -2058,10 +2066,8 @@ class coremake(object):
     def compile (self, skipexist = False, printmode = 0, cpus = 0):
         self.config.check()
         self.mkdir(os.path.abspath(self._int))
-        printcmd = False
-        if printmode & 4:
-            printcmd = True
-        if printmode & 2:
+        printcmd = bool(printmode & PRINT_MODE_SHOWCMD)
+        if printmode & PRINT_MODE_SHOWSTAT:
             print('compiling ...')
         t = time.time()
         if cpus <= 1:
@@ -2076,10 +2082,8 @@ class coremake(object):
     def link (self, skipexist = False, printmode = 0):
         self.config.check()
         retval = 0   # noqa: F841
-        printcmd = False
-        if printmode & 4:
-            printcmd = True
-        if printmode & 2:
+        printcmd = bool(printmode & PRINT_MODE_SHOWCMD)
+        if printmode & PRINT_MODE_SHOWSTAT:
             print('linking ...')
         output = self._out
         if skipexist and os.path.exists(output):
@@ -3432,7 +3436,7 @@ def install():
 __updated_files = {}
 
 def __update_file(name, content):
-    source = ''
+    source = b''
     name = os.path.abspath(name)
     if name in __updated_files:
         return 0
@@ -3442,7 +3446,7 @@ def __update_file(name, content):
         source = fp.read()
         fp.close()
     except:
-        source = ''
+        source = b''
     if not isinstance(content, bytes):
         rawdata = content.encoding('utf-8', 'ignore')
     else:
@@ -3550,7 +3554,7 @@ def help():
     print('options  :  --cfg={cfg}      load config from ~/.config/emake/{cfg}.ini')
     print('            --ini={inipath}  load config from {inipath} directly')
     print('            --profile={name} set profile to {name}')
-    print('            --print={n}      set verbose level: 0-3')
+    print('            --print={n}      set verbose level: 0-7')
     print('            --abs={0|1}      display absolute path in error messages')
     print('')
     print("Emake is a easy tool which controls the generation of executables and other")
@@ -3702,7 +3706,7 @@ def main(argv = None):
             print('not enough parameter: %s'%name)
             return 0
 
-    printmode = 3
+    printmode = PRINT_MODE_BASIC
 
     def int_safe(text, defval):
         num = defval
@@ -3723,7 +3727,7 @@ def main(argv = None):
         make.cpus = int_safe(options['cpu'], 1)
 
     if 'print' in options:
-        printmode = int_safe(options['print'], 3)
+        printmode = int_safe(options['print'], PRINT_MODE_BASIC)
 
     if 'int' in options:
         CFG['int'] = options['int']
@@ -3731,7 +3735,7 @@ def main(argv = None):
     printenv = os.environ.get('EMAKE_PRINT', '')
 
     if printenv:
-        printmode = int_safe(printenv, 3)
+        printmode = int_safe(printenv, PRINT_MODE_BASIC)
 
     if 'EMAKE_ABSPATH' in os.environ:
         hr = bool_safe(os.environ['EMAKE_ABSPATH'], True)
@@ -3912,7 +3916,7 @@ if __name__ == '__main__':
         make.push('malloc/mod1.c', '', {})
         make.push('malloc/mod2.c', '', {})
         make.push('malloc/mod3.c', '', {})
-        make.build(printmode = 7)
+        make.build(printmode = PRINT_MODE_ALL)
         print(os.path.getmtime('malloc/main.c'))
     def test2():
         pst = preprocessor()
