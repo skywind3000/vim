@@ -565,3 +565,35 @@ function! s:DumpArgs(bang, ...)
 endfunc
 
 
+"----------------------------------------------------------------------
+" CondaActivate
+"----------------------------------------------------------------------
+command! -nargs=+ -complete=customlist,module#conda#complete
+			\ CondaActivate call s:CondaActivate(<f-args>)
+
+function! s:CondaActivate(name) abort
+	let ret = module#conda#activate(a:name)
+	if ret == 0
+		call asclib#common#echo('Title', 'Conda: activate ' . a:name)
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" CondaDeactivate
+"----------------------------------------------------------------------
+command! -nargs=0 CondaDeactivate call s:CondaDeactivate()
+function! s:CondaDeactivate() abort
+	let name = module#conda#current()
+	if name == ''
+		call asclib#common#errmsg('Conda: no environment activated')
+		return 0
+	endif
+	let ret = module#conda#deactivate()
+	if ret == 0
+		call asclib#common#echo('Title', 'Conda: deactivate ' . name)
+	endif
+	return 0
+endfunc
+
+
