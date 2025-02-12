@@ -52,6 +52,8 @@ function! s:installation_root() abort
 			let s:_conda_root = '/home/data/app/miniconda3'
 		elseif isdirectory('/home/data/miniconda3')
 			let s:_conda_root = '/home/data/miniconda3'
+		elseif isdirectory('/mnt/e/Local/linux/miniconda3')
+			let s:_conda_root = '/mnt/e/Local/linux/miniconda3'
 		endif
 	endif
 	return s:_conda_root
@@ -179,7 +181,7 @@ function! module#conda#deactivate() abort
 		call asclib#common#errmsg('conda not found')
 		return -1
 	elseif type(info) == type(v:null)
-		call asclib#common#errmsg('environment not found: ', current)
+		call asclib#common#errmsg('conda environment not found: ', current)
 		return -2
 	endif
 	unlet $CONDA_DEFAULT_ENV
@@ -207,7 +209,7 @@ function! module#conda#activate(name) abort
 	endif
 	let info = module#conda#info(a:name)
 	if type(info) == type(v:null)
-		call asclib#common#errmsg('environment not found:', a:name)
+		call asclib#common#errmsg('conda environment not found:', a:name)
 		return -2
 	endif
 	silent call module#conda#deactivate()
