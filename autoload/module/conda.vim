@@ -187,7 +187,9 @@ function! module#conda#deactivate() abort
 	let paths = []
 	for path in split($PATH, sep)
 		if asclib#path#contains(root, path) == 0
-			call add(paths, path)
+			if !asclib#path#equal(root, path)
+				call add(paths, path)
+			endif
 		endif
 	endfor
 	let $PATH = join(paths, sep)
