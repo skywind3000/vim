@@ -193,6 +193,10 @@ function! module#conda#deactivate() abort
 	for path in info.PATH
 		call asclib#utils#path_remove(path)
 	endfor
+	if s:windows
+		unlet $SSL_CERT_FILE
+		unlet $__CONDA_OPENSLL_CERT_FILE_SET
+	endif
 	return 0
 endfunc
 
@@ -221,6 +225,13 @@ function! module#conda#activate(name) abort
 	let $CONDA_PYTHON_EXE = info.CONDA_PYTHON_EXE
 	let path = join(info.PATH, sep)
 	let $PATH = path . sep . $PATH
+	if s:windows
+		let cert = info.prefix . '\Library\ssl\cacert.pem'
+		if filereadable(cert)
+			let $SSL_CERT_FILE = cert
+			let $__CONDA_OPENSLL_CERT_FILE_SET = "1"
+		endif
+	endif
 	return 0
 endfunc
 
