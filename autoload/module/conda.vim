@@ -173,16 +173,10 @@ endfunc
 "----------------------------------------------------------------------
 function! module#conda#deactivate() abort
 	let root = module#conda#root()
-	let current = module#conda#current()
-	let info = module#conda#info(current)
-	if current == ''
-		return 0
-	elseif root == ''
+	let sep = (s:windows != 0)? ';' : ','
+	if root == ''
 		call asclib#common#errmsg('conda not found')
 		return -1
-	elseif type(info) == type(v:null)
-		call asclib#common#errmsg('conda environment not found: ', current)
-		return -2
 	endif
 	unlet $CONDA_DEFAULT_ENV
 	unlet $CONDA_PREFIX
@@ -190,9 +184,13 @@ function! module#conda#deactivate() abort
 	unlet $CONDA_SHLVL
 	unlet $CONDA_EXE
 	unlet $CONDA_PYTHON_EXE
-	for path in info.PATH
-		call asclib#utils#path_remove(path)
+	let paths = []
+	for path in split($PATH, sep)
+		if asclib#path#contains(root, path) == 0
+			call add(paths, path)
+		endif
 	endfor
+	let $PATH = join(paths, sep)
 	if s:windows
 		unlet $SSL_CERT_FILE
 		unlet $__CONDA_OPENSLL_CERT_FILE_SET
