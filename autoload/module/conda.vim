@@ -206,7 +206,7 @@ endfunc
 "----------------------------------------------------------------------
 function! module#conda#activate(name) abort
 	let root = module#conda#root()
-	let sep = (s:windows)? ';' : ','
+	let sep = (s:windows)? ';' : ':'
 	if root == ''
 		call asclib#common#errmsg('conda not found')
 		return -1
