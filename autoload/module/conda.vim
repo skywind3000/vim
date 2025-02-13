@@ -293,3 +293,30 @@ function! module#conda#complete(ArgLead, CmdLine, CursorPos) abort
 endfunc
 
 
+"----------------------------------------------------------------------
+" select conda environment
+"----------------------------------------------------------------------
+function! module#conda#select() abort
+	let items = module#conda#list()
+	let msg = 'Select Conda Environment:'
+	let items = ['(deactivate)'] + items
+	let index = asclib#ui#select(msg, items)
+	if index == 1
+		let name = module#conda#current()
+		if name == ''
+			call asclib#common#errmsg('Conda: no environment activated')
+			return 0
+		endif
+		let ret = module#conda#deactivate()
+		if ret == 0
+			call asclib#common#echo('Title', 'Conda: deactivate ' . name)
+		endif
+	elseif index > 1
+		let name = items[index - 1]
+		call module#conda#activate(name)
+		call asclib#common#echo('Title', 'Conda: activate ' . name)
+	endif
+	return 0
+endfunc
+
+
