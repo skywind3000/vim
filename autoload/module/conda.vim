@@ -38,6 +38,8 @@ function! s:installation_root() abort
 			let s:_conda_root = 'C:\Miniconda3'
 		elseif isdirectory('D:\Dev\MiniConda3')
 			let s:_conda_root = 'D:\Dev\MiniConda3'
+		elseif isdirectory('D:\Dev\MiniKonda3')
+			let s:_conda_root = 'D:\Dev\MiniKonda3'
 		endif
 	else
 		if isdirectory($HOME . '/miniconda3')
