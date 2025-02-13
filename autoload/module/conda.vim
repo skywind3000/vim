@@ -38,8 +38,14 @@ function! s:installation_root() abort
 			let s:_conda_root = 'C:\Miniconda3'
 		elseif isdirectory('D:\Dev\MiniConda3')
 			let s:_conda_root = 'D:\Dev\MiniConda3'
-		elseif isdirectory('D:\Dev\MiniKonda3')
-			let s:_conda_root = 'D:\Dev\MiniKonda3'
+		elseif isdirectory($HOME . '\miniforge3')
+			let s:_conda_root = $HOME . '\miniforge3'
+		elseif isdirectory('C:\ProgramData\miniforge3')
+			let s:_conda_root = 'C:\ProgramData\miniforge3'
+		elseif isdirectory('C:\Miniforge3')
+			let s:_conda_root = 'C:\Miniforge3'
+		elseif isdirectory('D:\Dev\MiniForge3')
+			let s:_conda_root = 'D:\Dev\MiniForge3'
 		endif
 	else
 		if isdirectory($HOME . '/miniconda3')
@@ -54,8 +60,18 @@ function! s:installation_root() abort
 			let s:_conda_root = '/home/data/app/miniconda3'
 		elseif isdirectory('/home/data/miniconda3')
 			let s:_conda_root = '/home/data/miniconda3'
-		elseif isdirectory('/mnt/e/Local/linux/miniconda3')
-			let s:_conda_root = '/mnt/e/Local/linux/miniconda3'
+		elseif isdirectory($HOME . '/miniforge3')
+			let s:_conda_root = $HOME . '/miniforge3'
+		elseif isdirectory('/usr/local/miniforge3')
+			let s:_conda_root = '/usr/local/miniforge3'
+		elseif isdirectory('/usr/local/app/miniforge3')
+			let s:_conda_root = '/usr/local/app/miniforge3'
+		elseif isdirectory('/usr/local/opt/miniforge3')
+			let s:_conda_root = '/usr/local/opt/miniforge3'
+		elseif isdirectory('/home/data/app/miniforge3')
+			let s:_conda_root = '/home/data/app/miniforge3'
+		elseif isdirectory('/home/data/miniforge3')
+			let s:_conda_root = '/home/data/miniforge3'
 		endif
 	endif
 	return s:_conda_root

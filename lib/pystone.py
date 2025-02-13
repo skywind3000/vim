@@ -41,7 +41,7 @@ except ImportError:
 except ImportError:
     from time import time as clock
 
-LOOPS = 50000
+LOOPS = 500000
 
 __version__ = "1.1"
 
