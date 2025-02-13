@@ -16,6 +16,48 @@ let s:_conda_root = ''
 
 
 "----------------------------------------------------------------------
+" guess conda root
+"----------------------------------------------------------------------
+function! s:guess_root() abort
+	let p = $HOME . '/.conda/environments.txt'
+	if !filereadable(p) 
+		return ''
+	endif
+	let lines = readfile(p)
+	for line in lines
+		let line = substitute(line, '\s*#.*$', '', '')
+		let line = substitute(line, '\s*$', '', '')
+		if line == ''
+			continue
+		endif
+		let text = fnamemodify(line, ':h')
+		if text !~ 'envs$'
+			continue
+		endif
+		let text = fnamemodify(text, ':h')
+		if !isdirectory(text)
+			continue
+		endif
+		if s:windows
+			if !executable(text . '\Scripts\conda.exe')
+				continue
+			elseif !executable(text . '\python.exe')
+				continue
+			endif
+		else
+			if !executable(text . '/bin/conda')
+				continue
+			elseif !executable(text . '/bin/python')
+				continue
+			endif
+		endif
+		return text
+	endfor
+	return ''
+endfunc
+
+
+"----------------------------------------------------------------------
 " get miniconda installation root
 "----------------------------------------------------------------------
 function! s:installation_root() abort
@@ -59,6 +101,9 @@ function! s:installation_root() abort
 			break
 		endif
 	endfor
+	if s:_conda_root == ''
+		let s:_conda_root = s:guess_root()
+	endif
 	return s:_conda_root
 endfunc
 
