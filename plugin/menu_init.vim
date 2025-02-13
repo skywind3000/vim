@@ -152,6 +152,7 @@ call quickui#menu#install('&Tools', [
 			\ ['--',''],
 			\ ['&Open URL', 'OpenURL', 'open current URL in browser'],
 			\ ['Read &URL', 'call menu#ReadUrl()', 'load content from url into current buffer'],
+			\ ['Conda &Activate', 'call module#conda#select()', 'Activate conda environment'],
 			\ ['&Shell Command', 'call module#action#shell()', 'Run shell command in project root'],
 			\ ['&Profile Start', 'call MonitorInit()', ''],
 			\ ['Profile S&top', 'call MonitorExit()', ''],
