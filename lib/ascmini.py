@@ -77,7 +77,8 @@ def execute(args, shell = False, capture = False):
             return b''
     import subprocess
     if 'Popen' in subprocess.__dict__:
-        p = subprocess.Popen(args, shell = shell,
+        argv = shell and cmd or args
+        p = subprocess.Popen(argv, shell = shell,
                 stdin = subprocess.PIPE, stdout = subprocess.PIPE, 
                 stderr = subprocess.STDOUT)
         stdin, stdouterr = (p.stdin, p.stdout)
