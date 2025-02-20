@@ -13,7 +13,7 @@ SetTitleMatchMode(2)
 
 ^!O::Run "C:\Users\Linwei\AppData\Local\Obsidian\Obsidian.exe --proxy-server=socks5://127.0.0.1:1080"
 
-^!P::Run "D:\dev\vim\nvim094\bin\nvim-qt.exe -- -u c:\users\linwei\.config\nvim\neovim.vim"
+^!P::Run "D:\dev\vim\nvim0104\bin\nvim-qt.exe -- -u c:\users\linwei\.config\nvim\neovim.vim"
 
 /* WinLaunch */
 /* #Space::Run "D:\Program Files\WinLaunch\WinLaunch.exe" */
