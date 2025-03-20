@@ -9,6 +9,149 @@
 #
 #======================================================================
 import sys
+import time
+import os
+import random
+
+
+#----------------------------------------------------------------------
+# random temp 
+#----------------------------------------------------------------------
+def tmpname (filename, fill = 5):
+    while 1:
+        name = '.' + str(int(time.time() * 1000000))
+        for i in range(fill):
+            k = random.randint(0, 51)
+            name += (k < 26) and chr(ord('A') + k) or chr(ord('a') + k - 26)
+        test = filename + name + str(os.getpid())
+        if not os.path.exists(test):
+            return test
+    return None
+
+
+#----------------------------------------------------------------------
+# replace file atomicly
+#----------------------------------------------------------------------
+def replace_file(srcname, dstname):
+    if sys.platform[:3] != 'win':
+        try:
+            os.rename(srcname, dstname)
+        except OSError:
+            return False
+    else:
+        import ctypes.wintypes
+        kernel32 = ctypes.windll.kernel32
+        wp, vp, cp = ctypes.c_wchar_p, ctypes.c_void_p, ctypes.c_char_p
+        DWORD, BOOL = ctypes.wintypes.DWORD, ctypes.wintypes.BOOL
+        kernel32.ReplaceFileA.argtypes = [ cp, cp, cp, DWORD, vp, vp ]
+        kernel32.ReplaceFileW.argtypes = [ wp, wp, wp, DWORD, vp, vp ]
+        kernel32.ReplaceFileA.restype = BOOL
+        kernel32.ReplaceFileW.restype = BOOL
+        kernel32.GetLastError.argtypes = []
+        kernel32.GetLastError.restype = DWORD
+        success = False
+        try:
+            os.rename(srcname, dstname)
+            success = True
+        except OSError:
+            pass
+        if success:
+            return True
+        if sys.version_info[0] < 3 and isinstance(srcname, str):
+            hr = kernel32.ReplaceFileA(dstname, srcname, None, 2, None, None)
+        else:
+            hr = kernel32.ReplaceFileW(dstname, srcname, None, 2, None, None)
+        if not hr:
+            return False
+    return True
+
+
+#----------------------------------------------------------------------
+# atomic file write
+#----------------------------------------------------------------------
+def atomic_file_write(filename, text):
+    if isinstance(text, str):
+        content = text.encode('utf-8', 'ignore')
+    else:
+        content = text
+    temp = tmpname(filename)
+    with open(temp, 'wb') as fp:
+        fp.write(content)
+    if not replace_file(temp, filename):
+        return False
+    return True
+
+
+#----------------------------------------------------------------------
+# read file content
+#----------------------------------------------------------------------
+def file_read(filename):
+    if not os.path.exists(filename):
+        return None
+    with open(filename, 'rb') as fp:
+        content = fp.read()
+        return content.decode('utf-8', 'ignore')
+    return None
+
+
+#----------------------------------------------------------------------
+# samples for git credential standard input
+#----------------------------------------------------------------------
+SAMPLES = '''
+get 'protocol=https\nhost=github.com\nwwwauth[]=Basic realm="GitHub"\n'
+store 'protocol=https\nhost=github.com\nusername=jack\npassword=XXXX\n'
+erase 'protocol=https\nhost=github.com\nusername=jack\npassword=Username for \'https://github.com\': jack\nwwwauth[]=Basic realm="GitHub"\n'
+'''
+
+
+#----------------------------------------------------------------------
+# git credential helper
+#----------------------------------------------------------------------
+class Credential (object):
+
+    def __init__ (self, filename = None):
+        if not filename:
+            self.filename = os.path.expanduser('~/.git-shadow')
+        else:
+            self.filename = filename
+        if '~' in self.filename:
+            self.filename = os.path.expanduser(self.filename)
+        self.data = []
+
+    def __len__ (self):
+        return len(self.data)
+
+    def __getitem__ (self, key):
+        return self.data[key]
+
+    def __setitem__ (self, key, value):
+        self.data[key] = value
+
+    def __iter__ (self):
+        return iter(self.data)
+
+    def load (self):
+        return 0
+
+
+
+#----------------------------------------------------------------------
+# parse git credential standard input
+#----------------------------------------------------------------------
+def parse_request(text):
+    request = {}
+    for line in text.split('\n'):
+        line = line.strip('\r\n\t ')
+        if not line:
+            continue
+        if line.startswith('#'):
+            continue
+        if '=' in line:
+            key, _, value = line.partition('=')
+            key = key.strip('\r\n\t ')
+            value = value.strip('\r\n\t ')
+            request[key] = value
+    return request
 
 
 #----------------------------------------------------------------------
@@ -50,6 +193,7 @@ def main(argv = None):
     if action == 'get':
         text = sys.stdin.read()
         mlog('get', repr(text))
+        sys.exit(1)
     elif action == 'store':
         text = sys.stdin.read()
         mlog('store', repr(text))
