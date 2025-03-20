@@ -241,6 +241,7 @@ class Credential (object):
             self.filename = filename
         if '~' in self.filename:
             self.filename = os.path.expanduser(self.filename)
+        self.__uuid = None
         self.data = []
 
     def __len__ (self):
@@ -255,8 +256,45 @@ class Credential (object):
     def __iter__ (self):
         return iter(self.data)
 
+    def uuid (self):
+        if not self.__uuid:
+            self.__uuid = profile_uuid()
+        return self.__uuid
+
     def load (self):
-        return 0
+        self.data = []
+        uuid = self.uuid()
+        content = file_read(self.filename)
+        for line in content.split('\n'):
+            line = line.strip('\r\n\t ')
+            if not line:
+                continue
+            if line.startswith('#'):
+                continue
+            part = line.split(':')
+            if len(part) < 4:
+                continue
+            item = {}
+            item['protocol'] = part[0].strip('\r\n\t ')
+            item['host'] = part[1].strip('\r\n\t ')
+            item['username'] = part[2].strip('\r\n\t ')
+            password = part[3].strip('\r\n\t ')
+            item['password'] = string_decrypt(password, uuid)
+            self.data.append(item)
+        return True
+
+    def save (self):
+        uuid = self.uuid()
+        content = []
+        for item in self.data:
+            line = []
+            line.append(item.get('protocol', '').replace(':', ''))
+            line.append(item.get('host', '').replace(':', ''))
+            line.append(item.get('username', '').replace(':', ''))
+            line.append(string_encrypt(item.get('password', ''), uuid))
+            content.append(':'.join(line))
+        content = '\n'.join(content)
+        return atomic_file_write(self.filename, content)
 
 
 
