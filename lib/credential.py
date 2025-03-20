@@ -261,6 +261,11 @@ class Credential (object):
             self.__uuid = profile_uuid()
         return self.__uuid
 
+    def normalize (self, text):
+        text = text and text or ''
+        text = text.replace(':', '').replace('\n', '').replace('\r', '')
+        return text.strip('\r\n\t ')
+
     def load (self):
         self.data = []
         uuid = self.uuid()
@@ -275,9 +280,9 @@ class Credential (object):
             if len(part) < 4:
                 continue
             item = {}
-            item['protocol'] = part[0].strip('\r\n\t ')
-            item['host'] = part[1].strip('\r\n\t ')
-            item['username'] = part[2].strip('\r\n\t ')
+            item['protocol'] = self.normalize(part[0])
+            item['host'] = self.normalize(part[1])
+            item['username'] = self.normalize(part[2])
             password = part[3].strip('\r\n\t ')
             item['password'] = string_decrypt(password, uuid)
             self.data.append(item)
@@ -288,14 +293,49 @@ class Credential (object):
         content = []
         for item in self.data:
             line = []
-            line.append(item.get('protocol', '').replace(':', ''))
-            line.append(item.get('host', '').replace(':', ''))
-            line.append(item.get('username', '').replace(':', ''))
+            line.append(self.normalize(item.get('protocol', '')))
+            line.append(self.normalize(item.get('host', '')))
+            line.append(self.normalize(item.get('username', '')))
             line.append(string_encrypt(item.get('password', ''), uuid))
             content.append(':'.join(line))
         content = '\n'.join(content)
         return atomic_file_write(self.filename, content)
 
+    def get (self, protocol, host, username):
+        protocol = self.normalize(protocol)
+        host = self.normalize(host)
+        username = self.normalize(username)
+        for item in self.data:
+            if item['protocol'] == protocol and item['host'] == host:
+                if username:
+                    if item['username'] == username:
+                        return item
+                else:
+                    return item
+        return None
+
+    def store (self, protocol, host, username, password):
+        protocol = self.normalize(protocol)
+        host = self.normalize(host)
+        username = self.normalize(username)
+        for item in self.data:
+            if item['protocol'] == protocol and item['host'] == host:
+                if item['username'] == username:
+                    item['password'] = password
+                    return True
+        item = {}
+        item['protocol'] = protocol
+        item['host'] = host
+        item['username'] = username
+        item['password'] = password
+        self.data.append(item)
+        return True
+
+    def erase (self, protocol, host, username):
+        protocol = self.normalize(protocol)
+        host = self.normalize(host)
+        username = self.normalize(username)
+        return True
 
 
 #----------------------------------------------------------------------
