@@ -181,6 +181,16 @@ def __generate_host_uuid(additional = None):
             components.append(str(t))
     except:
         pass
+    try:
+        if os.path.exists('/sys/class/dmi/id/product_uuid'):
+            with open('/sys/class/dmi/id/product_uuid', 'r') as f:
+                t = str(f.read().strip())
+                components.append(t)
+    except:
+        pass
+    cpuinfo = platform.processor()
+    if cpuinfo:
+        components.append(cpuinfo)
     if additional:
         components.append(additional)
     unique_id = ':'.join(components)
@@ -205,7 +215,7 @@ def fetch_uuid(key):
 # profile_uuid
 #----------------------------------------------------------------------
 def profile_uuid():
-    key = ''
+    key = 'profile:' + os.path.expanduser('~/uuid')
     return fetch_uuid(key)
 
 
@@ -338,6 +348,8 @@ if __name__ == '__main__':
         print(fetch_uuid('test'))
         print(fetch_uuid('test'))
         print(fetch_uuid('test2'))
+        print(profile_uuid())
+        print(profile_uuid())
         return 0
 
     test2()
