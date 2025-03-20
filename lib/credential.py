@@ -13,6 +13,11 @@ import time
 import os
 import random
 import base64
+import socket
+import platform
+import hashlib
+import uuid
+import subprocess
 
 
 #----------------------------------------------------------------------
@@ -152,6 +157,59 @@ def string_decrypt(text, key):
 
 
 #----------------------------------------------------------------------
+# generate host uuid
+#----------------------------------------------------------------------
+def __generate_host_uuid(additional = None):
+    components = []
+    components.append(socket.gethostname())
+    try:
+        if sys.platform[:3] != 'win':
+            if os.path.exists('/etc/machine-id'):
+                with open('/etc/machine-id', 'r') as f:
+                    t = f.read().strip()
+                    components.append(t)
+        else:
+            result = subprocess.check_output('wmic csproduct get uuid').decode()
+            hardware_id = result.split('\n')[1].strip()
+            components.append(hardware_id)
+    except:
+        pass
+    try:
+        mac = uuid.getnode()
+        if ((mac >> 40) & 0x01) == 0:
+            t = uuid.uuid5(uuid.NAMESPACE_DNS, str(mac))
+            components.append(str(t))
+    except:
+        pass
+    if additional:
+        components.append(additional)
+    unique_id = ':'.join(components)
+    hash_obj = hashlib.sha256(unique_id.encode('utf-8', 'ignore'))
+    digit = hash_obj.hexdigest()
+    return f"{digit[:8]}-{digit[8:12]}-{digit[12:16]}-{digit[16:20]}-{digit[20:32]}"
+
+
+#----------------------------------------------------------------------
+# generate machine uuid
+#----------------------------------------------------------------------
+def fetch_uuid(key):
+    if '__uuid' not in sys.modules[__name__].__dict__:
+        sys.modules[__name__].__dict__['__uuid'] = {}
+    uuidmap = sys.modules[__name__].__dict__['__uuid']
+    if key not in uuidmap:
+        uuidmap[key] = __generate_host_uuid(key)
+    return uuidmap[key]
+
+
+#----------------------------------------------------------------------
+# profile_uuid
+#----------------------------------------------------------------------
+def profile_uuid():
+    key = ''
+    return fetch_uuid(key)
+
+
+#----------------------------------------------------------------------
 # samples for git credential standard input
 #----------------------------------------------------------------------
 SAMPLES = '''
@@ -277,6 +335,9 @@ if __name__ == '__main__':
         t = string_encrypt('hello', key)
         q = string_decrypt(t, key)
         print(q)
+        print(fetch_uuid('test'))
+        print(fetch_uuid('test'))
+        print(fetch_uuid('test2'))
         return 0
 
     test2()
