@@ -12,6 +12,7 @@ import sys
 import time
 import os
 import random
+import base64
 
 
 #----------------------------------------------------------------------
@@ -92,6 +93,62 @@ def file_read(filename):
         content = fp.read()
         return content.decode('utf-8', 'ignore')
     return None
+
+
+#----------------------------------------------------------------------
+# string encrypt
+#----------------------------------------------------------------------
+def string_encrypt(text, key):
+    if not text:
+        return text
+    if not key:
+        key = ''
+    key = key.encode('utf-8')
+    text = text.encode('utf-8')
+    keylen = len(key)
+    textlen = len(text)
+    result = bytearray(textlen)
+    if keylen > 0:
+        for i in range(textlen):
+            result[i] = text[i] ^ key[i % keylen]
+    else:
+        for i in range(textlen):
+            result[i] = text[i]
+    index = 1
+    while index < textlen:
+        result[index] ^= result[index - 1]
+        index += 1
+    return base64.b32encode(result).decode('ascii').lower()
+
+
+#----------------------------------------------------------------------
+# string decrypt
+#----------------------------------------------------------------------
+def string_decrypt(text, key):
+    if not text:
+        return text
+    if not key:
+        key = ''
+    key = key.encode('utf-8')
+    text = base64.b32decode(text.upper())
+    if not text:
+        return ''
+    keylen = len(key)
+    textlen = len(text)
+    result = bytearray(textlen)
+    for i in range(textlen):
+        result[i] = text[i]
+    index = 1
+    previous = (textlen > 0) and result[0] or 0
+    while index < textlen:
+        old = result[index]
+        result[index] ^= previous
+        previous = old
+        index += 1
+    if keylen > 0:
+        for i in range(textlen):
+            result[i] = result[i] ^ key[i % keylen]
+    return result.decode('utf-8', 'ignore')
 
 
 #----------------------------------------------------------------------
@@ -209,9 +266,18 @@ def main(argv = None):
 # testing suit
 #----------------------------------------------------------------------
 if __name__ == '__main__':
+
     def test1():
         argv = None
         main(argv)
         return 0
-    test1()
+
+    def test2():
+        key = '123456'
+        t = string_encrypt('hello', key)
+        q = string_decrypt(t, key)
+        print(q)
+        return 0
+
+    test2()
 
