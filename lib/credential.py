@@ -357,6 +357,7 @@ class Credential (object):
     def print (self):
         for item in self.data:
             print(item)
+        print('')
         return True
 
 
@@ -464,6 +465,10 @@ if __name__ == '__main__':
         print(c.get('https', 'gitlab.com', 'jack'))
         print(c.get('https', 'gitlab.com', None))
         c.save()
+        c = Credential()
+        c.load()
+        print('')
+        c.print()
         return 0
 
     test3()
