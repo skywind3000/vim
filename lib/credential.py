@@ -130,7 +130,7 @@ def string_decrypt(text, key):
     if not key:
         key = ''
     key = key.encode('utf-8')
-    text = base64.b32decode(text.upper())
+    text = base64.b32decode(text.upper().strip())
     if not text:
         return ''
     keylen = len(key)
