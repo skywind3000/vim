@@ -123,7 +123,8 @@ def string_encrypt(text, key):
     while index < textlen:
         result[index] ^= result[index - 1]
         index += 1
-    return base64.b32encode(result).decode('ascii').lower()
+    t = base64.b32encode(result).decode('ascii').lower()
+    return t.rstrip('=')
 
 
 #----------------------------------------------------------------------
@@ -134,6 +135,12 @@ def string_decrypt(text, key):
         return text
     if not key:
         key = ''
+    text = text.strip('\r\n\t ').rstrip('=')
+    if not text:
+        return text
+    remainder = len(text) % 8
+    if remainder:
+        text = text + ('=' * (8 - remainder))
     key = key.encode('utf-8')
     text = base64.b32decode(text.upper().strip())
     if not text:
@@ -335,6 +342,21 @@ class Credential (object):
         protocol = self.normalize(protocol)
         host = self.normalize(host)
         username = self.normalize(username)
+        data = []
+        for item in self.data:
+            if item['protocol'] == protocol and item['host'] == host:
+                if username:
+                    if item['username'] == username:
+                        continue
+                else:
+                    continue
+            data.append(item)
+        self.data = data
+        return True
+
+    def print (self):
+        for item in self.data:
+            print(item)
         return True
 
 
@@ -430,5 +452,20 @@ if __name__ == '__main__':
         print(profile_uuid())
         return 0
 
-    test2()
+    def test3():
+        c = Credential()
+        c.store('https', 'github.com', 'jack', '123456')
+        c.store('https', 'gitlab.com', 'zhj', '678901')
+        c.store('https', 'gitlab.com', 'jack', '54321')
+        c.print()
+        print(c.get('https', 'github.com', None))
+        print(c.get('https', 'github.com', 'jack'))
+        print(c.get('https', 'github.com', 'rose'))
+        print(c.get('https', 'gitlab.com', 'jack'))
+        print(c.get('https', 'gitlab.com', None))
+        c.save()
+        return 0
+
+    test3()
+
 
