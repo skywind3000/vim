@@ -3,7 +3,7 @@
 #  vim: set ts=4 sw=4 tw=0 et :
 #======================================================================
 #
-# emake.py - emake version 3.7.7
+# emake.py - emake version 3.7.8
 #
 # history of this file:
 # 2009.08.20   skywind   create this file
@@ -53,8 +53,8 @@ else:
 #----------------------------------------------------------------------
 # version info
 #----------------------------------------------------------------------
-EMAKE_VERSION = '3.7.7'
-EMAKE_DATE = 'Jan.27 2025'
+EMAKE_VERSION = '3.7.8'
+EMAKE_DATE = 'Mar.21 2025'
 
 #----------------------------------------------------------------------
 # constant value
@@ -785,6 +785,12 @@ class configure(object):
                     sys.stderr.flush()
                 else:
                     self.config['default']['java'] = os.path.abspath(java)
+            if 'xlink' in config['default']:
+                xlink = config['default']['xlink'].strip().lower()
+                if xlink in ('true', '1', 'yes', 'on', 'y', 't'):
+                    self.xlink = 1
+                elif xlink in ('false', 'f', '0', 'no', 'off', 'n'):
+                    self.xlink = 0
             self.haveini = True
         return 0
 
