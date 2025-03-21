@@ -420,7 +420,7 @@ if os.environ.get('MLOG_ENABLED', '').lower() in ('1', 'true', 'yes'):
 
 def mlog(*args):
     import sys, codecs, os, time
-    if MLOG_ENABLED:
+    if not MLOG_ENABLED:
         return 0
     now = time.strftime('%Y-%m-%d %H:%M:%S')
     part = [ str(n) for n in args ]
