@@ -305,6 +305,8 @@ class Credential (object):
         self.data = []
         uuid = self.uuid()
         content = file_read(self.filename)
+        if not content:
+            content = ''
         for line in content.split('\n'):
             line = line.strip('\r\n\t ')
             if not line:
