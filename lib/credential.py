@@ -416,16 +416,40 @@ def main(argv = None):
         print("Usage: %s <options>" % argv[0])
         return 1
     action = argv[1]
+    cc = Credential()
+    cc.load()
+    text = sys.stdin.read()
+    req = parse_request(text)
     if action == 'get':
-        text = sys.stdin.read()
         mlog('get', repr(text))
-        sys.exit(1)
+        protocol = req.get('protocol', '')
+        host = req.get('host', '')
+        username = req.get('username', '')
+        item = cc.get(protocol, host, username)
+        if not item:
+            return 1
+        password = item.get('password', '')
+        username = item.get('username', '')
+        if password:
+            print('password=%s' % password)
+        if username:
+            print('username=%s' % username)
+        return 0
     elif action == 'store':
-        text = sys.stdin.read()
         mlog('store', repr(text))
+        protocol = req.get('protocol', '')
+        host = req.get('host', '')
+        username = req.get('username', '')
+        password = req.get('password', '')
+        cc.store(protocol, host, username, password)
+        cc.save()
     elif action == 'erase':
-        text = sys.stdin.read()
         mlog('erase', repr(text))
+        protocol = req.get('protocol', '')
+        host = req.get('host', '')
+        username = req.get('username', '')
+        cc.erase(protocol, host, username)
+        cc.save()
     else:
         mlog('unknow action', action)
     return 0
@@ -471,6 +495,7 @@ if __name__ == '__main__':
         c.print()
         return 0
 
-    test3()
+    # test3()
+    sys.exit(main())
 
 
