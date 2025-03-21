@@ -229,7 +229,7 @@ def profile_uuid():
 #----------------------------------------------------------------------
 # getopt: returns (options, args)
 #----------------------------------------------------------------------
-def getopt (self, argv):
+def getopt(argv):
     args = []
     options = {}
     if argv is None:
@@ -440,10 +440,11 @@ def mlog(*args):
 #----------------------------------------------------------------------
 def main(argv = None):
     argv = [ n for n in (argv or sys.argv) ]
-    if len(argv) <= 1:
+    options, args = getopt(argv[1:])
+    if len(args) < 1:
         print("Usage: %s <options>" % argv[0])
         return 1
-    action = argv[1]
+    action = args[0]
     cc = Credential()
     cc.load()
     text = sys.stdin.read()
