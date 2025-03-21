@@ -74,8 +74,13 @@ function! module#misc#emake_config() abort
 	let choice = []
 	let index = 0
 	let key = 'econfig'
+	let mode = 1
 	for c in ['(clear)'] + candidate
-		let t = printf('[&%d] %s', index, c)
+		if mode == 0
+			let t = printf('[&%d] %s', index, c)
+		else
+			let t = printf('%s', c)
+		endif
 		let choice += [t]
 		let index += 1
 	endfor
@@ -92,7 +97,12 @@ function! module#misc#emake_config() abort
 		endif
 		let index += 1
 	endfor
-	let hr = asclib#ui#confirm(msg, join(choice, "\n"), n) - 1
+	let hr = 0
+	if mode == 0
+		let hr = asclib#ui#confirm(msg, join(choice, "\n"), n) - 1
+	else
+		let hr = asclib#ui#select(msg, choice) - 1
+	endif
 	if hr == 0
 		let g:asynctasks_environ[key] = ''
 		exec ':AsyncTaskEnviron! ' . key
