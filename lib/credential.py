@@ -5,7 +5,7 @@
 # credential.py - 
 #
 # Created by skywind on 2025/03/19
-# Last Modified: 2025/03/19 15:46:10
+# Last Modified: 2025/03/21 21:58:09
 #
 #======================================================================
 import sys
@@ -190,13 +190,23 @@ def __generate_host_uuid(additional = None):
             components.append(str(t))
     except:
         pass
-    try:
-        if os.path.exists('/sys/class/dmi/id/product_uuid'):
-            with open('/sys/class/dmi/id/product_uuid', 'r') as f:
-                t = str(f.read().strip())
-                components.append(t)
-    except:
-        pass
+    names = []
+    names.append('~/.config/uuid.txt')
+    if sys.platform[:3] != 'win':
+        names.append('/sys/class/dmi/id/product_uuid')
+        names.append('/usr/local/etc/uuid.txt')
+    for name in names:
+        if '~' in name:
+            name = os.path.expanduser(name)
+        if not os.path.exists(name):
+            continue
+        try:
+            with open(name, 'r') as f:
+                t = str(f.read().strip()).strip()
+                if t:
+                    components.append(t)
+        except:
+            pass
     cpuinfo = platform.processor()
     if cpuinfo:
         components.append(cpuinfo)
@@ -204,8 +214,8 @@ def __generate_host_uuid(additional = None):
         components.append(additional)
     unique_id = ':'.join(components)
     hash_obj = hashlib.sha256(unique_id.encode('utf-8', 'ignore'))
-    digit = hash_obj.hexdigest()
-    return f"{digit[:8]}-{digit[8:12]}-{digit[12:16]}-{digit[16:20]}-{digit[20:32]}"
+    d = hash_obj.hexdigest()
+    return f"{d[:8]}-{d[8:12]}-{d[12:16]}-{d[16:20]}-{d[20:32]}"
 
 
 #----------------------------------------------------------------------
