@@ -413,8 +413,15 @@ def parse_request(text):
 #----------------------------------------------------------------------
 # write application level log
 #----------------------------------------------------------------------
+MLOG_ENABLED = False
+
+if os.environ.get('MLOG_ENABLED', '').lower() in ('1', 'true', 'yes'):
+    MLOG_ENABLED = True
+
 def mlog(*args):
     import sys, codecs, os, time
+    if MLOG_ENABLED:
+        return 0
     now = time.strftime('%Y-%m-%d %H:%M:%S')
     part = [ str(n) for n in args ]
     text = u' '.join(part)
