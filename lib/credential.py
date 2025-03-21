@@ -166,8 +166,10 @@ def string_decrypt(text, key):
 #----------------------------------------------------------------------
 # generate host uuid
 #----------------------------------------------------------------------
+SHADOW_CODE = 'GIT-CREDENTIAL-SHADOW'
 def __generate_host_uuid(additional = None):
     components = []
+    components.append(SHADOW_CODE)
     components.append(socket.gethostname())
     try:
         if sys.platform[:3] != 'win':
