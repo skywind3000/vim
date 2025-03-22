@@ -191,7 +191,7 @@ def __generate_host_uuid(additional = None):
     except:
         pass
     names = []
-    names.append('~/.config/uuid.txt')
+    names.append('~/.local/etc/uuid.txt')
     if sys.platform[:3] != 'win':
         names.append('/sys/class/dmi/id/product_uuid')
         names.append('/usr/local/etc/uuid.txt')
@@ -545,7 +545,11 @@ if __name__ == '__main__':
         c.print()
         return 0
 
-    # test3()
+    def test4():
+        print(__generate_host_uuid())
+        return 0
+
+    # test4()
     sys.exit(main())
 
 
