@@ -979,7 +979,10 @@ endfunc
 " Replace string
 function! s:StringReplace(text, old, new)
 	let l:data = split(a:text, a:old, 1)
-	return join(l:data, a:new)
+	if type(a:new) == 1
+		return join(l:data, a:new)
+	endif
+	return join(l:data, string(a:new))
 endfunc
 
 " Trim leading and tailing spaces
@@ -2274,9 +2277,8 @@ function! asyncrun#run(bang, opts, args, ...)
 				exec 'let $'.l:key.' = l:val'
 			endif
 		endif
-		let l:text = string(l:val)
-		let l:command = s:StringReplace(l:command, l:replace, l:text)
-		let l:opts.text = s:StringReplace(l:opts.text, l:replace, l:text)
+		let l:command = s:StringReplace(l:command, l:replace, l:val)
+		let l:opts.text = s:StringReplace(l:opts.text, l:replace, l:val)
 	endfor
 
 	" config
