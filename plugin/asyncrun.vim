@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016-2024
 " Homepage: https://github.com/skywind3000/asyncrun.vim
 "
-" Last Modified: 2024/11/08 14:42:39
+" Last Modified: 2025/03/24 10:40:26
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -2274,8 +2274,9 @@ function! asyncrun#run(bang, opts, args, ...)
 				exec 'let $'.l:key.' = l:val'
 			endif
 		endif
-		let l:command = s:StringReplace(l:command, l:replace, l:val)
-		let l:opts.text = s:StringReplace(l:opts.text, l:replace, l:val)
+		let l:text = string(l:val)
+		let l:command = s:StringReplace(l:command, l:replace, l:text)
+		let l:opts.text = s:StringReplace(l:opts.text, l:replace, l:text)
 	endfor
 
 	" config
@@ -2341,7 +2342,7 @@ endfunc
 " asyncrun - version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.13.2'
+	return '2.13.3'
 endfunc
 
 
