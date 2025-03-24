@@ -13,7 +13,7 @@
 "----------------------------------------------------------------------
 function! asclib#string#replace(text, old, new)
 	let data = split(a:text, a:old, 1)
-	return join(data, a:new)
+	return join(data, (type(a:new) == 1)? a:new : string(a:new))
 endfunc
 
 
