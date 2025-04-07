@@ -28,7 +28,7 @@ if get(g:, 'vim_manual', 0) == 0
 		let g:bundle_group += ['inter']
 	elseif g:vim_startup == 2
 		let g:bundle_group += ['basic', 'inter', 'high', 'opt']
-		let g:bundle_group += ['ale']
+		" let g:bundle_group += ['ale']
 	endif
 	let g:bundle_group += ['nerdtree']
 endif
