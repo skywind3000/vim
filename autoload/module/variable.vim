@@ -31,6 +31,16 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" remove variable
+"----------------------------------------------------------------------
+function! module#variable#remove(name) abort
+	if has_key(g:asynctasks_environ, a:name)
+		unlet g:asynctasks_environ[a:name]
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " append value
 "----------------------------------------------------------------------
 function! module#variable#append(name, value) abort
@@ -46,6 +56,5 @@ function! module#variable#prepend(name, value) abort
 	let l:value = get(g:asynctasks_environ, a:name, '')
 	let g:asynctasks_environ[a:name] = a:value . l:value
 endfunc
-
 
 
