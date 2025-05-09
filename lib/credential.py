@@ -183,13 +183,6 @@ def __generate_host_uuid(additional = None):
             components.append(hardware_id)
     except:
         pass
-    try:
-        mac = uuid.getnode()
-        if ((mac >> 40) & 0x01) == 0:
-            t = uuid.uuid5(uuid.NAMESPACE_DNS, str(mac))
-            components.append(str(t))
-    except:
-        pass
     names = []
     names.append('~/.local/etc/uuid.txt')
     if sys.platform[:3] != 'win':
@@ -210,6 +203,20 @@ def __generate_host_uuid(additional = None):
     cpuinfo = platform.processor()
     if cpuinfo:
         components.append(cpuinfo)
+    wsl = False
+    if sys.platform[:3] != 'win' and os.path.exists('/proc/version'):
+        with open('/proc/version', 'r') as f:
+            t = str(f.read().strip()).strip().lower()
+            if 'microsoft' in t or 'wsl' in t:
+                wsl = True
+    if not wsl:
+        try:
+            mac = uuid.getnode()
+            if ((mac >> 40) & 0x01) == 0:
+                t = uuid.uuid5(uuid.NAMESPACE_DNS, str(mac))
+                components.append(str(t))
+        except:
+            pass
     if additional:
         components.append(additional)
     unique_id = ':'.join(components)
