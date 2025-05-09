@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 #======================================================================
 #
-# credential.py - 
+# credential.py - git credential helper
+# skywind3000 (at) gmail.com
 #
-# Created by skywind on 2025/03/19
+# Usage:
+#   git config --global credential.helper "/path/to/credential.py"
+#
 # Last Modified: 2025/03/21 21:58:09
 #
 #======================================================================
