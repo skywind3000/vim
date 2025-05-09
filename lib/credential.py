@@ -6,7 +6,7 @@
 # skywind3000 (at) gmail.com
 #
 # Usage:
-#   git config --global credential.helper "/path/to/credential.py"
+# git config --global credential.helper "/path/to/credential.py"
 #
 # Last Modified: 2025/03/21 21:58:09
 #
