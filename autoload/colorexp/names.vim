@@ -33,7 +33,8 @@ let s:native_names = [
 	\ 'Structure', 'TabLine', 'TabLineFill', 'TabLineSel', 'Tag',
 	\ 'Terminal', 'Title', 'Todo', 'ToolbarButton', 'ToolbarLine', 'Type',
 	\ 'Typedef', 'Underlined', 'VertSplit', 'Visual', 'VisualNOS',
-	\ 'WarningMsg', 'WildMenu', 'lCursor',
+	\ 'WarningMsg', 'WildMenu', 'lCursor', 'TabPanel', 'TabPanelFill',
+	\ 'TabPanelSel',
 	\ ]
 
 

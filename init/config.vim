@@ -153,13 +153,15 @@ function! Vim_NeatTabPanelText()
 	let l:winnr = tabpagewinnr(l:tabnr)
 	let l:bufnr = l:buflist[l:winnr - 1]
 	let l:caption = Vim_NeatBuffer(l:bufnr, 0)
-	if g:config_vim_tab_style == 0
-		return l:caption
-	elseif g:config_vim_tab_style == 1
+	let l:style = g:config_vim_tab_style
+	if l:style == 0
+		return '' . l:caption
+	elseif l:style == 1
 		return "[".l:tabnr."] ".l:caption
-	elseif g:config_vim_tab_style == 2
+	elseif l:style == 2
 		return "".l:tabnr." - ".l:caption
 	endif
+	return "[".l:tabnr."] ".l:caption
 endfunc
 
 
