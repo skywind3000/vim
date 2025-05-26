@@ -134,6 +134,10 @@ hi clear lCursor
 hi NormalTransparent gui=NONE term=NONE cterm=NONE guifg=#ffff57 guibg=NONE ctermfg=227 ctermbg=NONE
 hi link BorlandSpecial Statement
 
+hi! link TabPanel TabLine
+hi! link TabPanelSel TabLineSel
+hi! link TabPanelFill TabLine
+
 
 "----------------------------------------------------------------------
 " options

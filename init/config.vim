@@ -146,11 +146,32 @@ function! Vim_NeatGuiTabTip()
 	return tip
 endfunc
 
+" get a tab panel text
+function! Vim_NeatTabPanelText()
+	let l:tabnr = g:actual_curtabpage
+	let l:buflist = tabpagebuflist(l:tabnr)
+	let l:winnr = tabpagewinnr(l:tabnr)
+	let l:bufnr = l:buflist[l:winnr - 1]
+	let l:caption = Vim_NeatBuffer(l:bufnr, 0)
+	if g:config_vim_tab_style == 0
+		return l:caption
+	elseif g:config_vim_tab_style == 1
+		return "[".l:tabnr."] ".l:caption
+	elseif g:config_vim_tab_style == 2
+		return "".l:tabnr." - ".l:caption
+	endif
+endfunc
+
+
 " setup new tabline, just %M%t in macvim
 set tabline=%!Vim_NeatTabLine()
 set guitablabel=%{Vim_NeatTabLabel(v:lnum)}
 set guitabtooltip=%{Vim_NeatGuiTabTip()}
 
+" setup tab panel text
+if exists('+tabpanel')
+	set tabpanel=%!Vim_NeatTabPanelText()
+endif
 
 
 "----------------------------------------------------------------------
