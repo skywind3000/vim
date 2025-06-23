@@ -1,0 +1,8 @@
+[default]
+link=stdc++, pthread, m
+flag@debug=-Og, -g
+flag@release=-O3, -g
+flag@static=-O3, -static
+
+cpu=2
+
