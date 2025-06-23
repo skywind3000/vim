@@ -2,9 +2,15 @@
 link=stdc++, pthread, m
 flag=-Wall
 
+define@debug=_DEBUG=1
+define@release=_RELEASE=1
+define@static=_STATIC=1, _RELEASE=1
+define@profile=_PROFILE=1, _RELEASE=1
+
 flag@debug=-Og, -g
 flag@release=-O3, -g
 flag@static=-O3, -static
+flag@profile=-O3, -g
 
 cpu=2
 
