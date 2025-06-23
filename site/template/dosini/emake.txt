@@ -1,5 +1,6 @@
 [default]
 link=stdc++, pthread, m
+flag=-Wall
 flag@debug=-Og, -g
 flag@release=-O3, -g
 flag@static=-O3, -static
