@@ -1,6 +1,6 @@
 [default]
-link=stdc++, pthread, m
 flag=-Wall
+link=stdc++, pthread, m
 
 define@debug=_DEBUG=1
 define@release=_RELEASE=1
@@ -11,6 +11,8 @@ flag@debug=-Og, -g
 flag@release=-O3, -g
 flag@static=-O3, -static
 flag@profile=-O3, -g
+
+link@profile=profiler, unwind
 
 cpu=2
 

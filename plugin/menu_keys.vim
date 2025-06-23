@@ -199,7 +199,7 @@ let g:navigator.e = {
 			\ 'name': '+emake',
 			\ 'C': ['module#misc#emake_config()', 'emake-config-change'],
 			\ 'c': [':AsyncTask emake-clean', 'emake-clean'],
-			\ 'p': [':AsyncTaskEnviron profile debug release static', 'emake-profile-change'],
+			\ 'p': [':AsyncTaskEnviron profile debug release static profile', 'emake-profile-change'],
 			\ 'o': [':split ~/.config/emake/', 'open-config-directory'],
 			\ 'e': ['module#misc#open("~/.config/emake.ini")', 'edit-global-config'],
 			\ }
