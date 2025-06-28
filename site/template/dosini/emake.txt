@@ -1,6 +1,8 @@
 [default]
 flag=-Wall
-link=stdc++, pthread, m
+link=stdc++
+win32/link=winmm, wsock32, opengl32, gdi32, glu32, ws2_32, user32
+linux/link=m, pthread
 
 define@debug=_DEBUG=1
 define@release=_RELEASE=1
