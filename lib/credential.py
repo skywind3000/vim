@@ -357,7 +357,7 @@ class Credential (object):
             line.append(self.normalize(item.get('username', '')))
             line.append(string_encrypt(item.get('password', ''), uuid))
             content.append(':'.join(line))
-        content = '\n'.join(content)
+        content = '\n'.join(content) + '\n'
         return atomic_file_write(self.filename, content)
 
     def get (self, protocol, host, username):
