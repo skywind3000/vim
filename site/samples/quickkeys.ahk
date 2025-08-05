@@ -28,4 +28,8 @@ SetTitleMatchMode(2)
 
 $CapsLock::Ctrl
 
+/* foobar 2000 */
+^Volume_Mute::^!F9
+^Volume_Down::^!F10
+^Volume_Up::^!F11
 
