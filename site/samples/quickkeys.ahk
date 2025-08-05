@@ -32,4 +32,5 @@ $CapsLock::Ctrl
 ^Volume_Mute::^!F9
 ^Volume_Down::^!F10
 ^Volume_Up::^!F11
+^sc121::^!F12
 
