@@ -34,3 +34,9 @@ $CapsLock::Ctrl
 ^Volume_Up::^!F11
 ^sc121::^!F12
 
+/* use the following script to detect keys 
+#Requires AutoHotkey v2.0
+InstallKeybdHook()
+KeyHistory
+*/
+
