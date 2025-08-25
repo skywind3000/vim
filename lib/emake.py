@@ -3,7 +3,7 @@
 #  vim: set ts=4 sw=4 tw=0 et :
 #======================================================================
 #
-# emake.py - emake version 3.7.9
+# emake.py - emake version 3.7.8
 #
 # history of this file:
 # 2009.08.20   skywind   create this file
@@ -53,8 +53,8 @@ else:
 #----------------------------------------------------------------------
 # version info
 #----------------------------------------------------------------------
-EMAKE_VERSION = '3.7.9'
-EMAKE_DATE = 'Mar.22 2025'
+EMAKE_VERSION = '3.7.8'
+EMAKE_DATE = 'Aug.25 2025'
 
 #----------------------------------------------------------------------
 # constant value
@@ -785,18 +785,6 @@ class configure(object):
                     sys.stderr.flush()
                 else:
                     self.config['default']['java'] = os.path.abspath(java)
-            if 'xlink' in config['default']:
-                xlink = config['default']['xlink'].strip().lower()
-                if xlink in ('true', '1', 'yes', 'on', 'y', 't'):
-                    self.xlink = 1
-                elif xlink in ('false', 'f', '0', 'no', 'off', 'n'):
-                    self.xlink = 0
-            if 'option' in config['default']:
-                option = config['default']['option'].strip()
-                if 'x' in option:
-                    self.xlink = 0
-                elif 'X' in option:
-                    self.xlink = 1
             self.haveini = True
         return 0
 
@@ -2370,6 +2358,21 @@ class iparser (object):
         if name not in self.events:
             self.events[name] = []
         self.events[name].append(value)
+
+    # 处理环境变量
+    def _environ_detect (self):
+        for name in ('flag', 'cflag', 'cxxflag', 'mflag', 'mmflag', 'sflag'):
+            key = 'EMAKE_' + name.upper()
+            if key in os.environ:
+                text = os.environ.get(key, '').strip()
+                for flag in text.replace(';', ',').split(','):
+                    flag = flag.strip(' \t\n\r')
+                    if not flag: continue
+                    if name == 'flag':
+                        self.push_flag(flag)
+                    else:
+                        self.push_cond(flag, name)
+        return 0
     
     # 分析开始
     def parse (self, makefile, profile = None):
@@ -2386,6 +2389,7 @@ class iparser (object):
             sys.stderr.write('error: %s cannot be open\n'%(makefile))
             sys.stderr.flush()
             return -1
+        self._environ_detect()
         cfg = self.config.config.get('default', {})
         for name in ('prebuild', 'prelink', 'postbuild'):
             body = cfg.get(name, '').strip('\r\n\t ').split('&&')
