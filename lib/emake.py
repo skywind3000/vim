@@ -3,7 +3,7 @@
 #  vim: set ts=4 sw=4 tw=0 et :
 #======================================================================
 #
-# emake.py - emake version 3.7.10
+# emake.py - emake version 3.7.11
 #
 # history of this file:
 # 2009.08.20   skywind   create this file
@@ -53,8 +53,8 @@ else:
 #----------------------------------------------------------------------
 # version info
 #----------------------------------------------------------------------
-EMAKE_VERSION = '3.7.10'
-EMAKE_DATE = 'Aug.25 2025'
+EMAKE_VERSION = '3.7.11'
+EMAKE_DATE = 'Aug.27 2025'
 
 #----------------------------------------------------------------------
 # constant value
@@ -3250,6 +3250,24 @@ class emake (object):
         if self.error_checked != 0:
             return 2
         return 0
+
+    def check_dirty (self):
+        if not self.loaded:
+            return False
+        if self._check_error() != 0:
+            return True
+        outname = self.parser.out
+        outtime = self.dependence.mtime(outname)
+        if not os.path.exists(outname):
+            return True
+        for src in self.parser:
+            if src in self.dependence._dirty:
+                return True
+            obj = self.parser[src]
+            mtime = self.dependence.mtime(obj)
+            if mtime == 0 or mtime > outtime:
+                return True
+        return False
     
     def compile (self, printmode = 0):
         if not self.loaded:
@@ -3561,7 +3579,7 @@ def help():
     print('            -c | -compile    compile project')
     print('            -l | -link       link project')
     print('            -r | -rebuild    rebuild project')
-    print('            -e | -execute    execute project')
+    print('            -e | -execute    execute project (-E for auto-build if needed)')
     print('            -o | -out        show output file name')
     print('            -d | -cmdline    call cmdline tool in given environ')
     if sys.platform[:3] == 'win':
@@ -3727,7 +3745,7 @@ def main(argv = None):
             return 0
 
     if len(argv) >= 3:
-        cmd = argv[1].strip(' ').lower()
+        cmd = argv[1].strip(' ')
         name = argv[2]
     else:
         if name[:1] == '-':
@@ -3893,9 +3911,17 @@ def main(argv = None):
     elif cmd in ('r', '-r', 'rebuild', '-rebuild'):
         make.open(name, profile)
         retval = make.rebuild(printmode)
-    elif cmd in ('e', '-e', 'execute', '-execute'):
+    elif cmd in ('e', '-e', 'execute', '-execute', '-E'):
         make.open(name, profile)
-        retval = make.execute()
+        if cmd != '-E':
+            retval = make.execute()
+        else:
+            dirty = make.check_dirty()
+            if dirty:
+                retval = make.build(printmode)
+                if retval != 0:
+                    return retval
+            retval = make.execute()
     elif cmd in ('a', '-a', 'call', '-call'):
         make.open(name, profile)
         retval = make.call(' '.join(argv[3:]))
