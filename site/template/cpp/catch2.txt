@@ -1,0 +1,42 @@
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_session.hpp>
+
+uint32_t factorial( uint32_t number ) {
+    return number <= 1 ? number : factorial(number-1) * number;
+}
+
+TEST_CASE( "Factorials are computed", "[factorial]" ) {
+    REQUIRE( factorial( 1) == 1 );
+    REQUIRE( factorial( 2) == 2 );
+    REQUIRE( factorial( 3) == 6 );
+    REQUIRE( factorial(10) == 3'628'800 );
+}
+
+TEST_CASE( "vectors can be sized and resized", "[vector]" ) {
+    // This setup will be done 2 times in total, once for each section
+    std::vector<int> v( 5 );
+
+    REQUIRE( v.size() == 5 );
+    REQUIRE( v.capacity() >= 5 );
+
+    SECTION( "resizing bigger changes size and capacity" ) {
+        v.resize( 10 );
+
+        REQUIRE( v.size() == 10 );
+        REQUIRE( v.capacity() >= 10 );
+    }
+    SECTION( "resizing smaller changes size but not capacity" ) {
+        v.resize( 0 );
+
+        REQUIRE( v.size() == 0 );
+        REQUIRE( v.capacity() >= 5 );
+    }
+}
+
+//! link: catch2
+//! exe:
+int main(int argc, const char *argv[]) {
+	int result = Catch::Session().run( argc, argv );
+	return result;
+}
+
