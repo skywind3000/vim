@@ -677,7 +677,7 @@ def main(args = None):
 #----------------------------------------------------------------------
 if __name__ == '__main__':
 
-    os.environ['CHEAT_PATH'] = 'c:/share/vim/cheat'
+    # os.environ['CHEAT_PATH'] = 'c:/share/vim/cheat'
 
     def test1():
         print(utils.search_cheat())
