@@ -1,5 +1,0 @@
-- nvim-qt disable gui tabline/popup
-
-  call rpcnotify(1, 'Gui', 'Option', 'Tabline', 0)
-  call rpcnotify(0, "Gui", "Option", "Popupmenu", 0)
-
