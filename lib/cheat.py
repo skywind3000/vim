@@ -686,7 +686,7 @@ if __name__ == '__main__':
     def test5():
         args = ['-l']
         args = ['hello']
-        args = ['-e', 'hello']
+        args = ['-e', 'suck']
         main(sys.argv[:1] + args)
         return 0
 
@@ -697,7 +697,7 @@ if __name__ == '__main__':
         pprint.pprint(cheatsheets.get())
         return 0
 
-    # test6()
+    # test5()
     sys.exit(main())
 
 
