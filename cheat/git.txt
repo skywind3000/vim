@@ -1,4 +1,4 @@
-Branch
+# Branch
 
 - List all branches. The current one is marked with *
   git branch
@@ -24,7 +24,7 @@ Branch
 - Merge another branch into the current one
   git merge [branch_name]
 
-History
+# History
 
 - Reset to certain commit and also reset working tree
   git reset --hard hash
