@@ -160,6 +160,7 @@ utils = CheatUtils()
 die = utils.die
 warn = utils.warn
 set_color = utils.set_color
+EXTNAMES = ('.txt', '.md', '')
 
 
 #----------------------------------------------------------------------
@@ -223,7 +224,12 @@ class CheatSheets (object):
             for cheat in os.listdir(cheat_dir):
                 if cheat[:1] == '.' or cheat[:2] == '__':
                     continue
-                cheats[cheat] = os.path.join(cheat_dir, cheat)
+                name, extname = os.path.splitext(cheat)
+                if sys.platform[:3] == 'win':
+                    extname = extname.lower()
+                if extname not in EXTNAMES:
+                    continue
+                cheats[name] = os.path.join(cheat_dir, cheat)
 
         return cheats
 
@@ -311,8 +317,13 @@ class CheatSheet (object):
 
     def exists_in_user_dir (self, sheet):
         """ Predicate that returns true if the sheet exists in user_dir"""
-        user_dir_sheet = os.path.join(cheatsheets.user_dir(), sheet)
-        return sheet in cheatsheets.get() and os.access(user_dir_sheet, os.R_OK)
+        if sheet not in cheatsheets.get():
+            return False
+        for extname in EXTNAMES:
+            test = os.path.join(cheatsheets.user_dir(), sheet + extname)
+            if os.path.isfile(test) and os.access(test, os.R_OK):
+                return True
+        return False
 
     def is_writable (self, sheet):
         """ Predicate that returns true if the sheet is writeable """
@@ -645,6 +656,7 @@ if __name__ == '__main__':
 
     def test1():
         print(utils.search_cheat())
+        print(cheatsheets.paths())
         print(1,2,3)
         return 0
 
@@ -671,7 +683,21 @@ if __name__ == '__main__':
         main(sys.argv[:1] + args)
         return 0
 
-    # test4()
+    def test5():
+        args = ['-l']
+        args = ['hello']
+        args = ['-e', 'hello']
+        main(sys.argv[:1] + args)
+        return 0
+
+    def test6():
+        import pprint
+        print(cheatsheet.exists_in_user_dir('hello'))
+        print(cheatsheet.exists('hello'))
+        pprint.pprint(cheatsheets.get())
+        return 0
+
+    # test6()
     sys.exit(main())
 
 
