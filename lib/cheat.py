@@ -5,7 +5,7 @@
 # cheat.py - python cheat sheet
 #
 # Created by skywind on 2018/01/25
-# Last Modified: 2021/11/21 04:57
+# Last Modified: 2025/09/10 15:46:07
 #
 #======================================================================
 from __future__ import print_function, unicode_literals
@@ -295,7 +295,7 @@ class CheatSheet (object):
         # if the cheatsheet exists but not in the user_dir, copy it to the
         # default path before editing
         elif self.exists(sheet) and not self.exists_in_user_dir(sheet):
-            self.copy(self.path(sheet), os.path.join(cheatsheets.user_dir(), sheet))
+            self.copy(self.path(sheet), os.path.join(cheatsheets.user_dir(), sheet + '.txt'))
             self.edit(sheet)
 
         # if it exists and is in the default path, then just open it
@@ -304,7 +304,7 @@ class CheatSheet (object):
 
     def create (self, sheet):
         """ Creates a cheatsheet """
-        new_sheet_path = os.path.join(cheatsheets.user_dir(), sheet)
+        new_sheet_path = os.path.join(cheatsheets.user_dir(), sheet + '.txt')
         utils.open_with_editor(new_sheet_path)
 
     def edit (self, sheet):
