@@ -1,0 +1,61 @@
+- Command Specification
+
+  # socat will redirect input from both side to the opposite side
+  socat [options] <addr1> <addr2>
+
+- Connect Standard Input and Output
+
+  socat - - 
+
+- Connection Detection
+
+  # server: listen on 8080
+  socat - TCP-LISTEN:8080
+
+  # client: connect to server
+  socat - TCP:localhost:8080
+
+- Keep Serving
+
+  # server: use fork to keep serving when after a client quits
+  socat - TCP-LISTEN:8080,fork,reuseaddr
+  socat - TCP:localhost:8080 
+
+- Port Forwarding
+
+  socat TCP-LISTEN:8080,fork,reuseaddr  TCP:192.168.1.3:80
+
+- Remote Login
+
+  # basic remote login
+  socat TCP-LISTEN:8080,fork,reuseaddr  EXEC:/usr/bin/bash
+  socat - TCP:localhost:8080
+
+  # remote login with a tty like terminal
+  socat TCP-LISTEN:8080,fork,reuseaddr  EXEC:/usr/bin/bash,pty,stderr
+  socat file:`tty`,raw,echo=0 TCP:localhost:8080
+
+- Telnetd Simulation
+
+  socat TCP-LISTEN:23,reuseaddr,fork,crlf exec:/bin/login,pty,setsid,setpgid,stderr,ctty
+
+- Server Scripting
+
+  socat TCP-LISTEN:8080,fork,reuseaddr SYSTEM:"bash web.sh"
+
+- Echo Server
+
+  socat TCP4-LISTEN:8000,fork,reuseaddr EXEC:/bin/cat
+  socat -T180 UDP4-LISTEN:8000,fork,reuseaddr EXEC:/bin/cat
+
+- File Receiving
+
+  socat -u TCP-LISTEN:8080 open:record.log,create
+  socat -u open:record.log TCP:localhost:8080
+
+- Proxy Redirect
+
+  socat TCP-LISTEN:<local-port>,reuseaddr,fork SOCKS:<socks-ip>:<remote-ip>:<remote-port>,socksport=<socks-port>
+  socat TCP-LISTEN:<local-port>,reuseaddr,fork PROXY:<proxy-ip>:<remote-ip>:<remote-port>,proxyport=<proxy-port>
+
+

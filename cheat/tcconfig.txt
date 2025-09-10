@@ -1,0 +1,28 @@
+# tcconfig cheatsheet
+
+- Install tcconfig:
+
+  pip3 install tcconfig
+
+- Emulate packet delay on 1.1.1.1:
+
+  tcset eth0 --delay 500ms --dst-network 1.1.1.1 --direction outgoing 
+
+- Emulate packet loss on 1.1.1.1 and port 80:
+
+  tcset eth0 --loss 5% --dst-network 1.1.1.1 --dst-port 80 --direction outgoing
+  tcset eth0 --loss 5% --src-network 1.1.1.1 --src-port 80 --direction incoming
+
+- Display current rules:
+
+  tcshow eth0
+
+- Remove rules:
+
+  tcdel eth0 --all
+
+- List tc commands:
+
+  tcset eth0 --delay 10ms --tc-command
+
+
