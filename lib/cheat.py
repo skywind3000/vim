@@ -152,6 +152,27 @@ class CheatUtils (object):
                 sys.stdout.flush()
         return 0
 
+    def remove_trailing_empty_lines (self, text):
+        content = []
+        for line in text.split('\n'):
+            line = line.rstrip('\r\n\t ')
+            content.append(line)
+        while len(content) > 0:
+            if content[len(content) - 1] == '':
+                content.pop()
+            else:
+                break
+        return '\n'.join(content)
+
+    def cardify (self, text):
+        content = []
+        content.append('')
+        for line in text.split('\n'):
+            line = line.rstrip('\n\r\t ')
+            content.append('  ' + line)
+        content.append('')
+        return '\n'.join(content)
+
 
 #----------------------------------------------------------------------
 # local utils
@@ -352,16 +373,18 @@ cheatsheet = CheatSheet()
 # display text
 #----------------------------------------------------------------------
 def display(text):
+    text = utils.remove_trailing_empty_lines(text)
     cheat_colors = os.environ.get('CHEAT_COLORS', '')
     if cheat_colors and sys.stdout.isatty():
         if cheat_colors in ('0', 'no', 'disable', ''):
-            print(text)
+            print(utils.cardify(text))
             return 0
         if cheat_colors.lower() in ('yes', 'bash', '1'):
             if sys.platform[:3] != 'win':
-                print(utils.colorize(text))
+                output = utils.colorize(text)
+                print(utils.cardify(output))
                 return 0
-            print(text)
+            print(utils.cardify(text))
             return 0
         colors = []
         if ',' in cheat_colors:
@@ -380,6 +403,7 @@ def display(text):
             c_comment = int(colors[3])
         current = c_main
         set_color(current)
+        print('')
         for line in text.split('\n'):
             char = line[:1]
             if char.isspace():
@@ -396,10 +420,11 @@ def display(text):
                 set_color(color)
                 current = color
             # print('color', color)
-            print(line)
+            print('  ' + line)
         set_color(-1)
+        print('')
         return 0
-    print(text)
+    print(utils.cardify(text))
     return 0
 
 
@@ -652,7 +677,7 @@ def main(args = None):
 #----------------------------------------------------------------------
 if __name__ == '__main__':
 
-    # os.environ['CHEAT_USER_DIR'] = 'd:/acm/github/vim/cheat'
+    os.environ['CHEAT_PATH'] = 'c:/share/vim/cheat'
 
     def test1():
         print(utils.search_cheat())
@@ -685,8 +710,8 @@ if __name__ == '__main__':
 
     def test5():
         args = ['-l']
-        args = ['hello']
-        args = ['-e', 'suck']
+        args = ['git']
+        # args = ['-e', 'suck']
         main(sys.argv[:1] + args)
         return 0
 
