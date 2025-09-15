@@ -5,7 +5,7 @@
 # cheat.py - python cheat sheet
 #
 # Created by skywind on 2018/01/25
-# Last Modified: 2025/09/10 15:46:07
+# Last Modified: 2025/09/15 15:26:38
 #
 #======================================================================
 from __future__ import print_function, unicode_literals
@@ -152,10 +152,15 @@ class CheatUtils (object):
                 sys.stdout.flush()
         return 0
 
-    def remove_trailing_empty_lines (self, text):
+    def trim_empty_lines (self, text):
         content = []
+        heading = True
         for line in text.split('\n'):
             line = line.rstrip('\r\n\t ')
+            if line:
+                heading = False
+            elif heading:
+                continue
             content.append(line)
         while len(content) > 0:
             if content[len(content) - 1] == '':
@@ -373,7 +378,7 @@ cheatsheet = CheatSheet()
 # display text
 #----------------------------------------------------------------------
 def display(text):
-    text = utils.remove_trailing_empty_lines(text)
+    text = utils.trim_empty_lines(text)
     cheat_colors = os.environ.get('CHEAT_COLORS', '')
     if cheat_colors and sys.stdout.isatty():
         if cheat_colors in ('0', 'no', 'disable', ''):
