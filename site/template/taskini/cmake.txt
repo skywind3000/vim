@@ -1,0 +1,45 @@
+# vim: set fenc=utf-8 ft=taskini:
+# see: https://github.com/skywind3000/asynctasks.vim/wiki/Task-Config
+[project-init]
+command=rm -rf build/default && cmake -B build/default
+command/win32=rd /s /q build/default 2> nul & cmake -B build/default
+cwd=<root>
+save=2
+
+[project-init:cprofile!=]
+command=rm -rf build/$(+cprofile) && cmake -DCMAKE_BUILD_TYPE=$(+cprofile) -B build/$(+cprofile)
+command/win32=rd /s /q build\$(+cprofile) 2> nul & cmake -DCMAKE_BUILD_TYPE=$(+cprofile) -B build/$(+cprofile)
+cwd=<root>
+save=2
+
+[project-build]
+command=cmake --build build/default
+cwd=<root>
+errorformat=%. %#--> %f:%l:%c,%f(%l):%m,%f:%l:%c:%m,%f:%l:%m
+save=2
+
+[project-build:cprofile!=]
+command=cmake --build build/$(+cprofile)
+cwd=<root>
+errorformat=%. %#--> %f:%l:%c,%f(%l):%m,%f:%l:%c:%m,%f:%l:%m
+save=2
+
+[project-run]
+command=build/default/$(VIM_PRONAME)
+command/win32=build\default\$(VIM_PRONAME)
+cwd=<root>
+output=terminal
+
+[project-run:cprofile!=]
+command=build/$(+cprofile)/$(VIM_PRONAME)
+command/win32=build\$(+cprofile)\$(VIM_PRONAME)
+cwd=<root>
+output=terminal
+
+[project-test]
+command=echo test task
+cwd=<root>
+output=terminal
+
+
+
