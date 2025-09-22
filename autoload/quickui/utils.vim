@@ -910,5 +910,34 @@ function! quickui#utils#print_table(rows, highmap)
 endfunc
 
 
+"----------------------------------------------------------------------
+" hide/show cursor
+"----------------------------------------------------------------------
+function! quickui#utils#hide_system_cursor(hide) abort
+	if !exists('s:cursor_highlight')
+		let s:cursor_highlight = hlget('Cursor')
+	endif
+	if !exists('s:cursor_guicursor')
+		let s:cursor_guicursor = &guicursor
+	endif
+	if !exists('s:cursor_current')
+		let s:cursor_current = 0
+	endif
+	if a:hide == 0
+		call hlset(s:cursor_highlight)
+		let &guicursor = s:cursor_guicursor
+		let s:cursor_current = 0
+	else
+		if s:cursor_current == 0
+			let s:cursor_current = 1
+			let s:cursor_highlight = hlget('Cursor')
+			let s:cursor_guicursor = &guicursor
+		endif
+		exec 'hi! link Cursor Normal'
+		exec 'set guicursor=a:ver25-Cursor/lCursor'
+	endif
+endfunc
+
+
 
 

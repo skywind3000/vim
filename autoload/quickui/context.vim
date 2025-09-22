@@ -874,7 +874,14 @@ endfunc
 " open context menu and execute commands
 "----------------------------------------------------------------------
 function! quickui#context#open_nested(textlist, opts) abort
+	let hide_system_cursor = get(a:opts, 'hide_system_cursor', 0)
+	if hide_system_cursor != 0
+		call quickui#utils#hide_system_cursor(1)
+	endif
 	let cmd = s:context_wait(a:textlist, a:opts)
+	if hide_system_cursor != 0
+		call quickui#utils#hide_system_cursor(0)
+	endif
 	if has_key(a:opts, 'callback')
 		call a:opts.callback(0)
 	endif

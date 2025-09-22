@@ -24,7 +24,7 @@ let g:context_menu_quickfix = [
 "----------------------------------------------------------------------
 " local mapping
 "----------------------------------------------------------------------
-nnoremap <silent><buffer>K :call quickui#tools#clever_context('qf', g:context_menu_quickfix, {})<cr>
+nnoremap <silent><buffer>K :call quickui#tools#clever_context('qf', g:context_menu_quickfix, {'hide_system_cursor':1})<cr>
 
 nnoremap <silent><buffer> p :call quickui#tools#preview_quickfix()<cr>
 nnoremap <silent><buffer> P :PreviewClose<cr>
