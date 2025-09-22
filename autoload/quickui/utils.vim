@@ -920,20 +920,27 @@ function! quickui#utils#hide_system_cursor(hide) abort
 	if !exists('s:cursor_guicursor')
 		let s:cursor_guicursor = &guicursor
 	endif
+	if !exists('s:cursor_tve')
+		let s:cursor_tve = &t_ve
+	endif
 	if !exists('s:cursor_current')
 		let s:cursor_current = 0
 	endif
 	if a:hide == 0
 		call hlset(s:cursor_highlight)
 		let &guicursor = s:cursor_guicursor
+		let &t_ve = s:cursor_tve
 		let s:cursor_current = 0
 	else
 		if s:cursor_current == 0
 			let s:cursor_current = 1
 			let s:cursor_highlight = hlget('Cursor')
 			let s:cursor_guicursor = &guicursor
+			let s:cursor_tve = &t_ve
 		endif
+		exec 'hi! clear Cursor'
 		exec 'hi! link Cursor Normal'
+		exec 'set t_ve='
 		exec 'set guicursor=a:ver25-Cursor/lCursor'
 	endif
 endfunc
