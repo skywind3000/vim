@@ -31,38 +31,10 @@ let g:lsp_settings_root_markers = ['.git', '.git/', '.svn', '.svn/',
 "----------------------------------------------------------------------
 " turning completion
 "----------------------------------------------------------------------
-let g:asyncomplete_min_chars = 0
+let g:asyncomplete_min_chars = 2
 let g:asyncomplete_auto_completeopt = 0
 
 set shortmess+=c
-
-
-"----------------------------------------------------------------------
-" popup
-"----------------------------------------------------------------------
-hi! PopupWindow ctermbg=236 guibg=#303030
-
-function! s:preview_open()
-	let wid = lsp#document_hover_preview_winid()
-	hi! PopupWindow ctermbg=236 guibg=#303030
-	echom "popup opened"
-	if has('nvim') == 0
-		call setwinvar(wid, '&wincolor', 'PopupWindow')
-		" call win_execute(wid, 'syn clear')
-		" call win_execute(wid, 'unsilent echom "ft: " . &ft')
-	else
-		call nvim_win_set_option(wid, 'winhighlight', 'Normal:PopupWindow')
-	endif
-endfunc
-
-function! s:preview_close()
-endfunc
-
-augroup Lsp_FloatColor2
-	au!
-	autocmd User lsp_float_opened call s:preview_open()
-	autocmd User lsp_float_closed call s:preview_close()
-augroup END
 
 
 "----------------------------------------------------------------------
@@ -89,6 +61,31 @@ inoremap <silent><expr> <TAB>
 " initialize lsp
 "----------------------------------------------------------------------
 function! s:initialize_lsp() abort
+	let lsp_servers = get(g:, 'lsp_servers', {})
+	let s:rootmarkers = {}
+	for name in keys(lsp_servers)
+		let info = lsp_servers[name]
+		let ni = {}
+		let ni.name = name
+		let ni.cmd = [info.path] + get(info, 'args', [])
+		let ni.allowlist = get(info, 'filetype', [])
+		let ni.initialization_options = get(info, 'options', {})
+		let ni.workspace_config = get(info, 'config', {})
+		let root = get(info, 'root', [])
+		if len(root) > 0
+			let rootmarkers = []
+			for marker in root
+				call add(rootmarkers, marker)
+				call add(rootmarkers, marker . '/')
+			endfor
+			let s:rootmarkers[name] = rootmarkers
+			let ni.root_uri = {server_info -> lsp#utils#path_to_uri(
+						\ lsp#utils#find_nearest_parent_file_directory(
+						\ lsp#utils#get_buffer_path(),
+						\ rootmarkers))}
+		endif
+		call lsp#register_server(ni)
+	endfor
 endfunc
 
 
@@ -96,10 +93,19 @@ endfunc
 " initialize complete
 "----------------------------------------------------------------------
 function! s:initialize_complete() abort
+	let lsp_servers = get(g:, 'lsp_servers', {})
+	let disable = {}
+	for name in keys(lsp_servers)
+		let info = lsp_servers[name]
+		for ft in get(info, 'filetype', [])
+			let disable[ft] = 1
+		endfor
+	endfor
+	let blacklist = keys(disable)
 	call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
 				\ 'name': 'buffer',
-				\ 'allowlist': ['vim'],
-				\ 'blocklist': ['go'],
+				\ 'allowlist': ['*'],
+				\ 'blocklist': blacklist,
 				\ 'completor': function('asyncomplete#sources#buffer#completor'),
 				\ 'config': {
 				\    'max_buffer_size': 5000000,
@@ -115,6 +121,34 @@ augroup PrabirshresthaLspListener
 	au!
 	autocmd User lsp_setup call s:initialize_lsp()
 	autocmd User asyncomplete_setup call s:initialize_complete()
+augroup END
+
+
+"----------------------------------------------------------------------
+" popup
+"----------------------------------------------------------------------
+hi! PopupWindow ctermbg=236 guibg=#303030
+
+function! s:preview_open()
+	let wid = lsp#document_hover_preview_winid()
+	hi! PopupWindow ctermbg=236 guibg=#303030
+	echom "popup opened"
+	if has('nvim') == 0
+		call setwinvar(wid, '&wincolor', 'PopupWindow')
+		" call win_execute(wid, 'syn clear')
+		" call win_execute(wid, 'unsilent echom "ft: " . &ft')
+	else
+		call nvim_win_set_option(wid, 'winhighlight', 'Normal:PopupWindow')
+	endif
+endfunc
+
+function! s:preview_close()
+endfunc
+
+augroup Lsp_FloatColor2
+	au!
+	" autocmd User lsp_float_opened call s:preview_open()
+	" autocmd User lsp_float_closed call s:preview_close()
 augroup END
 
 
