@@ -24,6 +24,9 @@ let g:lsp_document_highlight_enabled = 1
 let g:lsp_preview_fixup_conceal = 1
 let g:lsp_hover_conceal = 1
 
+let g:lsp_settings_root_markers = ['.git', '.git/', '.svn', '.svn/',
+			\ '.root', '.root/', '.project']
+
 
 "----------------------------------------------------------------------
 " turning completion
