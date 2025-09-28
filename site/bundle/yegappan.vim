@@ -94,21 +94,43 @@ inoremap <silent><expr> <S-TAB> pumvisible()? "\<c-p>" : "\<s-tab>"
 "----------------------------------------------------------------------
 function! s:init_lsp()
 	let l:lsp_opts = deepcopy(s:lsp_opts)
-	let l:lsp_servers = deepcopy(s:lsp_servers)
+	let l:lsp_servers = get(g:, 'lsp_servers', {})
 	if exists('g:yegappan_opts')
 		for key in keys(g:yegappan_opts)
 			let l:lsp_opts[key] = g:yegappan_opts[key]
 		endfor
 	endif
 	call LspOptionsSet(l:lsp_opts)
-	if exists('g:yegappan_servers')
-		for key in keys(g:yegappan_servers)
-			let item = deepcopy(g:yegappan_servers[key])
-			let item.name = key
-			call add(l:lsp_servers, item)
-		endfor
+	let servers = []
+	for name in keys(l:lsp_servers)
+		let info = l:lsp_servers[name]
+		let ni = {}
+		let ni.name = name
+		let ni.path = get(info, 'path', '')
+		let ni.args = get(info, 'args', [])
+		if has_key(info, 'filetype')
+			let ni.filetype = info.filetype
+		endif
+		if has_key(info, 'options')
+			let ni.initializationOptions = info.options
+		endif
+		if has_key(info, 'config')
+			let ni.workspaceConfig = info.config
+		endif
+		if has_key(info, 'root')
+			let rootmarkers = []
+			for marker in info.root
+				call add(rootmarkers, marker)
+				call add(rootmarkers, marker . '/')
+			endfor
+			let ni.rootSearch = rootmarkers
+		endif
+		call add(servers, ni)
+	endfor
+	if len(servers) > 0
+		" unsilent echom servers
+		call LspAddServer(servers)
 	endif
-	call LspAddServer(l:lsp_servers)
 	set noshowmode
 endfunc
 
