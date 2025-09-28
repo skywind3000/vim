@@ -1,6 +1,6 @@
 "======================================================================
 "
-" lsp9.vim - yegappan/lsp configuration
+" yegappan.vim - yegappan/lsp configuration
 "
 " Created by skywind on 2025/09/28
 " Last Modified: 2025/09/28 15:56:42
@@ -42,7 +42,7 @@ let s:lsp_opts = #{
         \   popupBorderSignatureHelp: v:false,
         \   popupHighlightSignatureHelp: 'Pmenu',
         \   popupHighlight: 'Normal',
-        \   semanticHighlight: v:true,
+        \   semanticHighlight: v:false,
         \   showDiagInBalloon: v:true,
         \   showDiagInPopup: v:true,
         \   showDiagOnStatusLine: v:false,
@@ -95,20 +95,21 @@ inoremap <silent><expr> <S-TAB> pumvisible()? "\<c-p>" : "\<s-tab>"
 function! s:init_lsp()
 	let l:lsp_opts = deepcopy(s:lsp_opts)
 	let l:lsp_servers = deepcopy(s:lsp_servers)
-	if exists('g:lsp9_opts')
-		for key in keys(g:lsp9_opts)
-			let l:lsp_opts[key] = g:lsp9_opts[key]
+	if exists('g:yegappan_opts')
+		for key in keys(g:yegappan_opts)
+			let l:lsp_opts[key] = g:yegappan_opts[key]
 		endfor
 	endif
 	call LspOptionsSet(l:lsp_opts)
-	if exists('g:lsp9_servers')
-		for key in keys(g:lsp9_servers)
-			let item = deepcopy(g:lsp9_servers[key])
+	if exists('g:yegappan_servers')
+		for key in keys(g:yegappan_servers)
+			let item = deepcopy(g:yegappan_servers[key])
 			let item.name = key
 			call add(l:lsp_servers, item)
 		endfor
 	endif
 	call LspAddServer(l:lsp_servers)
+	set noshowmode
 endfunc
 
 
