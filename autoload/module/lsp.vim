@@ -9,6 +9,62 @@
 
 
 "----------------------------------------------------------------------
+" internal
+"----------------------------------------------------------------------
+let s:lsp_servers = {}
+
+
+"----------------------------------------------------------------------
+" register lsp server
+"----------------------------------------------------------------------
+function! module#lsp#register(name, opts) abort
+	let ni = {}
+	let ni.path = get(a:opts, 'path', '')
+	let ni.args = get(a:opts, 'args', [])
+	let ni.root = get(a:opts, 'root', [])
+	let ni.filetype = get(a:opts, 'filetype', [])
+	let ni.options = get(a:opts, 'options', {})
+	let ni.config = get(a:opts, 'config', {})
+	let s:lsp_servers[a:name] = ni
+endfunc
+
+
+"----------------------------------------------------------------------
+" list lsp servers
+"----------------------------------------------------------------------
+function! module#lsp#list(format) abort
+	let output = []
+	for [name, info] in items(s:lsp_servers)
+		let item = {'name': name}
+		if a:format == ''
+			for key in keys(info)
+				let item[key] = info[key]
+			endfor
+		elseif a:format == 'lsp'
+			let item.cmd = [info.path] + info.args
+		elseif a:format == 'yageppan'
+			let item.path = info.path
+			let item.args = info.args
+			let item.filetype = info.filetype
+			let item.initializationOptions = info.options
+			let item.workspaceConfig = info.config
+			let root = get(info, 'root', [])
+			if len(root) > 0
+				let markers = []
+				for marker in root
+					call add(markers, marker)
+					call add(markers, marker . '/')
+				endfor
+				let item.rootSearch = markers
+			endif
+		endif
+		call add(output, item)
+	endfor
+	return output
+endfunc
+
+
+"----------------------------------------------------------------------
 " check type
 "----------------------------------------------------------------------
 function! module#lsp#type()
