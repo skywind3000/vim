@@ -386,6 +386,13 @@ if has_key(s:enabled, 'lsp')
 	IncScript site/bundle/lsp.vim
 endif
 
+if has_key(s:enabled, 'yegappan')
+	if v:version >= 901 && has('nvim') == 0
+		Plug 'yegappan/lsp'
+		IncScript site/bundle/yegappan.vim
+	endif
+endif
+
 " copilot.vim
 if has_key(s:enabled, 'copilot')
 	Plug 'github/copilot.vim'
