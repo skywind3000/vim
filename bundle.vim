@@ -382,6 +382,7 @@ if has_key(s:enabled, 'lsp')
 	Plug 'prabirshrestha/asyncomplete-lsp.vim'
 	Plug 'prabirshrestha/asyncomplete-buffer.vim'
 	Plug 'prabirshrestha/asyncomplete-tags.vim'
+	Plug 'prabirshrestha/asyncomplete-file.vim'
 	Plug 'jsit/asyncomplete-user.vim'
 	IncScript site/bundle/lsp.vim
 endif

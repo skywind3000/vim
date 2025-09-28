@@ -111,6 +111,13 @@ function! s:initialize_complete() abort
 				\    'max_buffer_size': 5000000,
 				\  },
 				\ }))
+	call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
+				\ 'name': 'file',
+				\ 'allowlist': ['*'],
+				\ 'blocklist': blacklist,
+				\ 'completor': function('asyncomplete#sources#file#completor')
+				\ 'priority': 10,
+				\ }))
 endfunc
 
 
