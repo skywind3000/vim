@@ -92,7 +92,7 @@ inoremap <silent><expr> <S-TAB> pumvisible()? "\<c-p>" : "\<s-tab>"
 "----------------------------------------------------------------------
 " initialize
 "----------------------------------------------------------------------
-function! s:init_lsp()
+function! s:init_lsp() abort
 	let l:lsp_opts = deepcopy(s:lsp_opts)
 	let l:lsp_servers = get(g:, 'lsp_servers', {})
 	if exists('g:yegappan_opts')
