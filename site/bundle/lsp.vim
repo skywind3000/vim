@@ -111,7 +111,7 @@ endfunc
 "----------------------------------------------------------------------
 " autocommands
 "----------------------------------------------------------------------
-augroup PrabirshresthaLsp
+augroup PrabirshresthaLspListener
 	au!
 	autocmd User lsp_setup call s:initialize_lsp()
 	autocmd User asyncomplete_setup call s:initialize_complete()
