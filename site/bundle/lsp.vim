@@ -132,7 +132,7 @@ hi! PopupWindow ctermbg=236 guibg=#303030
 function! s:preview_open()
 	let wid = lsp#document_hover_preview_winid()
 	hi! PopupWindow ctermbg=236 guibg=#303030
-	echom "popup opened"
+	" echom "popup opened"
 	if has('nvim') == 0
 		call setwinvar(wid, '&wincolor', 'PopupWindow')
 		" call win_execute(wid, 'syn clear')
@@ -147,8 +147,8 @@ endfunc
 
 augroup Lsp_FloatColor2
 	au!
-	" autocmd User lsp_float_opened call s:preview_open()
-	" autocmd User lsp_float_closed call s:preview_close()
+	autocmd User lsp_float_opened call s:preview_open()
+	autocmd User lsp_float_closed call s:preview_close()
 augroup END
 
 
