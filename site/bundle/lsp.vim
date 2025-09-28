@@ -85,3 +85,36 @@ inoremap <silent><expr> <TAB>
 " inoremap <silent><expr> .  ("." . asyncomplete#force_refresh())
 
 
+"----------------------------------------------------------------------
+" initialize lsp
+"----------------------------------------------------------------------
+function! s:initialize_lsp() abort
+endfunc
+
+
+"----------------------------------------------------------------------
+" initialize complete
+"----------------------------------------------------------------------
+function! s:initialize_complete() abort
+	call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
+				\ 'name': 'buffer',
+				\ 'allowlist': ['vim'],
+				\ 'blocklist': ['go'],
+				\ 'completor': function('asyncomplete#sources#buffer#completor'),
+				\ 'config': {
+				\    'max_buffer_size': 5000000,
+				\  },
+				\ }))
+endfunc
+
+
+"----------------------------------------------------------------------
+" autocommands
+"----------------------------------------------------------------------
+augroup PrabirshresthaLsp
+	au!
+	autocmd User lsp_setup call s:initialize_lsp()
+	autocmd User asyncomplete_setup call s:initialize_complete()
+augroup END
+
+
