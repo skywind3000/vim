@@ -70,10 +70,14 @@ endfunc
 " check type
 "----------------------------------------------------------------------
 function! module#lsp#type()
-	if exists(':YcmCompleter')
-		return 'ycm'
-	elseif exists(':CocInstall')
+	if exists(':CocInstall')
 		return 'coc'
+	elseif exists(':LspDefinition') && exists(':LspNextDiagnostic')
+		return 'lsp'
+	elseif exists(':LspGotoDefinition') && exists(':LspShowSignature')
+		return 'yegappan'
+	elseif exists(':YcmCompleter')
+		return 'ycm'
 	elseif exists(':CmpStatus')
 		return 'cmp'
 	endif
@@ -92,6 +96,8 @@ function! module#lsp#hover() abort
 		elseif &ft == 'vim'
 			call feedkeys('K', 'ni')
 		endif
+	elseif tt == 'yegappan' || tt == 'lsp'
+		exec 'LspHover'
 	elseif tt == 'ycm'
 		exec "normal \<Plug>(YCMHover)"
 	elseif tt == 'cmp'

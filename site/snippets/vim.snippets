@@ -61,5 +61,18 @@ snippet lsp_golang
 				\\ path: 'e:/local/go/bin/gopls.exe',
 				\\ args: ['serve'],
 				\\ root: ['.git', '.svn', '.root', '.project', '.hg'],
+				\\ options: #{
+				\\     completeUnimported: v:true,
+				\\     matcher: 'fuzzy',
+				\\ },
+				\\ }
+
+snippet lsp_pylsp
+	let g:lsp_servers.pylsp = #{
+				\\ filetype: ['python'],
+				\\ path: 'C:/Share/Python311/Scripts/pylsp.exe',
+				\\ args: [],
+				\\ root: ['.git', '.svn', '.root', '.project', '.hg'],
+				\\ workspace: {'param': {'enabled': v:true}},
 				\\ }
 
