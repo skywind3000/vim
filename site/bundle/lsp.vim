@@ -33,6 +33,7 @@ let g:lsp_settings_root_markers = ['.git', '.git/', '.svn', '.svn/',
 "----------------------------------------------------------------------
 let g:asyncomplete_min_chars = 2
 let g:asyncomplete_auto_completeopt = 0
+let g:asyncomplete_auto_popup = 1
 
 set shortmess+=c
 
@@ -54,7 +55,17 @@ inoremap <silent><expr> <TAB>
 			\ <SID>check_back_space() ? "\<TAB>" :
 			\ asyncomplete#force_refresh()
 
-" inoremap <silent><expr> .  ("." . asyncomplete#force_refresh())
+function! s:force_refresh()
+	" call feedkeys("\<Plug>(asyncomplete_force_refresh)", 'm')
+	call feedkeys("\<tab>", 'm')
+	" call feedkeys("\<tab>", 'n')
+	unsilent echom "refresh"
+	return ''
+endfunc
+
+" imap <silent><expr> . "." . <SID>force_refresh()
+" inoremap <silent><expr> > pumvisible() ? ">" : ">" . "\<Plug>(asyncomplete_force_refresh)"
+" inoremap <silent><expr> : pumvisible() ? ":" : ":" . "\<Plug>(asyncomplete_force_refresh)"
 
 
 "----------------------------------------------------------------------
@@ -86,6 +97,7 @@ function! s:initialize_lsp() abort
 		endif
 		call lsp#register_server(ni)
 	endfor
+	call s:initialize_ft()
 endfunc
 
 
@@ -118,6 +130,33 @@ function! s:initialize_complete() abort
 				\ 'completor': function('asyncomplete#sources#file#completor'),
 				\ 'priority': 10,
 				\ }))
+	call s:initialize_ft()
+endfunc
+
+
+"----------------------------------------------------------------------
+" initialize filetype
+"----------------------------------------------------------------------
+function! s:initialize_ft() abort
+	if exists('g:lsp_servers') && exists('s:enabled') == 0
+		let lsp_servers = get(g:, 'lsp_servers', {})
+		let enabled = {}
+		for name in keys(lsp_servers)
+			let info = lsp_servers[name]
+			for ft in get(info, 'filetype', [])
+				let enabled[ft] = 1
+			endfor
+		endfor
+		let s:enabled = enabled
+	endif
+	if exists('s:enabled')
+		if has_key(s:enabled, &ft)
+			set omnifunc=lsp#complete
+			inoremap <silent><buffer><expr> . ".\<c-x>\<c-o>"
+			inoremap <silent><buffer><expr> > ">\<c-x>\<c-o>"
+			inoremap <silent><buffer><expr> : ":\<c-x>\<c-o>"
+		endif
+	endif
 endfunc
 
 
@@ -128,6 +167,8 @@ augroup PrabirshresthaLspListener
 	au!
 	autocmd User lsp_setup call s:initialize_lsp()
 	autocmd User asyncomplete_setup call s:initialize_complete()
+	autocmd FileType * call s:initialize_ft()
+	autocmd InsertEnter * setlocal omnifunc=lsp#complete
 augroup END
 
 
