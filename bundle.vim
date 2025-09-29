@@ -377,7 +377,7 @@ endif
 " vim-lsp
 if has_key(s:enabled, 'lsp')
 	Plug 'prabirshrestha/vim-lsp'
-	" Plug 'mattn/vim-lsp-settings'
+	Plug 'mattn/vim-lsp-settings'
 	Plug 'prabirshrestha/asyncomplete.vim'
 	Plug 'prabirshrestha/asyncomplete-lsp.vim'
 	Plug 'prabirshrestha/asyncomplete-buffer.vim'

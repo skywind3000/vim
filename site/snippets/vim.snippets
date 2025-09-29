@@ -76,3 +76,14 @@ snippet lsp_pylsp
 				\\ workspace: {'param': {'enabled': v:true}},
 				\\ }
 
+snippet lsp_pyright
+	let g:lsp_servers.pyright = #{
+				\\ filetype: ['python'],	
+				\\ path: 'C:/Share/Python311/Scripts/pyright-langserver',
+				\\ args: ['--stdio'],
+				\\ root: ['.git', '.svn', '.root', '.project', '.hg'],
+				\\ workspace: {
+				\\   'python': {'analysis': {'useLibraryCodeForTypes': v:true}, },
+				\\ },
+				\\ }
+
