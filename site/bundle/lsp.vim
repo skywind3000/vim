@@ -115,7 +115,7 @@ function! s:initialize_complete() abort
 				\ 'name': 'file',
 				\ 'allowlist': ['*'],
 				\ 'blocklist': blacklist,
-				\ 'completor': function('asyncomplete#sources#file#completor')
+				\ 'completor': function('asyncomplete#sources#file#completor'),
 				\ 'priority': 10,
 				\ }))
 endfunc
