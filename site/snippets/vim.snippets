@@ -55,4 +55,11 @@ snippet lsp_basics
 				\\ root: ['.git', '.svn', '.root', '.project', '.hg'],
 				\\ }
 
+snippet lsp_golang
+	let g:lsp_servers.golang = #{
+				\\ filetype: ['go', 'gomod'],
+				\\ path: 'e:/local/go/bin/gopls.exe',
+				\\ args: ['serve'],
+				\\ root: ['.git', '.svn', '.root', '.project', '.hg'],
+				\\ }
 

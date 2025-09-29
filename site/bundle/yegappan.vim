@@ -114,8 +114,8 @@ function! s:init_lsp() abort
 		if has_key(info, 'options')
 			let ni.initializationOptions = info.options
 		endif
-		if has_key(info, 'config')
-			let ni.workspaceConfig = info.config
+		if has_key(info, 'workspace')
+			let ni.workspaceConfig = info.workspace
 		endif
 		if has_key(info, 'root')
 			let rootmarkers = []

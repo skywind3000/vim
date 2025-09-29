@@ -81,7 +81,11 @@ function! s:initialize_lsp() abort
 		let ni.cmd = [info.path] + get(info, 'args', [])
 		let ni.allowlist = get(info, 'filetype', [])
 		let ni.initialization_options = get(info, 'options', {})
-		let ni.workspace_config = get(info, 'config', {})
+		let ni.workspace_config = get(info, 'workspace', {})
+		let ni.config = get(info, 'config', {})
+		if has_key(info, 'environ')
+			let ni.env = info.environ
+		endif
 		let root = get(info, 'root', [])
 		if len(root) > 0
 			let rootmarkers = []

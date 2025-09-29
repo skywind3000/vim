@@ -24,7 +24,9 @@ function! module#lsp#register(name, opts) abort
 	let ni.root = get(a:opts, 'root', [])
 	let ni.filetype = get(a:opts, 'filetype', [])
 	let ni.options = get(a:opts, 'options', {})
+	let ni.workspace = get(a:opts, 'workspace', {})
 	let ni.config = get(a:opts, 'config', {})
+	let ni.environ = get(a:opts, 'environ', {})
 	let s:lsp_servers[a:name] = ni
 endfunc
 
@@ -47,7 +49,7 @@ function! module#lsp#list(format) abort
 			let item.args = info.args
 			let item.filetype = info.filetype
 			let item.initializationOptions = info.options
-			let item.workspaceConfig = info.config
+			let item.workspaceConfig = info.workspace
 			let root = get(info, 'root', [])
 			if len(root) > 0
 				let markers = []
