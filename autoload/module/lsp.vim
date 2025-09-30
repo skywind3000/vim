@@ -150,32 +150,10 @@ function! module#lsp#goto_definition() abort
 		exec 'YcmCompleter GoToDefinitionElseDeclaration'
 	elseif tt == 'coc'
 		call CocActionAsync('jumpDefinition')
-	endif
-endfunc
-
-
-"----------------------------------------------------------------------
-" goto references
-"----------------------------------------------------------------------
-function! module#lsp#goto_references() abort
-	let tt = module#lsp#type()
-	if tt == 'ycm'
-		exec 'YcmCompleter GoToReferences'
-	elseif tt == 'coc'
-		call CocActionAsync('jumpReferences')
-	endif
-endfunc
-
-
-"----------------------------------------------------------------------
-" goto implementation
-"----------------------------------------------------------------------
-function! module#lsp#goto_implementation() abort
-	let tt = module#lsp#type()
-	if tt == 'ycm'
-		exec 'YcmCompleter GoToImplementation'
-	elseif tt == 'coc'
-		call CocActionAsync('jumpImplementation')
+	elseif tt == 'lsp'
+		exec 'LspDefinition'
+	elseif tt == 'yegappan'
+		exec 'LspGotoDefinition'
 	endif
 endfunc
 
@@ -189,6 +167,44 @@ function! module#lsp#goto_declaration() abort
 		exec 'YcmCompleter GoToDeclaration'
 	elseif tt == 'coc'
 		call CocActionAsync('jumpDeclaration')
+	elseif tt == 'lsp'
+		exec 'LspDeclaration'
+	elseif tt == 'yegappan'
+		exec 'LspGotoDeclaration'
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" goto references
+"----------------------------------------------------------------------
+function! module#lsp#goto_references() abort
+	let tt = module#lsp#type()
+	if tt == 'ycm'
+		exec 'YcmCompleter GoToReferences'
+	elseif tt == 'coc'
+		call CocActionAsync('jumpReferences')
+	elseif tt == 'lsp'
+		exec 'LspReferences'
+	elseif tt == 'yegappan'
+		exec 'LspShowReferences'
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
+" goto implementation
+"----------------------------------------------------------------------
+function! module#lsp#goto_implementation() abort
+	let tt = module#lsp#type()
+	if tt == 'ycm'
+		exec 'YcmCompleter GoToImplementation'
+	elseif tt == 'coc'
+		call CocActionAsync('jumpImplementation')
+	elseif tt == 'lsp'
+		exec 'LspImplementation'
+	elseif tt == 'yegappan'
+		exec 'LspGotoImpl'
 	endif
 endfunc
 
@@ -204,5 +220,6 @@ function! module#lsp#goto_type_definition() abort
 		call CocActionAsync('jumpTypeDefinition')
 	endif
 endfunc
+
 
 
