@@ -24,6 +24,7 @@ let s:native_names = [
 	\ 'MoreMsg', 'NonText', 'Normal', 'Number', 'Operator', 'Pmenu',
 	\ 'PmenuExtra', 'PmenuExtraSel', 'PmenuKind', 'PmenuKindSel',
 	\ 'PmenuMatch', 'PmenuMatchSel', 'PmenuSbar', 'PmenuSel', 'PmenuThumb',
+	\ 'PmenuBorder', 'PmenuShadow',
 	\ 'PopupNotificatio',
 	\ 'PreCondit', 'PreProc', 'Question', 'QuickFixLine', 'Removed',
 	\ 'Repeat', 'Search', 'SignColumn', 'Special', 'SpecialChar',

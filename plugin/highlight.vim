@@ -41,7 +41,7 @@ if get(g:, 'quickui_color_pmenu', 0) == 0
 		hi! PmenuSel guibg=gray guifg=brown ctermbg=brown ctermfg=gray
 		hi! PmenuExtra guibg=gray guifg=#707070 ctermbg=gray ctermfg=238
 		hi! PmenuExtraSel guibg=gray guifg=#b54a4a ctermbg=brown ctermfg=gray
-		hi! PmenuKind guibg=gray guifg=darkgreen ctermbg=22 ctermfg=black
+		hi! PmenuKind guibg=gray guifg=darkgreen ctermbg=gray ctermfg=darkgreen
 		hi! PmenuKindSel guibg=gray guifg=brown ctermbg=brown ctermfg=gray
 	endif
 endif
