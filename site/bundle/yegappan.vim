@@ -132,6 +132,15 @@ function! s:init_lsp() abort
 		call LspAddServer(servers)
 	endif
 	set noshowmode
+	set completeopt=menuone,noinsert,noselect
+endfunc
+
+
+"----------------------------------------------------------------------
+" buffer initialize
+"----------------------------------------------------------------------
+function! s:init_buffer() abort
+	set completeopt-=popup,preview,popuphidden
 endfunc
 
 
@@ -141,6 +150,7 @@ endfunc
 augroup YegappanLspInit
 	au! 
 	autocmd User LspSetup call s:init_lsp()
+	autocmd User LspAttached call s:init_buffer()
 augroup END
 
 
