@@ -42,14 +42,14 @@ snippet while
 snippet lsp_clangd
 	let g:lsp_servers.clangd = #{
 				\\ filetype: ['c', 'cpp', 'objc', 'objcpp', 'cuda'],
-				\\ path: 'd:/Linux/clang64/bin/clangd.exe',
-				\\ args: ['--background-index'],
+				\\ path: 'clangd',
+				\\ args: ['--background-index', '--clang-tidy'],
 				\\ root: ['.git', '.svn', '.root', '.project', '.hg'],
 				\\ }
 
 snippet lsp_basics
 	let g:lsp_servers.basics = #{
-				\\ filetype: ['vim', 'text', 'bash'],
+				\\ filetype: ['text', 'bash'],
 				\\ path: 'd:/dev/node/node/basics-language-server.cmd',
 				\\ args: ['--stdio'],
 				\\ root: ['.git', '.svn', '.root', '.project', '.hg'],
@@ -58,7 +58,7 @@ snippet lsp_basics
 snippet lsp_golang
 	let g:lsp_servers.golang = #{
 				\\ filetype: ['go', 'gomod'],
-				\\ path: 'e:/local/go/bin/gopls.exe',
+				\\ path: 'gopls',
 				\\ args: ['serve'],
 				\\ root: ['.git', '.svn', '.root', '.project', '.hg'],
 				\\ options: #{
@@ -70,7 +70,7 @@ snippet lsp_golang
 snippet lsp_pylsp
 	let g:lsp_servers.pylsp = #{
 				\\ filetype: ['python'],
-				\\ path: 'C:/Share/Python311/Scripts/pylsp.exe',
+				\\ path: 'pylsp',
 				\\ args: [],
 				\\ root: ['.git', '.svn', '.root', '.project', '.hg'],
 				\\ workspace: {'param': {'enabled': v:true}},
@@ -86,4 +86,13 @@ snippet lsp_pyright
 				\\   'python': {'analysis': {'useLibraryCodeForTypes': v:true}, },
 				\\ },
 				\\ }
+
+snippet lsp_vim
+	let g:lsp_servers.vimlsp = #{
+				\\ filetype: ['vim'],
+				\\ path: 'vim-language-server',
+				\\ args: ['--stdio'],
+				\\ root: ['.git', '.svn', '.root', '.project', '.hg'],
+				\\ }
+
 
