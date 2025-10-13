@@ -347,14 +347,14 @@ if has('autocmd')
 	function! s:insert_enter()
 		if get(g:, 'echodoc#enable_at_startup', 0) != 0
 			set noshowmode
-		elseif exists(':CocInstall')
+		elseif exists(':CocInstall') || exists(':LspDiagNextWrap')
 			set noshowmode
 		endif
 	endfunc
 	function! s:insert_leave()
 		if get(g:, 'echodoc#enable_at_startup', 0) != 0
 			set showmode
-		elseif exists(':CocInstall')
+		elseif exists(':CocInstall') || exists(':LspDiagNextWrap')
 			set showmode
 		endif
 	endfunc
