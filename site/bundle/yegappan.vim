@@ -11,7 +11,7 @@
 " configuration
 "----------------------------------------------------------------------
 let s:lsp_opts = #{
-		\   aleSupport: v:true,
+		\   aleSupport: v:false,
         \   autoComplete: v:true,
         \   autoHighlight: v:false,
         \   autoHighlightDiags: v:false,
