@@ -19,12 +19,12 @@ if g:vim_startup == 1
 elseif g:vim_startup == 2
         let g:bundle_group += ['inter', 'high', 'opt']
         let g:bundle_group += ['floaterm']
-        let g:bundle_group += ['matchup']
+        " let g:bundle_group += ['matchup']
+        " let g:bundle_group += ['ale']
         let g:bundle_group += ['cursorword']
         let g:bundle_group += ['snipmate']
         let g:bundle_group += ['games']
         let g:bundle_group += ['nerdtree']
-        " let g:bundle_group += ['ale']
 endif
 
 let g:bundle_group += ['colors']
