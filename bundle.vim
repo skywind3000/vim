@@ -146,9 +146,9 @@ if has_key(s:enabled, 'basic')
 		IncScript site/bundle/targets.vim
 	endif
 
-	if !has_key(s:enabled, 'syntax-extra')
+	if has_key(s:enabled, 'syntax-enhanced')
 		Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['c', 'cpp'] }
-	else
+	elseif has_key(s:enabled, 'syntax-extra')
 		Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
 	endif
 	
