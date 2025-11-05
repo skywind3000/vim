@@ -16,7 +16,7 @@ let s:lsp_opts = #{
         \   autoHighlight: v:false,
         \   autoHighlightDiags: v:false,
         \   autoPopulateDiags: v:false,
-        \   completionMatcher: 'case',
+        \   completionMatcher: 'fuzzy',
         \   completionMatcherValue: 1,
         \   diagSignErrorText: 'E>',
         \   diagSignHintText: 'H>',
