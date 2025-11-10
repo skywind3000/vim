@@ -41,4 +41,15 @@
 - Checkout back to master (move HEAD back to branch pointer)
   git checkout master
 
+# Submodule
+
+- Initializes and updates submodules recursively to match the repository
+  git submodule update --init --recursive
+
+- Updates submodules recursively to the latest commit on their remote
+  git submodule update --remote --recursive
+
+- Add submodule to local repository
+  git submodule add <url> [local]
+
 
