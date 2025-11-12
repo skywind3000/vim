@@ -94,3 +94,32 @@ function! asclib#git#commit_parents(where, commit)
 endfunc
 
 
+"----------------------------------------------------------------------
+" git log --pretty=format:"%H %ad %s" --date=short -1 <commit-hash>
+"----------------------------------------------------------------------
+function! asclib#git#commit_info(where, commit)
+	let root = asclib#vcs#croot(a:where, 'git')
+	if root == ''
+		return {}
+	endif
+	let cmd = 'log --pretty=format:"%H %ad %s" --date=short -1 ' . a:commit
+	let hr = asclib#vcs#git(cmd, root)
+	let result = {}
+	for line in split(hr, '\n')
+		let line = asclib#string#strip(line)
+		if line == ''
+			continue
+		endif
+		let hash = matchstr(line, '^\S\+')
+		let rest = matchstr(line, '^\S\+\s\+\zs.*$')
+		let date = matchstr(rest, '^\S\+')
+		let message = matchstr(rest, '^\S\+\s\+\zs.*$')
+		if date == '' || hash == ''
+			continue
+		endif
+		let result = {'hash': hash, 'date': date, 'message': message}
+	endfor
+	return result
+endfunc
+
+
