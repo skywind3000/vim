@@ -60,9 +60,35 @@ function! asclib#git#diff_tree(where, commit)
 		endif
 		let status = matchstr(line, '^\S\+')
 		let filename = matchstr(line, '^\S\+\s\+\zs.*$')
-		let status = asclib#string#strip(status)
-		let filename = asclib#string#strip(filename)
 		call add(result, [status, filename])
+	endfor
+	return result
+endfunc
+
+
+"----------------------------------------------------------------------
+" git show -s --pretty=%P <commit-hash>
+"----------------------------------------------------------------------
+function! asclib#git#commit_parents(where, commit)
+	let root = asclib#vcs#croot(a:where, 'git')
+	if root == ''
+		return []
+	endif
+	let cmd = 'show -s --pretty=%P ' . a:commit
+	let hr = asclib#vcs#git(cmd, root)
+	let result = []
+	for line in split(hr, '\n')
+		let line = asclib#string#strip(line)
+		if line == ''
+			continue
+		endif
+		for parent in split(line, '\s\+')
+			let parent = asclib#string#strip(parent)
+			if parent == ''
+				continue
+			endif
+			call add(result, parent)
+		endfor
 	endfor
 	return result
 endfunc
