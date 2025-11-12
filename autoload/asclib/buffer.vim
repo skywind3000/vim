@@ -297,7 +297,7 @@ endfunc
 "----------------------------------------------------------------------
 function! asclib#buffer#linecount(bid) abort
 	if !s:has_getbufinfo
-		if getbufnr('%') == a:bid
+		if bufnr('%') == a:bid
 			return line('$')
 		endif
 	else
@@ -309,7 +309,7 @@ function! asclib#buffer#linecount(bid) abort
 			endif
 		endif
 	endif
-	if getbufnr('%') == a:bid
+	if bufnr('%') == a:bid
 		return line('$')
 	elseif s:has_getbufline
 		return len(getbufline(a:bid, 1, '$'))
