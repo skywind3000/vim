@@ -42,3 +42,29 @@ function! asclib#git#get_remote(where, name)
 endfunc
 
 
+"----------------------------------------------------------------------
+" git diff-tree --no-commit-id --name-status -r <commit-hash>
+"----------------------------------------------------------------------
+function! asclib#git#diff_tree(where, commit)
+	let root = asclib#vcs#croot(a:where, 'git')
+	if root == ''
+		return []
+	endif
+	let cmd = 'diff-tree --no-commit-id --name-status -r ' . a:commit
+	let hr = asclib#vcs#git(cmd, root)
+	let result = []
+	for line in split(hr, '\n')
+		let line = asclib#string#strip(line)
+		if line == ''
+			continue
+		endif
+		let status = matchstr(line, '^\S\+')
+		let filename = matchstr(line, '^\S\+\s\+\zs.*$')
+		let status = asclib#string#strip(status)
+		let filename = asclib#string#strip(filename)
+		call add(result, [status, filename])
+	endfor
+	return result
+endfunc
+
+
