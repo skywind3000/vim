@@ -70,8 +70,8 @@ function! module#gitlib#diffview(commit) abort
 		return 0
 	endif
 	let item = diff[index]
-	exec 'Gtabedit ' . a:commit . ':' . item[3]
-	exec 'Gvdiffsplit! ' . item[1] . ':' . item[3]
+	exec printf('Gtabedit %s:%s', hash, item[3])
+	exec printf('Gvdiffsplit! %s:%s', item[1], item[3])
 	return 0
 endfunc
 
