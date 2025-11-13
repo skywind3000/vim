@@ -82,10 +82,51 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" get git root for nofile buffer
+"----------------------------------------------------------------------
+function! asclib#git#nonfile_root() abort
+	if &bt == ''
+		return ''
+	elseif &bt == 'nofile'
+		if &ft == 'floggraph'
+			if exists('b:flog_state')
+				return get(b:flog_state, 'workdir', '')
+			endif
+		elseif &ft == 'agit_stat' || &ft == 'agit_diff'
+			if exists('t:git')
+				if has_key(t:git, 'git_root')
+					return t:git['git_root']
+				endif
+			endif
+		elseif &ft == 'magit'
+			if exists('b:magit_top_dir')
+				return b:magit_top_dir
+			endif
+		elseif &ft == 'NeogitStatus' && has('nvim')
+			try
+				let t = luaeval('require("neogit.lib.git").repo.git_root')
+				return t
+			catch
+			endtry
+		endif
+		if exists('b:git_dir')
+			return b:git_dir
+		endif
+	endif
+	return ''
+endfunc
+
+
+"----------------------------------------------------------------------
 " get git root for current buffer
 "----------------------------------------------------------------------
 function! asclib#git#current_root() abort
-	if &bt == 'quickfix'
+	if &bt == 'nofile'
+		let root = asclib#git#nonfile_root()
+		if root != '' && isdirectory(root)
+			return root
+		endif
+	elseif &bt == 'quickfix'
 		let bid = asclib#git#fugitive_qf_entry(line('.') - 1)
 		if bid >= 0
 			let root = asclib#git#fugitive_root(bid)
