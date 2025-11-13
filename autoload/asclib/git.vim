@@ -34,19 +34,18 @@ function! asclib#git#fugitive_root(bid) abort
 	if path != '' && path =~ '[\\/]\.git$'
 		let path = substitute(path, '[\\/]\.git$', '', '')
 		if isdirectory(path)
-			return path
+			return asclib#path#normalize(path)
 		endif
 	endif
 	let path = substitute(name, '^fugitive:[\\/][\\/]', '', '')
 	let path = substitute(path, '[\\/]\.git[\\/].*$', '', '')
-	echo path
 	if s:windows
 		if path =~ '^[\\/]\a\:[\\/]'
 			let path = strpart(path, 1)
 		endif
 	endif
 	if isdirectory(path)
-		return path
+		return asclib#path#normalize(path)
 	endif
 	return ''
 endfunc
@@ -65,7 +64,7 @@ function! asclib#git#current_root() abort
 		let git.root = root
 		return root
 	endif
-	let root = asclib#vcs#croot(bufname('%'), 'git')
+	let root = asclib#vcs#croot('', 'git')
 	if root != '' && isdirectory(root)
 		let git.root = root
 		return root
