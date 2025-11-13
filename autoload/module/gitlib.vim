@@ -25,9 +25,9 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" 
+" diff view side-by-side
 "----------------------------------------------------------------------
-function! module#gitlib#sidebyside(commit) abort
+function! module#gitlib#diffview(commit) abort
 	let root = asclib#git#current_root()
 	if root == ''
 		return -1
