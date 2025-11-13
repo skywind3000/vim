@@ -75,9 +75,8 @@ function! module#gitlib#diffview(where, commit) abort
 		return 0
 	endif
 	let item = diff[index]
-	if &bt == 'quickfix'
-	endif
-	exec printf('Gtabedit %s:%s', hash, item[3])
+	let name = asclib#git#fugitive_make(root, hash, item[3])
+	exec printf('tabe %s', fnameescape(name))
 	exec printf('Gvdiffsplit! %s:%s', item[1], item[3])
 	return 0
 endfunc

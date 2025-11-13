@@ -286,3 +286,26 @@ function! asclib#git#fugitive_commit(bid)
 endfunc
 
 
+"----------------------------------------------------------------------
+" build fugitive file name
+"----------------------------------------------------------------------
+function! asclib#git#fugitive_make(root, commit, fn) abort
+	let name = 'fugitive://'
+	if s:windows
+		let name .= '/'
+	endif
+	let root = a:root
+	if root =~ '^\~'
+		let root = expand(root)
+	endif
+	let name .= root . '/.git//' . a:commit
+	if a:fn != ''
+		let name .= '/' . a:fn
+	endif
+	if s:windows
+		let name = asclib#string#replace(name, '/', "\\")
+	endif
+	return name
+endfunc
+
+
