@@ -84,7 +84,7 @@ endfunc
 "----------------------------------------------------------------------
 " get git root for nofile buffer
 "----------------------------------------------------------------------
-function! asclib#git#nonfile_root() abort
+function! asclib#git#nofile_root() abort
 	if &bt == ''
 		return ''
 	elseif &bt == 'nofile'
@@ -122,7 +122,7 @@ endfunc
 "----------------------------------------------------------------------
 function! asclib#git#current_root() abort
 	if &bt == 'nofile'
-		let root = asclib#git#nonfile_root()
+		let root = asclib#git#nofile_root()
 		if root != '' && isdirectory(root)
 			return root
 		endif
