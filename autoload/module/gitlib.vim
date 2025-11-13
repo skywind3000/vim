@@ -12,16 +12,18 @@
 "----------------------------------------------------------------------
 " interal
 "----------------------------------------------------------------------
-let s:cursor_pos = {}
+let s:object = {}
 
 
 "----------------------------------------------------------------------
-" 
+" get object
 "----------------------------------------------------------------------
-function! module#gitlib#hello() abort
-	return 'Hello from gitlib module!'
+function! module#gitlib#object(name) abort
+	if !has_key(s:object, a:name)
+		let s:object[a:name] = {}
+	endif
+	return s:object[a:name]
 endfunc
-
 
 
 "----------------------------------------------------------------------
@@ -32,22 +34,37 @@ function! module#gitlib#diffview(commit) abort
 	if root == ''
 		return -1
 	endif
-	let diff = asclib#git#commit_diff(root, a:commit)
+	let key = root . '::' . a:commit
+	let obj = module#gitlib#object(key)
+	if !has_key(obj, 'diffview')
+		let diff = asclib#git#commit_diff(root, a:commit)
+		let obj.diffview = diff
+	endif
+	let diff = obj.diffview
 	if len(diff) == 0
 		return 0
 	endif
-	let content = []
-	for item in diff
-		let pid = item[0]
-		let hash = item[1]
-		let status = item[2]
-		let filename = item[3]
-		let short = strpart(hash, 0, 7)
-		let text = printf("%s\t%s\t%s\t%s", pid, short, status, filename)
-		call add(content, text)
-	endfor
-	let opts = {'title': 'Select to Compare (ParentId/Parent/Status/Filename)'}
-	let key = root . '::' . a:commit
+	if !has_key(obj, 'content')
+		let content = []
+		for item in diff
+			let pid = item[0]
+			let hash = item[1]
+			let status = item[2]
+			let filename = item[3]
+			let short = strpart(hash, 0, 7)
+			let text = printf("%s\t%s\t%s\t%s", pid, short, status, filename)
+			call add(content, text)
+		endfor
+		let obj.content = content
+	endif
+	let content = obj.content
+	if !has_key(obj, 'hash')
+		let hash = asclib#git#commit_hash(root, a:commit)
+		let obj.hash = hash
+	endif
+	let hash = obj.hash
+	let short = strpart(hash, 0, 7)
+	let opts = {'title': 'Commit Diff View ('. short . ')'}
 	let index = quickui#tools#clever_inputlist(key, content, opts)
 	if index < 0
 		return 0
