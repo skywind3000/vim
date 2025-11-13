@@ -23,7 +23,7 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" 
+" get git root for fugitive buffer
 "----------------------------------------------------------------------
 function! asclib#git#fugitive_root(bid) abort
 	let name = bufname(a:bid)
@@ -76,7 +76,7 @@ endfunc
 "----------------------------------------------------------------------
 " get branch info
 "----------------------------------------------------------------------
-function! asclib#git#get_branch(where)
+function! asclib#git#get_branch(where) abort
 	let root = asclib#vcs#croot(a:where, 'git')
 	if root == ''
 		return ''
@@ -97,7 +97,7 @@ endfunc
 "----------------------------------------------------------------------
 " get remote url
 "----------------------------------------------------------------------
-function! asclib#git#get_remote(where, name)
+function! asclib#git#get_remote(where, name) abort
 	let root = asclib#vcs#croot(a:where, 'git')
 	if root == ''
 		return ''
@@ -110,7 +110,7 @@ endfunc
 "----------------------------------------------------------------------
 " git diff-tree --no-commit-id --name-status -r <commit-hash>
 "----------------------------------------------------------------------
-function! asclib#git#diff_tree(where, commit, parent)
+function! asclib#git#diff_tree(where, commit, parent) abort
 	let root = asclib#vcs#croot(a:where, 'git')
 	if root == ''
 		return []
@@ -139,7 +139,7 @@ endfunc
 "----------------------------------------------------------------------
 " git show -s --pretty=%P <commit-hash>
 "----------------------------------------------------------------------
-function! asclib#git#commit_parents(where, commit)
+function! asclib#git#commit_parents(where, commit) abort
 	let root = asclib#vcs#croot(a:where, 'git')
 	if root == ''
 		return []
@@ -167,7 +167,7 @@ endfunc
 "----------------------------------------------------------------------
 " git log --pretty=format:"%H %ad %s" --date=short -1 <commit-hash>
 "----------------------------------------------------------------------
-function! asclib#git#commit_info(where, commit)
+function! asclib#git#commit_info(where, commit) abort
 	let root = asclib#vcs#croot(a:where, 'git')
 	if root == ''
 		return {}
@@ -188,6 +188,45 @@ function! asclib#git#commit_info(where, commit)
 			continue
 		endif
 		let result = {'hash': hash, 'date': date, 'message': message}
+	endfor
+	return result
+endfunc
+
+
+"----------------------------------------------------------------------
+" git rev-parse <commit-hash> 
+"----------------------------------------------------------------------
+function! asclib#git#commit_hash(where, commit) abort
+	let root = asclib#vcs#croot(a:where, 'git')
+	if root == ''
+		return ''
+	endif
+	let cmd = 'rev-parse ' . a:commit
+	let hr = asclib#vcs#git(cmd, root)
+	let hash = asclib#string#strip(hr)
+	if hash == '' || g:asclib#core#shell_error != 0
+		return ''
+	endif
+	return hash
+endfunc
+
+
+"----------------------------------------------------------------------
+" get commit diff info 
+"----------------------------------------------------------------------
+function! asclib#git#commit_diff(where, commit) abort
+	let root = asclib#vcs#croot(a:where, 'git')
+	if root == ''
+		return []
+	endif
+	let parents = asclib#git#commit_parents(a:where, a:commit)
+	let result = []
+	let index = 1
+	for parent in parents
+		for item in asclib#git#diff_tree(a:where, a:commit, parent)
+			call add(result, [index, parent, item[0], item[1]])
+		endfor
+		let index += 1
 	endfor
 	return result
 endfunc
