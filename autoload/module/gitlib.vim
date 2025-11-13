@@ -34,10 +34,14 @@ function! module#gitlib#diffview(commit) abort
 	if root == ''
 		return -1
 	endif
-	let key = root . '::' . a:commit
+	let commit = a:commit
+	if commit == ''
+		let commit = asclib#git#fugitive_commit('%')
+	endif
+	let key = root . '::' . commit
 	let obj = module#gitlib#object(key)
 	if !has_key(obj, 'diffview')
-		let diff = asclib#git#commit_diff(root, a:commit)
+		let diff = asclib#git#commit_diff(root, commit)
 		let obj.diffview = diff
 	endif
 	let diff = obj.diffview
@@ -59,7 +63,7 @@ function! module#gitlib#diffview(commit) abort
 	endif
 	let content = obj.content
 	if !has_key(obj, 'hash')
-		let hash = asclib#git#commit_hash(root, a:commit)
+		let hash = asclib#git#commit_hash(root, commit)
 		let obj.hash = hash
 	endif
 	let hash = obj.hash

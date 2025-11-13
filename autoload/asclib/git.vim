@@ -232,4 +232,18 @@ function! asclib#git#commit_diff(where, commit) abort
 endfunc
 
 
+"----------------------------------------------------------------------
+" get commit hash for fugitive buffer
+"----------------------------------------------------------------------
+function! asclib#git#fugitive_commit(bid)
+	let name = bufname(a:bid)
+	if name !~ '^fugitive:[\\/][\\/]'
+		return ''
+	endif
+	let ft = getbufvar(a:bid, '&filetype', '')
+	let part = matchstr(name, '[\\/]\.git[\\/][\\/]\zs.*$')
+	let commit = substitute(part, '[\\/].*$', '', '')
+	return commit
+endfunc
+
 
