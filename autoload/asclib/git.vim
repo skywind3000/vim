@@ -9,6 +9,78 @@
 
 
 "----------------------------------------------------------------------
+" internal
+"----------------------------------------------------------------------
+let s:windows = has('win32') || has('win64') || has('win95') || has('win16')
+
+
+"----------------------------------------------------------------------
+" get git object for current buffer
+"----------------------------------------------------------------------
+function! asclib#git#current_object() abort
+	return asclib#buffer#variable('%', 'git', {})
+endfunc
+
+
+"----------------------------------------------------------------------
+" 
+"----------------------------------------------------------------------
+function! asclib#git#fugitive_root(bid) abort
+	let name = bufname(a:bid)
+	if name !~ '^fugitive://'
+		return ''
+	endif
+	let path = getbufvar(a:bid, 'git_dir', '')
+	if path != '' && path =~ '/\.git$'
+		let path = substitute(path, '/\.git$', '', '')
+		if isdirectory(path)
+			" return path
+		endif
+	endif
+	let path = substitute(name, '^fugitive://', '', '')
+	let path = substitute(path, '/\.git/.*$', '', '')
+	if s:windows
+		if path =~ '^/\a://'
+			let path = strpart(path, 1)
+		endif
+	endif
+	if isdirectory(path)
+		return path
+	endif
+	return ''
+endfunc
+
+
+"----------------------------------------------------------------------
+" get git root for current buffer
+"----------------------------------------------------------------------
+function! asclib#git#current_root() abort
+	let git = asclib#git#current_object()
+	if has_key(git, 'root')
+		return git.root
+	endif
+	let name = bufname('%')
+	let root = ''
+	if name =~ '^fugitive://'
+		if has_key(b:, 'git_dir')
+			let path = b:git_dir
+			if path =~ '/\.git$'
+				let path = substitute(root, '/\.git$', '', '')
+			endif
+			if isdirectory(path)
+				let root = path
+			endif
+		endif
+		if root == ''
+			let path = substitute(name, '^fugitive://', '', '')
+			let path = substitute(path, '/\.git/.*$', '', '')
+		endif
+	endif
+	return ''
+endfunc
+
+
+"----------------------------------------------------------------------
 " get branch info
 "----------------------------------------------------------------------
 function! asclib#git#get_branch(where)
@@ -126,5 +198,6 @@ function! asclib#git#commit_info(where, commit)
 	endfor
 	return result
 endfunc
+
 
 

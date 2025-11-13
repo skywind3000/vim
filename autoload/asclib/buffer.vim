@@ -198,6 +198,21 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" ensurebufvar
+"----------------------------------------------------------------------
+function! asclib#buffer#variable(bid, varname, default)
+	let obj = asclib#buffer#object(a:bid)
+	if type(obj) == 4
+		if !has_key(obj, a:varname)
+			let obj[a:varname] = a:default
+		endif
+		return obj[a:varname]
+	endif
+	return a:default
+endfunc
+
+
+"----------------------------------------------------------------------
 " autocmd
 "----------------------------------------------------------------------
 function! asclib#buffer#autocmd(bid, group, funcname) abort
