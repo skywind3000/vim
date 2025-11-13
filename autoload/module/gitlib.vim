@@ -41,7 +41,7 @@ function! module#gitlib#diffview(where, commit) abort
 	let key = root . '::' . commit
 	let obj = module#gitlib#object(key)
 	if !has_key(obj, 'diffview')
-		unsilent echom printf('root(%s), commit(%s)', root, commit)
+		" unsilent echom printf('root(%s), commit(%s)', root, commit)
 		let diff = asclib#git#commit_diff(root, commit)
 		let obj.diffview = diff
 	endif
@@ -75,7 +75,14 @@ function! module#gitlib#diffview(where, commit) abort
 		return 0
 	endif
 	let item = diff[index]
+	let pwd = getcwd()
+	if &bt == 'quickfix'
+		call asclib#core#chdir(root)
+	endif
 	exec printf('Gtabedit %s:%s', hash, item[3])
+	if &bt == 'quickfix'
+		call asclib#core#chdir(pwd)
+	endif
 	exec printf('Gvdiffsplit! %s:%s', item[1], item[3])
 	return 0
 endfunc
@@ -115,7 +122,7 @@ function! module#gitlib#clever_diffview(commit) abort
 		call asclib#core#errmsg('No commit specified for diff view.')
 		return 0
 	endif
-	call module#gitlib#diffview(commit)
+	call module#gitlib#diffview(root, commit)
 	return 0
 endfunc
 
