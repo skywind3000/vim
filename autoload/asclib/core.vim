@@ -274,6 +274,8 @@ function! asclib#core#system(cmd, ...)
 	else
 		let sinput = {}
 	endif
+	let g:asclib#core#shell_cmd = a:cmd
+	let g:asclib#core#shell_cwd = cwd
 	let hr = s:python_system(a:cmd, get(g:, 'asclib#core#python', 0), sinput)
 	if cwd != ''
 		noautocmd call asclib#core#chdir(previous)

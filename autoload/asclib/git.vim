@@ -12,6 +12,7 @@
 " internal
 "----------------------------------------------------------------------
 let s:windows = has('win32') || has('win64') || has('win95') || has('win16')
+let s:quickfix = {}
 
 
 "----------------------------------------------------------------------
@@ -52,9 +53,47 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" get fugitive quickfix entry buffer id
+"----------------------------------------------------------------------
+function! asclib#git#fugitive_qf_entry(index) abort
+	let items = getqflist({'title':1, 'id':0})
+	let title = asclib#string#strip(items.title)
+	if title !~ ':Gclog'
+		return -1
+	endif
+	if !has_key(s:quickfix, items.id)
+		let s:quickfix[items.id] = getqflist()
+	endif
+	let content = s:quickfix[items.id]
+	let index = a:index
+	if index < 0 || index >= len(content)
+		return -1
+	endif
+	let item = content[index]
+	if !item.valid
+		return -1
+	endif
+	let bid = item.bufnr
+	if strlen(item.module) != 7
+		return -1
+	endif
+	return bid
+endfunc
+
+
+"----------------------------------------------------------------------
 " get git root for current buffer
 "----------------------------------------------------------------------
 function! asclib#git#current_root() abort
+	if &bt == 'quickfix'
+		let bid = asclib#git#fugitive_qf_entry(line('.') - 1)
+		if bid >= 0
+			let root = asclib#git#fugitive_root(bid)
+			if root != '' && isdirectory(root)
+				return root
+			endif
+		endif
+	endif
 	let git = asclib#git#current_object()
 	if has_key(git, 'root')
 		return git.root

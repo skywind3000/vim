@@ -29,18 +29,19 @@ endfunc
 "----------------------------------------------------------------------
 " diff view side-by-side
 "----------------------------------------------------------------------
-function! module#gitlib#diffview(commit) abort
-	let root = asclib#git#current_root()
+function! module#gitlib#diffview(where, commit) abort
+	let root = asclib#vcs#croot(a:where, 'git')
 	if root == ''
 		return -1
 	endif
 	let commit = a:commit
 	if commit == ''
-		let commit = asclib#git#fugitive_commit('%')
+		return -1
 	endif
 	let key = root . '::' . commit
 	let obj = module#gitlib#object(key)
 	if !has_key(obj, 'diffview')
+		unsilent echom printf('root(%s), commit(%s)', root, commit)
 		let diff = asclib#git#commit_diff(root, commit)
 		let obj.diffview = diff
 	endif
@@ -79,5 +80,43 @@ function! module#gitlib#diffview(commit) abort
 	return 0
 endfunc
 
+
+"----------------------------------------------------------------------
+" fugitive quickfix commit extractor
+"----------------------------------------------------------------------
+function! module#gitlib#fugitive_qf_commit() abort
+	if &bt != 'quickfix'
+		return ''
+	endif
+	let bid = asclib#git#fugitive_qf_entry(line('.') - 1)
+	if bid < 0
+		return ''
+	endif
+	let hash = asclib#git#fugitive_commit(bid)
+	return hash
+endfunc
+
+
+"----------------------------------------------------------------------
+" clever diff view
+"----------------------------------------------------------------------
+function! module#gitlib#clever_diffview(commit) abort
+	let root = asclib#git#current_root()
+	let commit = a:commit
+	if commit == ''
+		let commit = asclib#git#fugitive_commit('%')
+	endif
+	if commit == ''
+		if &bt == 'quickfix'
+			let commit = module#gitlib#fugitive_qf_commit()
+		endif
+	endif
+	if commit == ''
+		call asclib#core#errmsg('No commit specified for diff view.')
+		return 0
+	endif
+	call module#gitlib#diffview(commit)
+	return 0
+endfunc
 
 
