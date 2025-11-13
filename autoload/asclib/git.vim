@@ -27,20 +27,21 @@ endfunc
 "----------------------------------------------------------------------
 function! asclib#git#fugitive_root(bid) abort
 	let name = bufname(a:bid)
-	if name !~ '^fugitive://'
+	if name !~ '^fugitive:[\\/][\\/]'
 		return ''
 	endif
 	let path = getbufvar(a:bid, 'git_dir', '')
-	if path != '' && path =~ '/\.git$'
-		let path = substitute(path, '/\.git$', '', '')
+	if path != '' && path =~ '[\\/]\.git$'
+		let path = substitute(path, '[\\/]\.git$', '', '')
 		if isdirectory(path)
-			" return path
+			return path
 		endif
 	endif
-	let path = substitute(name, '^fugitive://', '', '')
-	let path = substitute(path, '/\.git/.*$', '', '')
+	let path = substitute(name, '^fugitive:[\\/][\\/]', '', '')
+	let path = substitute(path, '[\\/]\.git[\\/].*$', '', '')
+	echo path
 	if s:windows
-		if path =~ '^/\a://'
+		if path =~ '^[\\/]\a\:[\\/]'
 			let path = strpart(path, 1)
 		endif
 	endif
@@ -59,22 +60,15 @@ function! asclib#git#current_root() abort
 	if has_key(git, 'root')
 		return git.root
 	endif
-	let name = bufname('%')
-	let root = ''
-	if name =~ '^fugitive://'
-		if has_key(b:, 'git_dir')
-			let path = b:git_dir
-			if path =~ '/\.git$'
-				let path = substitute(root, '/\.git$', '', '')
-			endif
-			if isdirectory(path)
-				let root = path
-			endif
-		endif
-		if root == ''
-			let path = substitute(name, '^fugitive://', '', '')
-			let path = substitute(path, '/\.git/.*$', '', '')
-		endif
+	let root = asclib#git#fugitive_root('%')
+	if root != '' && isdirectory(root)
+		let git.root = root
+		return root
+	endif
+	let root = asclib#vcs#croot(bufname('%'), 'git')
+	if root != '' && isdirectory(root)
+		let git.root = root
+		return root
 	endif
 	return ''
 endfunc
