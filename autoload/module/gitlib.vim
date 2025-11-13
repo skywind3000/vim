@@ -75,14 +75,9 @@ function! module#gitlib#diffview(where, commit) abort
 		return 0
 	endif
 	let item = diff[index]
-	let pwd = getcwd()
 	if &bt == 'quickfix'
-		call asclib#core#chdir(root)
 	endif
 	exec printf('Gtabedit %s:%s', hash, item[3])
-	if &bt == 'quickfix'
-		call asclib#core#chdir(pwd)
-	endif
 	exec printf('Gvdiffsplit! %s:%s', item[1], item[3])
 	return 0
 endfunc
