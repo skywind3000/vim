@@ -45,12 +45,17 @@ endfunc
 "----------------------------------------------------------------------
 " git diff-tree --no-commit-id --name-status -r <commit-hash>
 "----------------------------------------------------------------------
-function! asclib#git#diff_tree(where, commit)
+function! asclib#git#diff_tree(where, commit, parent)
 	let root = asclib#vcs#croot(a:where, 'git')
 	if root == ''
 		return []
 	endif
-	let cmd = 'diff-tree --no-commit-id --name-status -r ' . a:commit
+	let cmd = 'diff-tree --no-commit-id --name-status -r '
+	if a:parent == ''
+		let cmd .= a:commit
+	else
+		let cmd .= a:parent . ' ' . a:commit
+	endif
 	let hr = asclib#vcs#git(cmd, root)
 	let result = []
 	for line in split(hr, '\n')
