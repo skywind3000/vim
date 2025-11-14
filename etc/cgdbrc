@@ -1,1 +1,3 @@
-{\rtf1}
+set ttimeout
+set ttimeoutlen=50
+set wso=vertical
