@@ -392,4 +392,3 @@ command! -nargs=1 EnvPathRemove call s:RemovePath(<q-args>)
 
 
 
-
