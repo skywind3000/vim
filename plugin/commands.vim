@@ -607,4 +607,9 @@ function! s:GitDiffView(...) abort
 endfunc
 
 
+"----------------------------------------------------------------------
+" GitStageDiff
+"----------------------------------------------------------------------
+command! -nargs=0 GitStageDiff call module#gitlib#clever_stage_diff()
+
 
