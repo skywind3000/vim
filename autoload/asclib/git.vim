@@ -294,12 +294,16 @@ endfunc
 "----------------------------------------------------------------------
 " get commit diff info 
 "----------------------------------------------------------------------
-function! asclib#git#commit_diff(where, commit) abort
+function! asclib#git#commit_diff(where, commit, ...) abort
 	let root = asclib#vcs#croot(a:where, 'git')
 	if root == ''
 		return []
 	endif
-	let parents = asclib#git#commit_parents(a:where, a:commit)
+	if a:0 > 0
+		let parents = a:1
+	else
+		let parents = asclib#git#commit_parents(a:where, a:commit)
+	endif
 	let result = []
 	let index = 1
 	for parent in parents
@@ -307,6 +311,42 @@ function! asclib#git#commit_diff(where, commit) abort
 			call add(result, [index, parent, item[0], item[1]])
 		endfor
 		let index += 1
+	endfor
+	return result
+endfunc
+
+
+"----------------------------------------------------------------------
+" git show -s --format="%H %ad %P" --date=short <commit-hash>
+"----------------------------------------------------------------------
+function! asclib#git#commit_info(where, commit) abort
+	let root = asclib#vcs#croot(a:where, 'git')
+	if root == ''
+		return {}
+	endif
+	let cmd = 'show -s --format="%H %ad %P" --date=short ' . a:commit
+	let hr = asclib#vcs#git(cmd, root)
+	let result = {}
+	for line in split(hr, '\n')
+		let line = asclib#string#strip(line)
+		if line == ''
+			continue
+		endif
+		let hash = matchstr(line, '^\S\+')
+		let rest = matchstr(line, '^\S\+\s\+\zs.*$')
+		let date = matchstr(rest, '^\S\+')
+		let parents_str = matchstr(rest, '^\S\+\s\+\zs.*$')
+		let parents = []
+		for parent in split(parents_str, '\s\+')
+			let parent = asclib#string#strip(parent)
+			if parent != ''
+				call add(parents, parent)
+			endif
+		endfor
+		if date == '' || hash == ''
+			continue
+		endif
+		let result = {'hash': hash, 'date': date, 'parents': parents}
 	endfor
 	return result
 endfunc

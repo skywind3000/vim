@@ -40,9 +40,14 @@ function! module#gitlib#diffview(where, commit) abort
 	endif
 	let key = root . '::' . commit
 	let obj = module#gitlib#object(key)
+	if !has_key(obj, 'info')
+		let info = asclib#git#commit_info(root, commit)
+		let obj.info = info
+	endif
+	let info = obj.info
 	if !has_key(obj, 'diffview')
 		" unsilent echom printf('root(%s), commit(%s)', root, commit)
-		let diff = asclib#git#commit_diff(root, commit)
+		let diff = asclib#git#commit_diff(root, commit, info.parents)
 		let obj.diffview = diff
 	endif
 	let diff = obj.diffview
@@ -63,13 +68,9 @@ function! module#gitlib#diffview(where, commit) abort
 		let obj.content = content
 	endif
 	let content = obj.content
-	if !has_key(obj, 'hash')
-		let hash = asclib#git#commit_hash(root, commit)
-		let obj.hash = hash
-	endif
-	let hash = obj.hash
+	let hash = info.hash
 	let short = strpart(hash, 0, 7)
-	let opts = {'title': 'Commit Diff View ('. short . ')'}
+	let opts = {'title': 'Commit Diff View ('. short . ') ' . info.date}
 	let index = quickui#tools#clever_inputlist(key, content, opts)
 	if index < 0
 		return 0

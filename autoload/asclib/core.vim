@@ -276,11 +276,16 @@ function! asclib#core#system(cmd, ...)
 	endif
 	let g:asclib#core#shell_cmd = a:cmd
 	let g:asclib#core#shell_cwd = cwd
+	if !exists('g:asclib#core#shell_count')
+		let g:asclib#core#shell_count = 0
+	endif
+	let g:asclib#core#shell_count += 1
 	let hr = s:python_system(a:cmd, get(g:, 'asclib#core#python', 0), sinput)
 	if cwd != ''
 		noautocmd call asclib#core#chdir(previous)
 	endif
 	let g:asclib#core#shell_error = s:shell_error
+	" unsilent echom printf('Shell[%d]: %s', g:asclib#core#shell_count, a:cmd)
 	if (a:0) > 1 && has('iconv')
 		let encoding = a:2
 		if encoding != '' && encoding != &encoding
