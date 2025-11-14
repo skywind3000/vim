@@ -99,6 +99,55 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" floggraph commit reader
+"----------------------------------------------------------------------
+function! module#gitlib#flog_commit_line(lnum) abort
+	if &bt != 'nofile'
+		return ''
+	elseif &ft != 'floggraph'
+		return ''
+	endif
+	let text = getline(a:lnum)
+	let pos = stridx(text, '*')
+	if pos < 0
+		return ''
+	endif
+	let rest = strpart(text, pos + 1)
+	let p1 = stridx(rest, '[')
+	if p1 < 0
+		return ''
+	endif
+	let p2 = stridx(rest, ']')
+	if p2 < 0 || p2 <= p1
+		return ''
+	endif
+	let hash = strpart(rest, p1 + 1, p2 - p1 - 1)
+	return hash
+endfunc
+
+
+"----------------------------------------------------------------------
+" floggraph commit extractor
+"----------------------------------------------------------------------
+function! module#gitlib#flog_commit_extract() abort
+	if &bt != 'nofile'
+		return ''
+	elseif &ft != 'floggraph'
+		return ''
+	endif
+	let lnum = line('.')
+	while lnum > 0
+		let hash = module#gitlib#flog_commit_line(lnum)
+		if hash != ''
+			return hash
+		endif
+		let lnum -= 1
+	endwhile
+	return ''
+endfunc
+
+
+"----------------------------------------------------------------------
 " clever diff view
 "----------------------------------------------------------------------
 function! module#gitlib#clever_diffview(commit) abort
@@ -110,6 +159,8 @@ function! module#gitlib#clever_diffview(commit) abort
 	if commit == ''
 		if &bt == 'quickfix'
 			let commit = module#gitlib#fugitive_qf_commit()
+		elseif &bt == 'nofile'
+			let commit = module#gitlib#flog_commit_extract()
 		endif
 	endif
 	if commit == ''
