@@ -70,7 +70,9 @@ function! module#gitlib#diffview(where, commit) abort
 	let content = obj.content
 	let hash = info.hash
 	let short = strpart(hash, 0, 7)
-	let opts = {'title': 'Commit Diff View ('. short . ') ' . info.date}
+	let opts = {}
+	let opts.title = 'Commit Diff View ('. short . ') ' . info.date
+	let opts.hide_system_cursor = 1
 	let index = quickui#tools#clever_inputlist(key, content, opts)
 	if index < 0
 		return 0
