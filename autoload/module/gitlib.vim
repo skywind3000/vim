@@ -172,3 +172,72 @@ function! module#gitlib#clever_diffview(commit) abort
 endfunc
 
 
+"----------------------------------------------------------------------
+" stage diff file
+"----------------------------------------------------------------------
+function! module#gitlib#stage_diffview(where, fname, staged) abort
+	let root = asclib#git#current_root()
+	if a:where != '' && a:where != '%'
+		let root = asclib#vcs#croot(a:where, 'git')
+	endif
+	if root == ''
+		return -1
+	endif
+	if a:staged == 0
+		let srcname = asclib#path#join(root, a:fname)
+	else
+		let srcname = asclib#git#fugitive_make(root, '0', a:fname)
+	endif
+	exec printf('tabe %s', fnameescape(srcname))
+	exec printf('Gvdiffsplit! %s:%s', 'HEAD', a:fname)
+endfunc
+
+
+"----------------------------------------------------------------------
+" clever stage diff on a fugitive status buffer
+"----------------------------------------------------------------------
+function! module#gitlib#clever_stage_diff() abort
+	if &bt != 'nowrite'
+		call asclib#core#errmsg('Not a fugitive status buffer.')
+		return -1
+	elseif &ft != 'fugitive'
+		call asclib#core#errmsg('Not a fugitive status buffer.')
+		return -1
+	endif
+	let lnum = line('.')
+	let text = getline(lnum)
+	if text !~ '^\S\s\+\S\+'
+		call asclib#core#errmsg('Not on a valid file line.')
+		return -1
+	endif
+	let status = strpart(text, 0, 1)
+	let fname = asclib#string#strip(strpart(text, 2))
+	if fname == ''
+		call asclib#core#errmsg('Cannot extract filename.')
+		return -1
+	endif
+	if status !~ '\a'
+		call asclib#core#errmsg('File is untracked or ignored')
+		return -1
+	endif
+	let mode = ''
+	while lnum > 0
+		let curline = getline(lnum)
+		if curline =~ '^\a\a\+\s\+('
+			let mode = tolower(matchstr(curline, '^\a\S\+'))
+			break
+		endif
+		let lnum -= 1
+	endwhile
+	if mode == ''
+		call asclib#core#errmsg('Cannot determine staging mode.')
+		return -1
+	endif
+	if mode == 'untracked'
+		call asclib#core#errmsg('File is untracked, no diff available.')
+		return -1
+	endif
+	call module#gitlib#stage_diffview('', fname, mode == 'staged')
+endfunc
+
+
