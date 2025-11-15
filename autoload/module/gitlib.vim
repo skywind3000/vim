@@ -107,7 +107,7 @@ endfunc
 function! module#gitlib#flog_commit_line(lnum) abort
 	if &bt != 'nofile'
 		return ''
-	elseif &ft != 'floggraph'
+	elseif &ft != 'floggraph' && &ft != 'GV'
 		return ''
 	endif
 	let text = getline(a:lnum)
@@ -116,15 +116,21 @@ function! module#gitlib#flog_commit_line(lnum) abort
 		return ''
 	endif
 	let rest = strpart(text, pos + 1)
-	let p1 = stridx(rest, '[')
-	if p1 < 0
-		return ''
+	let hash = ''
+	if &ft == 'floggraph'
+		let p1 = stridx(rest, '[')
+		if p1 < 0
+			return ''
+		endif
+		let p2 = stridx(rest, ']')
+		if p2 < 0 || p2 <= p1
+			return ''
+		endif
+		let hash = strpart(rest, p1 + 1, p2 - p1 - 1)
+	else
+		let begin = '^[^0-9]*[0-9]\{4}-[0-9]\{2}-[0-9]\{2}\s\+'
+		let hash = matchstr(rest, begin . '\zs[0-9a-f]\{5,40}\ze\s')
 	endif
-	let p2 = stridx(rest, ']')
-	if p2 < 0 || p2 <= p1
-		return ''
-	endif
-	let hash = strpart(rest, p1 + 1, p2 - p1 - 1)
 	return hash
 endfunc
 
@@ -135,7 +141,7 @@ endfunc
 function! module#gitlib#flog_commit_extract() abort
 	if &bt != 'nofile'
 		return ''
-	elseif &ft != 'floggraph'
+	elseif &ft != 'floggraph' && &ft != 'GV'
 		return ''
 	endif
 	let lnum = line('.')

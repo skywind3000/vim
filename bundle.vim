@@ -200,6 +200,7 @@ if has_key(s:enabled, 'inter')
 	Plug 'mattn/webapi-vim'
 	Plug 'mattn/gist-vim'
 	Plug 'hrj/vim-DrawIt'
+	Plug 'junegunn/gv.vim'
 	Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
 	if v:version >= 800 || has('nvim')
 		Plug 'rbong/vim-flog', { 'branch': 'v1' }

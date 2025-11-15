@@ -110,7 +110,11 @@ function! asclib#git#nofile_root() abort
 			endtry
 		endif
 		if exists('b:git_dir')
-			return b:git_dir
+			let r = b:git_dir
+			if r =~ '[\\/]\.git$'
+				let r = substitute(r, '[\\/]\.git$', '', '')
+			endif
+			return r
 		endif
 	endif
 	return ''
