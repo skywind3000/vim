@@ -91,7 +91,7 @@ endfunc
 "----------------------------------------------------------------------
 " start diff view
 "----------------------------------------------------------------------
-function! gdv#diffview#start(commit) abort
+function! gdv#diffview#run(commit) abort
 	let root = gdv#fugitive#current_root()
 	let commit = a:commit
 	if commit == ''
@@ -108,7 +108,7 @@ function! gdv#diffview#start(commit) abort
 		call asclib#core#errmsg('No commit specified for diff view.')
 		return 0
 	endif
-	let right = get(g:, 'git_diffview_right', 0)
+	let right = get(g:, 'gdv_tab_right', 0)
 	call gdv#diffview#open(root, commit, right? 0 : 1)
 	return 0
 endfunc
