@@ -22,18 +22,15 @@ endfunc
 "----------------------------------------------------------------------
 function! s:gdv_buffer_init() abort
 	let keymap = get(g:, 'gdv_keymap', 'dd')
-	unsilent echom printf('[gdv] buffer keymap set to "%s"', keymap)
 	if keymap == ''
 		return 0
 	endif
-	unsilent echom "step1"
 	if &bt == ''
 		if &ft != 'git'
 			" skip normal file buffers
 			return 0
 		endif
 	endif
-	unsilent echom "step2"
 	exec printf('nnoremap <buffer> %s :GitDiffView<cr>', keymap)
 	return 0
 endfunc
