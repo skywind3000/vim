@@ -54,6 +54,21 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" get current buffer git object
+"----------------------------------------------------------------------
+function! gdv#git#current_object() abort
+	let name = '__gdv__'
+	let bid = bufnr('%')
+	let obj = getbufvar(bid, name)
+	if type(obj) != 4
+		call setbufvar(bid, name, {})
+		let obj = getbufvar(bid, name)
+	endif
+	return obj
+endfunc
+
+
+"----------------------------------------------------------------------
 " run git command and return output lines
 "----------------------------------------------------------------------
 function! gdv#git#run(args, cwd) abort
