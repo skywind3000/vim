@@ -101,14 +101,15 @@ function! gdv#diffview#start(commit) abort
 		if &bt == 'quickfix'
 			let commit = gdv#fugitive#qf_commit()
 		elseif &bt == 'nofile'
-			let commit = module#gitlib#flog_commit_extract()
+			let commit = gdv#flog#commit_extract()
 		endif
 	endif
 	if commit == ''
 		call asclib#core#errmsg('No commit specified for diff view.')
 		return 0
 	endif
-	call module#gitlib#diffview(root, commit)
+	let right = get(g:, 'git_diffview_right', 0)
+	call gdv#diffview#open(root, commit, right? 0 : 1)
 	return 0
 endfunc
 
