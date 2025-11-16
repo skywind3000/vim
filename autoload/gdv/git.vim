@@ -196,7 +196,7 @@ function! gdv#git#commit_hash(where, commit) abort
 	let cmd = 'rev-parse ' . a:commit
 	let hr = gdv#git#run(cmd, root)
 	let hash = quickui#core#string_strip(hr)
-	if hash == '' || g:asclib#core#shell_error != 0
+	if hash == '' || g:quickui#utils#shell_error != 0
 		return ''
 	endif
 	return hash
@@ -214,7 +214,7 @@ function! gdv#git#commit_diff(where, commit, ...) abort
 	if a:0 > 0
 		let parents = a:1
 	else
-		let parents = asclib#git#commit_parents(a:where, a:commit)
+		let parents = gdv#git#commit_parents(a:where, a:commit)
 	endif
 	let result = []
 	let index = 1
