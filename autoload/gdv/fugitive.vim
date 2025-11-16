@@ -80,6 +80,22 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" fugitive quickfix commit extractor 
+"----------------------------------------------------------------------
+function! gdv#fugitive#qf_commit() abort
+	if &bt != 'quickfix'
+		return ''
+	endif
+	let bid = gdv#fugitive#qf_entry(line('.') - 1)
+	if bid < 0
+		return ''
+	endif
+	let hash = gdv#fugitive#commit_hash(bid)
+	return hash
+endfunc
+
+
+"----------------------------------------------------------------------
 " get git root for nofile buffer
 "----------------------------------------------------------------------
 function! gdv#fugitive#nofile_root() abort

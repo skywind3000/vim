@@ -34,4 +34,3 @@ setlocal nonumber
 nnoremap <silent><buffer> x :call module#quickfix#filter()<cr>
 nnoremap <silent><buffer> c :call module#quickfix#iconv('gbk')<cr>
 nnoremap <silent><buffer> <s-f10> :call module#quickfix#filter()<cr>
-nnoremap <silent><buffer> dd :GitDiffView<cr>
