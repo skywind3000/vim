@@ -159,7 +159,7 @@ endfunc
 "----------------------------------------------------------------------
 " git log --pretty=format:"%H %ad %s" --date=short -1 <commit-hash>
 "----------------------------------------------------------------------
-function! asclib#git#commit_info(where, commit) abort
+function! gdv#git#commit_info(where, commit) abort
 	let root = gdv#git#root(a:where)
 	if root == ''
 		return {}
@@ -188,7 +188,7 @@ endfunc
 "----------------------------------------------------------------------
 " git rev-parse <commit-hash> 
 "----------------------------------------------------------------------
-function! asclib#git#commit_hash(where, commit) abort
+function! gdv#git#commit_hash(where, commit) abort
 	let root = gdv#git#root(a:where)
 	if root == ''
 		return ''
@@ -206,7 +206,7 @@ endfunc
 "----------------------------------------------------------------------
 " get commit diff info 
 "----------------------------------------------------------------------
-function! asclib#git#commit_diff(where, commit, ...) abort
+function! gdv#git#commit_diff(where, commit, ...) abort
 	let root = gdv#git#root(a:where)
 	if root == ''
 		return []
@@ -219,7 +219,7 @@ function! asclib#git#commit_diff(where, commit, ...) abort
 	let result = []
 	let index = 1
 	for parent in parents
-		for item in asclib#git#diff_tree(a:where, a:commit, parent)
+		for item in gdv#git#diff_tree(a:where, a:commit, parent)
 			call add(result, [index, parent, item[0], item[1]])
 		endfor
 		let index += 1
@@ -231,7 +231,7 @@ endfunc
 "----------------------------------------------------------------------
 " git show -s --format="%H %ad %P" --date=short <commit-hash>
 "----------------------------------------------------------------------
-function! asclib#git#commit_info(where, commit) abort
+function! gdv#git#commit_info(where, commit) abort
 	let root = gdv#git#root(a:where)
 	if root == ''
 		return {}
