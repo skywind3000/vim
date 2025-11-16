@@ -152,6 +152,16 @@ function! gdv#fugitive#current_root() abort
 				return root
 			endif
 		endif
+	elseif &bt == 'nowrite' && &ft == 'git'
+		if exists('b:git_dir')
+			let root = b:git_dir
+			if root =~ '[\\/]\.git$'
+				let root = substitute(root, '[\\/]\.git$', '', '')
+			endif
+			if isdirectory(root)
+				return root
+			endif
+		endif
 	endif
 	let git = gdv#git#current_object()
 	if has_key(git, 'root')
