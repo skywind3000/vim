@@ -597,19 +597,3 @@ function! s:CondaDeactivate() abort
 endfunc
 
 
-"----------------------------------------------------------------------
-" GitDiffView
-"----------------------------------------------------------------------
-command! -nargs=? GitDiffView call s:GitDiffView(<f-args>)
-function! s:GitDiffView(...) abort
-	let commit = (a:0 >= 1)? a:1 : ''
-	call module#gitlib#clever_diffview(commit)
-endfunc
-
-
-"----------------------------------------------------------------------
-" GitStageDiff
-"----------------------------------------------------------------------
-command! -nargs=0 GitStageDiff call module#gitlib#clever_stage_diff()
-
-

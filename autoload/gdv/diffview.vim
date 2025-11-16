@@ -91,10 +91,13 @@ endfunc
 "----------------------------------------------------------------------
 " start diff view
 "----------------------------------------------------------------------
-function! gdv#diffview#run(commit) abort
+function! gdv#diffview#start(commit) abort
 	let root = gdv#fugitive#current_root()
 	let commit = a:commit
 	if commit == ''
+		if &bt == 'nowrite' && &ft == 'fugitive'
+			return gdv#stage#open_diff()
+		endif
 		let commit = gdv#fugitive#commit_hash('%')
 	endif
 	if commit == ''
