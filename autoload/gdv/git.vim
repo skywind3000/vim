@@ -12,5 +12,6 @@
 " internal
 "----------------------------------------------------------------------
 let s:windows = has('win32') || has('win16') || has('win64') || has('win95')
+let g:has_popup = exists('*popup_create') && v:version >= 800
 
 

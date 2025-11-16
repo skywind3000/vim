@@ -225,6 +225,10 @@ function! module#gitlib#clever_stage_diff() abort
 		call asclib#core#errmsg('Cannot extract filename.')
 		return -1
 	endif
+	if status =~ '[\+\- ]'
+		call asclib#core#errmsg('Cannot extract filename.')
+		return -1
+	endif
 	if status !~ '\a'
 		call asclib#core#errmsg('File is untracked or ignored')
 		return -1
