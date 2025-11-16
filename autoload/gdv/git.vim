@@ -15,3 +15,55 @@ let s:windows = has('win32') || has('win16') || has('win64') || has('win95')
 let g:has_popup = exists('*popup_create') && v:version >= 800
 
 
+"----------------------------------------------------------------------
+" error message
+"----------------------------------------------------------------------
+function! gdv#git#errmsg(what)
+	redraw
+	echohl ErrorMsg
+	echom 'ERROR: ' . a:what
+	echohl None
+endfunc
+
+
+"----------------------------------------------------------------------
+" system
+"----------------------------------------------------------------------
+function! gdv#git#system(cmd, cwd) abort
+	let pwd = getcwd()
+	if a:cwd != ''
+		call quickui#core#chdir(a:cwd)
+	endif
+	let hr = quickui#utils#system(a:cmd)
+	if a:cwd != ''
+		call quickui#core#chdir(pwd)
+	endif
+	return hr
+endfunc
+
+
+"----------------------------------------------------------------------
+" run git command and return output lines
+"----------------------------------------------------------------------
+function! gdv#git#run(args, cmd) abort
+	return gdv#git#system('git ' . a:args, a:cmd.cwd)
+endfunc
+
+
+"----------------------------------------------------------------------
+" get git root directory
+"----------------------------------------------------------------------
+function! gdv#git#root(where) abort
+	let place = (a:where == '')? expand('%:p') : (a:where)
+	let root = quickui#core#find_root(place, ['.git'], 1)
+	if root == ''
+		return ''
+	endif
+	let test = root . '/.git'
+	if !isdirectory(test)
+		return ''
+	endif
+	return root
+endfunc
+
+
