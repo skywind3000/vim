@@ -45,8 +45,8 @@ endfunc
 "----------------------------------------------------------------------
 " run git command and return output lines
 "----------------------------------------------------------------------
-function! gdv#git#run(args, cmd) abort
-	return gdv#git#system('git ' . a:args, a:cmd.cwd)
+function! gdv#git#run(args, cwd) abort
+	return gdv#git#system('git ' . a:args, a:cwd)
 endfunc
 
 
@@ -64,6 +64,27 @@ function! gdv#git#root(where) abort
 		return ''
 	endif
 	return root
+endfunc
+
+
+"----------------------------------------------------------------------
+" get branch info
+"----------------------------------------------------------------------
+function! gdv#git#get_branch(where) abort
+	let root = gdv#git#root(a:where)
+	if root == ''
+		return ''
+	endif
+	let hr = gdv#git#run('branch', root)
+	for text in split(hr, '\n')
+		let text = quickui#core#string_strip(text)
+		let name = matchstr(text, '^\*\s*\zs\S\+\ze\s*$')
+		let name = quickui#core#string_strip(name)
+		if name != ''
+			return name
+		endif
+	endfor
+	return ''
 endfunc
 
 
