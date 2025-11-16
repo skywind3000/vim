@@ -108,7 +108,7 @@ function! gdv#diffview#start(commit) abort
 		endif
 	endif
 	if commit == ''
-		call asclib#core#errmsg('No commit specified for diff view.')
+		call gdv#git#errmsg('No commit specified for diff view.')
 		return 0
 	endif
 	let right = get(g:, 'gdv_tab_right', 0)
