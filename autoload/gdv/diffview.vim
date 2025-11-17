@@ -89,26 +89,80 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" extract commit hash from git log output line
+"----------------------------------------------------------------------
+function! gdv#diffview#extract_git_log_hash() abort
+	if &bt != 'nowrite' || &ft != 'git'
+		return ''
+	endif
+	let line = getline('.')
+	if line == ''
+		return ''
+	endif
+	" Extract the first non-whitespace string (usually the commit hash)
+	" This works for formats like:
+	" - abc1234 commit message
+	" - * abc1234 [branch] commit message
+	" - |/ abc1234 commit message
+	let hash = matchstr(line, '^\S\+')
+	" Validate it looks like a commit hash (7-40 hex characters)
+	if hash =~ '^[0-9a-f]\{7,40}$'
+		return hash
+	endif
+	" Try to find hash in the line (for graph formats)
+	" Look for 7-40 hex characters that might be a commit hash
+	let hash = matchstr(line, '\<[0-9a-f]\{7,40}\>')
+	if hash != ''
+		return hash
+	endif
+	return ''
+endfunc
+
+
+"----------------------------------------------------------------------
 " start diff view
 "----------------------------------------------------------------------
 function! gdv#diffview#start(commit) abort
-	let root = gdv#fugitive#current_root()
+	let root = ''
 	let commit = a:commit
-	if commit == ''
-		if &bt == 'nowrite' && &ft == 'fugitive'
-			return gdv#stage#open_diff()
-		endif
-		let commit = gdv#fugitive#commit_hash('%')
-	endif
-	if commit == ''
-		if &bt == 'quickfix'
+	" For quickfix windows, get both root and commit from the same quickfix item
+	" This ensures they match (important for submodules)
+	if &bt == 'quickfix'
+		if commit == ''
 			let commit = gdv#fugitive#qf_commit()
-		elseif &bt == 'nofile'
-			let commit = gdv#flog#commit_extract()
+		endif
+		if commit != ''
+			" Get root from the same quickfix item to ensure they match
+			let root = gdv#fugitive#qf_root(line('.') - 1)
+		endif
+		if root == ''
+			" Fallback to current_root() if qf_root() fails
+			let root = gdv#fugitive#current_root()
+		endif
+	else
+		" For other window types, use the normal flow
+		let root = gdv#fugitive#current_root()
+		if commit == ''
+			if &bt == 'nowrite' && &ft == 'fugitive'
+				return gdv#stage#open_diff()
+			endif
+			let commit = gdv#fugitive#commit_hash('%')
+		endif
+		if commit == ''
+			if &bt == 'nofile'
+				let commit = gdv#flog#commit_extract()
+			elseif &bt == 'nowrite' && &ft == 'git'
+				" Support for fugitive git log output windows
+				let commit = gdv#diffview#extract_git_log_hash()
+			endif
 		endif
 	endif
 	if commit == ''
 		call gdv#git#errmsg('No commit specified for diff view.')
+		return 0
+	endif
+	if root == ''
+		call gdv#git#errmsg('No git repository found.')
 		return 0
 	endif
 	let right = get(g:, 'gdv_tab_right', 0)
