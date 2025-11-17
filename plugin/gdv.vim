@@ -25,12 +25,17 @@ function! s:gdv_buffer_init() abort
 	if keymap == ''
 		return 0
 	endif
+	" Support normal file buffers with filetype=git
 	if &bt == ''
 		if &ft != 'git'
-			" skip normal file buffers
+			" skip normal file buffers that are not git type
 			return 0
 		endif
 	endif
+	" Support nowrite buffers with filetype=git (fugitive git log output)
+	" These are temporary windows created by :Git log commands like
+	" :Git log --oneline or :Git log --graph --oneline --all --decorate
+	" Note: buftype=nowrite, filetype=git windows are supported
 	exec printf('nnoremap <buffer> %s :GitDiffView<cr>', keymap)
 	return 0
 endfunc

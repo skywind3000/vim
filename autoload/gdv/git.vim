@@ -85,11 +85,48 @@ function! gdv#git#root(where) abort
 	if root == ''
 		return ''
 	endif
-	let test = root . '/.git'
-	if !isdirectory(test)
-		return ''
+	let git_path = root . '/.git'
+	" Check if .git is a directory (normal git repo)
+	if isdirectory(git_path)
+		return root
 	endif
-	return root
+	" Check if .git is a file (git submodule)
+	if filereadable(git_path)
+		" Read the .git file to get the gitdir path
+		try
+			let lines = readfile(git_path)
+			if len(lines) > 0
+				let gitdir_line = quickui#core#string_strip(lines[0])
+				" Check if it's a gitdir reference (format: "gitdir: <path>")
+				if gitdir_line =~ '^gitdir:\s*'
+					let gitdir_path = matchstr(gitdir_line, '^gitdir:\s*\zs.*$')
+					let gitdir_path = quickui#core#string_strip(gitdir_path)
+					" Convert relative path to absolute path
+					" Git submodule .git files use relative paths like "../../../../.git/modules/..."
+					if gitdir_path !~ '^[\\/]\|^\a:'
+						" Relative path, resolve it relative to root
+						" Use fnamemodify to properly resolve the path
+						let gitdir_path = fnamemodify(root . '/' . gitdir_path, ':p')
+						" Remove trailing path separator if present
+						let gitdir_path = substitute(gitdir_path, '[\\/]$', '', '')
+					endif
+					" Normalize path separators for Windows
+					if s:windows
+						let gitdir_path = substitute(gitdir_path, '/', '\', 'g')
+					endif
+					" Verify the gitdir exists and is a directory
+					if isdirectory(gitdir_path)
+						" This is a valid git submodule, return the work tree root
+						" Git commands should be run in the work tree (root), not in gitdir
+						return root
+					endif
+				endif
+			endif
+		catch
+			" If reading fails, it's not a valid git submodule
+		endtry
+	endif
+	return ''
 endfunc
 
 
