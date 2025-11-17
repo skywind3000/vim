@@ -305,7 +305,7 @@ function! gdv#fugitive#qf_commit() abort
 	" item.module contains the 7-character commit hash short format
 	" This is always available, regardless of whether the buffer is open
 	" Use the same logic for both normal git and submodule
-	if has_key(item, 'module') && strlen(item.module) == 7
+	if has_key(item, 'module') && strlen(item.module) >= 4
 		" First, try to get full commit hash from buffer name if buffer is open
 		" This works for both normal repos and submodules
 		let bid = gdv#fugitive#qf_entry(index)
