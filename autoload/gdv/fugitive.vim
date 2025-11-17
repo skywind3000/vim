@@ -360,7 +360,7 @@ function! gdv#fugitive#nofile_root() abort
 			catch
 			endtry
 		endif
-		if exists('b:git_dir')
+		if exists('b:git_dir') && get(b:, 'git_dir', '') != ''
 			let git_dir = b:git_dir
 			" For submodules, b:git_dir might point to the actual gitdir
 			" (e.g., parent/.git/modules/submodule), not the work tree
