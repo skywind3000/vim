@@ -72,7 +72,7 @@ function! gdv#fugitive#qf_entry(index) abort
 		return -1
 	endif
 	let bid = item.bufnr
-	if strlen(item.module) != 7
+	if strlen(item.module) < 4
 		return -1
 	endif
 	return bid
