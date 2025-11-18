@@ -43,11 +43,17 @@ endfunc
 function! gdv#git#system(cmd, cwd) abort
 	let pwd = getcwd()
 	if a:cwd != ''
-		call quickui#core#chdir(a:cwd)
+		if isdirectory(a:cwd)
+			call quickui#core#chdir(a:cwd)
+		else
+			let pwd = ''
+		endif
 	endif
 	let hr = quickui#utils#system(a:cmd)
 	if a:cwd != ''
-		call quickui#core#chdir(pwd)
+		if pwd != ''
+			call quickui#core#chdir(pwd)
+		endif
 	endif
 	return hr
 endfunc
@@ -171,6 +177,43 @@ function! gdv#git#root2git(root) abort
 		endif
 	endif
 	return ''
+endfunc
+
+
+"----------------------------------------------------------------------
+" convert .git directory to root path (top level directory)
+"----------------------------------------------------------------------
+function! gdv#git#git2root(gitdir) abort
+	let path = gdv#git#normpath(a:gitdir)
+	if path =~ '[\\/]\.git$'
+		let path = fnamemodify(path, ':h')
+		if isdirectory(path)
+			return path
+		endif
+	elseif path !~ '[\\/]\.git[\\/]modules[\\/]'
+		return gdv#git#toplevel(path)
+	endif
+	let config = path . '/config'
+	if !filereadable(config)
+		return gdv#git#toplevel(path)
+	endif
+	let content = gdv#git#readfile(config)
+	for line in content
+		let line = quickui#core#string_strip(line)
+		if line =~ '^\s*worktree\s*='
+			let worktree = matchstr(line, '^\s*worktree\s*=\s*\zs.*$')
+			let worktree = quickui#core#string_strip(worktree)
+			if worktree != ''
+				let worktree = path . '/' . worktree
+				let worktree = gdv#git#normpath(worktree)
+				if isdirectory(worktree)
+					return worktree
+				endif
+			endif
+			break
+		endif
+	endfor
+	return gdv#git#toplevel(path)
 endfunc
 
 
