@@ -120,11 +120,30 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" check requirement
+"----------------------------------------------------------------------
+function! gdv#diffview#check() abort
+	if exists(':Git') == 0
+		call gdv#git#errmsg('Prerequisite tpope/vim-fugitive is not installed')
+		return 0
+	endif
+	if gdv#git#detect() == 0
+		call gdv#git#errmsg('Prerequisite skywind3000/vim-quickui is not installed')
+		return 0
+	endif
+	return 1
+endfunc
+
+
+"----------------------------------------------------------------------
 " start diff view
 "----------------------------------------------------------------------
 function! gdv#diffview#start(commit) abort
 	let root = ''
 	let commit = a:commit
+	if gdv#diffview#check() == 0
+		return 0
+	endif
 	" For quickfix windows, get both root and commit from the same quickfix item
 	" This ensures they match (important for submodules)
 	if &bt == 'quickfix'
