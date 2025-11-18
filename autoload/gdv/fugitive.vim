@@ -102,11 +102,8 @@ function! gdv#fugitive#qf_root(index) abort
 		return ''
 	endif
 	let item = content[a:index]
-	" Try to get root from buffer name
-	" Use getbufinfo() if available (works even if buffer is not loaded)
 	if item.bufnr > 0
 		let bufname_str = ''
-		" Try getbufinfo() first (more reliable for unloaded buffers)
 		if exists('*getbufinfo')
 			try
 				let buf_info = getbufinfo(item.bufnr)
@@ -116,12 +113,10 @@ function! gdv#fugitive#qf_root(index) abort
 			catch
 			endtry
 		endif
-		" Fallback to bufname()
 		if bufname_str == ''
 			let bufname_str = bufname(item.bufnr)
 		endif
 		if bufname_str != '' && bufname_str =~ '^fugitive:[\\/][\\/]'
-			" Extract path from fugitive buffer name and get root
 			let root = gdv#fugitive#root(item.bufnr)
 			if root != ''
 				return root
@@ -143,37 +138,9 @@ function! gdv#fugitive#qf_root(index) abort
 		endif
 	endif
 	" Fallback: try to find root from current context
-	" This should work if we're in the submodule directory
 	let root = gdv#git#root('')
 	if root != ''
 		return root
-	endif
-	" Last resort: if we have a commit hash, try to find which repo contains it
-	" This is expensive but might work for submodules
-	if has_key(item, 'module') && strlen(item.module) == 7
-		" Try to find the repo that contains this commit
-		" Start from current directory and go up
-		let current_dir = getcwd()
-		let test_dir = current_dir
-		let max_depth = 10
-		let depth = 0
-		while depth < max_depth && test_dir != ''
-			let test_root = gdv#git#root(test_dir)
-			if test_root != ''
-				" Check if this commit exists in this repo
-				let full_hash = gdv#git#commit_hash(test_root, item.module)
-				if full_hash != ''
-					return test_root
-				endif
-			endif
-			" Go up one directory
-			let parent_dir = fnamemodify(test_dir, ':h')
-			if parent_dir == test_dir
-				break
-			endif
-			let test_dir = parent_dir
-			let depth += 1
-		endwhile
 	endif
 	return ''
 endfunc
@@ -197,12 +164,7 @@ function! gdv#fugitive#qf_commit() abort
 		return ''
 	endif
 	let item = content[index]
-	" item.module contains the 7-character commit hash short format
-	" This is always available, regardless of whether the buffer is open
-	" Use the same logic for both normal git and submodule
 	if has_key(item, 'module') && strlen(item.module) >= 4
-		" First, try to get full commit hash from buffer name if buffer is open
-		" This works for both normal repos and submodules
 		let bid = gdv#fugitive#qf_entry(index)
 		if bid >= 0
 			let hash = gdv#fugitive#commit_hash(bid)
@@ -210,8 +172,6 @@ function! gdv#fugitive#qf_commit() abort
 				return hash
 			endif
 		endif
-		" If buffer is not open, try to resolve short hash to full hash
-		" Get root from the same quickfix item to ensure they match
 		let root = gdv#fugitive#qf_root(index)
 		if root != ''
 			let full_hash = gdv#git#commit_hash(root, item.module)
@@ -220,7 +180,6 @@ function! gdv#fugitive#qf_commit() abort
 			endif
 		endif
 		" Fallback: use short hash directly
-		" Git commands can handle short hashes, and gdv#git#commit_info() will resolve it
 		return item.module
 	endif
 	return ''
@@ -529,7 +488,7 @@ function! gdv#fugitive#commit_hash(bid)
 	let part = matchstr(name, '[\\/][\\/]\zs[^\\/]*$')
 	if part == ''
 		" Try to find commit hash after // (may have path after it)
-		let part = matchstr(name, '[\\/][\\/]\zs[0-9a-f]\{7,40}\ze')
+		let part = matchstr(name, '[\\/][\\/]\zs[0-9a-f]\{4,40}\ze')
 		if part != ''
 			return part
 		endif
@@ -538,14 +497,14 @@ function! gdv#fugitive#commit_hash(bid)
 		if part != ''
 			" Take the first part (before next /)
 			let commit = substitute(part, '[\\/].*$', '', '')
-			if commit =~ '^[0-9a-f]\{7,40}$'
+			if commit =~ '^[0-9a-f]\{4,40}$'
 				return commit
 			endif
 		endif
 	else
 		" part is everything after //, commit is the first segment
 		let commit = substitute(part, '[\\/].*$', '', '')
-		if commit =~ '^[0-9a-f]\{7,40}$'
+		if commit =~ '^[0-9a-f]\{4,40}$'
 			return commit
 		endif
 	endif
