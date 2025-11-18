@@ -265,12 +265,6 @@ function! gdv#fugitive#current_root() abort
 				return root
 			endif
 		endif
-		" Fallback: try to find git root from current context
-		" This handles submodules where nofile_root() might fail
-		let root = gdv#git#root('')
-		if root != ''
-			return root
-		endif
 	elseif &bt == 'quickfix'
 		" Try to get root from quickfix list item first (works even if buffer not open)
 		let root = gdv#fugitive#qf_root(line('.') - 1)
@@ -285,13 +279,6 @@ function! gdv#fugitive#current_root() abort
 				return root
 			endif
 		endif
-		" Final fallback: try to find git root from current context
-		" This handles submodules where gdv#fugitive#root() might fail
-		" because it assumes .git is a directory, not a file
-		let root = gdv#git#root('')
-		if root != ''
-			return root
-		endif
 	elseif &bt == 'nowrite' && &ft == 'git'
 		" For git log output windows, try to find git root from current context
 		" This handles both normal repos and submodules
@@ -300,95 +287,10 @@ function! gdv#fugitive#current_root() abort
 			return root
 		endif
 		" Fallback: try to use b:git_dir if available
-		if exists('b:git_dir')
-			let git_dir = b:git_dir
-			" For git submodules, b:git_dir might point to the actual gitdir
-			" (e.g., parent/.git/modules/submodule), not the work tree
-			" Check if git_dir is a gitdir (contains .git/modules/)
-			if git_dir =~ '[\\/]\.git[\\/]modules[\\/]'
-				" This is a gitdir, extract parent path and submodule relative path
-				" Path format: d:/WeirdData/vim-init/.git/modules/pack/mydev/opt/vim-git-diffview
-				" Parent: d:/WeirdData/vim-init
-				" Submodule path: pack/mydev/opt/vim-git-diffview
-				let parent_path = substitute(git_dir, '[\\/]\.git[\\/]modules.*$', '', '')
-				let submodule_rel_path = matchstr(git_dir, '[\\/]\.git[\\/]modules[\\/]\zs.*$')
-				if parent_path != '' && submodule_rel_path != '' && parent_path != git_dir
-					let work_tree = parent_path . '/' . submodule_rel_path
-					" Normalize path separators
-					if s:windows
-						let work_tree = substitute(work_tree, '/', '\', 'g')
-					endif
-					if isdirectory(work_tree)
-						" Verify this is the work tree (has .git file pointing to gitdir)
-						let git_file = work_tree . '/.git'
-						if filereadable(git_file)
-							let root = gdv#git#root(work_tree)
-							if root != ''
-								if s:windows
-									let root = quickui#core#string_replace(root, '/', '\')
-								endif
-								return root
-							endif
-						endif
-					endif
-				endif
-			elseif isdirectory(git_dir) && filereadable(git_dir . '/config')
-				" This is a gitdir, try to get work tree using git command
-				" But we need to find the work tree first
-				" Try to get work tree from a file in the gitdir
-				try
-					" Use git command to get work tree, but we need to run it in the work tree
-					" First, try to find work tree by going up from git_dir
-					let test_path = git_dir
-					while test_path != '' && test_path != fnamemodify(test_path, ':h')
-						let test_path = fnamemodify(test_path, ':h')
-						let git_file = test_path . '/.git'
-						if filereadable(git_file)
-							" Check if this .git file points to our git_dir
-							try
-								let lines = readfile(git_file)
-								if len(lines) > 0
-									let gitdir_line = quickui#core#string_strip(lines[0])
-									if gitdir_line =~ '^gitdir:\s*'
-										let gitdir_path = matchstr(gitdir_line, '^gitdir:\s*\zs.*$')
-										let gitdir_path = quickui#core#string_strip(gitdir_path)
-										if gitdir_path !~ '^[\\/]\|^\a:'
-											let gitdir_path = fnamemodify(test_path . '/' . gitdir_path, ':p')
-											let gitdir_path = substitute(gitdir_path, '[\\/]$', '', '')
-										endif
-										if s:windows
-											let gitdir_path = substitute(gitdir_path, '/', '\', 'g')
-										endif
-										if gitdir_path == git_dir || simplify(gitdir_path) == simplify(git_dir)
-											" Found the work tree
-											let root = gdv#git#root(test_path)
-											if root != ''
-												if s:windows
-													let root = quickui#core#string_replace(root, '/', '\')
-												endif
-												return root
-											endif
-										endif
-									endif
-								endif
-							catch
-							endtry
-						endif
-					endwhile
-				catch
-				endtry
-			endif
-			" Fallback: assume git_dir is the .git directory, get parent
-			let root = git_dir
-			if root =~ '[\\/]\.git$'
-				let root = substitute(root, '[\\/]\.git$', '', '')
-			endif
-			if isdirectory(root)
-				" Verify this is a valid git repository
-				let git_path = root . '/.git'
-				if isdirectory(git_path) || filereadable(git_path)
-					return root
-				endif
+		if exists('b:git_dir') && get(b:, 'git_dir', '') != ''
+			let root = gdv#git#git2root(b:git_dir)
+			if root != '' && isdirectory(root)
+				return root
 			endif
 		endif
 	endif
@@ -423,34 +325,8 @@ function! gdv#fugitive#commit_hash(bid)
 	if name !~ '^fugitive:[\\/][\\/]'
 		return ''
 	endif
-	" Extract commit hash from buffer name
-	" Format: fugitive://path/.git//commit
-	" For submodules: fugitive://path/.git/modules/submodule//commit
-	" The commit hash is always after the last "//"
-	let part = matchstr(name, '[\\/][\\/]\zs[^\\/]*$')
-	if part == ''
-		" Try to find commit hash after // (may have path after it)
-		let part = matchstr(name, '[\\/][\\/]\zs[0-9a-f]\{4,40}\ze')
-		if part != ''
-			return part
-		endif
-		" Last resort: extract everything after //
-		let part = matchstr(name, '[\\/][\\/]\zs.*$')
-		if part != ''
-			" Take the first part (before next /)
-			let commit = substitute(part, '[\\/].*$', '', '')
-			if commit =~ '^[0-9a-f]\{4,40}$'
-				return commit
-			endif
-		endif
-	else
-		" part is everything after //, commit is the first segment
-		let commit = substitute(part, '[\\/].*$', '', '')
-		if commit =~ '^[0-9a-f]\{4,40}$'
-			return commit
-		endif
-	endif
-	return ''
+	let hash = gdv#fugitive#name2hash(name)
+	return hash
 endfunc
 
 
@@ -466,7 +342,9 @@ function! gdv#fugitive#make(root, commit, fn) abort
 	if root =~ '^\~'
 		let root = expand(root)
 	endif
-	let name .= root . '/.git//' . a:commit
+	let git_dir = gdv#git#root2git(root)
+	let git_dir = gdv#git#abspath(git_dir)
+	let name .= git_dir . '//' . a:commit
 	if a:fn != ''
 		let name .= '/' . a:fn
 	endif
