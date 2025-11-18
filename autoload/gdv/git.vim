@@ -77,7 +77,37 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" get git root directory
+" toplevel directory
+"----------------------------------------------------------------------
+function! gdv#git#toplevel(where) abort
+	let text = gdv#git#run('rev-parse --show-toplevel', a:where)
+	let text = quickui#core#string_strip(text)
+	return text
+endfunc
+
+
+"----------------------------------------------------------------------
+" read file safely
+"----------------------------------------------------------------------
+function! gdv#git#readfile(path) abort
+	let path = a:path
+	if stridx(path, '~') >= 0
+		let path = expand(a:path)
+	endif
+	if !filereadable(path)
+		return []
+	endif
+	try
+		let lines = readfile(path)
+		return lines
+	catch
+	endtry
+	return []
+endfunc
+
+
+"----------------------------------------------------------------------
+" get git root directory: aka. top level directory (not the .git dir)
 "----------------------------------------------------------------------
 function! gdv#git#root(where) abort
 	let place = (a:where == '')? expand('%:p') : (a:where)
@@ -86,45 +116,59 @@ function! gdv#git#root(where) abort
 		return ''
 	endif
 	let git_path = root . '/.git'
-	" Check if .git is a directory (normal git repo)
 	if isdirectory(git_path)
 		return root
+	elseif filereadable(git_path)
+		return root
 	endif
-	" Check if .git is a file (git submodule)
-	if filereadable(git_path)
-		" Read the .git file to get the gitdir path
-		try
-			let lines = readfile(git_path)
-			if len(lines) > 0
-				let gitdir_line = quickui#core#string_strip(lines[0])
-				" Check if it's a gitdir reference (format: "gitdir: <path>")
-				if gitdir_line =~ '^gitdir:\s*'
-					let gitdir_path = matchstr(gitdir_line, '^gitdir:\s*\zs.*$')
-					let gitdir_path = quickui#core#string_strip(gitdir_path)
-					" Convert relative path to absolute path
-					" Git submodule .git files use relative paths like "../../../../.git/modules/..."
-					if gitdir_path !~ '^[\\/]\|^\a:'
-						" Relative path, resolve it relative to root
-						" Use fnamemodify to properly resolve the path
-						let gitdir_path = fnamemodify(root . '/' . gitdir_path, ':p')
-						" Remove trailing path separator if present
-						let gitdir_path = substitute(gitdir_path, '[\\/]$', '', '')
-					endif
-					" Normalize path separators for Windows
-					if s:windows
-						let gitdir_path = substitute(gitdir_path, '/', '\', 'g')
-					endif
-					" Verify the gitdir exists and is a directory
-					if isdirectory(gitdir_path)
-						" This is a valid git submodule, return the work tree root
-						" Git commands should be run in the work tree (root), not in gitdir
-						return root
-					endif
+	return ''
+endfunc
+
+
+"----------------------------------------------------------------------
+" normpath
+"----------------------------------------------------------------------
+function! gdv#git#normpath(path) abort
+	let path = fnamemodify(a:path, ':p')
+	if isdirectory(path)
+		let path = fnamemodify(path, ':h')
+	endif
+	if s:windows
+		let path = substitute(path, '/', '\', 'g')
+	else
+		let path = substitute(path, '\\', '/', 'g')
+	endif
+	return path
+endfunc
+
+
+"----------------------------------------------------------------------
+" convert root to git path
+"----------------------------------------------------------------------
+function! gdv#git#root2git(root) abort
+	let root = gdv#git#normpath(a:root)
+	if stridx(root, '~') >= 0
+		let root = expand(root)
+	endif
+	let git_path = root . '/.git'
+	if isdirectory(git_path)
+		return gdv#git#normpath(git_path)
+	elseif filereadable(git_path)
+		let lines = gdv#git#readfile(git_path)
+		if len(lines) > 0
+			let gitdir_line = quickui#core#string_strip(lines[0])
+			if gitdir_line =~ '^gitdir:\s*'
+				let test = matchstr(gitdir_line, '^gitdir:\s*\zs.*$')
+				let test = quickui#core#string_strip(test)
+				if test !~ '^[\\/]\|^\a:'
+					let test = fnamemodify(root . '/' . test, ':p')
+				endif
+				let test = gdv#git#normpath(test)
+				if isdirectory(test)
+					return test
 				endif
 			endif
-		catch
-			" If reading fails, it's not a valid git submodule
-		endtry
+		endif
 	endif
 	return ''
 endfunc
