@@ -44,7 +44,7 @@ function! gdv#git#system(cmd, cwd) abort
 	let pwd = getcwd()
 	if a:cwd != ''
 		if isdirectory(a:cwd)
-			call quickui#core#chdir(a:cwd)
+			noautocmd call quickui#core#chdir(a:cwd)
 		else
 			let pwd = ''
 		endif
@@ -52,7 +52,7 @@ function! gdv#git#system(cmd, cwd) abort
 	let hr = quickui#utils#system(a:cmd)
 	if a:cwd != ''
 		if pwd != ''
-			call quickui#core#chdir(pwd)
+			noautocmd call quickui#core#chdir(pwd)
 		endif
 	endif
 	return hr

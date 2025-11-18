@@ -263,7 +263,11 @@ function! asclib#core#system(cmd, ...)
 	let cwd = ((a:0) > 0)? (a:1) : ''
 	if cwd != ''
 		let previous = getcwd()
-		noautocmd call asclib#core#chdir(cwd)
+		if isdirectory(cwd)
+			noautocmd call asclib#core#chdir(cwd)
+		else
+			let previous = ''
+		endif
 	endif
 	if a:0 >= 3
 		if type(a:3) == type('')
@@ -281,7 +285,7 @@ function! asclib#core#system(cmd, ...)
 	endif
 	let g:asclib#core#shell_count += 1
 	let hr = s:python_system(a:cmd, get(g:, 'asclib#core#python', 0), sinput)
-	if cwd != ''
+	if cwd != '' && previous != ''
 		noautocmd call asclib#core#chdir(previous)
 	endif
 	let g:asclib#core#shell_error = s:shell_error
