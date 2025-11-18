@@ -16,12 +16,13 @@ let s:quickfix = {}
 
 
 "----------------------------------------------------------------------
+" Extract git root from fugitive buffer name
 " fugitive:///home/user/.vim/vim/.git//HASH
 " fugitive:///home/user/.vim/vim/.git//HASH/autoload/gdv/git.vim
 " fugitive:///home/user/.vim/vim/.git/module/NAME//HASH
 " fugitive:///home/user/.vim/vim/.git/module/NAME//HASH/path/file
 "----------------------------------------------------------------------
-function! gdv#fugitive#translate(name) abort
+function! gdv#fugitive#name2root(name) abort
 	let name = a:name
 	if name !~ '^fugitive:[\\/][\\/]'
 		return ''
@@ -32,6 +33,26 @@ function! gdv#fugitive#translate(name) abort
 	endif
 	let path = substitute(path, '[\\/][\\/].*$', '', '')
 	return gdv#git#git2root(path)
+endfunc
+
+
+"----------------------------------------------------------------------
+" Extract commit hash from fugitive buffer name
+" Format: fugitive://path/.git//commit
+" For submodules: fugitive://path/.git/modules/submodule//commit
+" The commit hash is always after the last "//"
+"----------------------------------------------------------------------
+function! gdv#fugitive#name2hash(name) abort
+	let name = a:name
+	if name !~ '^fugitive:[\\/][\\/]'
+		return ''
+	endif
+	let name = substitute(name, '^fugitive:[\\/][\\/]', '', '')
+	let part = matchstr(name, '[\\/][\\/]\zs[0-9a-f]\{4,40}\ze')
+	if part != ''
+		return part
+	endif
+	return ''
 endfunc
 
 
@@ -50,7 +71,7 @@ function! gdv#fugitive#root(bid) abort
 			return path
 		endif
 	endif
-	let path = gdv#fugitive#translate(name)
+	let path = gdv#fugitive#name2root(name)
 	if path != ''
 		if isdirectory(path)
 			return path
@@ -167,7 +188,8 @@ function! gdv#fugitive#qf_commit() abort
 	if has_key(item, 'module') && strlen(item.module) >= 4
 		let bid = gdv#fugitive#qf_entry(index)
 		if bid >= 0
-			let hash = gdv#fugitive#commit_hash(bid)
+			let name = bufname(bid)
+			let hash = gdv#fugitive#name2hash(name)
 			if hash != ''
 				return hash
 			endif
