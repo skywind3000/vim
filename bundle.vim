@@ -129,6 +129,7 @@ if has_key(s:enabled, 'basic')
 	Plug 'tpope/vim-eunuch'
 	Plug 'dag/vim-fish'
 	Plug 'jamessan/vim-gnupg'
+	Plug 'junegunn/gv.vim'
 
 	Plug 'kana/vim-textobj-user'
 	Plug 'kana/vim-textobj-syntax'
@@ -200,7 +201,6 @@ if has_key(s:enabled, 'inter')
 	Plug 'mattn/webapi-vim'
 	Plug 'mattn/gist-vim'
 	Plug 'hrj/vim-DrawIt'
-	Plug 'junegunn/gv.vim'
 	Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
 	if v:version >= 800 || has('nvim')
 		Plug 'rbong/vim-flog', { 'branch': 'v1' }
