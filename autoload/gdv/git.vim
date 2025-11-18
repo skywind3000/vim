@@ -132,11 +132,11 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" normpath
+" abspath
 "----------------------------------------------------------------------
-function! gdv#git#normpath(path) abort
+function! gdv#git#abspath(path) abort
 	let path = fnamemodify(a:path, ':p')
-	if isdirectory(path)
+	if path =~ '[\\/]$'
 		let path = fnamemodify(path, ':h')
 	endif
 	if s:windows
@@ -152,13 +152,13 @@ endfunc
 " convert root to git path
 "----------------------------------------------------------------------
 function! gdv#git#root2git(root) abort
-	let root = gdv#git#normpath(a:root)
+	let root = gdv#git#abspath(a:root)
 	if stridx(root, '~') >= 0
 		let root = expand(root)
 	endif
 	let git_path = root . '/.git'
 	if isdirectory(git_path)
-		return gdv#git#normpath(git_path)
+		return gdv#git#abspath(git_path)
 	elseif filereadable(git_path)
 		let lines = gdv#git#readfile(git_path)
 		if len(lines) > 0
@@ -169,7 +169,7 @@ function! gdv#git#root2git(root) abort
 				if test !~ '^[\\/]\|^\a:'
 					let test = fnamemodify(root . '/' . test, ':p')
 				endif
-				let test = gdv#git#normpath(test)
+				let test = gdv#git#abspath(test)
 				if isdirectory(test)
 					return test
 				endif
@@ -184,7 +184,7 @@ endfunc
 " convert .git directory to root path (top level directory)
 "----------------------------------------------------------------------
 function! gdv#git#git2root(gitdir) abort
-	let path = gdv#git#normpath(a:gitdir)
+	let path = gdv#git#abspath(a:gitdir)
 	if path =~ '[\\/]\.git$'
 		let path = fnamemodify(path, ':h')
 		if isdirectory(path)
@@ -205,7 +205,7 @@ function! gdv#git#git2root(gitdir) abort
 			let worktree = quickui#core#string_strip(worktree)
 			if worktree != ''
 				let worktree = path . '/' . worktree
-				let worktree = gdv#git#normpath(worktree)
+				let worktree = gdv#git#abspath(worktree)
 				if isdirectory(worktree)
 					return worktree
 				endif
