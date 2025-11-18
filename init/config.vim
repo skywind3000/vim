@@ -86,7 +86,13 @@ function! Vim_NeatBuffer(bufnr, fullname)
 			return '[Quickfix]'
 		elseif bt == 'terminal'
 			return '[Terminal]'
-		elseif name != ''
+		elseif bt == 'nofile'
+			let ft = getbufvar(a:bufnr, '&filetype')
+			if ft == 'GV'
+				return 'Git View'
+			endif
+		endif
+		if name != ''
 			if a:fullname 
 				return '-'.fnamemodify(name, ':p')
 			else
