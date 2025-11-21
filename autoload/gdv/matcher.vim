@@ -79,10 +79,10 @@ function! gdv#matcher#extract_vimplug() abort
 	endif
 	let line = quickui#core#string_strip(getline('.'))
 	let hash = matchstr(line, '^\S\+')
-	if hash =~ '^[0-9a-f]\{5,40}$'
+	if hash =~ '^[0-9a-f]\{7,40}$'
 		return hash
 	endif
-	let hash = matchstr(line, '\<[0-9a-f]\{5,40}\>')
+	let hash = matchstr(line, '\<[0-9a-f]\{7,40}\>')
 	if hash != ''
 		let hash = gdv#git#commit_hash(root, hash)
 		if hash != ''
