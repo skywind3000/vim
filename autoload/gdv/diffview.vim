@@ -138,8 +138,10 @@ function! gdv#diffview#start(commit) abort
 			let commit = gdv#fugitive#commit_hash('%')
 		endif
 		if commit == ''
-			if &bt == 'nofile'
+			if &bt == 'nofile' && &ft == 'floggraph'
 				let commit = gdv#flog#commit_extract()
+			elseif &bt == 'nofile' && &ft == 'vim-plug'
+				let [root, commit] = gdv#matcher#extract_vimplug()
 			elseif &bt == 'nowrite' && &ft == 'git'
 				" Support for fugitive git log output windows
 				let commit = gdv#matcher#extract_git_log_hash()

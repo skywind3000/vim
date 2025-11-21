@@ -38,3 +38,58 @@ function! gdv#matcher#extract_git_log_hash() abort
 	return ''
 endfunc
 
+
+"----------------------------------------------------------------------
+" extract [root, commit] from vim-plug buffer
+"----------------------------------------------------------------------
+function! gdv#matcher#extract_vimplug() abort
+	if &bt != 'nofile' || &ft != 'vim-plug'
+		return ['', '']
+	endif
+	let line = quickui#core#string_strip(getline('.'))
+	if line == ''
+		return ['', '']
+	endif
+	let lnum = line('.')
+	let root = ''
+	let name = ''
+	while lnum >= 1
+		let text = quickui#core#string_strip(getline(lnum))
+		if text =~ '^-\s\+\S'
+			let name = matchstr(text, '^-\s\+\zs\S\+\ze:')
+			break
+		endif
+		let lnum = lnum - 1
+	endwhile
+	if name == ''
+		return ['', '']
+	elseif exists('g:plugs') == 0
+		return ['', '']
+	elseif !has_key(g:plugs, name)
+		return ['', '']
+	endif
+	let item = g:plugs[name]
+	let root = quickui#core#string_strip(get(item, 'dir', ''))
+	if root == ''
+		return ['', '']
+	endif
+	let root = gdv#git#abspath(root)
+	if !isdirectory(root . '/.git')
+		return ['', '']
+	endif
+	let line = quickui#core#string_strip(getline('.'))
+	let hash = matchstr(line, '^\S\+')
+	if hash =~ '^[0-9a-f]\{5,40}$'
+		return hash
+	endif
+	let hash = matchstr(line, '\<[0-9a-f]\{5,40}\>')
+	if hash != ''
+		let hash = gdv#git#commit_hash(root, hash)
+		if hash != ''
+			return [root, hash]
+		endif
+	endif
+	return ['', '']
+endfunc
+
+

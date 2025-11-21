@@ -57,6 +57,7 @@ augroup gdv_plugin
 	autocmd FileType floggraph call s:gdv_buffer_init()
 	autocmd FileType qf call s:gdv_buffer_init()
 	autocmd FileType git call s:gdv_buffer_init()
+	autocmd FileType vim-plug call s:gdv_buffer_init()
 augroup END
 
 
