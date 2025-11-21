@@ -138,24 +138,24 @@ function! gdv#diffview#start(commit) abort
 			let commit = gdv#fugitive#commit_hash('%')
 		endif
 		if commit == ''
-			if &bt == 'nofile' && &ft == 'floggraph'
-				let commit = gdv#flog#commit_extract()
-			elseif &bt == 'nofile' && &ft == 'GV'
-				let commit = gdv#flog#commit_extract()
-			elseif &bt == 'nofile' && &ft == 'vim-plug'
-				let [root, commit] = gdv#matcher#extract_vimplug()
+			if &bt == 'nofile'
+				if &ft == 'floggraph' || &ft == 'GV'
+					let commit = gdv#flog#commit_extract()
+				elseif &ft == 'vim-plug'
+					let [root, commit] = gdv#matcher#extract_vimplug()
+				endif
 			elseif &bt == 'nowrite' && &ft == 'git'
 				" Support for fugitive git log output windows
 				let commit = gdv#matcher#extract_git_log_hash()
 			endif
 		endif
 	endif
-	if commit == ''
-		call gdv#git#errmsg('No commit specified for diff view.')
-		return 0
-	endif
 	if root == ''
 		call gdv#git#errmsg('No git repository found.')
+		return 0
+	endif
+	if commit == ''
+		call gdv#git#errmsg('No commit specified for diff view.')
 		return 0
 	endif
 	let right = get(g:, 'gdv_tab_right', 0)
