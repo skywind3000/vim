@@ -140,6 +140,8 @@ function! gdv#diffview#start(commit) abort
 		if commit == ''
 			if &bt == 'nofile' && &ft == 'floggraph'
 				let commit = gdv#flog#commit_extract()
+			elseif &bt == 'nofile' && &ft == 'GV'
+				let commit = gdv#flog#commit_extract()
 			elseif &bt == 'nofile' && &ft == 'vim-plug'
 				let [root, commit] = gdv#matcher#extract_vimplug()
 			elseif &bt == 'nowrite' && &ft == 'git'
