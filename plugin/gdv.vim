@@ -52,11 +52,10 @@ command! -nargs=? GitDiffView call s:GitDiffView(<f-args>)
 "----------------------------------------------------------------------
 augroup gdv_plugin
 	autocmd!
-	autocmd FileType fugitive call s:gdv_buffer_init()
+	autocmd FileType fugitive,git,fugitiveblame call s:gdv_buffer_init()
 	autocmd FileType GV call s:gdv_buffer_init()
 	autocmd FileType floggraph call s:gdv_buffer_init()
 	autocmd FileType qf call s:gdv_buffer_init()
-	autocmd FileType git call s:gdv_buffer_init()
 	autocmd FileType vim-plug call s:gdv_buffer_init()
 augroup END
 
