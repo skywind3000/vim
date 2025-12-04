@@ -279,7 +279,7 @@ function! gdv#fugitive#current_root() abort
 				return root
 			endif
 		endif
-	elseif &bt == 'nowrite' && &ft == 'git'
+	elseif &bt == 'nowrite' && (&ft == 'git' || &ft == 'fugitiveblame')
 		" For git log output windows, try to find git root from current context
 		" This handles both normal repos and submodules
 		let root = gdv#git#root('')

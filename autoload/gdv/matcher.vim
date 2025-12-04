@@ -12,8 +12,9 @@
 " extract commit hash from git log output line
 "----------------------------------------------------------------------
 function! gdv#matcher#extract_git_log_hash() abort
-	if &bt != 'nowrite' || &ft != 'git'
+	if &bt != 'nowrite'
 		return ''
+	elseif &ft != 'git' && &ft != 'fugitiveblame'
 	endif
 	let line = getline('.')
 	if line == ''
@@ -91,6 +92,36 @@ function! gdv#matcher#extract_vimplug() abort
 		endif
 	endif
 	return ['', '']
+endfunc
+
+
+"----------------------------------------------------------------------
+" extract commit hash from fugitive blame buffer line
+"----------------------------------------------------------------------
+function! gdv#matcher#blame_commit() abort
+	if &bt != 'nowrite' 
+		return ''
+	elseif &ft != 'fugitiveblame'
+		return ''
+	endif
+	let line = getline('.')
+	if line == ''
+		return ''
+	endif
+	let hash = matchstr(line, '^\S\+')
+	if hash =~ '^[0-9a-f]\{7,40}$'
+		return hash
+	endif
+	let hash = matchstr(line, '^\^\zs\S\+')
+	if hash =~ '^[0-9a-f]\{7,40}$'
+		return hash
+	endif
+	let hash = matchstr(line, '\<[0-9a-f]\{7,40}\>')
+	if hash != ''
+		return hash
+	endif
+	return ''
+	return ''
 endfunc
 
 

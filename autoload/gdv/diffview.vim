@@ -144,9 +144,12 @@ function! gdv#diffview#start(commit) abort
 				elseif &ft == 'vim-plug'
 					let [root, commit] = gdv#matcher#extract_vimplug()
 				endif
-			elseif &bt == 'nowrite' && &ft == 'git'
-				" Support for fugitive git log output windows
-				let commit = gdv#matcher#extract_git_log_hash()
+			elseif &bt == 'nowrite'
+				if &ft == 'git'
+					let commit = gdv#matcher#extract_git_log_hash()
+				elseif &ft == 'fugitiveblame'
+					let commit = gdv#matcher#blame_commit()
+				endif
 			endif
 		endif
 	endif
@@ -159,6 +162,7 @@ function! gdv#diffview#start(commit) abort
 		return 0
 	endif
 	let right = get(g:, 'gdv_tab_right', 0)
+	" unsilent echom printf("> %s : %s", root, commit)
 	call gdv#diffview#open(root, commit, right? 0 : 1)
 	return 0
 endfunc
