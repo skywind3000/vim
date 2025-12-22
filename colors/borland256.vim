@@ -185,6 +185,9 @@ call s:newmatch()
 hi! def link vimParenSep BorlandSpecial 
 hi! def link Delimiter BorlandSpecial 
 
+" c/c++
+hi! link cCharacter String
+
 " quickui
 hi QuickPreview gui=NONE term=NONE cterm=NONE guifg=#ffff57 guibg=#000087 ctermfg=227 ctermbg=18
 
