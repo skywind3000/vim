@@ -258,6 +258,57 @@ let g:navigator_display_path = 1
 
 
 "----------------------------------------------------------------------
+" ambiwidth
+"----------------------------------------------------------------------
+set ambiwidth=single
+
+" Initialize an empty list
+let s:cjk_width_rules = []
+
+" --- 1. CJK (Chinese, Japanese, Korean) basic ranges ---
+let s:cjk_width_rules += [
+\   [0x1100, 0x115f, 2],
+\   [0x2e80, 0x2eff, 2],
+\   [0x3000, 0x303f, 2],
+\   [0x3040, 0x309f, 2],
+\   [0x30a0, 0x30ff, 2],
+\   [0x31c0, 0x31ef, 2],
+\   [0x3200, 0x32ff, 2],
+\   [0x4e00, 0x9fff, 2],
+\   [0xac00, 0xd7af, 2],
+\   [0xf900, 0xfaff, 2],
+\ ]
+
+" --- 2. Punctuation and symbols (non-PUA, no conflict with Nerd Font) ---
+" Includes fullwidth colon, exclamation mark, circled numbers, etc.
+let s:cjk_width_rules += [
+\   [0xfe30, 0xfe4f, 2],
+\   [0xff01, 0xff60, 2],
+\   [0xffe0, 0xffe6, 2],
+\   [0x2460, 0x24ff, 2],
+\ ]
+
+" --- Ellipsis and dashes ---
+let s:cjk_width_rules += [
+\   [0x2014, 0x2014, 2],
+\   [0x2026, 0x2026, 2],
+\ ]
+
+" --- 3. Emoji symbols (in SMP plane) ---
+" Fix width of Emoji like rockets, smileys, etc., without affecting Nerd Font
+let s:cjk_width_rules += [
+\   [0x1f100, 0x1f1ff, 2],
+\   [0x1f300, 0x1f5ff, 2],
+\   [0x1f600, 0x1f64f, 2],
+\   [0x1f680, 0x1f6ff, 2],
+\   [0x1f900, 0x1f9ff, 2],
+\ ]
+
+" Apply the custom width rules
+call setcellwidths(s:cjk_width_rules)
+
+
+"----------------------------------------------------------------------
 " completion
 "----------------------------------------------------------------------
 let g:apc_enable_ft = get(g:, 'apc_enable_ft', {})
