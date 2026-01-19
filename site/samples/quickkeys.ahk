@@ -36,6 +36,7 @@ $CapsLock::Ctrl
 
 /* remap shift+space to space */
 +Space::Space
+#w::Run "D:\Program Files\Q-Dir\Q-Dir.exe"
 
 /* use the following script to detect keys 
 #Requires AutoHotkey v2.0
