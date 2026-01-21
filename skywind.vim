@@ -185,13 +185,13 @@ nnoremap <silent><space>hf :FileSwitch ~/.vim/test.comp<cr>
 " cloud drivers
 "----------------------------------------------------------------------
 if has('win32') || has('win64')
-	if isdirectory('E:/Local/Cloud/rclone/notes')
-		let $VIM_RCLONE = 'E:/Local/Cloud/rclone/notes/vim'
+	if isdirectory('E:/Local/cloud/rclone/notes')
+		let $VIM_RCLONE = 'E:/Local/cloud/rclone/notes/vim'
 		nnoremap <silent><space>hz :FileSwitch $VIM_RCLONE/quicknote.md<cr>
 	endif
 else
-	if isdirectory('/mnt/e/Local/Cloud/rclone/notes')
-		let $VIM_RCLONE = '/mnt/e/Local/Cloud/rclone/notes/vim'
+	if isdirectory('/mnt/e/Local/cloud/rclone/notes')
+		let $VIM_RCLONE = '/mnt/e/Local/cloud/rclone/notes/vim'
 		nnoremap <silent><space>hz :FileSwitch $VIM_RCLONE/quicknote.md<cr>
 	endif
 endif
