@@ -189,6 +189,11 @@ if has('win32') || has('win64')
 		let $VIM_RCLONE = 'E:/Local/cloud/rclone/notes/vim'
 		nnoremap <space>hz :FileSwitch $VIM_RCLONE/quicknote.md<cr>
 	endif
+elseif has('win32unix') && has('cygwin') == 0
+	if isdirectory('/e/Local/cloud/rclone/notes')
+		let $VIM_RCLONE = '/e/Local/cloud/rclone/notes/vim'
+		nnoremap <space>hz :FileSwitch $VIM_RCLONE/quicknote.md<cr>
+	endif
 else
 	if isdirectory('/mnt/e/Local/cloud/rclone/notes')
 		let $VIM_RCLONE = '/mnt/e/Local/cloud/rclone/notes/vim'
