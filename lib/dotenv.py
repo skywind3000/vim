@@ -349,7 +349,9 @@ def main(argv = None):
                 print(envfile)
             return 0
         elif args[0] == '--echo':
-            for key in dotenv._dotenv:
+            keys = [n for n in dotenv._dotenv]
+            # keys.sort()
+            for key in keys:
                 print(f'{key}={dotenv._dotenv[key]}')
             return 0
     ret = dotenv.run(args)
