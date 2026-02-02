@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 #======================================================================
 #
-# dotenv.py - 
+# dotenv.py - Simple .env file parser and environment variable loader
+# author: skywind3000 (at) 163.com, 2026
 #
-# Created by skywind on 2026/02/02
-# Last Modified: 2026/02/02 20:08:46
+# Last Modified: 2026/02/03 00:54:50
 #
 #======================================================================
 import sys
