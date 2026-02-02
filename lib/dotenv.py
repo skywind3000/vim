@@ -305,6 +305,12 @@ def help():
 
 
 #----------------------------------------------------------------------
+# dotenv files
+#----------------------------------------------------------------------
+DOTENV_FILES = ['.dotenv', '.env', '.dotenv.local', '.env.local']
+
+
+#----------------------------------------------------------------------
 # main entry
 #----------------------------------------------------------------------
 def main(argv = None):
@@ -338,13 +344,12 @@ def main(argv = None):
             print(f'Failed to load .env file: {name}')
             return 0
     else:
-        files = ['.dotenv', '.env']
-        envfiles = dotenv.list_env_files(os.getcwd(), files)
+        envfiles = dotenv.list_env_files(os.getcwd(), DOTENV_FILES)
         for envfile in envfiles:
             dotenv.load(envfile)
     if len(args) == 1:
         if args[0] == '--list':
-            envfiles = dotenv.list_env_files(os.getcwd(), ['.dotenv', '.env'])
+            envfiles = dotenv.list_env_files(os.getcwd(), DOTENV_FILES)
             for envfile in envfiles:
                 print(envfile)
             return 0
