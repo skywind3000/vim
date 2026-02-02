@@ -28,7 +28,8 @@ def getopt (argv, shortopts = ''):
             head = arg[:1]
             if head != '-':
                 break
-            if arg == '-':
+            if arg in ('-', '--'):
+                index += 1
                 break
             if not arg.startswith('--') and (len(arg) == 2):
                 if (arg[1] in shortopts) and (index + 1 < count):
@@ -294,6 +295,8 @@ def help():
     print("  -c <name>   Load ~/.config/dotenv/{name}.env file")
     print("  -f <name>   Load .env file given in {name}")
     print("  -h          Show this help message")
+    print("  --list      List all .env files from current directory to root")
+    print("  --echo      Echo loaded environment variables")
     print('')
     print('If -c and -f are not provided, dotenv will search for .env files from')
     print('current directory to root.')
@@ -309,6 +312,10 @@ def main(argv = None):
     if 'h' in options:
         help()
         return 0
+    if 'list' in options:
+        args = ['--list']
+    elif 'echo' in options:
+        args = ['--echo']
     if not args:
         print('Empty command to run, use -h for help.')
         return 0
@@ -334,6 +341,16 @@ def main(argv = None):
         envfiles = dotenv.list_env_files(os.getcwd(), files)
         for envfile in envfiles:
             dotenv.load(envfile)
+    if len(args) == 1:
+        if args[0] == '--list':
+            envfiles = dotenv.list_env_files(os.getcwd(), ['.dotenv', '.env'])
+            for envfile in envfiles:
+                print(envfile)
+            return 0
+        elif args[0] == '--echo':
+            for key in dotenv._dotenv:
+                print(f'{key}={dotenv._dotenv[key]}')
+            return 0
     ret = dotenv.run(args)
     return ret
 

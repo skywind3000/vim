@@ -1345,7 +1345,8 @@ class __ShellUtils (object):
                 head = arg[:1]
                 if head != '-':
                     break
-                if arg == '-':
+                if arg in ('-', '--'):
+                    index += 1
                     break
                 if not arg.startswith('--') and (len(arg) == 2):
                     if (arg[1] in shortopts) and (index + 1 < count):

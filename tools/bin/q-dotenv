@@ -1,0 +1,4 @@
+#! /bin/sh
+
+python3 ~/.vim/lib/dotenv.py "$@"
+
