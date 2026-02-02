@@ -282,6 +282,8 @@ class DotEnv (object):
         if not name:
             return False
         configdir = os.path.join(os.path.expanduser('~'), '.config', 'dotenv')
+        if 'XDG_CONFIG_HOME' in os.environ:
+            configdir = os.path.join(os.environ['XDG_CONFIG_HOME'], 'dotenv')
         configpath = os.path.join(configdir, f'{name}.env')
         hr = self.load(configpath)
         return hr
