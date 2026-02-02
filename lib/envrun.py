@@ -12,6 +12,39 @@ import sys
 import os
 
 
+#----------------------------------------------------------------------
+# getopt: returns (options, args)
+#----------------------------------------------------------------------
+def getopt (argv, shortopts = ''):
+    args = []
+    options = {}
+    if argv is None:
+        argv = sys.argv[1:]
+    index = 0
+    count = len(argv)
+    while index < count:
+        arg = argv[index]
+        if arg != '':
+            head = arg[:1]
+            if head != '-':
+                break
+            if arg == '-':
+                break
+            if not arg.startswith('--') and (len(arg) == 2):
+                if (arg[1] in shortopts) and (index + 1 < count):
+                    nextarg = argv[index + 1]
+                    options[arg[1]] = nextarg
+                    index += 2
+                    continue
+            name = arg.lstrip('-')
+            key, _, val = name.partition('=')
+            options[key.strip()] = val.strip()
+        index += 1
+    while index < count:
+        args.append(argv[index])
+        index += 1
+    return options, args
+
 
 #----------------------------------------------------------------------
 # DotEnvParser
@@ -235,6 +268,16 @@ class EnvRun (object):
             curdir = parentdir
         envfiles.reverse()
         return envfiles
+
+    # load {name}.env file from ~/.config/envrun/
+    def load_config (self, name):
+        if not name:
+            return False
+        configdir = os.path.join(os.path.expanduser('~'), '.config', 'envrun')
+        configpath = os.path.join(configdir, f'{name}.env')
+        hr = self.load(configpath)
+        return hr
+
 
 
 #----------------------------------------------------------------------
