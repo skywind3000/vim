@@ -279,6 +279,56 @@ class EnvRun (object):
         return hr
 
 
+#----------------------------------------------------------------------
+# help
+#----------------------------------------------------------------------
+def help():
+    print("Usage: envrun [options] command [args...]")
+    print("Options:")
+    print("  -c <name>   Load ~/.config/envrun/{name}.env file")
+    print("  -f <name>   Load .env file given in {name}")
+    print("  -h          Show this help message")
+    print("If -c and -f are not provided, envrun will search for .env files from current directory to root.")
+    return 0
+
+
+#----------------------------------------------------------------------
+# main entry
+#----------------------------------------------------------------------
+def main(argv = None):
+    argv = argv or sys.argv[1:]
+    options, args = getopt(argv, 'cf')
+    if 'h' in options:
+        help()
+        return 0
+    if not args:
+        print('Empty command to run, use -h for help.')
+        return 0
+    envrun = EnvRun()
+    if 'c' in options:
+        name = options['c']
+        if not name:
+            print('Config name is empty.')
+            return 0
+        if not envrun.load_config(name):
+            print(f'Failed to load config file for name: {name}')
+            return 0
+    elif 'f' in options:
+        name = options['f']
+        if not name:
+            print('File name is empty.')
+            return 0
+        if not envrun.load(name):
+            print(f'Failed to load .env file: {name}')
+            return 0
+    else:
+        envfiles = envrun.list_env_files(os.getcwd(), '.env')
+        for envfile in envfiles:
+            envrun.load(envfile)
+    ret = envrun.run(args)
+    return ret
+
+
 
 #----------------------------------------------------------------------
 # testing suit
@@ -302,6 +352,18 @@ if __name__ == '__main__':
     def test2():
         envrun = EnvRun()
         ret = envrun.run(['busybox', 'printenv', 'KEY1'])
+        help()
         return 0
-    test2()
+    def test3():
+        envrun = EnvRun()
+        envrun.load('.env')
+        ret = envrun.run(['busybox', 'printenv', 'KEY_FROM_ENV'])
+        return 0
+    def test4():
+        os.environ['CONFIG_KEY'] = 'OriginalValue'
+        args = ['busybox', 'printenv', 'CONFIG_KEY']
+        main(args)
+    # test4()
+    main()
+
 
