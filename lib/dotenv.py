@@ -248,6 +248,8 @@ class DotEnvParser:
             return ''
         if line.startswith('#'):
             return ''
+        if line.startswith(';'):
+            return ''
         if '=' not in line:
             return ''
         key, _, value = line.partition('=')
@@ -349,16 +351,20 @@ class DotEnv (object):
     def run (self, args):
         if not args:
             return
-        envcopy = os.environ.copy()
-        for key in self._dotenv:
-            os.environ[key] = self._dotenv[key]
-        import subprocess
-        ep = subprocess.run(args, shell = True)
+        win32 = sys.platform[:3] == 'win'
+        merged = CaseInsensitiveDict(win32)
         for key in os.environ:
-            if key not in self._origin:
-                del os.environ[key]
-        for key in self._origin:
-            os.environ[key] = self._origin[key]
+            merged[key] = os.environ[key]
+        for key in self._dotenv:
+            merged[key] = self._dotenv[key]
+        final = {}
+        for key in merged:
+            final[key] = merged[key]
+        import subprocess
+        if win32:
+            ep = subprocess.run(args, shell = True, env = final)
+        else:
+            ep = subprocess.run(args, shell = False, env = final)
         return ep.returncode
 
     # enumerate all the .env files from current directory to root
