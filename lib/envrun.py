@@ -18,15 +18,15 @@ import os
 #----------------------------------------------------------------------
 class DotEnvParser:
 
-    def __init__ (self, init = None):
+    def __init__ (self, origin = None):
         self._environ = {}
-        self._init = init and init or os.environ.copy()
+        self._origin = origin and origin or os.environ.copy()
 
     def _load_value (self, key, default = None):
         if key in self._environ:
             return self._environ[key]
-        if key in self._init:
-            return self._init[key]
+        if key in self._origin:
+            return self._origin[key]
         return default
 
     def __len__ (self):
@@ -40,6 +40,9 @@ class DotEnvParser:
 
     def __iter__ (self):
         return iter(self._environ)
+
+    def __keys__ (self):
+        return self._environ.keys()
 
     def _substitute_vars (self, value):
         start = 0
@@ -125,6 +128,114 @@ class DotEnvParser:
     def clear (self):
         self._environ.clear()
 
+    # load content
+    def _load_file_content (self, filename, mode = 'r'):
+        if hasattr(filename, 'read'):
+            try: content = filename.read()
+            except: content = None
+            return content
+        try:
+            if '~' in filename:
+                filename = os.path.expanduser(filename)
+            fp = open(filename, mode)
+            content = fp.read()
+            fp.close()
+        except:
+            content = None
+        return content
+
+    # load file and guess encoding
+    def _load_file_text (self, filename, encoding = None):
+        content = self._load_file_content(filename, 'rb')
+        if content is None:
+            return None
+        if content[:3] == b'\xef\xbb\xbf':
+            text = content[3:].decode('utf-8')
+        elif encoding is not None:
+            text = content.decode(encoding, 'ignore')
+        else:
+            text = None
+            guess = [sys.getdefaultencoding(), 'utf-8']
+            if sys.stdout and sys.stdout.encoding:
+                guess.append(sys.stdout.encoding)
+            try:
+                import locale
+                guess.append(locale.getpreferredencoding())
+            except:
+                pass
+            visit = {}
+            for name in guess + ['gbk', 'ascii', 'latin1']:
+                if name in visit:
+                    continue
+                visit[name] = 1
+                try:
+                    text = content.decode(name)
+                    break
+                except:
+                    pass
+            if text is None:
+                text = content.decode('utf-8', 'ignore')
+        return text
+
+    def load (self, filepath):
+        text = self._load_file_text(filepath)
+        if text is None:
+            return False
+        for line in text.splitlines():
+            self.push(line)
+        return True
+
+
+#----------------------------------------------------------------------
+# EnvRun
+#----------------------------------------------------------------------
+class EnvRun (object):
+
+    def __init__ (self):
+        self._origin = os.environ.copy()
+        self._dotenv = DotEnvParser(self._origin)
+
+    def load (self, filepath):
+        return self._dotenv.load(filepath)
+
+    def push (self, line):
+        return self._dotenv.push(line)
+
+    def reset (self):
+        self._dotenv.clear()
+
+    def run (self, args):
+        if not args:
+            return
+        envcopy = os.environ.copy()
+        for key in self._dotenv:
+            os.environ[key] = self._dotenv[key]
+        import subprocess
+        ep = subprocess.run(args, shell = True)
+        for key in os.environ:
+            if key not in self._origin:
+                del os.environ[key]
+        for key in self._origin:
+            os.environ[key] = self._origin[key]
+        return ep.returncode
+
+    # enumerate all the .env files from current directory to root
+    def list_env_files (self, locate, filename = '.env'):
+        envfiles = []
+        if not locate:
+            locate = os.getcwd()
+        curdir = os.path.abspath(locate)
+        while True:
+            envpath = os.path.join(curdir, filename)
+            if os.path.isfile(envpath):
+                envfiles.append(envpath)
+            parentdir = os.path.dirname(curdir)
+            if parentdir == curdir:
+                break
+            curdir = parentdir
+        envfiles.reverse()
+        return envfiles
+
 
 #----------------------------------------------------------------------
 # testing suit
@@ -145,5 +256,9 @@ if __name__ == '__main__':
         parser.clear()
         print("All tests passed.")
         return 0
-    test1()
+    def test2():
+        envrun = EnvRun()
+        ret = envrun.run(['busybox', 'printenv', 'KEY1'])
+        return 0
+    test2()
 
