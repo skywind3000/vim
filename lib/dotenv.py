@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #======================================================================
 #
-# envrun.py - 
+# dotenv.py - 
 #
 # Created by skywind on 2026/02/02
 # Last Modified: 2026/02/02 20:08:46
@@ -220,9 +220,9 @@ class DotEnvParser:
 
 
 #----------------------------------------------------------------------
-# EnvRun
+# DotEnv
 #----------------------------------------------------------------------
-class EnvRun (object):
+class DotEnv (object):
 
     def __init__ (self):
         self._origin = os.environ.copy()
@@ -275,11 +275,11 @@ class EnvRun (object):
         envfiles.reverse()
         return envfiles
 
-    # load {name}.env file from ~/.config/envrun/
+    # load {name}.env file from ~/.config/dotenv/
     def load_config (self, name):
         if not name:
             return False
-        configdir = os.path.join(os.path.expanduser('~'), '.config', 'envrun')
+        configdir = os.path.join(os.path.expanduser('~'), '.config', 'dotenv')
         configpath = os.path.join(configdir, f'{name}.env')
         hr = self.load(configpath)
         return hr
@@ -289,13 +289,13 @@ class EnvRun (object):
 # help
 #----------------------------------------------------------------------
 def help():
-    print("Usage: envrun [options] command [args...]")
+    print("Usage: dotenv [options] command [args...]")
     print("Options:")
-    print("  -c <name>   Load ~/.config/envrun/{name}.env file")
+    print("  -c <name>   Load ~/.config/dotenv/{name}.env file")
     print("  -f <name>   Load .env file given in {name}")
     print("  -h          Show this help message")
     print('')
-    print('If -c and -f are not provided, envrun will search for .env files from')
+    print('If -c and -f are not provided, dotenv will search for .env files from')
     print('current directory to root.')
     return 0
 
@@ -312,13 +312,13 @@ def main(argv = None):
     if not args:
         print('Empty command to run, use -h for help.')
         return 0
-    envrun = EnvRun()
+    dotenv = DotEnv()
     if 'c' in options:
         name = options['c']
         if not name:
             print('Config name is empty.')
             return 0
-        if not envrun.load_config(name):
+        if not dotenv.load_config(name):
             print(f'Failed to load config file for name: {name}')
             return 0
     elif 'f' in options:
@@ -326,15 +326,15 @@ def main(argv = None):
         if not name:
             print('File name is empty.')
             return 0
-        if not envrun.load(name):
+        if not dotenv.load(name):
             print(f'Failed to load .env file: {name}')
             return 0
     else:
-        files = ['.dotenv', '.envrun', '.env']
-        envfiles = envrun.list_env_files(os.getcwd(), files)
+        files = ['.dotenv', '.env']
+        envfiles = dotenv.list_env_files(os.getcwd(), files)
         for envfile in envfiles:
-            envrun.load(envfile)
-    ret = envrun.run(args)
+            dotenv.load(envfile)
+    ret = dotenv.run(args)
     return ret
 
 
@@ -359,14 +359,14 @@ if __name__ == '__main__':
         print("All tests passed.")
         return 0
     def test2():
-        envrun = EnvRun()
-        ret = envrun.run(['busybox', 'printenv', 'KEY1'])
+        dotenv = DotEnv()
+        ret = dotenv.run(['busybox', 'printenv', 'KEY1'])
         help()
         return 0
     def test3():
-        envrun = EnvRun()
-        envrun.load('.env')
-        ret = envrun.run(['busybox', 'printenv', 'KEY_FROM_ENV'])
+        dotenv = DotEnv()
+        dotenv.load('.env')
+        ret = dotenv.run(['busybox', 'printenv', 'KEY_FROM_ENV'])
         return 0
     def test4():
         os.environ['CONFIG_KEY'] = 'OriginalValue'
@@ -374,5 +374,6 @@ if __name__ == '__main__':
         main(args)
     # test4()
     main()
+
 
 
