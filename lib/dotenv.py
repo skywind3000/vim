@@ -49,13 +49,93 @@ def getopt (argv, shortopts = ''):
 
 
 #----------------------------------------------------------------------
+# CaseInsensitiveDict
+#----------------------------------------------------------------------
+class CaseInsensitiveDict (object):
+
+    def __init__ (self, insensitive):
+        self._store = {}
+        self._names = {}
+        self._insensitive = insensitive
+
+    def __len__ (self):
+        return len(self._store)
+
+    def __getitem__ (self, key):
+        if self._insensitive:
+            lkey = key.lower()
+            if lkey not in self._store:
+                raise KeyError(key)
+            return self._store[lkey]
+        return self._store[key]
+
+    def __setitem__ (self, key, value):
+        if self._insensitive:
+            lkey = key.lower()
+            self._names[lkey] = key
+            self._store[lkey] = value
+        else:
+            self._store[key] = value
+        return 0
+
+    def get (self, key, default = None):
+        if self._insensitive:
+            lkey = key.lower()
+            return self._store.get(lkey, default)
+        return self._store.get(key, default)
+
+    def __contains__ (self, key):
+        if self._insensitive:
+            lkey = key.lower()
+            return lkey in self._store
+        return key in self._store
+
+    def __iter__ (self):
+        if self._insensitive:
+            for lkey in self._store:
+                yield self._names[lkey]
+        else:
+            for key in self._store:
+                yield key
+
+    def __keys__ (self):
+        if self._insensitive:
+            return [self._names[lkey] for lkey in self._store]
+        return list(self._store.keys())
+
+    def keys (self):
+        return self.__keys__()
+
+    def items (self):
+        if self._insensitive:
+            return [(self._names[lkey], self._store[lkey]) for lkey in self._store]
+        return list(self._store.items())
+
+    def values (self):
+        return list(self._store.values())
+
+    def clear (self):
+        self._store.clear()
+        self._names.clear()
+        return 0
+
+
+#----------------------------------------------------------------------
 # DotEnvParser
 #----------------------------------------------------------------------
 class DotEnvParser:
 
     def __init__ (self, origin = None):
-        self._environ = {}
-        self._origin = origin and origin or os.environ.copy()
+        self._win32 = sys.platform[:3] == 'win' and True or False
+        self._environ = CaseInsensitiveDict(self._win32)
+        self._origin = CaseInsensitiveDict(self._win32)
+        origin = origin and origin or os.environ.copy()
+        for key in origin:
+            self._origin[key] = origin[key]
+        self._reset_windows()
+
+    def _reset_windows (self):
+        return 0
 
     def _load_value (self, key, default = None):
         if key in self._environ:
@@ -63,6 +143,10 @@ class DotEnvParser:
         if key in self._origin:
             return self._origin[key]
         return default
+
+    def _store_value (self, key, value):
+        self._environ[key] = value
+        return 0
 
     def __len__ (self):
         return len(self._environ)
@@ -78,6 +162,9 @@ class DotEnvParser:
 
     def __keys__ (self):
         return self._environ.keys()
+
+    def keys (self):
+        return self.__keys__()
 
     def _substitute_vars (self, value):
         start = 0
@@ -154,7 +241,7 @@ class DotEnvParser:
         elif value.startswith("'") and value.endswith("'"):
             value = value[1:-1]
         value = self._substitute_vars(value)
-        self._environ[key] = value
+        self._store_value(key, value)
         return key
 
     def push (self, line):
@@ -162,6 +249,7 @@ class DotEnvParser:
 
     def clear (self):
         self._environ.clear()
+        self._reset_windows()
 
     # load content
     def _load_file_content (self, filename, mode = 'r'):
@@ -399,7 +487,18 @@ if __name__ == '__main__':
         os.environ['CONFIG_KEY'] = 'OriginalValue'
         args = ['busybox', 'printenv', 'CONFIG_KEY']
         main(args)
-    # test4()
+    def test5():
+        cid = CaseInsensitiveDict(True)
+        cid['KeyOne'] = 'Value1'
+        assert cid['keyone'] == 'Value1'
+        assert cid['KEYONE'] == 'Value1'
+        cid['KEYTWO'] = 'Value2'
+        assert cid['keytwo'] == 'Value2'
+        keys = cid.keys()
+        assert 'KeyOne' in keys
+        print(cid['KeyONE'])
+        return 0
+    # test5()
     main()
 
 
