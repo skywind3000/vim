@@ -31,10 +31,11 @@ def getopt (argv, shortopts = ''):
             if arg in ('-', '--'):
                 index += 1
                 break
-            if not arg.startswith('--') and (len(arg) == 2):
-                if (arg[1] in shortopts) and (index + 1 < count):
+            if (not arg.startswith('--')) and (len(arg) == 2):
+                name = arg[1]
+                if (name in shortopts) and (index + 1 < count):
                     nextarg = argv[index + 1]
-                    options[arg[1]] = nextarg
+                    options[name] = nextarg
                     index += 2
                     continue
             name = arg.lstrip('-')
