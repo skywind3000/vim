@@ -1332,7 +1332,7 @@ class __ShellUtils (object):
         return self.find_root(path, markers, True)
 
     # getopt: returns (options, args)
-    def getopt (self, argv):
+    def getopt (self, argv, shortopts = ''):
         args = []
         options = {}
         if argv is None:
@@ -1347,6 +1347,12 @@ class __ShellUtils (object):
                     break
                 if arg == '-':
                     break
+                if not arg.startswith('--') and (len(arg) == 2):
+                    if (arg[1] in shortopts) and (index + 1 < count):
+                        nextarg = argv[index + 1]
+                        options[arg[1]] = nextarg
+                        index += 2
+                        continue
                 name = arg.lstrip('-')
                 key, _, val = name.partition('=')
                 options[key.strip()] = val.strip()

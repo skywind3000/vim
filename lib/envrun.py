@@ -119,6 +119,12 @@ class DotEnvParser:
         self._environ[key] = value
         return key
 
+    def push (self, line):
+        return self._parse_line(line)
+
+    def clear (self):
+        self._environ.clear()
+
 
 #----------------------------------------------------------------------
 # testing suit
@@ -126,16 +132,17 @@ class DotEnvParser:
 if __name__ == '__main__':
     def test1():
         parser = DotEnvParser()
-        parser._parse_line('KEY1=VALUE1')
-        parser._parse_line('KEY2="VALUE2 with spaces"')
-        parser._parse_line("KEY3='VALUE3 with single quotes'")
-        parser._parse_line('KEY4=VALUE4_$KEY1')
-        parser._parse_line('KEY5="VALUE5 with \\n new line"')
+        parser.push('KEY1=VALUE1')
+        parser.push('KEY2="VALUE2 with spaces"')
+        parser.push("KEY3='VALUE3 with single quotes'")
+        parser.push('KEY4=VALUE4_$KEY1')
+        parser.push('KEY5="VALUE5 with \\n new line"')
         assert parser['KEY1'] == 'VALUE1'
         assert parser['KEY2'] == 'VALUE2 with spaces'
         assert parser['KEY3'] == 'VALUE3 with single quotes'
         assert parser['KEY4'] == 'VALUE4_VALUE1'
         assert parser['KEY5'] == 'VALUE5 with \n new line'
+        parser.clear()
         print("All tests passed.")
         return 0
     test1()
