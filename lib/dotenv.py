@@ -192,8 +192,14 @@ class DotEnvParser:
                 if end_brace == -1:
                     start = dollar_index + 1
                     continue
-                var_name = value[dollar_index + 2:end_brace]
-                var_value = self._load_value(var_name, '')
+                var_name = value[dollar_index + 2:end_brace].strip('\r\n\t ')
+                if ':' in var_name:
+                    var_name, _, default_val = var_name.partition(':')
+                    var_name = var_name.strip('\r\n\t ')
+                    default_val = default_val.strip('\r\n\t ')
+                    var_value = self._load_value(var_name, default_val)
+                else:
+                    var_value = self._load_value(var_name, '')
                 value = value[:dollar_index] + var_value + value[end_brace + 1:]
                 start = dollar_index + len(var_value)
             else:
