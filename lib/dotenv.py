@@ -78,6 +78,19 @@ class CaseInsensitiveDict (object):
             self._store[key] = value
         return 0
 
+    def __delitem__ (self, key):
+        if self._insensitive:
+            lkey = key.lower()
+            if lkey not in self._names:
+                raise KeyError(key)
+            del self._names[lkey]
+            del self._store[lkey]
+        else:
+            if key not in self._store:
+                raise KeyError(key)
+            del self._store[key]
+        return 0
+
     def get (self, key, default = None):
         if self._insensitive:
             lkey = key.lower()
