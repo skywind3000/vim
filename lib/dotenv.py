@@ -33,6 +33,16 @@
 # 5. Echo loaded environment variables:
 #    $ dotenv --echo
 #
+# Sample .env file:
+#
+#    # This is a comment
+#    KEY1=VALUE1
+#    KEY2="VALUE2 with spaces and \n new line"
+#    KEY3='VALUE3 with single quotes'
+#    KEY4=VALUE4_$KEY1
+#    KEY5=${UNSET_VAR:DefaultIfUnset}
+#    PATH="/usr/local/bin:$PATH"
+#
 # Note:
 #
 # - This script requires Python 3.x to run.
