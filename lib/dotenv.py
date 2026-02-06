@@ -24,7 +24,7 @@
 # 2. Load specific .env file and run command:
 #    $ dotenv -f <filename> <command> [args...]
 #
-# 3. Load config .env file from ~/.config/dotenv/ and run command:
+# 3. Load ~/.config/dotenv/{name}.env and run command:
 #    $ dotenv -c <name> <command> [args...]
 #
 # 4. List all .env files found from current directory to root:
