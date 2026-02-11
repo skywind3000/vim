@@ -116,3 +116,6 @@ nnoremap <buffer> <space>fh :SwitchHeader vsplit<cr>
 let b:navigator = get(b:, 'navigator', {})
 let b:navigator.c = get(b:navigator, 'c', {'name': '+coding'})
 
+let b:navigator.c.k = [':AsyncTask cppcheck', 'cppcheck-current-file']
+
+
