@@ -7,6 +7,49 @@
 #
 # Last Modified: 2026/02/03 00:54:50
 #
+# Features:
+#
+# - Load .env files from current directory to root and run commands
+# - Load specific .env file or config .env file from ~/.config/dotenv/
+# - Supports variable substitution with ${VAR} or $VAR syntax
+# - Supports default values with ${VAR:default} syntax
+# - Supports quoted values with escape sequences
+# - Case-insensitive keys on Windows
+# 
+# Usage:
+#
+# 1. Load .env file from current directory to root and run command:
+#    $ dotenv <command> [args...]
+# 
+# 2. Load specific .env file and run command:
+#    $ dotenv -f <filename> <command> [args...]
+#
+# 3. Load ~/.config/dotenv/{name}.env and run command:
+#    $ dotenv -c <name> <command> [args...]
+#
+# 4. List all .env files found from current directory to root:
+#    $ dotenv --list
+#
+# 5. Echo loaded environment variables:
+#    $ dotenv --echo
+#
+# Sample .env file:
+#
+#    # This is a comment
+#    KEY1=VALUE1
+#    KEY2="VALUE2 with spaces and \n new line"
+#    KEY3='VALUE3 with single quotes'
+#    KEY4=VALUE4_$KEY1
+#    KEY5=${UNSET_VAR:DefaultIfUnset}
+#    PATH="/usr/local/bin:$PATH"
+#
+# Note:
+#
+# - This script requires Python 3.x to run.
+# - It uses only standard library modules for compatibility.
+#
+# For more details, refer to the documentation or source code comments
+#
 #======================================================================
 import sys
 import os
