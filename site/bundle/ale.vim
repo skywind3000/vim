@@ -26,6 +26,7 @@ if has('nvim-0.9') || has('patch-9.0.1')
 	let g:ale_virtualtext_cursor = 1
 	let g:ale_virtualtext_single = 1
 	let g:ale_floating_preview = 1
+	let g:ale_virtualtext_prefix    = '     ● '
 endif
 
 function! s:init_highlight()
