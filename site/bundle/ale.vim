@@ -30,8 +30,10 @@ if has('nvim-0.9') || has('patch-9.0.1')
 endif
 
 function! s:init_highlight()
-	hi! link ALEVirtualTextError ErrorMsg
-	hi! link ALEVirtualTextWarning WarningMsg
+	hi! ALEVirtualTextError term=standout ctermfg=197 guifg=#f43753
+	hi! ALEVirtualTextWarning term=standout ctermfg=204 guifg=#af5f5f
+	" hi! link ALEVirtualTextError ErrorMsg
+	" hi! link ALEVirtualTextWarning WarningMsg
 	hi! link ALEVirtualTextInfo  ALEInfo
 	hi! link ALEVirtualTextStyleError ALEStyleError
 endfunc
