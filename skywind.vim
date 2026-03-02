@@ -48,7 +48,7 @@ if has('patch-8.0.0')
 endif
 
 if has('patch-9.0.1')
-	set listchars+=leadmultispace:\|\ \ \ 
+	exec 'set listchars+=leadmultispace:\|\ \ \ '
 endif
 
 set cpt=.,w,k
