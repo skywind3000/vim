@@ -15,6 +15,35 @@ let g:ale_echo_msg_format = '[%linter%] %code: %%s [%severity% (%type%)]'
 let g:ale_lint_on_text_changed = 'normal'
 let g:ale_lint_on_insert_leave = 1
 let g:ale_virtualtext_cursor = 0
+let g:ale_sign_priority = 40
+
+
+"----------------------------------------------------------------------
+" style
+"----------------------------------------------------------------------
+if has('nvim-0.9') || has('patch-9.0.1')
+	let g:ale_echo_cursor = 0
+	let g:ale_virtualtext_cursor = 1
+	let g:ale_virtualtext_single = 1
+	let g:ale_floating_preview = 1
+	let g:ale_virtualtext_prefix    = "     \u25cf "
+endif
+
+function! s:init_highlight()
+	hi! ALEVirtualTextError term=standout ctermfg=197 guifg=#f43753
+	hi! ALEVirtualTextWarning term=standout ctermfg=204 guifg=#af5f5f
+	" hi! link ALEVirtualTextError ErrorMsg
+	" hi! link ALEVirtualTextWarning WarningMsg
+	hi! link ALEVirtualTextInfo  ALEInfo
+	hi! link ALEVirtualTextStyleError ALEStyleError
+endfunc
+
+augroup ale_highlight
+	autocmd!
+	autocmd ColorScheme * call s:init_highlight()
+augroup END
+
+call s:init_highlight()
 
 
 "----------------------------------------------------------------------
