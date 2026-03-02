@@ -47,6 +47,10 @@ if has('patch-8.0.0')
 	set shortmess+=c
 endif
 
+if has('patch-9.0.1')
+	set listchars+=leadmultispace:\|\ \ \ 
+endif
+
 set cpt=.,w,k
 
 if has('patch-8.2.4500')
