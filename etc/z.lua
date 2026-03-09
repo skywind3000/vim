@@ -4,7 +4,7 @@
 -- z.lua - a cd command that learns, by skywind 2018-2022
 -- Licensed under MIT license.
 --
--- Version 1.8.24, Last Modified: 2025/05/24 23:04:42
+-- Version 1.8.25, Last Modified: 2026/03/09 21:15:46
 --
 -- * 10x faster than fasd and autojump, 3x faster than z.sh
 -- * available for posix shells: bash, zsh, sh, ash, dash, busybox
@@ -235,7 +235,8 @@ end
 function dump(o)
 	if type(o) == 'table' then
 		local s = '{ '
-		for k,v in pairs(o) do
+		for key, v in pairs(o) do
+			local k = key
 			if type(k) ~= 'number' then k = '"'..k..'"' end
 			s = s .. '['..k..'] = ' .. dump(v) .. ','
 		end
