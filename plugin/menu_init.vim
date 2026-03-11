@@ -214,6 +214,7 @@ let g:quickui_context = [
 			\ [ "Goto Declara&tion\t(LSP)", 'call module#lsp#goto_declaration()'],
 			\ [ "Goto &Implementaion\t(LSP)", 'call module#lsp#goto_implementation()'],
 			\ [ "Cursor Ho&ver\t(LSP)", 'call module#lsp#hover()'],
+			\ [ "Diag&nose Current\t(LSP)", 'call module#lsp#diag_current()'],
 			\ ]
 
 let g:quickui_context_foot = [

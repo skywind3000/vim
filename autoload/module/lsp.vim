@@ -223,3 +223,15 @@ endfunc
 
 
 
+"----------------------------------------------------------------------
+" diag
+"----------------------------------------------------------------------
+function! module#lsp#diag_current() abort
+	let tt = module#lsp#type()
+	if tt == 'ycm'
+	elseif tt == 'yegappan'
+		exec 'LspDiag current'
+	endif
+endfunc
+
+
