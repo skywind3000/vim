@@ -232,6 +232,11 @@ def MakeMessages(text, OPTIONS):
     if lang:
         lang = lang[:1].upper() + lang[1:].lower()
         prompt += ' (in %s)'%lang
+    if True:
+        prompt += '. '
+        prompt += 'Only generate the commit message, '
+        prompt += 'which I can directly copy and paste to git commit, '
+        prompt += 'no other text, no explanation, no code block, no markdown format.'
     if 'prompt' in OPTIONS:
         prompt = OPTIONS['prompt']
     # print('prompt', prompt)
