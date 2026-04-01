@@ -408,7 +408,7 @@ class DotEnv (object):
             ep = subprocess.run(args, shell = True, env = final)
         else:
             # ep = subprocess.run(args, shell = False, env = final)
-            os.execvpe(args[0], args, env)
+            os.execvpe(args[0], args, final)
             return 0
         return ep.returncode
 
