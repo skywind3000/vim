@@ -5,7 +5,7 @@
 # dotenv.py - Simple .env file parser and environment variable loader
 # author: skywind3000 (at) 163.com, 2026
 #
-# Last Modified: 2026/02/03 00:54:50
+# Last Modified: 2026/04/01 22:03:15
 #
 # Features:
 #
@@ -53,6 +53,7 @@
 #======================================================================
 import sys
 import os
+import subprocess
 
 
 #----------------------------------------------------------------------
@@ -381,6 +382,7 @@ class DotEnv (object):
     def __init__ (self):
         self._origin = os.environ.copy()
         self._dotenv = DotEnvParser(self._origin)
+        self._win32 = (sys.platform[:3] == 'win') and True or False
 
     def load (self, filepath):
         return self._dotenv.load(filepath)
@@ -391,11 +393,9 @@ class DotEnv (object):
     def reset (self):
         self._dotenv.clear()
 
-    def run (self, args):
-        if not args:
-            return
-        win32 = sys.platform[:3] == 'win'
-        merged = CaseInsensitiveDict(win32)
+    # combine environment variables
+    def combinate (self):
+        merged = CaseInsensitiveDict(self._win32)
         for key in os.environ:
             merged[key] = os.environ[key]
         for key in self._dotenv:
@@ -403,14 +403,35 @@ class DotEnv (object):
         final = {}
         for key in merged:
             final[key] = merged[key]
-        import subprocess
-        if win32:
-            ep = subprocess.run(args, shell = True, env = final)
+        return final
+
+    # run the child process and return the exit code
+    def run (self, args):
+        if not args:
+            return -1
+        final = self.combinate()
+        if not self._win32:
+            ep = subprocess.run(args, shell = False, env = final)
         else:
-            # ep = subprocess.run(args, shell = False, env = final)
-            os.execvpe(args[0], args, final)
-            return 0
+            ep = subprocess.run(args, shell = True, env = final)
         return ep.returncode
+
+    # no return, replace the current process
+    def exec (self, args):
+        if not args:
+            return -1
+        final = self.combinate()
+        if not self._win32:
+            os.execvpe(args[0], args, final)
+            sys.exit(0)
+        else:
+            ep = subprocess.Popen(args, shell = True, env = final)
+            try:
+                ep.wait()
+            except KeyboardInterrupt:
+                ep.wait()
+                sys.exit(130)
+        return 0
 
     # enumerate all the .env files from current directory to root
     def list_env_files (self, locate, filename = '.env'):
@@ -519,8 +540,8 @@ def main(argv = None):
             for key in keys:
                 print(f'{key}={dotenv._dotenv[key]}')
             return 0
-    ret = dotenv.run(args)
-    return ret
+    dotenv.exec(args)
+    return 0
 
 
 
