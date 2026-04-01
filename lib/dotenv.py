@@ -407,7 +407,9 @@ class DotEnv (object):
         if win32:
             ep = subprocess.run(args, shell = True, env = final)
         else:
-            ep = subprocess.run(args, shell = False, env = final)
+            # ep = subprocess.run(args, shell = False, env = final)
+            os.execvpe(args[0], args, env)
+            return 0
         return ep.returncode
 
     # enumerate all the .env files from current directory to root
