@@ -220,6 +220,9 @@ class DotEnvParser:
     def __keys__ (self):
         return self._environ.keys()
 
+    def get (self, key, default):
+        return self._environ.get(key, default)
+
     def keys (self):
         return self.__keys__()
 
