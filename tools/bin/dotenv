@@ -1,4 +1,4 @@
 #! /bin/sh
 
-python3 ~/.vim/vim/lib/dotenv.py "$@"
+exec python3 ~/.vim/vim/lib/dotenv.py "$@"
 
