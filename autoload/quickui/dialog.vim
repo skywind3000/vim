@@ -559,9 +559,10 @@ function! s:hl_prepare(hwnd) abort
 	call quickui#highlight#clear('QuickButtonOff2')
 	call quickui#highlight#make_underline('QuickButtonOn2', c1)
 	call quickui#highlight#make_underline('QuickButtonOff2', c2)
-	" prepare QuickOff for unfocused input
+	" prepare QuickOff for unfocused input:
+	" keep QuickInput bg (visible box) + muted fg from theme's Disable color
 	call quickui#highlight#clear('QuickOff')
-	call quickui#highlight#make_underline('QuickOff', get(g:, 'quickui_dialog_input_off', 'QuickBG'))
+	call quickui#highlight#overlay('QuickOff', 'QuickInput', 'QuickDefaultDisable')
 endfunc
 
 
