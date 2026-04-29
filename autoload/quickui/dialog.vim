@@ -808,6 +808,7 @@ function! s:render_all(hwnd) abort
 			call s:render_button(hwnd, ctrl, is_focused)
 		endif
 	endfor
+	call win.update()
 	call win.syntax_end()
 endfunc
 
