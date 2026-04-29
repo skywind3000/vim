@@ -247,6 +247,10 @@ c:\Share\vim/
 | `site/specs/reference/quickui.md` | QuickUI 界面组件库 | `autoload/quickui/`, `plugin/menu_init.vim` |
 | `site/specs/reference/gdv.md` | Git Diff View（side-by-side diff） | `autoload/gdv/` |
 | `site/specs/reference/textproc.md` | TextProc 文本过滤器管理 | `plugin/textproc.vim` |
+| `site/specs/reference/quickui-window.md` | QuickUI Window 通用窗口抽象层 | `autoload/quickui/window.vim` |
+| `site/specs/reference/quickui-readline.md` | QuickUI Readline 行编辑引擎 | `autoload/quickui/readline.vim` |
+
+> **QuickUI 迭代必读**: 修改或迭代 `autoload/quickui/` 下的任何组件前，除了阅读 `quickui.md`（整体介绍）外，还**必须阅读** `quickui-window.md`（通用窗口抽象层，封装了 Vim popup 和 Neovim floating window 的差异）和 `quickui-readline.md`（行编辑引擎，管理输入框的字符级编辑状态、可视选择、视口滚动和渲染）。这两个模块是 QuickUI 输入框等上层组件的核心依赖，不理解它们的接口约定会导致错误的修改。
 
 ## 测试
 
