@@ -62,3 +62,5 @@ tags
 /etc/test_*.*
 /lua/?/test_*.*
 
+nul
+/site/specs/.gitkeep
