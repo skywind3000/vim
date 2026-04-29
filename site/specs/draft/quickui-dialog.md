@@ -579,3 +579,341 @@ endfunc
 ```
 
 在 Vim 中运行：`:source tools/test/test_dialog.vim | call Test_dialog_basic()`
+
+### 自动化验证
+
+手动测试无法覆盖所有场景，且 coding agent 无法直接操作 Vim 交互式界面。因此需要一套基于脚本的自动化验证方案，让 Vim 在无人值守模式下完成渲染验证。
+
+#### 核心思路
+
+1. 编写 VimL 测试脚本（如 `tools/test/test_dialog_auto.vim`）
+2. 通过命令行启动 Vim 加载该脚本，Vim 在脚本内完成全部验证
+3. 脚本内使用 `screenstring()` / `screenchars()` 获取屏幕内容，与预期值比对
+4. 脚本通过 `:cq` 命令退出 Vim，返回码表示成功/失败
+5. 外部调用方（shell 或 coding agent）通过检查退出码判断测试结果
+
+#### 启动方式
+
+```bash
+# 以固定屏幕尺寸启动 Vim，加载测试脚本
+# -u NONE 避免加载用户 vimrc 干扰
+# -N 启用 nocompatible
+# -i NONE 禁用 viminfo
+# -n 禁用 swap 文件
+# -e -s 进入 silent ex mode（部分场景可用）
+vim -u NONE -N -i NONE -n \
+    --cmd "set lines=30 columns=80" \
+    -S tools/test/test_dialog_auto.vim
+echo "Exit code: $?"
+# 退出码 0 = 所有测试通过
+# 退出码非 0 = 某项测试失败
+```
+
+注意：`set lines=30 columns=80` 放在 `--cmd` 中确保在脚本加载前设置。某些终端环境下 Vim 的 `lines`/`columns` 可能被终端尺寸覆盖，如果无法设定可改用 GUI 模式（`gvim`）或在脚本中校验并跳过。
+
+#### 测试脚本结构
+
+```vim
+" tools/test/test_dialog_auto.vim
+" 自动化验证脚本 —— 由命令行启动，无需人工交互
+
+" ── 0. 加载依赖 ──────────────────────────────────────
+set rtp+=c:/Share/vim        " 或用相对路径，确保 autoload/ 可达
+runtime plugin/asyncrun.vim  " 按需加载
+
+" ── 1. 校验屏幕尺寸 ──────────────────────────────────
+let s:expected_lines = 30
+let s:expected_cols = 80
+if &lines != s:expected_lines || &columns != s:expected_cols
+    " 屏幕尺寸不符合预期，写日志并退出
+    call writefile(['FAIL: screen size mismatch, expected ' .
+        \ s:expected_lines . 'x' . s:expected_cols .
+        \ ', got ' . &lines . 'x' . &columns],
+        \ 'test_dialog_result.log')
+    cq 2    " 退出码 2 表示环境问题
+endif
+
+" ── 2. 测试辅助函数 ──────────────────────────────────
+
+" 捕获屏幕指定区域的文本
+function! s:screen_capture(row, col, width) abort
+    let text = ''
+    let c = a:col
+    while c < a:col + a:width
+        let ch = screenstring(a:row, c)
+        let text .= ch
+        " 全角字符占两列，跳过下一列
+        let w = strdisplaywidth(ch)
+        let c += (w > 1) ? w : 1
+    endwhile
+    return text
+endfunc
+
+" 捕获整个屏幕到行列表（用于 dump 到文件）
+function! s:screen_dump(filename) abort
+    let lines = []
+    for row in range(1, &lines)
+        let line = ''
+        let col = 1
+        while col <= &columns
+            let ch = screenstring(row, col)
+            let line .= ch
+            let w = strdisplaywidth(ch)
+            let col += (w > 1) ? w : 1
+        endwhile
+        call add(lines, line)
+    endfor
+    call writefile(lines, a:filename)
+endfunc
+
+" 断言函数：actual != expected 时记录错误
+let s:errors = []
+function! s:assert_equal(expected, actual, msg) abort
+    if a:expected != a:actual
+        call add(s:errors, a:msg . ': expected ' .
+            \ string(a:expected) . ', got ' . string(a:actual))
+    endif
+endfunc
+
+" 断言屏幕某位置包含指定文本
+function! s:assert_screen(row, col, expected, msg) abort
+    let width = strdisplaywidth(a:expected)
+    let actual = s:screen_capture(a:row, a:col, width)
+    call s:assert_equal(a:expected, actual, a:msg)
+endfunc
+
+" ── 3. 模拟用户输入 ──────────────────────────────────
+"
+" 关键技巧：dialog 的主循环使用 getchar() 等待输入，
+" 可以用 feedkeys() 预先注入按键序列，使 dialog 在无人
+" 交互下完成输入并退出。
+"
+" feedkeys() 的 't' 标志表示按键被当作用户输入（触发映射），
+" 'x' 标志表示立即执行（不等待 getchar 返回）。
+"
+" 示例：输入 "hello"，然后按 Tab 切换焦点，再按 Enter 确认
+"   call feedkeys("hello\<Tab>\<CR>", 't')
+
+" ── 4. 测试用例 ──────────────────────────────────────
+
+function! s:test_basic_render() abort
+    " 构造对话框
+    let items = [
+        \ {'type': 'label', 'text': 'Hello Dialog:'},
+        \ {'type': 'input', 'name': 'name', 'prompt': 'Name:',
+        \  'value': 'test'},
+        \ {'type': 'check', 'name': 'flag', 'text': 'Enable'},
+        \ {'type': 'button', 'name': 'confirm',
+        \  'items': [' &OK ', ' &Cancel ']},
+        \ ]
+
+    " 预注入按键：直接按 ESC 关闭对话框
+    " 如需测试输入：feedkeys("hello\<Tab>\<Space>\<Tab>\<CR>", 't')
+    call feedkeys("\<ESC>", 't')
+
+    let result = quickui#dialog#open(items, {
+        \ 'title': 'Test', 'w': 40})
+
+    " 验证返回值
+    call s:assert_equal('', result.button, 'ESC should cancel')
+    call s:assert_equal(-1, result.button_index, 'cancel index')
+endfunc
+
+function! s:test_input_and_submit() abort
+    let items = [
+        \ {'type': 'input', 'name': 'name', 'prompt': 'Name:'},
+        \ {'type': 'button', 'name': 'confirm',
+        \  'items': [' &OK ', ' &Cancel ']},
+        \ ]
+
+    " 预注入：输入 "skywind" → Tab 到按钮 → Enter 确认
+    call feedkeys("skywind\<Tab>\<CR>", 't')
+
+    let result = quickui#dialog#open(items, {
+        \ 'title': 'Test', 'w': 40})
+
+    call s:assert_equal('confirm', result.button, 'button name')
+    call s:assert_equal(0, result.button_index, 'OK index')
+    call s:assert_equal('skywind', result.name, 'input value')
+endfunc
+
+function! s:test_screen_content() abort
+    " 测试渲染后的屏幕内容
+    let items = [
+        \ {'type': 'label', 'text': 'Screen Test:'},
+        \ {'type': 'check', 'name': 'flag', 'text': 'Enable',
+        \  'value': 1},
+        \ {'type': 'button', 'name': 'confirm',
+        \  'items': [' &OK ']},
+        \ ]
+
+    " 注入一个 timer 延迟检查屏幕（在 dialog 显示期间）
+    " 然后注入 ESC 关闭
+    let s:screen_ok = 0
+    function! s:check_screen(timer) closure
+        " 把当前屏幕 dump 到文件供外部审查
+        call s:screen_dump('test_dialog_screen.txt')
+
+        " 也可以直接断言屏幕内容
+        " 假设对话框居中显示，label 在某行某列
+        " 具体坐标取决于 lines/columns 和对话框尺寸
+        " call s:assert_screen(row, col, '[x] Enable', 'checkbox')
+
+        let s:screen_ok = 1
+        " 注入 ESC 关闭对话框
+        call feedkeys("\<ESC>", 't')
+    endfunc
+
+    " 50ms 后检查屏幕（足够 dialog 渲染完毕）
+    call timer_start(50, function('s:check_screen'))
+
+    let result = quickui#dialog#open(items, {
+        \ 'title': 'Test', 'w': 40})
+
+    call s:assert_equal(1, s:screen_ok, 'screen check executed')
+endfunc
+
+" ── 5. 运行所有测试并汇报结果 ─────────────────────────
+
+call s:test_basic_render()
+call s:test_input_and_submit()
+call s:test_screen_content()
+
+" ── 6. 输出结果并退出 ─────────────────────────────────
+if len(s:errors) == 0
+    call writefile(['ALL PASSED'], 'test_dialog_result.log')
+    qa!      " 退出码 0 —— 成功
+else
+    let report = ['FAILED: ' . len(s:errors) . ' error(s)'] + s:errors
+    call writefile(report, 'test_dialog_result.log')
+    cq 1     " 退出码 1 —— 测试失败
+endif
+```
+
+#### 技术要点
+
+##### 屏幕尺寸控制
+
+```vim
+" --cmd 在加载任何文件前执行，确保尺寸在 dialog 渲染前就绑定
+" 终端 Vim 的 lines/columns 可能被终端模拟器覆盖，
+" gvim 则可以可靠地设置任意尺寸：
+"   gvim --cmd "set lines=30 columns=80" -S test.vim
+"
+" 脚本内必须校验实际尺寸是否符合预期
+```
+
+##### feedkeys() 模拟输入
+
+```vim
+" feedkeys(keys, flags) 的关键 flags：
+"   't' — 当作从终端输入（触发映射和 typeahead）
+"   'x' — 立即处理（不等待返回主循环）
+"   'n' — 不重新映射
+"
+" dialog 主循环用 getchar() 阻塞等待输入，
+" feedkeys 注入的按键会被 getchar() 依次消费。
+"
+" 时序：feedkeys() 在调用 dialog#open() 之前执行，
+" 按键被放入 typeahead 缓冲区，dialog 启动后
+" getchar() 立即从缓冲区取到按键。
+
+" 示例：完整的表单填写流程
+call feedkeys("John\<Tab>john@test.com\<Tab>\<Right>\<Tab>\<Space>\<Tab>\<CR>", 't')
+"             ^^^^^ input1  ^^^^^^^^^^^^^ input2  ^^^^^^ radio   ^^^^^^ check  ^^ button
+```
+
+##### screenstring() 屏幕捕获
+
+```vim
+" screenstring(row, col) — 返回屏幕指定位置的字符
+"   row: 1-based 行号（1 = 屏幕最顶行）
+"   col: 1-based 列号（1 = 最左列）
+"   返回值：单个字符的字符串（多字节字符返回完整字符）
+"
+" screenchars(row, col) — 返回字符码点列表
+"   用于精确比对 Unicode 字符
+"
+" screenattr(row, col) — 返回屏幕属性（高亮信息）
+"   可以用来验证高亮是否正确应用
+"
+" 注意：必须在 redraw 之后调用，否则屏幕内容可能未更新。
+" 在 dialog 主循环中，可以通过 timer_start() 延迟回调
+" 来在 redraw 之后捕获屏幕。
+```
+
+##### timer_start() 延迟验证
+
+```vim
+" 对于需要在 dialog 显示期间验证屏幕内容的场景，
+" 不能在 feedkeys 中直接做（feedkeys 的按键被 dialog 消费了）。
+" 解决办法：用 timer_start() 注册一个延迟回调，
+" dialog 显示并 redraw 后，timer 触发，在回调中：
+"   1. 调用 screenstring() 验证屏幕
+"   2. 调用 s:screen_dump() 保存屏幕快照
+"   3. 注入 feedkeys("\<ESC>") 关闭 dialog
+"
+" timer 的延迟建议 50-100ms，足够 dialog 完成首次渲染。
+```
+
+##### :cq 退出码
+
+```vim
+" :cq [N] — 以错误码 N 退出 Vim（默认 N=1）
+" :qa!     — 正常退出，退出码为 0
+"
+" 约定：
+"   0 — 所有测试通过
+"   1 — 测试失败（断言不匹配）
+"   2 — 环境问题（屏幕尺寸不对等）
+"
+" 外部 shell 检查：
+"   vim ... -S test.vim; echo $?
+```
+
+##### screen dump 供外部审查
+
+```vim
+" 当断言条件难以精确预知（如对话框居中位置取决于尺寸计算），
+" 可以将整个屏幕 dump 到文本文件，由 coding agent 读取
+" 文件内容进行视觉审查：
+"
+"   call s:screen_dump('test_dialog_screen.txt')
+"
+" 文件格式为纯文本，每行对应屏幕一行，可直接阅读。
+" agent 读取后可以检查：
+"   - 对话框边框是否完整
+"   - 控件文本是否正确渲染
+"   - 焦点高亮位置是否正确（通过 screenattr 辅助判断）
+```
+
+#### 外部调用流程
+
+```bash
+# 1. coding agent 生成/修改 dialog.vim 代码
+# 2. 启动 Vim 执行自动化测试
+vim -u NONE -N -i NONE -n \
+    --cmd "set lines=30 columns=80" \
+    -S tools/test/test_dialog_auto.vim
+
+# 3. 检查退出码
+if [ $? -eq 0 ]; then
+    echo "PASS"
+else
+    echo "FAIL — see test_dialog_result.log"
+    cat test_dialog_result.log
+fi
+
+# 4. 可选：读取 screen dump 文件进行视觉审查
+cat test_dialog_screen.txt
+```
+
+对于 Windows 环境，等效的调用方式：
+
+```cmd
+vim -u NONE -N -i NONE -n ^
+    --cmd "set lines=30 columns=80" ^
+    -S tools/test/test_dialog_auto.vim
+echo Exit code: %ERRORLEVEL%
+type test_dialog_result.log
+```
