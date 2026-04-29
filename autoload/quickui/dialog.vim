@@ -1013,14 +1013,34 @@ function! s:handle_key(hwnd, ch) abort
 
 	if ch == "\<Tab>"
 		if focus_size > 0
-			let hwnd.focus_index = (hwnd.focus_index + 1) % focus_size
+			let fi = hwnd.focus_index
+			let ctrl = hwnd.focus_list[fi].control
+			if ctrl.type ==# 'button' && ctrl.value < len(ctrl.parsed) - 1
+				let ctrl.value += 1
+			else
+				let hwnd.focus_index = (fi + 1) % focus_size
+				let new_ctrl = hwnd.focus_list[hwnd.focus_index].control
+				if new_ctrl.type ==# 'button'
+					let new_ctrl.value = 0
+				endif
+			endif
 		endif
 		return
 	endif
 
 	if ch == "\<S-Tab>"
 		if focus_size > 0
-			let hwnd.focus_index = (hwnd.focus_index - 1 + focus_size) % focus_size
+			let fi = hwnd.focus_index
+			let ctrl = hwnd.focus_list[fi].control
+			if ctrl.type ==# 'button' && ctrl.value > 0
+				let ctrl.value -= 1
+			else
+				let hwnd.focus_index = (fi - 1 + focus_size) % focus_size
+				let new_ctrl = hwnd.focus_list[hwnd.focus_index].control
+				if new_ctrl.type ==# 'button'
+					let new_ctrl.value = len(new_ctrl.parsed) - 1
+				endif
+			endif
 		endif
 		return
 	endif
