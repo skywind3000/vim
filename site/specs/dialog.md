@@ -173,6 +173,7 @@ let hwnd = {
 | `s:handle_mouse(hwnd)` | 平台分支：Vim 用 `getmousepos()`，Neovim 用 `v:mouse_*`。Neovim 额外检测边框窗口关闭按钮。 |
 | `s:dispatch_click(hwnd, x, y)` | 将 0-based 坐标映射到控件，执行点击操作。 |
 | `s:focus_to_ctrl(hwnd, ctrl)` | 将焦点移到指定控件。 |
+| `s:input_select_all(ctrl)` | 若 input 有内容，全选文本并将光标置于末尾（Windows 风格焦点行为）。 |
 
 #### 退出阶段
 
@@ -190,6 +191,7 @@ quickui#dialog#open(items, opts)
   ├── s:calc_layout() → line_start, content_h, prompt 对齐
   ├── s:build_focus_list() → focus_list
   ├── opts.focus → 设置初始焦点
+  ├── 初始焦点为 input 时 → s:input_select_all() 全选内容
   ├── s:build_keymap() → keymap (含冲突检测)
   ├── s:build_content() → 初始 buffer 文本
   ├── s:hl_prepare() → QuickOff, QuickButtonOn2/Off2
@@ -206,6 +208,7 @@ quickui#dialog#open(items, opts)
         ├── getchar → ch
         │   getchar(0) 返回 0 → sleep 15m → continue
         └── s:handle_key(hwnd, ch) → 可能设置 exit=1
+              焦点变化时：若新焦点为 input 且非鼠标操作 → s:input_select_all()
   │
   ├── 退出动画：最终状态 render + redraw + sleep 15m
   ├── 保存 input 历史：rl.history_save() + s:history 缓存

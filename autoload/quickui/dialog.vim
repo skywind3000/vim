@@ -940,6 +940,18 @@ endfunc
 
 
 "----------------------------------------------------------------------
+" select all text in input control (Windows-style focus behavior)
+"----------------------------------------------------------------------
+function! s:input_select_all(ctrl) abort
+	let rl = a:ctrl.rl
+	if rl.size > 0
+		let rl.select = 0
+		call rl.seek(0, 2)
+	endif
+endfunc
+
+
+"----------------------------------------------------------------------
 " focus to a specific control
 "----------------------------------------------------------------------
 function! s:focus_to_ctrl(hwnd, ctrl) abort
@@ -1279,6 +1291,14 @@ function! quickui#dialog#open(items, ...) abort
 		endfor
 	endif
 
+	" ── select all for initially focused input ──
+	if len(hwnd.focus_list) > 0
+		let fc = hwnd.focus_list[hwnd.focus_index].control
+		if fc.type ==# 'input'
+			call s:input_select_all(fc)
+		endif
+	endif
+
 	" ── build keymap ──
 	if s:build_keymap(hwnd) < 0
 		return {'button': '', 'button_index': -1}
@@ -1366,7 +1386,18 @@ function! quickui#dialog#open(items, ...) abort
 			continue
 		endif
 
+		let prev_fi = hwnd.focus_index
 		call s:handle_key(hwnd, ch)
+
+		" select all when keyboard navigation moves focus to an input
+		if hwnd.focus_index != prev_fi && hwnd.exit == 0
+			if ch != "\<LeftMouse>"
+				let fc = hwnd.focus_list[hwnd.focus_index].control
+				if fc.type ==# 'input'
+					call s:input_select_all(fc)
+				endif
+			endif
+		endif
 	endwhile
 
 	" ── brief render of final state ──
