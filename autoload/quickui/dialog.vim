@@ -1675,6 +1675,7 @@ function! quickui#dialog#open(items, ...) abort
 	let hwnd.exit = 0
 	let hwnd.exit_button = ''
 	let hwnd.exit_index = -1
+	let hwnd.validator = get(opts, 'validator', v:null)
 
 	" -- calculate width --
 	if has_key(opts, 'w')
@@ -1818,6 +1819,22 @@ function! quickui#dialog#open(items, ...) abort
 				if fc.type ==# 'input'
 					call s:input_select_all(fc)
 				endif
+			endif
+		endif
+
+		" -- validator check before exit --
+		if hwnd.exit != 0 && hwnd.exit_index >= 0 && hwnd.validator != v:null
+			let vresult = s:collect_result(hwnd)
+			let vresult.button = hwnd.exit_button
+			let vresult.button_index = hwnd.exit_index
+			let errmsg = call(hwnd.validator, [vresult])
+			if type(errmsg) == v:t_string && errmsg !=# ''
+				let hwnd.exit = 0
+				call s:render_all(hwnd)
+				redraw
+				echohl ErrorMsg
+				echo errmsg
+				echohl None
 			endif
 		endif
 	endwhile

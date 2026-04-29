@@ -271,6 +271,29 @@ Passed via the second parameter `opts`:
 | `gap` | Number | `1` | Number of blank lines between different control types |
 | `button` | Number | `1` | Whether to show the close button |
 | `focus` | String | — | Name of the control to receive initial focus |
+| `validator` | Funcref | — | Validation function called before normal exit (see below) |
+
+### Validator
+
+If `opts.validator` is provided, it is called before the dialog exits normally (i.e., `button_index >= 0`). It is **not** called on cancel (ESC / Ctrl-C / close button).
+
+The function receives a single argument — the same Dict that `open()` would return — and should return:
+- `0` or `''` (empty string) — validation passed, dialog exits normally
+- A non-empty string — validation failed, the string is displayed as an error message with `ErrorMsg` highlight, and the dialog remains open
+
+```vim
+function! MyValidator(result) abort
+    if a:result.username ==# ''
+        return 'Username cannot be empty!'
+    endif
+    return ''
+endfunc
+
+let result = quickui#dialog#open(items, {
+    \ 'title': 'Form',
+    \ 'validator': function('MyValidator'),
+    \ })
+```
 
 ## Return Value
 

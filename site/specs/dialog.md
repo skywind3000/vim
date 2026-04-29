@@ -58,6 +58,7 @@ let hwnd = {
     \ 'color_off2': 'QuickButtonOff2', " 未聚焦按钮快捷键下划线
     \ 'padding_left': 1,       " 左侧 padding 列数（用于鼠标坐标计算）
     \ 'sep_char': '─',        " separator 分隔线字符（从 border 样式获取）
+    \ 'validator': v:null,    " Funcref/null 退出前校验函数
     \ }
 ```
 
@@ -234,6 +235,8 @@ quickui#dialog#open(items, opts)
         │   getchar(0) 返回 0 → sleep 15m → continue
         └── s:handle_key(hwnd, ch) → 可能设置 exit=1
               焦点变化时：若新焦点为 input 且非鼠标操作 → s:input_select_all()
+              exit 前 validator 检查：若 exit_index>=0 且 validator 存在，
+              调用 validator(result)，非空字符串则 exit=0 + ErrorMsg 显示错误
   │
   ├── 退出动画：最终状态 render + redraw + sleep 15m
   ├── 保存 input 历史：rl.history_save() + s:history 缓存
