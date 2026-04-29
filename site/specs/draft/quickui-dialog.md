@@ -86,6 +86,7 @@ let result = quickui#dialog#open(items, opts)
 - 可聚焦
 - 占用 1 行（水平排列）
 - 布局：`prompt  (*) Dev  ( ) QA  ( ) PM`
+- 若选项总宽度超出对话框内容区宽度，超出部分截断显示，但仍可通过方向键访问所有选项（选中项始终可见）。选项过多时建议使用 `vertical: 1` 垂直布局（见 [扩展预留](#扩展预留)）
 
 #### check — 复选框
 
@@ -98,11 +99,13 @@ let result = quickui#dialog#open(items, opts)
 | `type` | String | 是 | — | `'check'` |
 | `name` | String | 是 | — | 控件名称 |
 | `text` | String | 是 | — | 显示文本，支持 `&` 标记快捷键 |
+| `prompt` | String | 否 | `''` | 左侧标签文本（设置后可参与对齐组） |
 | `value` | Number | 否 | `0` | 初始状态，0=未选中，1=选中 |
 
 - 可聚焦
 - 占用 1 行
-- 布局：`[x] Administrator` 或 `[ ] Administrator`
+- 无 prompt 时布局：`[x] Administrator`
+- 有 prompt 时布局：`Admin:  [x] Administrator`（可与 input/radio 的 prompt 对齐）
 
 #### button — 按钮行
 
@@ -122,6 +125,13 @@ let result = quickui#dialog#open(items, opts)
 - 支持定义多个 button 控件，各占一行
 - 布局：按钮居中或居右排列，`< OK >  < Cancel >`
 - `items` 中的 `&` 标记同 `quickui#confirm` 的 choices 约定（`quickui#utils#item_parse`）
+- **限制**：任何按钮被激活（Space/Enter/快捷键/鼠标点击）都会关闭对话框。如需"Apply"等不关闭对话框的按钮，可通过未来的回调扩展实现。
+- **注意**：`button_index` 使用 0-based 索引，这与 `quickui#confirm#open()` 的 1-based 返回值不同
+
+### 控件通用约束
+
+- **name 唯一性**：所有带 `name` 字段的控件，其 `name` 值必须唯一（`name` 用作返回值字典的键）。`s:parse_items()` 检测到重复 `name` 时应 `echoerr` 报错并中止。
+- **button 默认 name**：如果存在多个 button 控件，每个都必须显式指定不同的 `name`，否则默认的 `'button'` 会导致冲突。
 
 ### 对话框选项
 
@@ -131,9 +141,10 @@ let result = quickui#dialog#open(items, opts)
 |------|------|--------|------|
 | `title` | String | `'Dialog'` | 对话框标题 |
 | `w` | Number | auto | 对话框内容区宽度，不指定则自动计算 |
+| `min_w` | Number | `40` | 自动计算宽度时的下限（可按需调小） |
 | `border` | Number | `g:quickui#style#border` | 边框样式 |
 | `center` | Number | `1` | 是否居中显示 |
-| `padding` | List | `[1,1,1,1]` | 内边距 |
+| `padding` | List | `[1,1,1,1]` | 内边距 `[top, right, bottom, left]`（同 Vim popup 约定） |
 | `color` | String | `'QuickBG'` | 背景高亮组 |
 | `bordercolor` | String | `'QuickBorder'` | 边框高亮组 |
 | `gap` | Number | `1` | 不同类型控件之间的空行数 |
@@ -141,7 +152,7 @@ let result = quickui#dialog#open(items, opts)
 
 ### 返回值
 
-返回一个 Dict，包含：
+返回一个 Dict，**无论用户确认还是取消，始终包含所有命名控件的当前值**。调用方通过 `button` / `button_index` 判断用户是正常提交还是取消：
 
 - 所有命名控件的值（以 `name` 为键）
 - `button` 字段标识哪个 button 控件被激活
@@ -167,8 +178,15 @@ let result = quickui#dialog#open(items, opts)
 {
     \ 'button': '',
     \ 'button_index': -1,
+    \ 'username': 'skywind',
+    \ 'email': 'half-typed@',
+    \ 'role': 1,
+    \ 'admin': 0,
+    \ 'notify': 1,
     \ }
 ```
+
+> 取消时也保留控件值，方便调用方在重新打开对话框时恢复用户已填写的内容。
 
 字段说明：
 
@@ -254,7 +272,7 @@ endif
 
 ### prompt 对齐
 
-连续的 input 控件（中间无其他类型控件）形成一个"对齐组"，组内所有 prompt 按最长的 prompt 宽度 + 2 对齐：
+连续的带 `prompt` 字段的控件（input、radio、设置了 prompt 的 check），中间无不带 prompt 的控件打断，形成一个"对齐组"。组内所有 prompt 按最长的 prompt 宽度 + 2 对齐：
 
 ```
 Name:   [skywind                       ]
@@ -262,7 +280,7 @@ Email:  [                              ]
 Phone:  [                              ]
 ```
 
-radio 控件的 prompt 也参与对齐组（如果与 input 连续）。
+不同对齐组之间互不影响。无 `prompt`（或 prompt 为空）的控件不参与对齐组，也会打断前后的对齐组。
 
 ### 宽度自动计算
 
@@ -271,7 +289,11 @@ radio 控件的 prompt 也参与对齐组（如果与 input 连续）。
 1. 取所有 label 文本行的最大宽度
 2. 取所有 button 行的渲染宽度
 3. 取所有 input/radio/check 渲染所需的最小宽度
-4. 取以上最大值，并设下限（如 40 列）和上限（`&columns * 80 / 100`）
+4. 取以上最大值，并设下限（`opts.min_w`，默认 40 列）和上限（`&columns * 80 / 100`）
+
+### 高度溢出保护
+
+对话框总高度（含 border + padding）不得超过 `&lines - 2`。如果控件总行数超出此限制，`s:calc_layout()` 应 `echoerr` 报错——dialog 是静态布局组件，不支持滚动。调用方应减少控件数量或使用更紧凑的布局。
 
 ## 焦点管理
 
@@ -320,9 +342,9 @@ radio 控件的 prompt 也参与对齐组（如果与 input 连续）。
 |------|------|
 | readline 按键 | 委托给 `rl.feed()`（光标移动、编辑、选择、剪贴板等） |
 | `Enter` | 焦点前进到下一个控件 |
-| `Up` / `Down` | 有历史时浏览历史；无历史时焦点上/下移动 |
+| `Up` / `Down` | 浏览历史记录（委托给 `rl.feed()`，与 `quickui#input` 行为一致） |
 
-说明：input 控件聚焦时接管大部分按键，只有 Tab/S-Tab/Enter/ESC 走全局处理。
+说明：input 控件聚焦时接管大部分按键，只有 Tab/S-Tab/Enter/ESC 走全局处理。焦点跳转统一由 Tab/Shift-Tab 负责，Up/Down 始终用于历史浏览，避免行为因 history 配置而异。
 
 ### radio 控件按键
 
@@ -350,11 +372,13 @@ radio 控件的 prompt 也参与对齐组（如果与 input 连续）。
 
 ### 快捷键
 
-button 和 radio 的 `items` 支持 `&` 标记快捷键（同 `quickui#utils#item_parse` 约定）。快捷键为全局有效：
+button、radio 和 check 的 `items`/`text` 支持 `&` 标记快捷键（同 `quickui#utils#item_parse` 约定）。快捷键为全局有效：
 
 - button 快捷键：直接激活对应按钮，关闭对话框
 - radio 快捷键：选中对应选项（不关闭对话框）
 - check 的 `text` 也支持 `&` 快捷键：切换勾选状态
+
+**冲突处理**：`s:build_keymap()` 按 items 顺序注册快捷键，若同一字符被多个控件使用，**后注册的覆盖先注册的**。由于 button 通常排在 items 列表末尾，其快捷键自然拥有最高优先级。调用方应避免同一字符在 button 和 radio/check 之间重复。
 
 ## 鼠标交互
 
@@ -464,7 +488,10 @@ quickui#dialog#open(items, opts)
         │
         ├── redraw
         │
-        ├── getchar() / getchar(0)
+        ├── 按焦点类型选择等待模式：
+        │     - 焦点在 input 上：getchar(0) 非阻塞 + sleep 15m
+        │       （驱动光标闪烁动画，同 input.vim 的做法）
+        │     - 焦点在其他控件：getchar(1) 阻塞等待（节省 CPU）
         │
         └── s:handle_key(hwnd, ch)
               ├── 全局键判断：ESC/Tab/S-Tab/Mouse/快捷键
@@ -512,8 +539,13 @@ function! s:render_input(hwnd, control, focused)
             let x += len
         endfor
 
-        " 更新 buffer 行文本
-        " ...
+        " 更新 buffer 行文本（从 display 中提取纯文本写入）
+        let line = a:control.prompt . repeat(' ', a:control.prompt_width
+            \ - strwidth(a:control.prompt))
+        for [attr, text] in display
+            let line .= text
+        endfor
+        call win.set_line(y, line, 0)  " refresh=0，延迟到 syntax_end 后统一刷新
     else
         " 未聚焦：显示静态文本，使用 QuickOff 高亮
         call win.syntax_region('QuickOff', col, y, col + a:control.input_width, y)
@@ -531,6 +563,128 @@ button 控件的渲染逻辑直接复用 `confirm.vim` 中的模式：
 - 鼠标点击区域判断逻辑相同
 
 区别在于 dialog 的 button 只是众多控件之一，不独占整个窗口。
+
+## Vim/Neovim 兼容性
+
+dialog 模块通过 `quickui#window` 屏蔽了大部分平台差异，但以下几处需要在 dialog 层面显式处理。
+
+### 平台检测
+
+使用 `quickui#core` 提供的全局变量，模块加载时一次性确定，不在运行时重复检测：
+
+```vim
+let s:has_nvim = g:quickui#core#has_nvim
+let s:has_popup = g:quickui#core#has_popup
+```
+
+### 窗口创建与边框
+
+dialog 通过 `quickui#window#new()` 创建窗口，**不直接调用** `popup_create()` 或 `nvim_open_win()`。`quickui#window` 内部根据平台选择实现：
+
+| 特性 | Vim | Neovim |
+|------|-----|--------|
+| 窗口创建 | `popup_create()` | `nvim_open_win()` |
+| 边框/padding | 内置参数（`borderchars`, `padding`） | 双窗口模拟（前景内容 + 背景边框） |
+| 标题 | `popup_setoptions()` 的 `title` 参数 | 在边框 buffer 文本中绘制 |
+| 关闭按钮 | `popup_setoptions()` 的 `close='button'` | 在边框文本中绘制 `X` 字符 |
+| 隐藏/显示 | `popup_hide/show`（winid 不变） | `nvim_win_close/open`（**winid 会变**） |
+
+dialog 只需调用 `win.open()`、`win.close()`、`win.set_line()` 等统一接口，无需关心这些差异。
+
+### 关闭按钮与退出检测
+
+Vim 和 Neovim 的关闭按钮检测机制不同，dialog 事件循环中需要两个分支：
+
+```vim
+" 在主事件循环中检测关闭按钮
+if s:has_nvim == 0
+    " Vim：popup 内置 callback 机制
+    " popup_exit 回调自动设置 win.quit = 1
+    if hwnd.win.quit != 0
+        let hwnd.exit = 1
+    endif
+else
+    " Neovim：必须在鼠标事件中手动检测边框窗口上的 X 字符
+    " 见下方"鼠标交互"一节
+endif
+```
+
+### 鼠标坐标转换
+
+鼠标点击后的坐标获取方式不同，dialog 在 `s:handle_mouse()` 中需要分支处理：
+
+```vim
+function! s:handle_mouse(hwnd) abort
+    let win = a:hwnd.win
+    if s:has_nvim == 0
+        " Vim：用 getmousepos() 获取精确坐标
+        let pos = getmousepos()
+        if pos.winid != win.winid
+            return -1
+        endif
+        " Vim popup 的 column 包含了 border+padding 偏移
+        " 需要减去 padding 列数得到内容区相对坐标
+        let x = pos.column - 1 - a:hwnd.padding_left
+        let y = pos.line - 1
+    else
+        " Neovim：用 v:mouse_* 全局变量
+        if v:mouse_winid == win.winid
+            " 点击在内容窗口上，坐标已经是内容区相对坐标
+            let x = v:mouse_col - 1
+            let y = v:mouse_lnum - 1
+        elseif v:mouse_winid == win.info.border_winid
+            " 点击在边框窗口上
+            " 检测是否点击了关闭按钮（右上角 X）
+            if v:mouse_lnum == 1 && v:mouse_col == win.info.tw
+                let a:hwnd.exit = 1
+                return -1
+            endif
+            return -1    " 边框其他区域忽略
+        else
+            return -1    " 点击在窗口外
+        endif
+    endif
+    " x, y 是内容区 0-based 坐标，后续映射到控件
+    return s:dispatch_click(a:hwnd, x, y)
+endfunc
+```
+
+### 事件循环中的 getchar
+
+`getchar()` 在两个平台上行为一致，无需分支。但 dialog 使用 `quickui#utils#getchar()` 封装，它额外处理了：
+
+- `Ctrl-C` 中断异常捕获（`catch /^Vim:Interrupt$/`）
+- 非阻塞模式下返回 0 时的 `sleep 15m` 等待
+- 数字返回值到字符串的统一转换（`nr2char()`）
+
+### 语法高亮
+
+dialog 通过 `win.syntax_begin/region/end` 批量设置高亮，`quickui#window` 内部自动使用 `quickui#core#win_execute()` 在目标窗口上下文中执行语法命令。此函数已封装了平台差异：
+
+- Vim 8.2+：直接调用 `win_execute()`
+- Neovim 0.7+：同样使用 `win_execute()`（已支持）
+- Neovim < 0.7：临时切换当前窗口后执行命令
+
+dialog 层面不需要额外处理。
+
+### Buffer 管理
+
+dialog 使用 `quickui#core#buffer_alloc/free` 的 buffer 池机制，该模块内部已处理了平台差异：
+
+- Vim：`bufadd('') + bufload()`
+- Neovim：`nvim_create_buf(v:false, v:true)`
+
+dialog 通过 `win.set_line()` 和 `win.update()` 更新 buffer 内容，不直接操作 buffer API。
+
+### 注意事项
+
+1. **不缓存 winid**：Neovim 下 `win.show(0)` 后 winid 会变为 -1，`win.show(1)` 后获得新的 winid。dialog 应始终通过 `hwnd.win.winid` 访问当前 winid，不要在局部变量中长期缓存。
+
+2. **Neovim 的 `noautocmd`**：`quickui#window` 在 Neovim 0.6+ 创建浮动窗口时自动添加 `noautocmd = 1`，防止用户 autocmd 干扰 dialog 的窗口管理。dialog 不需要额外处理。
+
+3. **边框模拟开关**：Neovim 下可通过 `let g:quickui_nvim_simulate_border = 0` 禁用边框模拟。dialog 应该在无边框时也能正常工作——此时没有关闭按钮，只能用 ESC 退出。
+
+4. **坐标系统一**：dialog 内部统一使用 0-based 坐标。`quickui#window` 的 `x`/`y` 属性已经是 0-based（内部自动对 Vim popup API 做 +1 转换）。`syntax_region()` 的参数也是 0-based。
 
 ## 扩展预留
 
@@ -717,6 +871,8 @@ function! s:test_basic_render() abort
     " 验证返回值
     call s:assert_equal('', result.button, 'ESC should cancel')
     call s:assert_equal(-1, result.button_index, 'cancel index')
+    " 取消时也应返回控件值
+    call s:assert_equal('test', result.name, 'cancel preserves input')
 endfunc
 
 function! s:test_input_and_submit() abort
@@ -811,7 +967,8 @@ endif
 "   'x' — 立即处理（不等待返回主循环）
 "   'n' — 不重新映射
 "
-" dialog 主循环用 getchar() 阻塞等待输入，
+" dialog 主循环在焦点于 input 时用 getchar(0) 非阻塞轮询，
+" 焦点在其他控件时用 getchar(1) 阻塞等待输入，
 " feedkeys 注入的按键会被 getchar() 依次消费。
 "
 " 时序：feedkeys() 在调用 dialog#open() 之前执行，
