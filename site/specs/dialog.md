@@ -1,0 +1,295 @@
+# QuickUI Dialog 模块参考文档
+
+> **文件路径**: `autoload/quickui/dialog.vim`
+> **依赖**: `quickui#window`, `quickui#readline`, `quickui#core`, `quickui#utils`, `quickui#highlight`
+> **适用**: Vim 8.2+ / Neovim 0.4+
+> **设计方案**: `site/specs/draft/quickui-dialog.md`
+> **用户指南**: `site/specs/use-dialog.md`
+
+## 概述
+
+`quickui#dialog` 是一个数据驱动的通用对话框模块。调用方通过声明式的控件列表描述对话框内容，调用 `quickui#dialog#open(items, opts)` 弹出对话框，用户交互后返回包含所有控件值的字典。
+
+支持 5 种控件：label（静态文本）、input（单行输入框）、radio（单选组）、check（复选框）、button（按钮行）。
+
+## 公开 API
+
+### `quickui#dialog#open(items [, opts])`
+
+唯一的公开入口函数。
+
+- `items`: `List<Dict>` — 控件描述列表
+- `opts`: `Dict`（可选）— 对话框选项
+- 返回: `Dict` — 包含所有控件值和按钮状态
+
+详细的参数格式和返回值说明见 `site/specs/use-dialog.md`。
+
+## 内部架构
+
+### 模块级变量
+
+```vim
+let s:has_nvim = g:quickui#core#has_nvim   " 平台检测（一次性）
+let s:history = {}                          " input 历史记录缓存
+```
+
+`s:history` 以 `history_key` 为键存储各 input 的历史列表，跨多次 `dialog#open()` 调用保持。
+
+### 核心数据结构
+
+#### hwnd（对话框主状态对象）
+
+```vim
+let hwnd = {
+    \ 'controls': [...],       " List<ctrl> 内部控件对象列表
+    \ 'focus_list': [...],     " List<{index, type, control}> 可聚焦控件有序列表
+    \ 'focus_index': 0,        " 当前焦点在 focus_list 中的索引
+    \ 'win': <window>,         " quickui#window 实例
+    \ 'w': 50,                 " 内容区宽度（列数）
+    \ 'content_h': 20,         " 内容区高度（行数，由 calc_layout 计算）
+    \ 'content': [...],        " List<String> 初始 buffer 文本
+    \ 'keymap': {...},         " Dict<hotkey → {action, control, index}>
+    \ 'exit': 0,               " 退出标志（1=退出主循环）
+    \ 'exit_button': '',       " 触发退出的 button name（'' 表示取消）
+    \ 'exit_index': -1,        " 触发退出的按钮索引（1-based，-1=取消，0=Enter）
+    \ 'color_on': 'QuickSel',  " 聚焦按钮高亮组
+    \ 'color_off': 'QuickBG',  " 未聚焦按钮高亮组
+    \ 'color_on2': 'QuickButtonOn2',   " 聚焦按钮快捷键下划线
+    \ 'color_off2': 'QuickButtonOff2', " 未聚焦按钮快捷键下划线
+    \ 'padding_left': 1,       " 左侧 padding 列数（用于鼠标坐标计算）
+    \ }
+```
+
+#### ctrl（内部控件对象）
+
+所有控件共享的字段：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `type` | String | 控件类型：`'label'`/`'input'`/`'radio'`/`'check'`/`'button'` |
+| `index` | Number | 在原始 items 列表中的索引 |
+| `line_start` | Number | 在 buffer 中的起始行号（0-based） |
+| `line_count` | Number | 占用行数 |
+| `focusable` | Number | 是否可聚焦（0/1） |
+
+各类型控件额外字段：
+
+**input**:
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `name` | String | 控件名称（返回值键名） |
+| `prompt` | String | 左侧标签文本 |
+| `prompt_width` | Number | 对齐后的 prompt 列宽（0=无 prompt） |
+| `input_col` | Number | 输入区域起始列（= prompt_width） |
+| `input_width` | Number | 输入区域宽度 |
+| `rl` | Object | `quickui#readline` 实例 |
+| `pos` | Number | readline 视口位置 |
+| `value` | String | 初始值 |
+| `history_key` | String | 历史记录命名空间 |
+
+**radio**:
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `name` | String | 控件名称 |
+| `prompt` / `prompt_width` | | 同 input |
+| `items` | List | 原始选项文本列表 |
+| `parsed` | List | `item_parse()` 解析后的列表 |
+| `value` | Number | 当前选中项索引（0-based） |
+| `vertical` | Number | 用户指定的布局（-1=auto, 0=水平, 1=垂直） |
+| `is_vertical` | Number | 实际布局（由 calc_layout 计算） |
+
+**check**:
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `name` | String | 控件名称 |
+| `text` | String | 显示文本 |
+| `prompt` / `prompt_width` | | 同 input |
+| `parsed` | Object | `item_parse()` 解析结果 |
+| `value` | Number | 0=未选中, 1=选中 |
+
+**button**:
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `name` | String | 控件名称（默认 `'button'`） |
+| `items` | List | 原始按钮文本列表 |
+| `parsed` | List | `item_parse()` 解析后的列表 |
+| `value` | Number | 当前聚焦的按钮索引（0-based） |
+| `btn_final` | String | 渲染后的按钮行文本 |
+| `btn_positions` | List | 每个按钮的 `{start, endup, offset}` 位置信息 |
+| `btn_width` | Number | 按钮行总宽度 |
+| `btn_padding` | Number | 居中对齐的左侧填充 |
+
+**label**:
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `lines` | List | 文本行列表 |
+
+### 内部函数列表
+
+#### 初始化阶段
+
+| 函数 | 说明 |
+|------|------|
+| `s:parse_items(items)` | 解析用户 items 列表，创建内部 ctrl 对象。检查 name 唯一性、type 合法性。为 input 创建 readline 实例并加载历史。 |
+| `s:calc_width(controls, opts)` | 自动计算对话框宽度。遍历所有控件取最大宽度需求，限定在 `[min_w, &columns*80%]` 范围内。 |
+| `s:calc_layout(hwnd, opts)` | 5 遍扫描：(1) prompt 对齐组 (2) radio 垂直布局判定 (3) 行位置分配+gap 插入 (4) input 列宽计算 (5) 高度溢出检查。返回 -1 表示失败。 |
+| `s:build_focus_list(hwnd)` | 过滤 focusable 控件，构建有序焦点链。 |
+| `s:build_keymap(hwnd)` | 收集 button/radio/check 的 `&` 快捷键，检测冲突。构建 `hwnd.keymap` 映射表。 |
+| `s:build_content(hwnd)` | 生成初始 buffer 文本行（所有控件的默认渲染）。 |
+| `s:hl_prepare(hwnd)` | 准备高亮组：`QuickButtonOn2`/`Off2`（按钮下划线变体）、`QuickOff`（未聚焦 input）。 |
+
+#### 渲染函数
+
+| 函数 | 说明 |
+|------|------|
+| `s:render_all(hwnd)` | 入口：`syntax_begin()` → 逐控件渲染 → `win.update()` → `syntax_end()`。 |
+| `s:render_input(hwnd, ctrl, focused)` | 聚焦时：`rl.slide()`/`rl.render()`/`rl.blink()` + 逐片段 `syntax_region()`。未聚焦时：`QuickOff` 高亮。 |
+| `s:render_radio(hwnd, ctrl, focused)` | 重建 `(*)/(  )` 标记行。聚焦时选中项用 `QuickSel` 高亮。支持水平/垂直布局。 |
+| `s:render_check(hwnd, ctrl, focused)` | 重建 `[x]/[ ]` 标记行。聚焦时用 `QuickSel` 高亮。 |
+| `s:render_button(hwnd, ctrl, focused)` | 按钮高亮：聚焦态 `QuickSel`/`QuickButtonOn2`，未聚焦态 `QuickBG`/`QuickButtonOff2`。 |
+
+**渲染流程关键点**：
+
+1. 所有 render 函数使用 `win.set_line(y, line, 0)` 写入文本（`refresh=0` 仅更新内存）
+2. `s:render_all()` 在循环结束后调用 `win.update()` 一次性刷新 buffer
+3. `syntax_begin(1)` 的参数 `1` 表示清除旧语法规则
+4. 高亮通过 `win.syntax_region()` 基于 `\%Nl\%Nv` 虚拟列模式实现
+
+#### 事件处理
+
+| 函数 | 说明 |
+|------|------|
+| `s:handle_key(hwnd, ch)` | 按键分发主函数。优先级：全局键 → (input: 直接给 readline，跳过 hotkey) → hotkey → 控件专属处理。 |
+| `s:dispatch_hotkey(hwnd, ch)` | 检查 `hwnd.keymap`，执行 hotkey 动作。返回 1=已消费，0=未匹配。 |
+| `s:handle_input(hwnd, ctrl, ch)` | Enter=确认, Up/Down=焦点切换, Ctrl+Up/Down=历史浏览, 其余=`rl.feed(ch)`。 |
+| `s:handle_radio(hwnd, ctrl, ch)` | Enter=确认, Up/Down=焦点切换, Left/h=上一项, Right/l/Space=下一项。 |
+| `s:handle_check(hwnd, ctrl, ch)` | Enter=确认, Up/Down=焦点切换, Space=切换。 |
+| `s:handle_button(hwnd, ctrl, ch)` | Up/Down=焦点切换, Left/h=左按钮, Right/l=右按钮, Space/Enter=激活。 |
+| `s:handle_mouse(hwnd)` | 平台分支：Vim 用 `getmousepos()`，Neovim 用 `v:mouse_*`。Neovim 额外检测边框窗口关闭按钮。 |
+| `s:dispatch_click(hwnd, x, y)` | 将 0-based 坐标映射到控件，执行点击操作。 |
+| `s:focus_to_ctrl(hwnd, ctrl)` | 将焦点移到指定控件。 |
+
+#### 退出阶段
+
+| 函数 | 说明 |
+|------|------|
+| `s:collect_result(hwnd)` | 遍历控件，收集 input(`rl.update()`)、radio/check(`ctrl.value`) 的当前值。 |
+
+### 主循环执行流程
+
+```
+quickui#dialog#open(items, opts)
+  ├── 空 items → 直接返回空结果
+  ├── s:parse_items() → controls
+  ├── s:calc_width() → hwnd.w
+  ├── s:calc_layout() → line_start, content_h, prompt 对齐
+  ├── s:build_focus_list() → focus_list
+  ├── opts.focus → 设置初始焦点
+  ├── s:build_keymap() → keymap (含冲突检测)
+  ├── s:build_content() → 初始 buffer 文本
+  ├── s:hl_prepare() → QuickOff, QuickButtonOn2/Off2
+  ├── win = quickui#window#new()
+  │   call win.open(content, win_opts)
+  │
+  └── while hwnd.exit == 0
+        ├── 判断等待模式：
+        │   input 焦点 → getchar(0) 非阻塞（驱动光标闪烁）
+        │   其他焦点 → getchar()  阻塞（省 CPU）
+        ├── s:render_all(hwnd) → 渲染 + 刷新 buffer + 应用高亮
+        ├── redraw
+        ├── 检测 Vim 关闭按钮 (win.quit)
+        ├── getchar → ch
+        │   getchar(0) 返回 0 → sleep 15m → continue
+        └── s:handle_key(hwnd, ch) → 可能设置 exit=1
+  │
+  ├── 退出动画：最终状态 render + redraw + sleep 15m
+  ├── 保存 input 历史：rl.history_save() + s:history 缓存
+  ├── win.close()
+  └── return s:collect_result() + button/button_index
+```
+
+### 高亮组依赖
+
+| 高亮组 | 来源 | 用途 |
+|--------|------|------|
+| `QuickBG` | 主题定义 | 窗口背景 / 未聚焦按钮 |
+| `QuickInput` | 主题定义 | 聚焦 input 文本区域 |
+| `QuickCursor` | 主题定义 | input 光标（闪烁） |
+| `QuickVisual` | 主题定义 | input 选区 |
+| `QuickSel` | 主题定义 | 聚焦按钮 / radio 选中项 / check 选中项 |
+| `QuickBorder` | 主题定义 | 边框 |
+| `QuickOff` | 动态生成 | 未聚焦 input：`overlay(QuickInput, QuickDefaultDisable)` |
+| `QuickButtonOn2` | 动态生成 | 聚焦按钮快捷键：`make_underline(QuickSel)` |
+| `QuickButtonOff2` | 动态生成 | 未聚焦按钮快捷键：`make_underline(QuickBG)` |
+
+### 按键分发优先级
+
+```
+getchar() → ch
+  │
+  ├── ESC / Ctrl-C → 取消退出
+  ├── Tab → 焦点前进
+  ├── S-Tab → 焦点后退
+  ├── LeftMouse → s:handle_mouse()
+  ├── Vim close button → 取消退出
+  │
+  └── 根据焦点类型分发：
+      ├── input → s:handle_input(ch)     ← 不检查 hotkey
+      ├── radio → hotkey? → s:handle_radio(ch)
+      ├── check → hotkey? → s:handle_check(ch)
+      └── button → hotkey? → s:handle_button(ch)
+```
+
+input 焦点时跳过 hotkey 是为了避免用户输入文字时字符被按钮快捷键拦截。
+
+### prompt 对齐组算法
+
+1. 遍历所有控件，跳过 label（label 不打断对齐组）
+2. 连续的带 prompt 的交互控件（input/radio/check）构成一个对齐组
+3. 无 prompt 的交互控件打断对齐组
+4. 组内所有控件的 `prompt_width` = 最长 prompt 宽度 + 2
+
+### Vim/Neovim 兼容性
+
+dialog 通过 `quickui#window` 屏蔽平台差异，仅在以下两处直接分支：
+
+1. **`s:handle_mouse()`**: Vim 用 `getmousepos()`（坐标已是内容区相对），Neovim 用 `v:mouse_*` 且需检测边框窗口的关闭按钮
+2. **关闭按钮检测**: Vim 通过 `hwnd.win.quit != 0`（popup callback 设置），Neovim 通过鼠标点击边框窗口右上角
+
+## 测试
+
+### 交互测试
+
+```vim
+:source tools/test/test_dialog.vim
+:call Test_dialog_basic()
+```
+
+6 个交互测试函数，需手动操作验证。
+
+### 自动化测试
+
+```bash
+vim -u NONE -N -i NONE -n --not-a-term -es \
+    -c "set rtp+=c:/Share/vim" \
+    -c "source c:/Share/vim/tools/test/test_dialog_auto.vim"
+```
+
+- 退出码 0 = 通过，非 0 = 失败
+- 结果写入 `test_dialog_result.log`
+- 当前 12 个测试用例，27 个断言
+- 使用 `feedkeys()` 注入按键序列模拟用户操作
+
+## 已知限制与扩展预留
+
+1. **不支持滚动** — dialog 是静态布局，控件总高度超出屏幕时报错
+2. **input 仅单行** — 未来可通过 `multiline: 1` 扩展
+3. **按钮激活即关闭** — 未来可通过回调函数实现 "Apply" 等不关闭的按钮
+4. **separator 控件** — 预留 `{'type': 'separator'}` 水平分隔线
+5. **控件禁用** — 预留 `enable: 0` 字段
+6. **值变更回调** — 预留 radio/check 值变更时触发回调
