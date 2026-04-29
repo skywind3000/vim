@@ -86,7 +86,8 @@ function! asclib#buffer#update(bid, textlist)
 		silent exec 'noautocmd 1,$d'
 		silent call setline(1, textlist)
 	endif
-	call setbufvar(a:bid, '&modified', old)
+	call setbufvar(a:bid, '&modifiable', old)
+	call setbufvar(a:bid, '&modified', 0)
 endfunc
 
 

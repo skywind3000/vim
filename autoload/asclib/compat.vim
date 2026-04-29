@@ -59,7 +59,7 @@ function! asclib#compat#quickfix_title(title)
 			call setqflist([], 'a')
 		endif
 	else
-		call setqflist([], 'a', a:title)
+		call setqflist([], 'a', {'title': a:title})
 		redrawstatus!
 	endif
 endfunc

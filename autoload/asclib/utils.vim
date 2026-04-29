@@ -291,7 +291,7 @@ function! asclib#utils#get_bg_colors(group) abort
 	redir END
 	let link_matches = matchlist(highlight, 'links to \(\S\+\)')
 	if len(link_matches) > 0 " follow the link
-		return s:get_background_colors(link_matches[1])
+		return asclib#utils#get_bg_colors(link_matches[1])
 	endif
 	let ctermbg = s:match_highlight(highlight, 'ctermbg=\([0-9A-Za-z]\+\)')
 	let guibg   = s:match_highlight(highlight, 'guibg=\([#0-9A-Za-z]\+\)')
