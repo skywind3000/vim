@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-这是 skywind3000 的个人 Vim/Neovim 配置仓库，模块化、跨平台（Windows/Linux/macOS），同时支持 Vim (8.0+) 和 Neovim。代码库包含约 633 个 git 追踪文件，主要使用 VimL、Lua 和 Python 编写。
+这是 skywind3000 的个人 Vim/Neovim 配置仓库，模块化、跨平台（Windows/Linux/macOS），同时支持 Vim (8.0+) 和 Neovim。主要使用 VimL、Lua 和 Python 编写。
 
 **作者**: skywind3000
 **许可证**: MIT
@@ -41,14 +41,15 @@ tasks.ini                   # AsyncTasks 构建/运行/调试任务定义
 ```
 c:\Share\vim/
 |-- init/               核心初始化模块（12 个 VimL 文件）
-|-- autoload/           自动加载函数库（约 160 个文件）
+|-- autoload/           自动加载函数库
 |   |-- asclib/         公共工具库（24 个模块），提供路径、字符串、UI、Git、Python 等公共函数，
 |   |                   供仓库内其他模块广泛调用
 |   |-- asyncrun/       作者自写的 AsyncRun 插件，异步运行 shell 命令，
 |   |                   输出到 quickfix 窗口或内置终端，支持 13 种终端后端
-|   |-- asynctask.vim   基于 job 的异步任务执行引擎
-|   |-- quickui/        作者自写的 Vim 界面增强库（19 个组件：菜单、列表框、输入框、
-|   |                   确认框、预览窗口、终端等），基于 popup/floating window
+|   |-- asynctask.vim   模仿 VSCode 的任务配置/管理系统（INI 格式定义构建/运行任务），
+|   |                   基于 AsyncRun 执行，支持项目级 .tasks 和全局 tasks.ini
+|   |-- quickui/        作者自写的 Vim 界面增强库（菜单栏、列表框、输入框、上下文菜单、
+|   |                   文本框、预览窗口、弹出终端、确认对话框），基于 popup/floating window
 |   |-- module/         内部高级功能模块，基于 asclib 的二次封装
 |   |                   （24+ 模块：cpp、go、lsp、git、project、mode 等）
 |   |-- navigator/      作者自写的浮动操作面板，类似 Emacs 的 which-key，
@@ -56,28 +57,28 @@ c:\Share\vim/
 |   |-- quickmenu.vim   垂直弹出菜单系统
 |   |-- preview.vim     窗口管理系统（带唯一 ID 追踪）
 |   |-- colorexp/       配色方案浏览器和调色板查看器
-|   |-- gdv/            作者自写的 Git Diff View，在 fugitive 中按 dd 可分屏显示
-|   |                   相关文件的 diff（6 个模块）
+|   |-- gdv/            作者自写的 Git Diff View，side-by-side 左右分屏查看 commit diff，
+|   |                   支持 fugitive/flog/gv.vim/vim-plug（6 个模块）
 |   |-- gptcommit/      GPT 生成 Git 提交日志（支持 ChatGPT/Ollama）
 |   |-- notify/         弹窗通知系统
 |   |-- tweak/          杂项增强（cherry-pick、pastebin）
 |   |-- python/         Python 集成（pyvim、parser、treesitter）
 |   |-- plug.vim        vim-plug 插件管理器（junegunn，第三方）
 |   +-- ...             其他：snippet、svnhelp、textobj、projectile 等
-|-- plugin/             启动脚本，Vim 启动时自动加载（约 41 个文件）
+|-- plugin/             启动脚本，Vim 启动时自动加载
 |   |-- asyncrun.vim    AsyncRun 核心（约 67KB）
 |   |-- asynctasks.vim  AsyncTasks 核心（约 71KB）
 |   |-- commands.vim    自定义命令（FileSwitch、SwitchHeader 等）
 |   |-- menu_init.vim   QuickUI 菜单栏设置
 |   |-- menu_keys.vim   Buffer/窗口/标签导航菜单
 |   |-- template.vim    文件模板系统
-|   |-- textproc.vim    文本处理管道
+|   |-- textproc.vim    文本过滤器管理，通过 :TP 命令调用 site/text/ 中的外部过滤脚本
 |   |-- terminal_help.vim  终端集成
 |   |-- altmeta.vim     修复控制台 Vim 的 Alt/Meta 键编码
 |   |-- gutentags_plus.vim GNU Global/cscope 集成
 |   +-- ...             其他：highlight、localrc、preview、rtformat 等
 |-- site/
-|   |-- bundle/         各外部插件的配置文件（约 44 个，每个插件一个文件）
+|   |-- bundle/         各外部插件的配置文件（每个插件一个文件）
 |   |-- opt/            可选的内置插件（calendar、taglist、vimim 等）
 |   |-- snippets/       SnipMate 代码片段（按语言分）
 |   |-- ultisnips/      UltiSnips 代码片段（按语言分）
@@ -88,16 +89,17 @@ c:\Share\vim/
 |   |-- samples/        示例配置文件
 |   |-- doc/            速查文档（bash、emacs、gdb、git、vim 等）
 |   +-- specs/          agent 沟通文档（草案讨论、分析报告、模块详细说明等）
+|   |   +-- reference/  内置插件参考文档（asyncrun、asynctasks、quickui、gdv、textproc）
 |-- lua/                Neovim Lua 配置，与 Vim 配置共用 autoload/ 和 plugin/ 下的脚本
 |   |-- core/           核心工具（ascmini.lua、loader、utils）
 |   |-- config/         Lua 配置（custom、extra、packages），入口为 init.lua
 |   +-- plugins/        lazy.nvim 插件规格（basic、lsp、treesitter、telescope 等）
-|-- ftplugin/           文件类型专属设置（约 31 个文件：c、cpp、python、go 等）
-|-- colors/             配色方案（约 24 个 + patch/ 补丁 + quickui/ 变体）
+|-- ftplugin/           文件类型专属设置（c、cpp、python、go 等）
+|-- colors/             配色方案（patch/ 补丁 + quickui/ 变体）
 |-- syntax/             自定义语法文件（navigator、quickmenu、taskini、python 等）
 |-- cheat/              速查表（git、linux、regex、tcpdump 等）
 |-- doc/                Vim 帮助文件（asyncrun、asynctasks、terminal_help、apc 等）
-|-- lib/                Python 库模块（约 28 个文件：emake、gptcommit、shell 等）
+|-- lib/                Python 库模块（emake、gptcommit、shell 等）
 |-- tools/
 |   |-- bin/            命令行工具（cheat、dotenv、fasd、q-* 系列工具）
 |   |-- conf/           配置文件（clang-format、coc-settings、flake8、pylint 等）
@@ -241,10 +243,10 @@ c:\Share\vim/
 | 参考文档 | 对应插件 | 关键代码路径 |
 |----------|----------|-------------|
 | `site/specs/reference/asyncrun.md` | AsyncRun 异步执行引擎 | `plugin/asyncrun.vim`, `autoload/asyncrun/` |
-| `site/specs/reference/asynctasks.md` | AsyncTasks 任务系统 | `plugin/asynctasks.vim`, `autoload/asynctask.vim` |
+| `site/specs/reference/asynctasks.md` | AsyncTasks 任务配置/管理系统 | `plugin/asynctasks.vim`, `autoload/asynctask.vim` |
 | `site/specs/reference/quickui.md` | QuickUI 界面组件库 | `autoload/quickui/`, `plugin/menu_init.vim` |
-| `site/specs/reference/gdv.md` | Git Diff View | `autoload/gdv/` |
-| `site/specs/reference/textproc.md` | TextProc 文本处理管道 | `plugin/textproc.vim` |
+| `site/specs/reference/gdv.md` | Git Diff View（side-by-side diff） | `autoload/gdv/` |
+| `site/specs/reference/textproc.md` | TextProc 文本过滤器管理 | `plugin/textproc.vim` |
 
 ## 测试
 
@@ -291,7 +293,7 @@ Autoload 层：
   navigator/* <-- 键盘导航面板
   quickmenu.vim <-- 简单菜单
   preview.vim <-- 窗口管理
-  gdv/* <-- Git Diff View
+  gdv/* <-- Git Diff View（side-by-side diff）
   gptcommit/* <-- AI 提交日志
 
 Neovim Lua 层（与 Vim 共用 autoload/ 和 plugin/）：
