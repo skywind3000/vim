@@ -1072,7 +1072,7 @@ function! s:handle_input(hwnd, ctrl, ch) abort
 	let rl = a:ctrl.rl
 
 	if ch == "\<CR>"
-		let a:hwnd.exit_button = 'enter'
+		let a:hwnd.exit_button = ''
 		let a:hwnd.exit_index = 0
 		let a:hwnd.exit = 1
 		return
@@ -1124,7 +1124,7 @@ function! s:handle_radio(hwnd, ctrl, ch) abort
 	endif
 
 	if ch == "\<CR>"
-		let a:hwnd.exit_button = 'enter'
+		let a:hwnd.exit_button = ''
 		let a:hwnd.exit_index = 0
 		let a:hwnd.exit = 1
 		return
@@ -1160,7 +1160,7 @@ function! s:handle_check(hwnd, ctrl, ch) abort
 	let ch = a:ch
 
 	if ch == "\<CR>"
-		let a:hwnd.exit_button = 'enter'
+		let a:hwnd.exit_button = ''
 		let a:hwnd.exit_index = 0
 		let a:hwnd.exit = 1
 		return
