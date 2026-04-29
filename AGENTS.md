@@ -232,6 +232,20 @@ c:\Share\vim/
 - `site/opt/` 中后缀为 `.old` 的文件 - 已归档，不再活跃
 - `lib/*.py` 模块大多是独立工具，修改时请谨慎
 
+## 内置插件参考文档
+
+`site/specs/reference/` 存放了仓库内置插件的详细文档。
+
+> **强制规则**: 在**修改**或**调用**下列内置插件的代码之前，**必须先阅读**对应的参考文档，以了解插件的接口设计、使用约定和注意事项。
+
+| 参考文档 | 对应插件 | 关键代码路径 |
+|----------|----------|-------------|
+| `site/specs/reference/asyncrun.md` | AsyncRun 异步执行引擎 | `plugin/asyncrun.vim`, `autoload/asyncrun/` |
+| `site/specs/reference/asynctasks.md` | AsyncTasks 任务系统 | `plugin/asynctasks.vim`, `autoload/asynctask.vim` |
+| `site/specs/reference/quickui.md` | QuickUI 界面组件库 | `autoload/quickui/`, `plugin/menu_init.vim` |
+| `site/specs/reference/gdv.md` | Git Diff View | `autoload/gdv/` |
+| `site/specs/reference/textproc.md` | TextProc 文本处理管道 | `plugin/textproc.vim` |
+
 ## 测试
 
 - 插件测试脚本在 `tools/test/`（test_confirm.vim、test_listbox.vim 等）
