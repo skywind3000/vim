@@ -189,8 +189,7 @@ endfunc
 
 " replace string
 function! s:replace(text, old, new)
-	let l:data = split(a:text, a:old, 1)
-	return join(l:data, a:new)
+	return substitute(a:text, '\V' . escape(a:old, '\'), escape(a:new, '\&~'), 'g')
 endfunc
 
 " load ini file
@@ -420,7 +419,13 @@ function! s:cache_load_ini(name)
 	endif
 	let config = s:readini(name)
 	if type(config) != v:t_dict
-		let s:error = 'syntax error in '. a:name . ' line '. config
+		if config == -1
+			let s:error = 'cannot read ' . a:name
+		elseif config == -2
+			let s:error = 'invalid source type for ' . a:name
+		else
+			let s:error = 'parse error in ' . a:name
+		endif
 		return config
 	endif
 	let s:private.cache[p1] = {}
@@ -482,16 +487,17 @@ function! s:trinity_split(text)
 		return [text, '', '']
 	endif
 	let parts = split(text, '[:/]')
+	let nparts = len(parts)
 	if p1 >= 0 && p2 >= 0
 		if p1 < p2
-			return [parts[0], parts[1], parts[2]]
+			return [get(parts, 0, ''), get(parts, 1, ''), get(parts, 2, '')]
 		else
-			return [parts[0], parts[2], parts[1]]
+			return [get(parts, 0, ''), get(parts, 2, ''), get(parts, 1, '')]
 		endif
 	elseif p1 >= 0 && p2 < 0
-		return [parts[0], parts[1], '']
+		return [get(parts, 0, ''), get(parts, 1, ''), '']
 	elseif p1 < 0 && p2 >= 0
-		return [parts[0], '', parts[1]]
+		return [get(parts, 0, ''), '', get(parts, 1, '')]
 	endif
 endfunc
 
@@ -2357,7 +2363,7 @@ function! asynctasks#content(path, name)
 		if key =~ '^command[:\/]'
 			let protected[key] = 1
 			let textlist += [key . '=' . task[key]]
-		if key =~ '^precmd[:\/]'
+		elseif key =~ '^precmd[:\/]'
 			let protected[key] = 1
 			let textlist += [key . '=' . task[key]]
 		endif
