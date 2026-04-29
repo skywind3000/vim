@@ -240,7 +240,7 @@ let items = [
 let opts = {'title': 'User Form', 'w': 50}
 let result = quickui#dialog#open(items, opts)
 
-if result.button != ''
+if result.button_index >= 0
     echo 'User: ' . result.username
     echo 'Email: ' . result.email
     echo 'Role: ' . result.role
