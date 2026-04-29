@@ -133,7 +133,7 @@ function! asclib#core#win_execute(winid, command, ...)
 		let command = join(a:command, "\n")
 	endif
 	if s:has_winexe != 0
-		keepalt call win_execute(a:winid, command, silent)
+		keepalt call win_execute(a:winid, command, silent ? 'silent' : '')
 	elseif s:has_winapi
 		let current = nvim_get_current_win()
 		keepalt call nvim_set_current_win(a:winid)
@@ -181,7 +181,7 @@ endfunc
 function! asclib#core#confirm(msg, choices, default)
 	call inputsave()
 	try
-		let hr = confirm(a:msg, choices, default)
+		let hr = confirm(a:msg, a:choices, a:default)
 	catch /^Vim:Interrupt$/
 		let hr = 0
 	endtry
@@ -672,8 +672,8 @@ function! asclib#core#writefile(lines, name)
 		call writefile(a:lines, a:name)
 	else
 		exe 'redir ! > '.fnameescape(a:name)
-		for index in range(len(a:line))
-			silent echo a:line[index]
+		for index in range(len(a:lines))
+			silent echo a:lines[index]
 		endfor
 		redir END
 	endif
