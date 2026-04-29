@@ -201,7 +201,7 @@ Role:  (*) Development
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| `button` | String | 触发退出的按钮 name；`'enter'`=从非 button 控件按 Enter；`''`=取消 |
+| `button` | String | 触发退出的按钮 name；Enter 确认或取消时为 `''` |
 | `button_index` | Number | 按钮索引（**1-based**）；Enter 确认=`0`；取消=`-1` |
 | `<input.name>` | String | 文本框内容 |
 | `<radio.name>` | Number | 选中项索引（0-based） |
@@ -217,13 +217,13 @@ if r.button ==# 'confirm' && r.button_index == 1
     " 处理确认逻辑
 endif
 
-" 用户从 input/radio/check 上按了 Enter
-if r.button ==# 'enter'
+" 用户从 input/radio/check 上按了 Enter（button='' 但 button_index=0）
+if r.button ==# '' && r.button_index == 0
     " 处理 Enter 确认
 endif
 
-" 用户取消（ESC / Ctrl-C / 关闭按钮）
-if r.button ==# ''
+" 用户取消（ESC / Ctrl-C / 关闭按钮：button='' 且 button_index=-1）
+if r.button ==# '' && r.button_index == -1
     " 取消处理（r 中仍包含用户已填写的值）
 endif
 ```
