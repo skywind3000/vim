@@ -1,8 +1,8 @@
-# QuickUI Dialog 使用指南
+# QuickUI Dialog User Guide
 
-`quickui#dialog#open()` 提供数据驱动的对话框功能。你只需声明控件列表，即可弹出包含输入框、单选、复选、按钮等控件的对话框，用户交互完毕后返回所有控件的值。
+`quickui#dialog#open()` provides a data-driven dialog system. Simply declare a list of controls, and it pops up a dialog containing inputs, radio buttons, checkboxes, buttons, etc. Once the user finishes interacting, all control values are returned.
 
-## 快速上手
+## Quick Start
 
 ```vim
 let items = [
@@ -20,7 +20,7 @@ if result.button ==# 'confirm' && result.button_index == 1
 endif
 ```
 
-效果：
+Result:
 
 ```
 ┌─ User Info ──────────────────────────────┐
@@ -41,232 +41,232 @@ endif
 let result = quickui#dialog#open(items [, opts])
 ```
 
-- `items` — `List<Dict>`，每个元素描述一个控件
-- `opts` — `Dict`（可选），对话框级别选项
-- 返回 — `Dict`，包含所有控件值和退出状态
+- `items` — `List<Dict>`, each element describes a control
+- `opts` — `Dict` (optional), dialog-level options
+- Returns — `Dict`, containing all control values and exit status
 
-## 控件类型
+## Control Types
 
-### label — 静态文本
+### label — Static Text
 
-不可聚焦，用于显示说明文字。
+Not focusable. Used to display descriptive text.
 
 ```vim
 {'type': 'label', 'text': 'Please fill in the form:'}
-{'type': 'label', 'text': ['Line 1', 'Line 2']}   " 多行
+{'type': 'label', 'text': ['Line 1', 'Line 2']}   " multiline
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `type` | String | 是 | `'label'` |
-| `text` | String / List | 是 | 显示文本。String 按 `\n` 拆行，List 每元素一行 |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | String | Yes | `'label'` |
+| `text` | String / List | Yes | Display text. String is split by `\n`; List uses one element per line |
 
-### input — 单行输入框
+### input — Single-line Text Input
 
-可聚焦，内置 readline 编辑能力（光标移动、选择、剪贴板、历史浏览）。
+Focusable. Built-in readline editing (cursor movement, selection, clipboard, history browsing).
 
 ```vim
 {'type': 'input', 'name': 'username', 'prompt': 'Name:', 'value': 'skywind'}
 ```
 
-| 字段 | 类型 | 必填 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| `type` | String | 是 | — | `'input'` |
-| `name` | String | 是 | — | 控件名称，用作返回值键名 |
-| `prompt` | String | 否 | `''` | 左侧标签文本 |
-| `value` | String | 否 | `''` | 初始文本 |
-| `history` | String | 否 | `''` | 历史记录命名空间（多次调用共享历史） |
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `type` | String | Yes | — | `'input'` |
+| `name` | String | Yes | — | Control name, used as key in return value |
+| `prompt` | String | No | `''` | Label text on the left side |
+| `value` | String | No | `''` | Initial text |
+| `history` | String | No | `''` | History namespace (shared across calls) |
 
-**编辑快捷键**（焦点在 input 上时）：
+**Editing keybindings** (when input is focused):
 
-| 按键 | 动作 |
-|------|------|
-| 普通字符 | 插入 |
-| `Left` / `Right` | 移动光标 |
-| `Home` / `End` | 行首/行尾 |
-| `Ctrl+A` / `Ctrl+E` | 行首/行尾 |
-| `Backspace` / `Delete` | 删除字符 |
-| `Ctrl+K` / `Ctrl+U` | 删除到行尾/行首 |
-| `Ctrl+W` | 删除前一个单词 |
-| `Shift+Left/Right` | 选择文本 |
-| `Ctrl+C` / `Ctrl+V` | 复制/粘贴 |
-| `Ctrl+Up` / `Ctrl+Down` | 浏览历史 |
-| `Enter` | 确认对话框 |
-| `Up` / `Down` | 焦点切换到上/下控件 |
-| `Tab` / `S-Tab` | 焦点前进/后退 |
+| Key | Action |
+|-----|--------|
+| Regular characters | Insert |
+| `Left` / `Right` | Move cursor |
+| `Home` / `End` | Beginning / end of line |
+| `Ctrl+A` / `Ctrl+E` | Beginning / end of line |
+| `Backspace` / `Delete` | Delete character |
+| `Ctrl+K` / `Ctrl+U` | Delete to end / beginning of line |
+| `Ctrl+W` | Delete previous word |
+| `Shift+Left/Right` | Select text |
+| `Ctrl+C` / `Ctrl+V` | Copy / paste |
+| `Ctrl+Up` / `Ctrl+Down` | Browse history |
+| `Enter` | Confirm dialog |
+| `Up` / `Down` | Move focus to previous / next control |
+| `Tab` / `S-Tab` | Move focus forward / backward |
 
-### radio — 单选组
+### radio — Radio Button Group
 
-可聚焦，用 Left/Right/Space 切换选项。
+Focusable. Use Left/Right/Space to switch between options.
 
 ```vim
 {'type': 'radio', 'name': 'role', 'prompt': 'Role:',
  \ 'items': ['&Dev', '&QA', '&PM'], 'value': 0}
 ```
 
-| 字段 | 类型 | 必填 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| `type` | String | 是 | — | `'radio'` |
-| `name` | String | 是 | — | 控件名称 |
-| `prompt` | String | 否 | `''` | 左侧标签 |
-| `items` | List | 是 | — | 选项文本列表，`&` 标记快捷键 |
-| `value` | Number | 否 | `0` | 默认选中项索引（0-based） |
-| `vertical` | Number | 否 | auto | `0` 强制水平，`1` 强制垂直，不指定时自动 |
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `type` | String | Yes | — | `'radio'` |
+| `name` | String | Yes | — | Control name |
+| `prompt` | String | No | `''` | Label on the left side |
+| `items` | List | Yes | — | Option text list; `&` marks the hotkey character |
+| `value` | Number | No | `0` | Default selected index (0-based) |
+| `vertical` | Number | No | auto | `0` forces horizontal, `1` forces vertical; auto if omitted |
 
-水平布局：`Role:  (*) Dev  ( ) QA  ( ) PM`
+Horizontal layout: `Role:  (*) Dev  ( ) QA  ( ) PM`
 
-垂直布局（选项过宽时自动切换）：
+Vertical layout (auto-switches when options are too wide):
 ```
 Role:  (*) Development
        ( ) Quality Assurance
        ( ) Project Management
 ```
 
-| 按键 | 动作 |
-|------|------|
-| `Left` / `h` | 选上一项 |
-| `Right` / `l` / `Space` | 选下一项 |
-| `Enter` | 确认对话框 |
-| `Up` / `Down` | 焦点切换 |
+| Key | Action |
+|-----|--------|
+| `Left` / `h` | Select previous option |
+| `Right` / `l` / `Space` | Select next option |
+| `Enter` | Confirm dialog |
+| `Up` / `Down` | Move focus |
 
-### check — 复选框
+### check — Checkbox
 
-可聚焦，Space 切换勾选状态。
+Focusable. Space toggles the checked state.
 
 ```vim
 {'type': 'check', 'name': 'admin', 'text': '&Administrator'}
 {'type': 'check', 'name': 'notify', 'text': 'Send &notification', 'value': 1}
 ```
 
-| 字段 | 类型 | 必填 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| `type` | String | 是 | — | `'check'` |
-| `name` | String | 是 | — | 控件名称 |
-| `text` | String | 是 | — | 显示文本，`&` 标记快捷键 |
-| `prompt` | String | 否 | `''` | 左侧标签（设置后参与 prompt 对齐组） |
-| `value` | Number | 否 | `0` | 0=未选中，1=选中 |
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `type` | String | Yes | — | `'check'` |
+| `name` | String | Yes | — | Control name |
+| `text` | String | Yes | — | Display text; `&` marks the hotkey character |
+| `prompt` | String | No | `''` | Label on the left side (participates in prompt alignment when set) |
+| `value` | Number | No | `0` | 0 = unchecked, 1 = checked |
 
-布局：`[x] Administrator` 或 `Admin:  [x] Administrator`（有 prompt 时）
+Layout: `[x] Administrator` or `Admin:  [x] Administrator` (with prompt)
 
-| 按键 | 动作 |
-|------|------|
-| `Space` | 切换勾选 |
-| `Enter` | 确认对话框 |
-| `Up` / `Down` | 焦点切换 |
+| Key | Action |
+|-----|--------|
+| `Space` | Toggle check |
+| `Enter` | Confirm dialog |
+| `Up` / `Down` | Move focus |
 
-### button — 按钮行
+### button — Button Row
 
-可聚焦，按钮居中排列。激活任何按钮都会关闭对话框。
+Focusable. Buttons are centered. Activating any button closes the dialog.
 
 ```vim
 {'type': 'button', 'name': 'confirm', 'items': [' &OK ', ' &Cancel ']}
 ```
 
-| 字段 | 类型 | 必填 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| `type` | String | 是 | — | `'button'` |
-| `name` | String | 否 | `'button'` | 控件名称 |
-| `items` | List | 是 | — | 按钮文本列表，`&` 标记快捷键 |
-| `value` | Number | 否 | `0` | 默认聚焦按钮索引（0-based） |
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `type` | String | Yes | — | `'button'` |
+| `name` | String | No | `'button'` | Control name |
+| `items` | List | Yes | — | Button text list; `&` marks the hotkey character |
+| `value` | Number | No | `0` | Default focused button index (0-based) |
 
-布局：`< OK >    < Cancel >`
+Layout: `< OK >    < Cancel >`
 
-| 按键 | 动作 |
-|------|------|
-| `Left` / `h` | 切换到左按钮 |
-| `Right` / `l` | 切换到右按钮 |
-| `Space` / `Enter` | 激活当前按钮，关闭对话框 |
+| Key | Action |
+|-----|--------|
+| `Left` / `h` | Switch to left button |
+| `Right` / `l` | Switch to right button |
+| `Space` / `Enter` | Activate current button and close dialog |
 
-## 对话框选项
+## Dialog Options
 
-通过第二个参数 `opts` 传递：
+Passed via the second parameter `opts`:
 
-| 选项 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `title` | String | `'Dialog'` | 标题文本 |
-| `w` | Number | auto | 内容区宽度（不指定则自动计算） |
-| `min_w` | Number | `40` | 自动宽度的下限 |
-| `border` | Number | `g:quickui#style#border` | 边框样式 |
-| `center` | Number | `1` | 是否居中 |
-| `padding` | List | `[1,1,1,1]` | 内边距 `[top, right, bottom, left]` |
-| `color` | String | `'QuickBG'` | 背景高亮组 |
-| `bordercolor` | String | `'QuickBorder'` | 边框高亮组 |
-| `gap` | Number | `1` | 不同类型控件间的空行数 |
-| `button` | Number | `1` | 是否显示关闭按钮 |
-| `focus` | String | — | 初始焦点控件的 name |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `title` | String | `'Dialog'` | Title text |
+| `w` | Number | auto | Content area width (auto-calculated if omitted) |
+| `min_w` | Number | `40` | Minimum width for auto-calculation |
+| `border` | Number | `g:quickui#style#border` | Border style |
+| `center` | Number | `1` | Whether to center the dialog |
+| `padding` | List | `[1,1,1,1]` | Inner padding `[top, right, bottom, left]` |
+| `color` | String | `'QuickBG'` | Background highlight group |
+| `bordercolor` | String | `'QuickBorder'` | Border highlight group |
+| `gap` | Number | `1` | Number of blank lines between different control types |
+| `button` | Number | `1` | Whether to show the close button |
+| `focus` | String | — | Name of the control to receive initial focus |
 
-## 返回值
+## Return Value
 
-返回一个 Dict，**无论确认还是取消，始终包含所有控件的当前值**：
+Returns a Dict. **All control values are always included, regardless of confirm or cancel**:
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `button` | String | 触发退出的按钮 name；Enter 确认或取消时为 `''` |
-| `button_index` | Number | 按钮索引（**1-based**）；Enter 确认=`0`；取消=`-1` |
-| `<input.name>` | String | 文本框内容 |
-| `<radio.name>` | Number | 选中项索引（0-based） |
-| `<check.name>` | Number | 勾选状态（0/1） |
+| Field | Type | Description |
+|-------|------|-------------|
+| `button` | String | Name of the button that triggered exit; `''` for Enter confirm or cancel |
+| `button_index` | Number | Button index (**1-based**); `0` for Enter confirm; `-1` for cancel |
+| `<input.name>` | String | Text content of the input |
+| `<radio.name>` | Number | Selected option index (0-based) |
+| `<check.name>` | Number | Checked state (0/1) |
 
-### 判断退出方式
+### Detecting Exit Method
 
 ```vim
 let r = quickui#dialog#open(items, opts)
 
-" 用户按了 OK 按钮（button name='confirm'，OK 是第1个按钮）
+" User clicked the OK button (button name='confirm', OK is the 1st button)
 if r.button ==# 'confirm' && r.button_index == 1
-    " 处理确认逻辑
+    " Handle confirm logic
 endif
 
-" 用户从 input/radio/check 上按了 Enter（button='' 但 button_index=0）
+" User pressed Enter from input/radio/check (button='' but button_index=0)
 if r.button ==# '' && r.button_index == 0
-    " 处理 Enter 确认
+    " Handle Enter confirm
 endif
 
-" 用户取消（ESC / Ctrl-C / 关闭按钮：button='' 且 button_index=-1）
+" User cancelled (ESC / Ctrl-C / close button: button='' and button_index=-1)
 if r.button ==# '' && r.button_index == -1
-    " 取消处理（r 中仍包含用户已填写的值）
+    " Handle cancel (r still contains user-modified values)
 endif
 ```
 
-## 快捷键
+## Hotkeys
 
-button、radio、check 的文本中用 `&` 标记快捷键字符（如 `' &OK '` 中 `O` 是快捷键）。
+Use `&` in button, radio, and check text to mark a hotkey character (e.g., `' &OK '` makes `O` the hotkey).
 
-- **button 快捷键** → 直接激活按钮，关闭对话框
-- **radio 快捷键** → 选中对应选项，不关闭
-- **check 快捷键** → 切换勾选，不关闭
+- **Button hotkey** — directly activates the button and closes the dialog
+- **Radio hotkey** — selects the corresponding option without closing
+- **Check hotkey** — toggles the checkbox without closing
 
-快捷键在焦点不在 input 上时全局有效。焦点在 input 上时，所有字符都作为输入处理，不触发快捷键。
+Hotkeys are globally active when focus is **not** on an input. When an input is focused, all characters are treated as text input and hotkeys are disabled.
 
-## 焦点导航
+## Focus Navigation
 
-| 按键 | 动作 |
-|------|------|
-| `Tab` | 焦点前进到下一个控件（循环） |
-| `Shift-Tab` | 焦点后退到上一个控件（循环） |
-| `Up` | 焦点后退（纵向直觉） |
-| `Down` | 焦点前进（纵向直觉） |
+| Key | Action |
+|-----|--------|
+| `Tab` | Move focus to next control (wraps around) |
+| `Shift-Tab` | Move focus to previous control (wraps around) |
+| `Up` | Move focus backward (vertical intuition) |
+| `Down` | Move focus forward (vertical intuition) |
 
-初始焦点默认在第一个可聚焦控件上。可通过 `opts.focus` 指定初始焦点：
+Initial focus defaults to the first focusable control. Use `opts.focus` to specify initial focus:
 
 ```vim
 let result = quickui#dialog#open(items, {'focus': 'email'})
 ```
 
-## 布局规则
+## Layout Rules
 
-### 垂直堆叠
+### Vertical Stacking
 
-控件按 `items` 顺序从上到下排列。
+Controls are arranged top-to-bottom in the order of `items`.
 
-### 空行分隔
+### Blank Line Separation
 
-- 不同类型的相邻控件之间插入 `gap` 行空行（默认 1 行）
-- 相同类型的相邻控件之间**不插入**空行，形成视觉分组
+- Adjacent controls of **different** types are separated by `gap` blank lines (default: 1)
+- Adjacent controls of the **same** type have **no** blank lines, forming a visual group
 
-### prompt 对齐
+### Prompt Alignment
 
-连续的带 prompt 的控件（input、radio、有 prompt 的 check）自动对齐：
+Consecutive controls with prompts (input, radio, check with prompt) are automatically aligned:
 
 ```
 Name:   [skywind                       ]
@@ -274,19 +274,19 @@ Email:  [                              ]
 Role:   (*) Dev  ( ) QA  ( ) PM
 ```
 
-label 不打断对齐组，无 prompt 的交互控件才会打断。
+Labels do not break alignment groups; only interactive controls without a prompt break the group.
 
-## 鼠标支持
+## Mouse Support
 
-- 点击 input → 聚焦并定位光标
-- 点击 radio 选项 → 聚焦并选中该项
-- 点击 check → 聚焦并切换勾选
-- 点击 button → 激活该按钮，关闭对话框
-- 点击关闭按钮（X） → 取消
+- Click input — focus and position cursor
+- Click radio option — focus and select that option
+- Click check — focus and toggle check state
+- Click button — activate that button and close dialog
+- Click close button (X) — cancel
 
-## 完整示例
+## Complete Examples
 
-### 用户表单
+### User Form
 
 ```vim
 let items = [
@@ -315,7 +315,7 @@ if result.button ==# 'confirm' && result.button_index == 1
 endif
 ```
 
-### 简单确认对话框
+### Simple Confirmation Dialog
 
 ```vim
 let items = [
@@ -331,7 +331,7 @@ if result.button ==# 'confirm' && result.button_index == 1
 endif
 ```
 
-### 带历史的搜索框
+### Search Box with History
 
 ```vim
 let items = [
@@ -347,7 +347,7 @@ let result = quickui#dialog#open(items, {
     \ 'title': 'Find and Replace', 'w': 50})
 ```
 
-### 纯 label + Enter 退出
+### Label-only with Enter to Exit
 
 ```vim
 let items = [
@@ -363,11 +363,11 @@ let items = [
 let result = quickui#dialog#open(items, {'title': 'Build Result'})
 ```
 
-## 注意事项
+## Notes
 
-1. **name 必须唯一** — 所有带 name 的控件不能重名
-2. **多 button 行需不同 name** — 默认 name 是 `'button'`，多个 button 必须各指定不同 name
-3. **快捷键不能重复** — 不同控件的 `&` 快捷键字符不能冲突
-4. **button_index 是 1-based** — 与 `quickui#confirm#open()` 一致，第一个按钮返回 1
-5. **高度限制** — 控件总行数不能超出屏幕高度，否则报错
-6. **取消时值仍保留** — ESC 取消后返回值中仍包含用户已修改的控件值，方便重新打开时恢复
+1. **Names must be unique** — all controls with a name must not share the same name
+2. **Multiple button rows need different names** — the default name is `'button'`; multiple button controls must each specify a different name
+3. **Hotkeys must not conflict** — the `&` hotkey characters across different controls must be unique
+4. **button_index is 1-based** — consistent with `quickui#confirm#open()`; the first button returns 1
+5. **Height limit** — total control lines must not exceed screen height, otherwise an error is raised
+6. **Values are preserved on cancel** — after ESC cancel, the return value still contains user-modified control values, useful for restoring state when reopening
