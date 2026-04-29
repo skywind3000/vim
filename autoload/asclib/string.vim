@@ -12,7 +12,8 @@
 " string replace
 "----------------------------------------------------------------------
 function! asclib#string#replace(text, old, new)
-	let data = split(a:text, a:old, 1)
+	let l:escaped = escape(a:old, '\.*[]^$~/')
+	let data = split(a:text, l:escaped, 1)
 	return join(data, (type(a:new) == 1)? a:new : string(a:new))
 endfunc
 
@@ -21,7 +22,7 @@ endfunc
 " string strip
 "----------------------------------------------------------------------
 function! asclib#string#strip(text)
-	return substitute(a:text, '^\s*\(.\{-}\)[\t\r\n ]*$', '\1', '')
+	return substitute(a:text, '^[\t\r\n ]*\(.\{-}\)[\t\r\n ]*$', '\1', '')
 endfunc
 
 
@@ -34,7 +35,7 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" strip left
+" strip right
 "----------------------------------------------------------------------
 function! asclib#string#rstrip(text)
 	return substitute(a:text, '[\t\r\n ]*$', '', '')
@@ -141,7 +142,7 @@ function! asclib#string#expand(string) abort
 		endif
 		let endup = stridx(a:string, '}', pos + 2)
 		if endup < 0
-			let partial += [strpart(a:stirng, index)]
+			let partial += [strpart(a:string, index)]
 			break
 		endif
 		let index = endup + 1
@@ -174,7 +175,7 @@ function! asclib#string#prompt(string) abort
 		endif
 		let endup = stridx(a:string, '}', pos + 2)
 		if endup < 0
-			let partial += [strpart(a:stirng, index)]
+			let partial += [strpart(a:string, index)]
 			break
 		endif
 		let index = endup + 1
@@ -188,9 +189,10 @@ function! asclib#string#prompt(string) abort
 				let varname = strpart(script, 0, pos)
 				let default = strpart(script, pos + 1)
 			endif
+			let result = ''
 			if varname == ''
 				if default != ''
-					let result = eval(devault)
+					let result = eval(default)
 				endif
 			else
 				redraw
