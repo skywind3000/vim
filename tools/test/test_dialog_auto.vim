@@ -158,15 +158,14 @@ call s:assert_equal('', r.a, 'align: a default')
 call s:assert_equal('', r.b, 'align: b default')
 
 
-" ── 12. test: no button control — ESC from radio ──────────
-" Enter now selects (like Space), does not exit; use ESC to cancel
-call feedkeys("\<ESC>", 't')
+" ── 12. test: no button control — Enter from radio ───────
+call feedkeys("\<CR>", 't')
 let r = quickui#dialog#open([
 	\ {'type': 'radio', 'name': 'r',
 	\  'items': ['X', 'Y'], 'value': 1},
 	\ ], {'title': 'Test', 'w': 40})
 call s:assert_equal('', r.button, 'no-btn: button')
-call s:assert_equal(-1, r.button_index, 'no-btn: index')
+call s:assert_equal(0, r.button_index, 'no-btn: index')
 call s:assert_equal(1, r.r, 'no-btn: radio value unchanged')
 
 

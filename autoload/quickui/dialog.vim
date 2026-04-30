@@ -1336,8 +1336,15 @@ function! s:handle_radio(hwnd, ctrl, ch) abort
 		return
 	endif
 
-	" Space/Enter: select the item under cursor
-	if ch == "\<Space>" || ch == "\<CR>"
+	if ch == "\<CR>"
+		let a:hwnd.exit_button = ''
+		let a:hwnd.exit_index = 0
+		let a:hwnd.exit = 1
+		return
+	endif
+
+	" Space: select the item under cursor
+	if ch == "\<Space>"
 		let a:ctrl.value = a:ctrl.cursor
 		return
 	endif
