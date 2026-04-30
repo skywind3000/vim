@@ -99,6 +99,7 @@ let hwnd = {
 | `items` | List | 原始选项文本列表 |
 | `parsed` | List | `item_parse()` 解析后的列表 |
 | `value` | Number | 当前选中项索引（0-based） |
+| `cursor` | Number | 当前视觉焦点索引（0-based），方向键移动 cursor，Space 将 value 设为 cursor |
 | `vertical` | Number | 用户指定的布局（-1=auto, 0=水平, 1=垂直） |
 | `is_vertical` | Number | 实际布局（由 calc_layout 计算） |
 
@@ -170,7 +171,7 @@ let hwnd = {
 |------|------|
 | `s:render_all(hwnd)` | 入口：`syntax_begin()` → 逐控件渲染 → `win.update()` → `syntax_end()`。 |
 | `s:render_input(hwnd, ctrl, focused)` | 聚焦时：`rl.slide()`/`rl.render()`/`rl.blink()` + 逐片段 `syntax_region()`。未聚焦时：`QuickOff` 高亮。 |
-| `s:render_radio(hwnd, ctrl, focused)` | 重建 `(*)/(  )` 标记行。聚焦时选中项用 `QuickSel` 高亮。支持水平/垂直布局。 |
+| `s:render_radio(hwnd, ctrl, focused)` | 重建 `(*)/(  )` 标记行（`(*)` 跟随 `value`）。失焦时重置 `cursor=value`。聚焦时 `cursor` 所在项用 `QuickSel` 高亮。支持水平/垂直布局。 |
 | `s:render_check(hwnd, ctrl, focused)` | 重建 `[x]/[ ]` 标记行。聚焦时用 `QuickSel` 高亮。 |
 | `s:render_button(hwnd, ctrl, focused)` | 按钮高亮：聚焦态 `QuickSel`/`QuickButtonOn2`，未聚焦态 `QuickBG`/`QuickButtonOff2`。 |
 | `s:render_dropdown(hwnd, ctrl, focused)` | 重建 `[text v]` 折叠显示。聚焦时整个下拉区域用 `QuickSel` 高亮。 |
@@ -189,7 +190,7 @@ let hwnd = {
 | `s:handle_key(hwnd, ch)` | 按键分发主函数。优先级：全局键 → (input: 直接给 readline，跳过 hotkey) → hotkey → 控件专属处理。 |
 | `s:dispatch_hotkey(hwnd, ch)` | 检查 `hwnd.keymap`，执行 hotkey 动作。返回 1=已消费，0=未匹配。 |
 | `s:handle_input(hwnd, ctrl, ch)` | Enter=确认, Up/Down=焦点切换, Ctrl+Up/Down=历史浏览, 其余=`rl.feed(ch)`。 |
-| `s:handle_radio(hwnd, ctrl, ch)` | Enter=确认, Up/Down=焦点切换, Left/h=上一项, Right/l/Space=下一项。 |
+| `s:handle_radio(hwnd, ctrl, ch)` | Enter=确认退出, Space=选中 cursor 项（`value=cursor`）, Left/Right/h/l=移动 cursor, 垂直模式 Up/Down=在 items 内移动 cursor（到边界切换控件）, 水平模式 Up/Down=焦点切换。 |
 | `s:handle_check(hwnd, ctrl, ch)` | Enter=确认, Up/Down=焦点切换, Space=切换。 |
 | `s:handle_button(hwnd, ctrl, ch)` | Up/Down=焦点切换, Left/h=左按钮, Right/l=右按钮, Space/Enter=激活。 |
 | `s:handle_dropdown(hwnd, ctrl, ch)` | Enter/Space=打开下拉列表, Up/Down=焦点切换, Left/h=上一项, Right/l=下一项。 |
