@@ -51,7 +51,7 @@ let hwnd = {
     \ 'keymap': {...},         " Dict<hotkey → {action, control, index}>
     \ 'exit': 0,               " 退出标志（1=退出主循环）
     \ 'exit_button': '',       " 触发退出的 button name（'' 表示取消或 Enter 确认）
-    \ 'exit_index': -1,        " 触发退出的按钮索引（1-based，-1=取消，0=Enter 确认）
+    \ 'exit_index': -1,        " 触发退出的按钮索引（0-based，-1=取消，0=Enter 确认或第一个按钮）
     \ 'color_on': 'QuickSel',  " 聚焦按钮高亮组
     \ 'color_off': 'QuickBG',  " 未聚焦按钮高亮组
     \ 'color_on2': 'QuickButtonOn2',   " 聚焦按钮快捷键下划线

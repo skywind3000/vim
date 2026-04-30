@@ -91,7 +91,7 @@ let r = quickui#dialog#open([
 	\  'items': [' &OK ', ' &Cancel ']},
 	\ ], {'title': 'Test', 'w': 40})
 call s:assert_equal('ok', r.button, 'Tab+Enter: button')
-call s:assert_equal(1, r.button_index, 'Tab+Enter: index')
+call s:assert_equal(0, r.button_index, 'Tab+Enter: index')
 call s:assert_equal('world', r.x, 'Tab+Enter: value')
 
 
@@ -123,7 +123,7 @@ let r = quickui#dialog#open([
 	\  'items': [' &OK ', ' &Cancel ']},
 	\ ], {'title': 'Test', 'w': 40})
 call s:assert_equal('ok', r.button, 'hotkey: button')
-call s:assert_equal(2, r.button_index, 'hotkey: Cancel index')
+call s:assert_equal(1, r.button_index, 'hotkey: Cancel index')
 
 
 " ── 9. test: Enter from check confirms ───────────────────

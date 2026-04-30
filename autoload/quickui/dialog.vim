@@ -1129,7 +1129,7 @@ function! s:dispatch_click(hwnd, x, a_y) abort
 				if bx >= pos.start && bx < pos.endup
 					let ctrl.value = bi
 					let a:hwnd.exit_button = ctrl.name
-					let a:hwnd.exit_index = bi + 1
+					let a:hwnd.exit_index = bi
 					let a:hwnd.exit = 1
 					return 1
 				endif
@@ -1188,7 +1188,7 @@ function! s:dispatch_hotkey(hwnd, ch) abort
 		if km.action ==# 'button'
 			let km.control.value = km.index
 			let a:hwnd.exit_button = km.control.name
-			let a:hwnd.exit_index = km.index + 1
+			let a:hwnd.exit_index = km.index
 			let a:hwnd.exit = 1
 			call s:focus_to_ctrl(a:hwnd, km.control)
 			return 1
@@ -1503,7 +1503,7 @@ function! s:handle_button(hwnd, ctrl, ch) abort
 		endif
 	elseif ch == "\<Space>" || ch == "\<CR>"
 		let a:hwnd.exit_button = a:ctrl.name
-		let a:hwnd.exit_index = a:ctrl.value + 1
+		let a:hwnd.exit_index = a:ctrl.value
 		let a:hwnd.exit = 1
 	endif
 endfunc
@@ -1925,7 +1925,7 @@ function! quickui#dialog#open(items, ...) abort
 	endwhile
 
 	" -- brief render of final state --
-	if hwnd.exit_button !=# '' && hwnd.exit_index > 0
+	if hwnd.exit_button !=# '' && hwnd.exit_index >= 0
 		call s:render_all(hwnd)
 		redraw
 		sleep 15m

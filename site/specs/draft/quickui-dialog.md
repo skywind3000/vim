@@ -119,7 +119,7 @@ let result = quickui#dialog#open(items, opts)
 | `type` | String | 是 | — | `'button'` |
 | `name` | String | 否 | `'button'` | 控件名称，用于返回值标识哪个 button 行被激活 |
 | `items` | List | 是 | — | 按钮文本列表，支持 `&` 标记快捷键 |
-| `value` | Number | 否 | `0` | 默认聚焦的按钮索引（0-based，内部使用；返回值 `button_index` 为 1-based） |
+| `value` | Number | 否 | `0` | 默认聚焦的按钮索引（0-based） |
 
 - 可聚焦
 - 占用 1 行
@@ -127,7 +127,7 @@ let result = quickui#dialog#open(items, opts)
 - 布局：按钮居中或居右排列，`< OK >  < Cancel >`
 - `items` 中的 `&` 标记同 `quickui#confirm` 的 choices 约定（`quickui#utils#item_parse`）
 - **限制**：任何按钮被激活（Space/Enter/快捷键/鼠标点击）都会关闭对话框。如需"Apply"等不关闭对话框的按钮，可通过未来的回调扩展实现。
-- **注意**：`button_index` 使用 1-based 索引，与 `quickui#confirm#open()` 的返回值一致
+- **注意**：`button_index` 使用 0-based 索引，与 radio/check/dropdown 的 value 索引一致
 
 ### 控件通用约束
 
@@ -164,14 +164,14 @@ let result = quickui#dialog#open(items, opts)
 
 - 所有命名控件的值（以 `name` 为键）
 - `button` 字段标识哪个 button 控件被激活（控件 name），Enter 确认或取消时为空字符串
-- `button_index` 字段标识退出方式：按钮内索引（1-based）、Enter 确认=`0`、取消=`-1`
+- `button_index` 字段标识退出方式：按钮内索引（0-based）、Enter 确认=`0`、取消=`-1`
 
 **用户点击按钮关闭**:
 
 ```vim
 {
     \ 'button': 'confirm',
-    \ 'button_index': 1,
+    \ 'button_index': 0,
     \ 'username': 'skywind',
     \ 'email': 'test@example.com',
     \ 'role': 1,
@@ -215,7 +215,7 @@ let result = quickui#dialog#open(items, opts)
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | `button` | String | 被激活的 button 控件的 `name`；Enter 确认或取消时为空字符串 `''` |
-| `button_index` | Number | 按钮索引（1-based）；Enter 确认时为 `0`；取消时为 `-1` |
+| `button_index` | Number | 按钮索引（0-based）；Enter 确认时为 `0`；取消时为 `-1` |
 | `<input.name>` | String | 文本框的内容 |
 | `<radio.name>` | Number | 单选组的选中项索引（0-based） |
 | `<check.name>` | Number | 复选框状态，0 或 1 |
@@ -957,7 +957,7 @@ function! s:test_input_and_submit() abort
         \ 'title': 'Test', 'w': 40})
 
     call s:assert_equal('confirm', result.button, 'button name')
-    call s:assert_equal(1, result.button_index, 'OK index')
+    call s:assert_equal(0, result.button_index, 'OK index')
     call s:assert_equal('skywind', result.name, 'input value')
 endfunc
 
