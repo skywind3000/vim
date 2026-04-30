@@ -169,6 +169,27 @@ call s:assert_equal(0, r.button_index, 'no-btn: index')
 call s:assert_equal(1, r.r, 'no-btn: radio value unchanged')
 
 
+" ── 13. test: prompt alignment inflates width for check ───
+" A check with short prompt + wide text should not overflow when
+" aligned to an input with a long prompt.
+call feedkeys("\<ESC>", 't')
+let r = quickui#dialog#open([
+	\ {'type': 'input', 'name': 'a', 'prompt': 'Very Long Prompt:',
+	\  'value': ''},
+	\ {'type': 'check', 'name': 'b', 'prompt': 'P:',
+	\  'text': 'A checkbox label text here', 'value': 0},
+	\ ], {'title': 'Test'})
+" The dialog should have opened and closed without error.
+" Verify that the width is at least prompt_width(aligned) + 4 + text_width.
+" 'Very Long Prompt:' display width = 17, aligned prompt_width = 17+2 = 19
+" check text 'A checkbox label text here' display width = 26
+" minimum width = 19 + 4 + 26 = 49
+" If the old code ran, w might be as small as 40 (min_w), causing overflow.
+call s:assert_equal('', r.button, 'align-inflate: button')
+call s:assert_equal(0, r.b, 'align-inflate: check value')
+call s:assert_equal('', r.a, 'align-inflate: input value')
+
+
 " ── report results ────────────────────────────────────────
 let total = s:passed + len(s:errors)
 if len(s:errors) == 0

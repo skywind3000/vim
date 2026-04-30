@@ -233,6 +233,42 @@ function! s:calc_layout(hwnd, opts) abort
 		endif
 	endfor
 
+	" -- pass 1.5: expand width for prompt alignment inflation --
+	" After alignment, check/radio may need more width than calc_width
+	" estimated (their content width is fixed, unlike input/dropdown which
+	" adapt via input_width/dropdown_width).
+	for ctrl in controls
+		let need = 0
+		if ctrl.type ==# 'check'
+			let need = ctrl.prompt_width + 4 + ctrl.parsed.text_width
+		elseif ctrl.type ==# 'radio'
+			" vertical-mode per-line width
+			for p in ctrl.parsed
+				let rn = ctrl.prompt_width + 4 + p.text_width
+				let need = (need < rn) ? rn : need
+			endfor
+			" forced-horizontal width
+			if ctrl.vertical == 0
+				let hw = ctrl.prompt_width
+				for p in ctrl.parsed
+					let hw += 4 + p.text_width + 2
+				endfor
+				if len(ctrl.parsed) > 0
+					let hw -= 2
+				endif
+				let need = (need < hw) ? hw : need
+			endif
+		endif
+		if need > content_w
+			let content_w = need
+		endif
+	endfor
+	let max_w = &columns * 80 / 100
+	if content_w > max_w
+		let content_w = max_w
+	endif
+	let hwnd.w = content_w
+
 	" -- pass 2: compute radio vertical layout --
 	for ctrl in controls
 		if ctrl.type !=# 'radio'

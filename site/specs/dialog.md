@@ -158,7 +158,7 @@ let hwnd = {
 |------|------|
 | `s:parse_items(items)` | 解析用户 items 列表，创建内部 ctrl 对象。检查 name 唯一性、type 合法性。为 input 创建 readline 实例并加载历史。支持 separator 和 dropdown。 |
 | `s:calc_width(controls, opts)` | 自动计算对话框宽度。遍历所有控件取最大宽度需求，限定在 `[min_w, &columns*80%]` 范围内。dropdown 宽度 = prompt + 最长 item + 4。 |
-| `s:calc_layout(hwnd, opts)` | 5 遍扫描：(1) prompt 对齐组（dropdown 参与，separator 不打断） (2) radio 垂直布局判定 (3) 行位置分配+gap 插入（separator 替代 gap） (4) input/dropdown 列宽计算 (5) 高度溢出检查。返回 -1 表示失败。 |
+| `s:calc_layout(hwnd, opts)` | 6 遍扫描：(1) prompt 对齐组（dropdown 参与，separator 不打断） (1.5) 对齐膨胀宽度校验——check/radio 内容宽度固定，对齐后 `prompt_width + content` 可能超过 `hwnd.w`，此步骤扩展 `hwnd.w`（上限 `&columns*80%`） (2) radio 垂直布局判定 (3) 行位置分配+gap 插入（separator 替代 gap） (4) input/dropdown 列宽计算 (5) 高度溢出检查。返回 -1 表示失败。 |
 | `s:build_focus_list(hwnd)` | 过滤 focusable 控件，构建有序焦点链。 |
 | `s:build_keymap(hwnd)` | 收集 button/radio/check 的 `&` 快捷键，检测冲突。构建 `hwnd.keymap` 映射表。 |
 | `s:build_content(hwnd)` | 生成初始 buffer 文本行（所有控件的默认渲染）。separator 用 `hwnd.sep_char` 填充。 |
@@ -214,7 +214,7 @@ quickui#dialog#open(items, opts)
   ├── 空 items → 直接返回空结果
   ├── s:parse_items() → controls
   ├── s:calc_width() → hwnd.w
-  ├── s:calc_layout() → line_start, content_h, prompt 对齐
+  ├── s:calc_layout() → prompt 对齐, 对齐膨胀宽度校验, line_start, content_h
   ├── s:build_focus_list() → focus_list
   ├── opts.focus → 设置初始焦点
   ├── 初始焦点为 input 时 → s:input_select_all() 全选内容
@@ -286,6 +286,7 @@ input 焦点时跳过 hotkey 是为了避免用户输入文字时字符被按钮
 2. 连续的带 prompt 的交互控件（input/radio/check/dropdown）构成一个对齐组
 3. 无 prompt 的交互控件打断对齐组
 4. 组内所有控件的 `prompt_width` = 最长 prompt 宽度 + 2
+5. **对齐膨胀宽度校验**（pass 1.5）：对齐可能使短 prompt 控件的 `prompt_width` 膨胀。`input`/`dropdown` 的内容区会自适应（`input_width = content_w - prompt_width`），但 `check`/`radio` 的文本宽度是固定的。此步骤遍历 check（`prompt_width + 4 + text_width`）和 radio（竖排：每行 `prompt_width + 4 + item_width` 取最大；强制横排：完整行宽），若超出 `content_w` 则扩展 `hwnd.w`，上限 `&columns * 80%`。扩展后 pass 2 的 radio auto-detect 使用更新后的 `content_w`，保证横排/竖排判定正确。
 
 ### validator 校验机制
 
@@ -345,7 +346,7 @@ vim -u NONE -N --noplugin -es --cmd "set lines=40 columns=100" \
 ```
 
 - 退出码 0 = 通过，非 0 = 失败
-- `test_dialog_auto.vim`: 12 个测试用例，27 个断言
+- `test_dialog_auto.vim`: 13 个测试用例，30 个断言
 - `test_dialog_headless.vim`: 4 个测试用例，6 个断言（含 separator/dropdown）
 - 使用 `feedkeys()` 注入按键序列模拟用户操作
 
