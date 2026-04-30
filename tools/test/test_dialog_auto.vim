@@ -96,13 +96,14 @@ call s:assert_equal('world', r.x, 'Tab+Enter: value')
 
 
 " ── 6. test: radio Right navigation ──────────────────────
-call feedkeys("\<Right>\<Right>\<CR>", 't')
+" Right moves cursor, Space commits selection
+call feedkeys("\<Right>\<Right>\<Space>\<CR>", 't')
 let r = quickui#dialog#open([
 	\ {'type': 'radio', 'name': 'r',
 	\  'items': ['A', 'B', 'C'], 'value': 0},
 	\ ], {'title': 'Test', 'w': 40})
 call s:assert_equal('', r.button, 'radio: button')
-call s:assert_equal(2, r.r, 'radio: value after Right x2')
+call s:assert_equal(2, r.r, 'radio: value after Right x2 + Space')
 
 
 " ── 7. test: check Space toggle ──────────────────────────
@@ -157,14 +158,15 @@ call s:assert_equal('', r.a, 'align: a default')
 call s:assert_equal('', r.b, 'align: b default')
 
 
-" ── 12. test: no button control — Enter from radio ───────
-call feedkeys("\<CR>", 't')
+" ── 12. test: no button control — ESC from radio ──────────
+" Enter now selects (like Space), does not exit; use ESC to cancel
+call feedkeys("\<ESC>", 't')
 let r = quickui#dialog#open([
 	\ {'type': 'radio', 'name': 'r',
 	\  'items': ['X', 'Y'], 'value': 1},
 	\ ], {'title': 'Test', 'w': 40})
 call s:assert_equal('', r.button, 'no-btn: button')
-call s:assert_equal(0, r.button_index, 'no-btn: index')
+call s:assert_equal(-1, r.button_index, 'no-btn: index')
 call s:assert_equal(1, r.r, 'no-btn: radio value unchanged')
 
 
