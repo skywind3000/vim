@@ -31,6 +31,7 @@ return {
 
 	{
 		'nvim-orgmode/orgmode',
+		enabled = false,
 		config = function()
 			utils.defer_init(10, function()
 				-- require('orgmode').setup_ts_grammar()

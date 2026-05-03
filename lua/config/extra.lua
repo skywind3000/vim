@@ -1,7 +1,7 @@
 local custom = require('config.custom')
 
 -- turn off diagnostic
-vim.diagnostic.disable()
+-- vim.diagnostic.disable()
 
 -- To instead override globally
 local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
