@@ -21,7 +21,7 @@ return {
 			-- Add languages to be installed here that you want installed for treesitter
 			ensure_installed = { 'c', 'cpp', 'go', 'lua', 
 				'python', 'rust', 'zig', 'javascript', 'html', 
-				'awk', 'hlsl', 'ini', 'org',
+				'awk', 'hlsl', 'ini', 
 				'tsx', 'typescript', 'vimdoc', 'vim' },
 
 			highlight = {
