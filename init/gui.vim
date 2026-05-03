@@ -111,7 +111,9 @@ endif
 "- GUI Setting
 "----------------------------------------------------------------------
 if has('gui_running')
-	set guioptions-=L
+	if exists('+guioptions')
+		set guioptions-=L
+	endif
 	set mouse=a
 	set showtabline=2
 	set laststatus=2
@@ -133,8 +135,10 @@ if has('gui_running')
 			color seoul256
 		catch
 		endtry
-		set guioptions-=t
-		set guioptions=egrmT
+		if exists('+guioptions')
+			set guioptions-=t
+			set guioptions=egrmT
+		endif
 	elseif has('gui_macvim')
 		color seoul256
 		set guioptions=egrm

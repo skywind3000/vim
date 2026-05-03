@@ -24,10 +24,12 @@ set splitright
 set viewdir=~/.vim/view
 set errorformat=%.\ %#-->\ %f:%l:%c,%f(%l):%m,%f:%l:%c:%m,%f:%l:%m
 set whichwrap=b,s,<,>,[,]
-set browsedir=buffer
 set keymodel=
 set selection=inclusive
 
+if exists('+browsedir')
+	set browsedir=buffer
+endif
 
 if exists('+breakindent')
 	set breakindent

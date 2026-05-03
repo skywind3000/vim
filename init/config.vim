@@ -173,8 +173,14 @@ endfunc
 
 " setup new tabline, just %M%t in macvim
 set tabline=%!Vim_NeatTabLine()
-set guitablabel=%{Vim_NeatTabLabel(v:lnum)}
-set guitabtooltip=%{Vim_NeatGuiTabTip()}
+
+if exists('+guitablabel')
+	set guitablabel=%{Vim_NeatTabLabel(v:lnum)}
+endif
+
+if exists('+guitabtooltip')
+	set guitabtooltip=%{Vim_NeatGuiTabTip()}
+endif
 
 " setup tab panel text
 if exists('+tabpanel')
