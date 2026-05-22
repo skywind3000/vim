@@ -1,0 +1,70 @@
+More information: https://wiki.wireshark.org/DisplayFilters
+
+- Filter by protocol (tcp / udp / icmp / dns / http / tls / arp):
+  tcp
+  http
+  icmp
+
+- Filter traffic from or to an IP address:
+  ip.addr == 192.168.1.1
+
+- Filter traffic from a specific source IP:
+  ip.src == 192.168.1.1
+
+- Filter traffic to a specific destination IP:
+  ip.dst == 192.168.1.2
+
+- Filter traffic from a specific source and to a specific destination:
+  ip.src == 192.168.1.1 and ip.dst == 192.168.1.2
+
+- Filter by destination port:
+  tcp.dstport == 80
+
+- Filter by source or destination port:
+  tcp.port == 443
+
+- Filter by source IP and destination port:
+  ip.src == 10.0.0.1 and tcp.dstport == 80
+
+- Filter traffic of a network (subnet):
+  ip.addr == 192.168.1.0/24
+
+- Filter UDP traffic on a specific port:
+  udp and udp.port == 5000
+
+- Exclude traffic on a specific port:
+  tcp.port != 22
+
+- Complex filter with logical operators (and / or / not):
+  icmp and (ip.addr == 8.8.8.8 or ip.addr == 8.8.4.4)
+
+- Filter TCP SYN packets only (connection initiation):
+  tcp.flags.syn == 1 and tcp.flags.ack == 0
+
+- Filter TCP RST or FIN packets:
+  tcp.flags.reset == 1 or tcp.flags.fin == 1
+
+- Filter HTTP GET requests:
+  http.request.method == "GET"
+
+- Filter by HTTP host header (contains substring):
+  http.host contains "example.com"
+
+- Filter by HTTP request URI:
+  http.request.uri == "/index.html"
+
+- Filter TLS handshake by SNI (Server Name Indication):
+  tls.handshake.extensions_server_name contains "example"
+
+- Filter DNS queries for a specific name:
+  dns.qry.name contains "example.com"
+
+- Filter by frame length (packet size in bytes):
+  frame.len > 1000
+
+- Filter packets containing a specific string (any protocol):
+  frame contains "password"
+
+- Filter by TCP stream index (follow a specific connection):
+  tcp.stream eq 3
+
