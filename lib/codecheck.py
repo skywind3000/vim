@@ -23,6 +23,7 @@
 #   codecheck.py -c -1 hello.c      # check only the 1st test case
 #   codecheck.py -d hello.c         # debug run (no output compare)
 #   codecheck.py -d -2 hello.c      # debug the 2nd test case
+#   codecheck.py -a hello.c         # compile and run with @args
 #
 # Embedding test cases in C/C++ source:
 #   // @input: test1
@@ -773,7 +774,7 @@ class foundation (object):
 
     def ensure_executable (self, force = False):
         if self.srctype not in ('c', 'cpp'):
-            return False
+            return True
         if os.path.exists(self.exename):
             ftime = os.path.getmtime(self.exename)
             stime = os.path.getmtime(self.srcname)
@@ -796,7 +797,7 @@ class foundation (object):
         return True
 
     # start the program, returns (exit code, stdout, stderr)
-    def start (self, capture = False, stdin = None, timeout = None):
+    def start (self, capture = False, stdin = None, timeout = None, argv = None):
         cwd = self.dirname
         env = None
         args = []
@@ -810,9 +811,11 @@ class foundation (object):
                 args.append(self.exename)
         elif self.srctype == 'python':
             args.append(self.config._binary['python'])
-            args.append(os.path.split(self.srcname)[-1])
+            args.append(self.srcname)
         else:
             return (-1, '', '')
+        if argv:
+            args += argv
         if not capture:
             if not stdin:
                 code = self.config.execute(args, cwd, env, timeout)
@@ -824,14 +827,14 @@ class foundation (object):
         code, stdout, stderr = hr
         return (code, stdout, stderr)
 
-    def launch (self, capture = False, stdin = None, timeout = None):
+    def launch (self, capture = False, stdin = None, timeout = None, args = None):
         if not self.ensure_executable():
             return False
         if not capture:
             if self.compiled:
                 self.echo(CC_NOTICE, 'Running %s ...' % os.path.split(self.exename)[-1])
         try:
-            hr = self.start(capture, stdin, timeout)
+            hr = self.start(capture, stdin, timeout, args)
         except FileNotFoundError as e:
             self.echo(CC_BAD, 'ERROR: Executable not found: %s' % str(e))
             return (-2, '', '')
@@ -885,6 +888,8 @@ class CommentParser (object):
         self.units: UnitTest = []
         self.pattern1 = re.compile(r'^\s*@\s*input\s*(:.*)?$', re.IGNORECASE)
         self.pattern2 = re.compile(r'^\s*@\s*output\s*(:.*)?$', re.IGNORECASE)
+        self.pattern3 = re.compile(r'^\s*@\s*args\s*(:.*)?$', re.IGNORECASE)
+        self.reset()
 
     def reset (self):
         self.units = []
@@ -892,6 +897,7 @@ class CommentParser (object):
         self.input = []
         self.output = []
         self.opts = None
+        self.args = []
         self.state = 0
         self.index = 0
         self.next = 0
@@ -909,6 +915,10 @@ class CommentParser (object):
             if self._check_output(test):
                 self.state = 2
                 self.next = lnum + 1
+                continue
+            args = self._check_args(test)
+            if args is not None:
+                self.args = args
                 continue
             if self.state == 1:
                 if lnum == self.next:
@@ -951,6 +961,25 @@ class CommentParser (object):
             self.output = []
             self.opts = None
         return 0
+
+    def _check_args (self, text):
+        head = text.strip('#*\r\n\t ')
+        if not head.startswith('@'):
+            return None
+        if head == '@args':
+            return []
+        m = self.pattern3.match(head)
+        if not m:
+            return None
+        meta = m.group(1)
+        args = []
+        if meta:
+            meta = meta.strip('\r\n\t ')
+            if meta.startswith(':'):
+                meta = meta[1:].strip('\r\n\t ')
+            import shlex
+            args = shlex.split(meta)
+        return args
 
     # returns (name, opts)
     def _check_input (self, text):
@@ -1069,8 +1098,8 @@ class CodeCheck (object):
         return 0
 
     # call launch in foundation
-    def _launch (self, capture, stdin, timeout):
-        hr = self.foundation.launch(capture, stdin, timeout)
+    def _launch (self, capture, stdin, timeout, args = None):
+        hr = self.foundation.launch(capture, stdin, timeout, args)
         return hr
 
     def color (self, color):
@@ -1086,6 +1115,16 @@ class CodeCheck (object):
         r = self._launch(False, None, None)
         if not r:
             return 2
+        return 0
+
+    # start with args
+    def run_args (self):
+        if not self.foundation.ensure_executable():
+            return 1
+        args = None
+        if self.parser.args:
+            args = self.parser.args
+        r = self._launch(False, None, None, args)
         return 0
 
     # start a unit test by index (1-based) without compare output
@@ -1175,6 +1214,7 @@ def help():
     print('  -h, --help     show this help message and exit')
     print('  -c, --check    check the source file with unit tests')
     print('  -d, --debug    debug the source file without compare output')
+    print('  -a, --args     run the source file with args specified in comments')
     print('  -{num}         check only the unit test with the given index (1-based)')
     return 0
 
@@ -1210,6 +1250,8 @@ def main(argv = None):
         if keys:
             first = keys[0]
         return cc.debug(first)
+    elif 'a' in options or 'args' in options:
+        cc.run_args()
     else:
         cc.start()
     return 0
@@ -1288,7 +1330,14 @@ if __name__ == '__main__':
         # args = ['-d', f]
         main(args)
         return 0
-    # test9()
+    def test0():
+        f = 'e:/lab/workshop/autumn/script/child.py'
+        args = [f]
+        args = ['-a', f]
+        # args = [f]
+        main(args)
+        return 0
+    # test0()
     main()
 
 
