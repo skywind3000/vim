@@ -762,8 +762,8 @@ class foundation (object):
         text = ' '.join(flags)
         text = text.strip('\r\n\t ')
         if text:
-            import shlex
             args += shlex.split(text)
+            args.append('-lm')
         else:
             args = ['-O2', '-g', '-Wall'] + args + ['-lm']
         cwd = os.path.dirname(self.srcname)
@@ -885,7 +885,7 @@ class UnitTest (object):
 class CommentParser (object):
 
     def __init__ (self):
-        self.units: UnitTest = []
+        self.units = []
         self.pattern1 = re.compile(r'^\s*@\s*input\s*(:.*)?$', re.IGNORECASE)
         self.pattern2 = re.compile(r'^\s*@\s*output\s*(:.*)?$', re.IGNORECASE)
         self.pattern3 = re.compile(r'^\s*@\s*args\s*(:.*)?$', re.IGNORECASE)
@@ -977,7 +977,6 @@ class CommentParser (object):
             meta = meta.strip('\r\n\t ')
             if meta.startswith(':'):
                 meta = meta[1:].strip('\r\n\t ')
-            import shlex
             args = shlex.split(meta)
         return args
 
@@ -1026,18 +1025,6 @@ class CommentParser (object):
 
 
 #----------------------------------------------------------------------
-# code checker
-#----------------------------------------------------------------------
-class CodeCheck (object):
-
-    def __init__ (self, srcname):
-        self.foundation: foundation = foundation(srcname)
-        self.config: configure = self.foundation.config
-        self.parser: CommentParser = CommentParser()
-
-
-
-#----------------------------------------------------------------------
 # code sample
 #----------------------------------------------------------------------
 sample_cpp_code_1 = r'''
@@ -1081,7 +1068,7 @@ class CodeCheck (object):
         self.foundation: foundation = foundation(srcname)
         self.config: configure = self.foundation.config
         self.parser: CommentParser = CommentParser()
-        self.units: UnitTest = []
+        self.units = []
         self._parse_comment()
 
     def _parse_comment (self):
@@ -1223,7 +1210,7 @@ def help():
 # main function
 #----------------------------------------------------------------------
 def main(argv = None):
-    argv = argv and argv or sys.argv[1:]
+    argv = argv if argv is not None else sys.argv[1:]
     args = [n for n in argv]
     options, args = getopt(args)
     enabled = {}
@@ -1337,7 +1324,7 @@ if __name__ == '__main__':
         # args = [f]
         main(args)
         return 0
-    # test0()
+    # test9()
     main()
 
 
