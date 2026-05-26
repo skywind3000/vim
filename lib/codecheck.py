@@ -2,20 +2,20 @@
 # -*- coding: utf-8 -*-
 #======================================================================
 #
-# codecheck.py - Extract @input/@output test cases from source 
-#                comments and auto-verify
+# codecheck.py - Extract @input/@output/@args/@timeout test directives
+#                from source comments and verify expected output
 #
 # Description:
-#   This tool scans C/C++/Python source files for comments marked 
-#   with @input and @output, compiles (C/C++) or directly runs the 
-#   source, feeds @input content as stdin, and compares actual output
-#   against @output expectations, enabling inline automated unit 
-#   testing within source code.
+#   This tool scans C/C++/Python source files for embedded test directives
+#   (@input, @output, @args, @timeout) in comments, compiles (for C/C++) or
+#   directly runs (for Python) the source, feeds @input as stdin, and
+#   compares actual output against @output expectations — enabling automated
+#   unit testing embedded directly in source code comments.
 #
 #   Three run modes are supported:
-#     start  - compile and run the source file (default)
-#     debug  - run a test case without comparing output
-#     check  - run test cases one by one and compare output
+#     start  - compile and run the source file (default, no test verification)
+#     debug  - run a test case with @input as stdin but without output comparison
+#     check  - run test cases one by one and verify output against @output
 #
 # Usage examples:
 #   codecheck.py hello.c            # compile and run
@@ -1248,10 +1248,10 @@ def help():
     print('Usage: python %s [options] <source-file>' % fn)
     print('options:')
     print('  -h, --help     show this help message and exit')
-    print('  -c, --check    check the source file with unit tests')
-    print('  -d, --debug    debug the source file without compare output')
-    print('  -a, --args     run the source file with args specified in comments')
-    print('  -{num}         check only the unit test with the given index (1-based)')
+    print('  -c, --check    run embedded unit tests and verify output')
+    print('  -d, --debug    run a test case without comparing output')
+    print('  -a, --args     run with command-line arguments from @args directive')
+    print('  -{num}         select a specific test case by index (1-based, use with -c/-d)')
     return 0
 
 
