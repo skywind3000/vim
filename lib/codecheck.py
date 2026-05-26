@@ -528,6 +528,23 @@ class configure (object):
             self._binary['python'] = os.path.abspath(py)
         return 0
 
+    # read config
+    def read_config (self, section, key, default = None):
+        if section not in self._config:
+            return default
+        return self._config[section].get(key, default)
+
+    # read config value as int
+    def read_int (self, section, key, default = -1):
+        val = self.read_config(section, key, None)
+        if val is None:
+            return default
+        try:
+            return int(val)
+        except:
+            pass
+        return default
+
     # execute command without capture, returns exit code
     def execute (self, args, cwd = None, env = None, timeout = None, stdin = None):
         if env:
@@ -1092,6 +1109,13 @@ class CodeCheck (object):
         self.parser: CommentParser = CommentParser()
         self.units = []
         self._parse_comment()
+        self._default_settings()
+
+    def _default_settings (self):
+        config = self.config
+        if 'timeout' not in config._config['default']:
+            config._config['default']['timeout'] = '10'
+        return 0
 
     def _parse_comment (self):
         comments = self.config.extract_comments(self.foundation.srcname)
@@ -1169,10 +1193,13 @@ class CodeCheck (object):
             self.echo(CC_NOTICE, 'No unit tests found in comments.')
             return 0
         passed = 0
+        _timeout = self.config.read_int('default', 'timeout', 10)
+        if _timeout < 0:
+            _timeout = None
         for unit in self.units:
             if enabled and unit.index not in enabled:
                 continue
-            timeout = None
+            timeout = _timeout
             if unit.opts and 'timeout' in unit.opts:
                 try:
                     timeout = int(unit.opts['timeout'])
