@@ -53,7 +53,6 @@
 #======================================================================
 import sys
 import os
-import time
 import re
 import shutil
 import subprocess
@@ -381,14 +380,13 @@ def text_normalize(text):
 class configure (object):
 
     def __init__ (self, ininame = None):
-        t = time.time()
         self._config = {}
         self._binary = {}
         if not ininame:
             ininame = os.path.expanduser('~/.config/codecheck.ini')
+        self._ininame = os.path.abspath(ininame)
+        self._inibase = os.path.dirname(self._ininame)
         if os.path.isfile(ininame):
-            self._ininame = os.path.abspath(ininame)
-            self._inibase = os.path.dirname(self._ininame)
             self._config = self.load_ini(self._ininame)
         if 'default' not in self._config:
             self._config['default'] = {}
@@ -400,7 +398,7 @@ class configure (object):
     def load_file_content (self, filename, mode = 'r'):
         if hasattr(filename, 'read'):
             try: content = filename.read()
-            except: content = None
+            except Exception: content = None
             return content
         try:
             if '~' in filename:
@@ -408,7 +406,7 @@ class configure (object):
             fp = open(filename, mode)
             content = fp.read()
             fp.close()
-        except:
+        except Exception:
             content = None
         return content
 
@@ -429,7 +427,7 @@ class configure (object):
             try:
                 import locale
                 guess.append(locale.getpreferredencoding())
-            except:
+            except Exception:
                 pass
             visit = {}
             for name in guess + ['gbk', 'ascii', 'latin1']:
@@ -439,7 +437,7 @@ class configure (object):
                 try:
                     text = content.decode(name)
                     break
-                except:
+                except (UnicodeDecodeError, LookupError):
                     pass
             if text is None:
                 text = content.decode('utf-8', 'ignore')
@@ -542,7 +540,7 @@ class configure (object):
             return default
         try:
             return int(val)
-        except:
+        except ValueError:
             pass
         return default
 
@@ -555,15 +553,11 @@ class configure (object):
         if stdin:
             if isinstance(stdin, str):
                 stdin = stdin.encode('utf-8', 'ignore')
-        try:
-            result = subprocess.run(args, cwd = cwd, env = env, 
-                                    shell = False,
-                                    input = stdin,
-                                    timeout = timeout)
-            return result.returncode
-        except Exception as e:
-            raise e
-        return -1
+        result = subprocess.run(args, cwd = cwd, env = env,
+                                shell = False,
+                                input = stdin,
+                                timeout = timeout)
+        return result.returncode
 
     # execute command and capture output, returns (exit code, stdout, stderr)
     def capture (self, args, cwd = None, env = None, timeout = None, stdin = None):
@@ -574,19 +568,15 @@ class configure (object):
         if stdin:
             if isinstance(stdin, str):
                 stdin = stdin.encode('utf-8', 'ignore')
-        try:
-            result = subprocess.run(args, cwd = cwd, env = env,
-                                    timeout = timeout,
-                                    shell = False,
-                                    input = stdin,
-                                    stdout = subprocess.PIPE,
-                                    stderr = subprocess.PIPE)
-            stdout = result.stdout.decode('utf-8', 'ignore')
-            stderr = result.stderr.decode('utf-8', 'ignore')
-            return (result.returncode, stdout, stderr)
-        except Exception as e:
-            raise e
-        return (-1, '', '')
+        result = subprocess.run(args, cwd = cwd, env = env,
+                                timeout = timeout,
+                                shell = False,
+                                input = stdin,
+                                stdout = subprocess.PIPE,
+                                stderr = subprocess.PIPE)
+        stdout = result.stdout.decode('utf-8', 'ignore')
+        stderr = result.stderr.decode('utf-8', 'ignore')
+        return (result.returncode, stdout, stderr)
 
     # check source file type by extension
     def check_source_type (self, filename):
@@ -822,11 +812,7 @@ class foundation (object):
         if self.srctype in ('c', 'cpp'):
             env = {}
             env['PATH'] = self.config.toolchain_path()
-            exename = os.path.split(self.exename)[-1]
-            if self.win32:
-                args.append(self.exename)
-            else:
-                args.append(self.exename)
+            args.append(self.exename)
         elif self.srctype == 'python':
             args.append(self.config._binary['python'])
             args.append(self.srcname)
@@ -847,7 +833,7 @@ class foundation (object):
 
     def launch (self, capture = False, stdin = None, timeout = None, args = None):
         if not self.ensure_executable():
-            return False
+            return (-1, '', '')
         if not capture:
             if self.compiled:
                 self.echo(CC_NOTICE, 'Running %s ...' % os.path.split(self.exename)[-1])
@@ -998,7 +984,7 @@ class CommentParser (object):
                 meta = meta[1:].strip('\r\n\t ')
             try:
                 self.timeout = int(meta)
-            except:
+            except ValueError:
                 pass
         return True
 
@@ -1146,8 +1132,8 @@ class CodeCheck (object):
     def start (self):
         if not self.foundation.ensure_executable():
             return 1
-        r = self._launch(False, None, None)
-        if not r:
+        code, _, _ = self._launch(False, None, None)
+        if code < 0:
             return 2
         return 0
 
@@ -1158,7 +1144,9 @@ class CodeCheck (object):
         args = None
         if self.parser.args:
             args = self.parser.args
-        r = self._launch(False, None, None, args)
+        code, _, _ = self._launch(False, None, None, args)
+        if code < 0:
+            return 2
         return 0
 
     # start a unit test by index (1-based) without compare output
@@ -1181,9 +1169,11 @@ class CodeCheck (object):
         if unit.opts and 'timeout' in unit.opts:
             try:
                 timeout = int(unit.opts['timeout'])
-            except:
+            except ValueError:
                 pass
-        hr = self._launch(False, unit.stdin, timeout)
+        code, _, _ = self._launch(False, unit.stdin, timeout)
+        if code < 0:
+            return 2
         return 0
 
     # check each unit test, returns a list of (unit, result) pairs
@@ -1204,7 +1194,7 @@ class CodeCheck (object):
             if unit.opts and 'timeout' in unit.opts:
                 try:
                     timeout = int(unit.opts['timeout'])
-                except:
+                except ValueError:
                     pass
             self.color(CC_UNIT)
             sys.stdout.write('[%d/%d] Running unit test: %s ... ' % 
