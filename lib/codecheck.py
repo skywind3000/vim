@@ -6,11 +6,12 @@
 #                from source comments and verify expected output
 #
 # Description:
-#   This tool scans C/C++/Python source files for embedded test directives
-#   (@input, @output, @args, @timeout) in comments, compiles (for C/C++) or
-#   directly runs (for Python) the source, feeds @input as stdin, and
-#   compares actual output against @output expectations — enabling automated
-#   unit testing embedded directly in source code comments.
+#   This tool scans C/C++/Python source files for embedded test 
+#   directives (@input, @output, @args, @timeout) in comments, 
+#   compiles (for C/C++) or directly runs (for Python) the source, 
+#   feeds @input as stdin, and compares actual output against @output
+#   expectations — enabling automated unit testing embedded directly
+#   in source code comments.
 #
 #   Three run modes are supported:
 #     start  - compile and run the source file (default, no test verification)
