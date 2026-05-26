@@ -1197,8 +1197,9 @@ class CodeCheck (object):
                 except ValueError:
                     pass
             self.color(CC_UNIT)
-            sys.stdout.write('[%d/%d] Running unit test: %s ... ' % 
-                             (unit.index, len(self.units), unit.name))
+            sys.stdout.write('[%d/%d] ' % (unit.index, len(self.units)))
+            self.color(CC_INFO)
+            sys.stdout.write('Running unit test: %s ... ' % unit.name)
             self.color(-1)
             sys.stdout.flush()
             hr = self._launch(True, unit.stdin, timeout)
