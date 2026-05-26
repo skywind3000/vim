@@ -889,6 +889,7 @@ class CommentParser (object):
         self.pattern1 = re.compile(r'^\s*@\s*input\s*(:.*)?$', re.IGNORECASE)
         self.pattern2 = re.compile(r'^\s*@\s*output\s*(:.*)?$', re.IGNORECASE)
         self.pattern3 = re.compile(r'^\s*@\s*args\s*(:.*)?$', re.IGNORECASE)
+        self.pattern4 = re.compile(r'^\s*@\s*timeout\s*(:.*)?$', re.IGNORECASE)
         self.reset()
 
     def reset (self):
@@ -901,6 +902,7 @@ class CommentParser (object):
         self.state = 0
         self.index = 0
         self.next = 0
+        self.timeout = None
 
     def process (self, comments):
         self.reset()
@@ -919,6 +921,8 @@ class CommentParser (object):
             args = self._check_args(test)
             if args is not None:
                 self.args = args
+                continue
+            if self._check_timeout(test):
                 continue
             if self.state == 1:
                 if lnum == self.next:
@@ -961,6 +965,24 @@ class CommentParser (object):
             self.output = []
             self.opts = None
         return 0
+
+    def _check_timeout (self, text):
+        head = text.strip('#*\r\n\t ')
+        if not head.startswith('@'):
+            return False
+        m = self.pattern4.match(head)
+        if not m:
+            return False
+        meta = m.group(1)
+        if meta:
+            meta = meta.strip('\r\n\t ')
+            if meta.startswith(':'):
+                meta = meta[1:].strip('\r\n\t ')
+            try:
+                self.timeout = int(meta)
+            except:
+                pass
+        return True
 
     def _check_args (self, text):
         head = text.strip('#*\r\n\t ')
