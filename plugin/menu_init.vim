@@ -49,6 +49,7 @@ call quickui#menu#install("&Edit", [
 			\ ['Update &ModTime', 'UpdateLastModified', ''],
 			\ ['&Paste Mode Line', 'PasteVimModeLine', ''],
 			\ ['Format Js&on', '%!python -m json.tool', ''],
+			\ ['Find &non-ASCII Char', '/[^\x00-\x7f]', ''],
 			\ ['--'],
 			\ ['&Align Table', 'Tabularize /|', ''],
 			\ ['Align &Cheatsheet', 'MyCheatSheetAlign', ''],
