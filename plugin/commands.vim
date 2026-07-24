@@ -265,7 +265,8 @@ function! s:SudoWrite(bang) abort
 		echohl None
 	else
 		let e = executable('tee')? 'tee' : 'busybox tee'
-		exec printf('w%s !sudo %s %s > /dev/null', a:bang, e, shellescape(t))
+		let n = (has('win32') || has('win64'))? 'NUL' : '/dev/null'
+		exec printf('w%s !sudo %s %s > %s', a:bang, e, shellescape(t), n)
 		if !v:shell_error
 			edit!
 		endif

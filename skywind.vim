@@ -184,6 +184,9 @@ endif
 
 nnoremap <silent><space>hf :FileSwitch ~/.vim/test.comp<cr>
 
+cabbrev w!! SudoWrite!
+
+
 
 "----------------------------------------------------------------------
 " cloud drivers
