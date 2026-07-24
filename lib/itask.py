@@ -75,7 +75,7 @@ class TaskExecutor (object):
     # 内部函数：线程主函数，从请求队列取出 task执行完 run后，塞入结果队列
     def __run (self, env):
         self.__active_thread_num += 1
-        name = threading.currentThread().name
+        name = threading.current_thread().name
         env['_NAME'] = name
         while not self.__stop_unconditional:
             if self.__stop_empty_queue:
