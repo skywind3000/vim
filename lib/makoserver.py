@@ -42,6 +42,14 @@
 #      _SERVER['argv'] (argv[0] = the script itself, "-" for stdin).
 #      No config file is read in this mode.
 #
+#   4. Plain CGI script (Apache mod_cgi / mod_cgid):
+#      Drop makoserver.py into cgi-bin (or map it via "Action"),
+#      the CGI environment is auto-detected (GATEWAY_INTERFACE /
+#      REQUEST_METHOD markers); one request is served per process
+#      through wsgiref's CGIHandler. Zero-config document root
+#      falls back to the server-provided DOCUMENT_ROOT; the normal
+#      config search chain still applies.
+#
 # Configuration is a single-section INI ([makoserver]), searched in
 # order: --conf FILE > env MAKOSERVER_CONF > makoserver.ini next to
 # this file > ~/.config/makoserver/settings.ini (first hit wins).
@@ -1322,6 +1330,51 @@ def render_cli (script, args):
 
 
 #======================================================================
+# CGI mode
+#======================================================================
+
+def is_cgi_environment ():
+    """Detect a plain CGI invocation (Apache mod_cgi / mod_cgid,
+    either cgi-bin placement or an Action mapping).
+
+    Primary marker: GATEWAY_INTERFACE = 'CGI/1.1' (RFC 3875). Some
+    servers omit it, so a secondary heuristic is applied:
+    REQUEST_METHOD plus SCRIPT_FILENAME / PATH_TRANSLATED is a
+    CGI-only signature, never present in interactive shells.
+    """
+    gateway = os.environ.get('GATEWAY_INTERFACE', '')
+    if gateway.upper().startswith('CGI'):
+        return True
+    if os.environ.get('REQUEST_METHOD') and \
+            (os.environ.get('SCRIPT_FILENAME') or
+             os.environ.get('PATH_TRANSLATED')):
+        return True
+    return False
+
+
+def run_cgi ():
+    """Serve one request as a plain CGI script and exit.
+
+    Zero-config document root falls back to the server-provided
+    DOCUMENT_ROOT (not MODULE_DIR: under cgi-bin placement the
+    script directory carries no site meaning); makoserver.ini /
+    MAKOSERVER_CONF / ~/.config still take precedence through the
+    normal search chain. Returns a process exit code.
+    """
+    conf_path = find_config_file()
+    default_root = os.environ.get('DOCUMENT_ROOT') or MODULE_DIR
+    try:
+        app = create_app(conf_file=conf_path, default_root=default_root,
+                         default_source='cgi document root')
+    except ConfigError as e:
+        sys.stderr.write('makoserver: %s\n' % e)
+        return 1
+    from wsgiref.handlers import CGIHandler
+    CGIHandler().run(app)
+    return 0
+
+
+#======================================================================
 # Command line entry
 #======================================================================
 
@@ -1381,4 +1434,8 @@ def _wsgi_bootstrap ():
 if __name__ != '__main__':
     application = _wsgi_bootstrap()
 else:
+    # CGI detection precedes argparse: mod_cgi invokes the script
+    # with no arguments, argv == ['makoserver.py']
+    if is_cgi_environment():
+        sys.exit(run_cgi())
     sys.exit(main())
