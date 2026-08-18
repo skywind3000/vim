@@ -118,6 +118,7 @@ if has_key(s:enabled, 'basic')
 	Plug 'pboettch/vim-cmake-syntax', { 'for': ['cmake'] }
 	Plug 'skywind3000/vim-flex-bison-syntax', { 'for': ['yacc', 'lex'] }
 	Plug 'lark-parser/vim-lark-syntax'
+	Plug 'sophacles/vim-bundle-mako'
 	Plug 'dylon/vim-antlr'
 	Plug 'beyondmarc/hlsl.vim'
 	if has('patch-9.0.1767') == 0
