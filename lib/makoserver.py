@@ -10,9 +10,11 @@
 # Serve .mako templates the way PHP serves .php files: drop files
 # into a document root and every "*.mako" is rendered per request
 # with PHP style superglobals (_GET / _POST / _REQUEST / _SERVER /
-# _COOKIE / _SESSION / _BODY / _JSON), echo()/escape() helpers and
-# a RESP response-control object. Whitelisted static files are
-# served as-is; everything else is 404 (fail-closed).
+# _COOKIE / _SESSION / _BODY / _JSON), echo()/escape() text helpers,
+# echoraw() for binary output (short-circuits text, appends to an
+# independent binary buffer) and a RESP response-control object.
+# Whitelisted static files are served as-is; everything else is 404
+# (fail-closed).
 #
 # Run modes:
 #
@@ -62,6 +64,7 @@
 
 import sys
 import os
+import io
 import json
 import time
 import html
@@ -80,6 +83,7 @@ import threading
 import traceback
 import datetime
 import configparser
+import urllib.parse
 
 import flask
 from werkzeug.utils import redirect as wz_redirect
@@ -107,6 +111,7 @@ DEFAULT_CONFIG = {
     'session_lifetime': 3600,
     'session_mode': 'sliding',
     'session_cookie': 'MAKO_SESSION',
+    'max_body': 67108864,
     'access_log': '',
     'error_log': '',
 }
@@ -216,6 +221,12 @@ def load_config (path):
         conf['session_lifetime'] = int(str(conf['session_lifetime']).strip())
     except ValueError:
         raise ConfigError('session_lifetime must be an integer in %s' % path)
+    # explicit int conversion for max_body (request body size limit
+    # in bytes; <= 0 means unlimited)
+    try:
+        conf['max_body'] = int(str(conf['max_body']).strip())
+    except ValueError:
+        raise ConfigError('max_body must be an integer in %s' % path)
     # validate session_mode
     mode = str(conf['session_mode']).strip().lower()
     if mode not in ('sliding', 'absolute'):
@@ -409,12 +420,12 @@ class AccessLogMiddleware:
 #======================================================================
 
 class TemplateStore:
-    """Custom template collection (TemplateLookup rejected: its file
-    reading offers no rstrip hook).
+    """Custom template collection: mtime_ns + size cache (checked per
+    request; no watchdog dependency), utf-8-sig reading (Windows
+    notepad BOM) and a pinned not-found error shape.
 
     Implements the Mako collection protocol get_template(uri) /
-    adjust_uri(uri, relativeto), with an mtime + size cache (checked
-    per request; no watchdog dependency).
+    adjust_uri(uri, relativeto).
     """
 
     def __init__ (self, base_dir):
@@ -440,9 +451,10 @@ class TemplateStore:
             except OSError:
                 raise mako_exceptions.TopLevelLookupException(
                     'template not found: %s' % uri)
-            # strip trailing whitespace: whitespace at EOF is never
-            # part of the output
-            text = text.rstrip()
+            # source is kept verbatim (no rstrip): text templates
+            # faithfully preserve the trailing newline of the source
+            # file; binary scripts go through RESP.writeraw/echoraw
+            # which short-circuits all text output anyway
             # filename= does NOT set __file__ in module blocks and
             # does NOT change runtime traceback frames (Mako compiles
             # with co_filename = mangled module_id, decision #28);
@@ -464,36 +476,13 @@ class TemplateStore:
 
 
 #======================================================================
-# Byte buffer: BytesBuffer
+# Output helpers: echo / escape
 #======================================================================
 
-class BytesBuffer:
-    """Byte buffer implementing the Mako buffer protocol
-    (write/getvalue).
-
-    write(str) encodes to UTF-8 immediately and appends;
-    write(bytes/bytearray/memoryview) passes through. Internally a
-    chunk list, avoiding repeated copies of immutable bytes.
-    """
-
-    def __init__ (self):
-        self.__chunks = []
-
-    def write (self, x):
-        if isinstance(x, str):
-            self.__chunks.append(x.encode('utf-8'))
-        elif isinstance(x, (bytes, bytearray, memoryview)):
-            self.__chunks.append(bytes(x))
-        else:
-            raise TypeError('BytesBuffer.write expects str or bytes-like')
-
-    def getvalue (self):
-        return b''.join(self.__chunks)
-
-
 def make_echo (buf):
-    """Build echo(*args): mimic PHP echo; None prints nothing, other
-    values are str()-ed then encoded."""
+    """Build echo(*args): mimic PHP echo, text only; None prints
+    nothing, other values are str()-ed; bytes-like raises TypeError
+    (binary output goes through RESP.writeraw/echoraw)."""
     def echo (*args):
         for item in args:
             if item is None:
@@ -501,7 +490,9 @@ def make_echo (buf):
             if isinstance(item, str):
                 buf.write(item)
             elif isinstance(item, (bytes, bytearray, memoryview)):
-                buf.write(bytes(item))
+                raise TypeError(
+                    'echo() accepts text only; use '
+                    'RESP.writeraw()/echoraw() for binary output')
             else:
                 buf.write(str(item))
     return echo
@@ -567,9 +558,11 @@ def merge_php_dict (get_d, post_d):
 
 class RespObject:
     """Response control object (RESP):
-    header/status/redirect/json/setcookie/write.
+    header/status/redirect/json/setcookie/write/writeraw.
 
-    In CLI mode everything except write/json is a no-op.
+    In CLI mode header/status/redirect/setcookie are no-ops;
+    write/writeraw/json output normally (output, not response
+    control).
     """
 
     def __init__ (self, echo_func, cli=False):
@@ -578,6 +571,8 @@ class RespObject:
         self.__headers = []     # (name, value) list; Set-Cookie appends, others overwrite
         self.__status = None
         self.__cookies = {}     # name -> full cookie string, same name overwrites
+        self.__raw_chunks = []  # independent binary buffer (writeraw)
+        self.__raw_used = False
         # canonical name for escape: the very same function object as
         # the injected escape (like the echo/RESP.write pair); a pure
         # conversion helper, not response control, so it stays usable
@@ -586,6 +581,21 @@ class RespObject:
 
     def write (self, *args):
         self.__echo(*args)
+
+    def writeraw (self, *args):
+        """Append bytes-like args to the independent binary buffer.
+        Once called, the raw bytes short-circuit all text output
+        (template text blocks and echo) and become the whole body;
+        Content-Type is NOT set here, the script must set it via
+        RESP.header() itself."""
+        self.__raw_used = True
+        for item in args:
+            if isinstance(item, (bytes, bytearray, memoryview)):
+                self.__raw_chunks.append(bytes(item))
+            else:
+                raise TypeError(
+                    'writeraw() accepts bytes-like only; use '
+                    'echo()/RESP.write() for text output')
 
     def header (self, name, value):
         if self.__cli:
@@ -621,7 +631,15 @@ class RespObject:
                    samesite=None):
         if self.__cli:
             return
-        parts = ['%s=%s' % (name, value)]
+        # the cookie VALUE is percent-encoded (RFC 3986 quote, space
+        # becomes %20 -- deliberately NOT PHP urlencode's '+'), the
+        # semantic counterpart of PHP setcookie() which encodes by
+        # default (raw values with ; , = or spaces would be
+        # truncated/corrupted by cookie syntax); _COOKIE decodes on
+        # read (spec decision #31). The raw escape hatch is
+        # RESP.header('Set-Cookie', ...), equivalent to PHP
+        # setrawcookie()
+        parts = ['%s=%s' % (name, urllib.parse.quote(str(value), safe=''))]
         if expires is not None:
             if isinstance(expires, (int, float)):
                 # fromtimestamp + utc tz (utcfromtimestamp deprecated in 3.12)
@@ -647,6 +665,11 @@ class RespObject:
     def collect (self):
         """Fetch internal state at assembly time: (status, headers, cookies)."""
         return (self.__status, list(self.__headers), dict(self.__cookies))
+
+    def collect_raw (self):
+        """Fetch the raw output state at assembly time:
+        (raw_used, raw_bytes)."""
+        return (self.__raw_used, b''.join(self.__raw_chunks))
 
 
 #======================================================================
@@ -1022,16 +1045,16 @@ class MakoServer:
             tpl = self.store.get_template(script_rel)
         except Exception:
             return self.__internal_error()
-        buf = BytesBuffer()
+        buf = io.StringIO()
         echo = make_echo(buf)
         resp = RespObject(echo)
         bridge, session_state, session_dict = self.__build_bridge(
             echo, resp, script_path, script_suffix, path_info)
         try:
+            # public Mako API only: the documented "using the Context
+            # programmatically" pattern (Context + render_context)
             ctx = mako_runtime.Context(buf, **bridge)
-            ctx._outputting_as_unicode = False
-            ctx._set_with_template(tpl)
-            mako_runtime._render_context(tpl, tpl.callable_, ctx)
+            tpl.render_context(ctx)
         except Exception:
             # discard partial output, return a clean 500
             return self.__internal_error()
@@ -1102,8 +1125,19 @@ class MakoServer:
                 session_state['snapshot'] = json.dumps(
                     session_dict, sort_keys=True, separators=(',', ':'))
 
+        # _COOKIE values are percent-decoded (the counterpart of PHP
+        # $_COOKIE urldecode, paired with RESP.setcookie encoding);
+        # a literal '+' is kept as-is, deliberately NOT decoded to a
+        # space like PHP does (protects third-party base64 cookies
+        # with raw '+', spec decision #31); the session codec reads
+        # request.cookies directly and is not affected
+        cookie_d = {}
+        for key in req.cookies:
+            cookie_d[key] = urllib.parse.unquote(req.cookies[key])
+
         bridge = {
             'echo': echo,
+            'echoraw': resp.writeraw,
             'escape': html_escape,
             '_REQUEST': request_d,
             '_BODY': body,
@@ -1111,7 +1145,7 @@ class MakoServer:
             '_POST': post_d,
             '_SERVER': server,
             '_JSON': json_data,
-            '_COOKIE': dict(req.cookies),
+            '_COOKIE': cookie_d,
             '_SESSION': session_dict,
             'RESP': resp,
         }
@@ -1175,7 +1209,16 @@ class MakoServer:
             raw_setcookies.append(cookies[name])
         if session_cookie:
             raw_setcookies.append(session_cookie)
-        response = flask.Response(buf.getvalue(), status=status,
+        # writeraw short-circuit: once used, the raw binary buffer is
+        # the whole body and the text buffer is discarded; headers /
+        # status / cookies still apply (Content-Type stays whatever
+        # the script set, default text/html otherwise)
+        raw_used, raw_body = resp.collect_raw()
+        if raw_used:
+            body = raw_body
+        else:
+            body = buf.getvalue().encode('utf-8')
+        response = flask.Response(body, status=status,
                                   content_type=content_type)
         for name, value in header_list:
             response.headers[name] = value
@@ -1228,6 +1271,12 @@ def create_app (root=None, conf_file=None, default_root=None,
     server = MakoServer(final_root, config, conf_path)
 
     app = flask.Flask('makoserver', static_folder=None)
+    # request body size cap (config key max_body, default 64MB,
+    # <= 0 disables the limit): a stray oversized POST would otherwise
+    # be read fully into memory by get_data(cache=True); oversize
+    # requests get Werkzeug's standard 413 response
+    max_body = int(config.get('max_body', 67108864))
+    app.config['MAX_CONTENT_LENGTH'] = max_body if max_body > 0 else None
     app.mako_server = server
     app.wsgi_app = PathInfoNormMiddleware(app.wsgi_app)
 
@@ -1275,7 +1324,7 @@ def render_cli (script, args):
             sys.exit(1)
         base_dir = os.path.dirname(script_abs)
     store = TemplateStore(base_dir)
-    buf = BytesBuffer()
+    buf = io.StringIO()
     echo = make_echo(buf)
     resp = RespObject(echo, cli=True)
     server = {
@@ -1294,6 +1343,7 @@ def render_cli (script, args):
     }
     bridge = {
         'echo': echo,
+        'echoraw': resp.writeraw,
         'escape': html_escape,
         '_REQUEST': PHPDict(),
         '_BODY': b'',
@@ -1307,25 +1357,28 @@ def render_cli (script, args):
     }
     try:
         if text is not None:
-            # stdin source: same trailing-whitespace truncation
-            # contract as file loading (whitespace at EOF is never
-            # part of the output)
-            tpl = Template(text=text.rstrip(), lookup=store,
+            # stdin source is kept verbatim (no rstrip), same as file
+            # loading
+            tpl = Template(text=text, lookup=store,
                            uri='<stdin>', filename='-',
                            input_encoding='utf-8')
         else:
             tpl = store.get_template(os.path.basename(script_abs))
+        # public Mako API only: Context + render_context
         ctx = mako_runtime.Context(buf, **bridge)
-        ctx._outputting_as_unicode = False
-        ctx._set_with_template(tpl)
-        mako_runtime._render_context(tpl, tpl.callable_, ctx)
+        tpl.render_context(ctx)
     except SystemExit:
         raise
     except BaseException:
         # no partial content on stdout; traceback goes to stderr
         traceback.print_exc()
         sys.exit(1)
-    sys.stdout.buffer.write(buf.getvalue())
+    raw_used, raw_body = resp.collect_raw()
+    if raw_used:
+        # writeraw short-circuit: raw bytes only, text discarded
+        sys.stdout.buffer.write(raw_body)
+    else:
+        sys.stdout.buffer.write(buf.getvalue().encode('utf-8'))
     sys.stdout.buffer.flush()
 
 
