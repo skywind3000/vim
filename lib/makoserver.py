@@ -87,13 +87,19 @@ import urllib.parse
 
 import flask
 from werkzeug.utils import redirect as wz_redirect
+from werkzeug.exceptions import HTTPException
 from mako.template import Template
 from mako import runtime as mako_runtime
 from mako import exceptions as mako_exceptions
 
 __version__ = '1.0.0'
 
-__all__ = ['MakoServer', 'create_app', 'application', '__version__']
+# NOTE: "application" is deliberately NOT listed in __all__: it is a
+# lazy module attribute (PEP 562 __getattr__, decision #37) with no
+# module-level binding, which static checkers would flag as undefined.
+# WSGI hosts access it as a plain attribute (makoserver:application),
+# which works regardless of __all__.
+__all__ = ['MakoServer', 'create_app', '__version__']
 
 
 #======================================================================
@@ -112,6 +118,7 @@ DEFAULT_CONFIG = {
     'session_mode': 'sliding',
     'session_cookie': 'MAKO_SESSION',
     'max_body': 67108864,
+    'static_types': '',
     'access_log': '',
     'error_log': '',
 }
@@ -119,14 +126,20 @@ DEFAULT_CONFIG = {
 KNOWN_KEYS = list(DEFAULT_CONFIG.keys())
 
 # Static file extension whitelist (mimetypes module rejected: its
-# mappings come from the OS registry and are not under our control)
+# mappings come from the OS registry and are not under our control);
+# extendable per site via the static_types config key (decision #39)
 STATIC_TYPES = {
     '.html': 'text/html; charset=utf-8',
     '.htm': 'text/html; charset=utf-8',
     '.txt': 'text/plain; charset=utf-8',
     '.css': 'text/css; charset=utf-8',
-    '.js': 'application/javascript',
+    '.js': 'text/javascript; charset=utf-8',
+    '.mjs': 'text/javascript; charset=utf-8',
     '.json': 'application/json',
+    '.map': 'application/json',
+    '.xml': 'application/xml',
+    '.csv': 'text/csv; charset=utf-8',
+    '.md': 'text/markdown; charset=utf-8',
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
     '.jpeg': 'image/jpeg',
@@ -134,6 +147,19 @@ STATIC_TYPES = {
     '.svg': 'image/svg+xml',
     '.ico': 'image/x-icon',
     '.webp': 'image/webp',
+    '.avif': 'image/avif',
+    '.bmp': 'image/bmp',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2',
+    '.ttf': 'font/ttf',
+    '.otf': 'font/otf',
+    '.eot': 'application/vnd.ms-fontobject',
+    '.mp3': 'audio/mpeg',
+    '.ogg': 'audio/ogg',
+    '.wav': 'audio/wav',
+    '.mp4': 'video/mp4',
+    '.webm': 'video/webm',
+    '.wasm': 'application/wasm',
     '.pdf': 'application/pdf',
     '.zip': 'application/zip',
     '.rar': 'application/vnd.rar',
@@ -176,11 +202,16 @@ def find_config_file (cli_conf=None):
     Returns the absolute path or None. Order: command line --conf >
     env MAKOSERVER_CONF > makoserver.ini next to makoserver.py >
     ~/.config/makoserver/settings.ini.
-    A specified but missing file counts as a miss; keep searching.
+    An explicit --conf pointing at a missing file is an error
+    (decision #40; silently falling through to the user-level config
+    would be a surprising misfire); a missing MAKOSERVER_CONF stays
+    lenient (env vars leak across contexts) and keeps searching.
     """
-    candidates = []
     if cli_conf:
-        candidates.append(cli_conf)
+        if not os.path.isfile(cli_conf):
+            raise ConfigError('config file not found: %s' % cli_conf)
+        return os.path.abspath(cli_conf)
+    candidates = []
     env_conf = os.environ.get('MAKOSERVER_CONF', '')
     if env_conf:
         candidates.append(env_conf)
@@ -191,6 +222,34 @@ def find_config_file (cli_conf=None):
         if name and os.path.isfile(name):
             return os.path.abspath(name)
     return None
+
+
+def parse_static_types (text):
+    """Parse the static_types config value ("ext=mime, ext2=mime2")
+    into a dict of {'.ext': 'mime'}; raises ValueError on bad format.
+
+    Extensions are lowercased and get a leading dot when missing;
+    entries extend/override the builtin STATIC_TYPES whitelist
+    (decision #39).
+    """
+    table = {}
+    for item in str(text or '').split(','):
+        item = item.strip()
+        if not item:
+            continue
+        if '=' not in item:
+            raise ValueError('bad static_types entry: %r '
+                             '(expected ext=mime)' % item)
+        ext, mime = item.split('=', 1)
+        ext = ext.strip().lower()
+        mime = mime.strip()
+        if not ext or not mime:
+            raise ValueError('bad static_types entry: %r '
+                             '(expected ext=mime)' % item)
+        if not ext.startswith('.'):
+            ext = '.' + ext
+        table[ext] = mime
+    return table
 
 
 def load_config (path):
@@ -221,12 +280,22 @@ def load_config (path):
         conf['session_lifetime'] = int(str(conf['session_lifetime']).strip())
     except ValueError:
         raise ConfigError('session_lifetime must be an integer in %s' % path)
+    if conf['session_lifetime'] <= 0:
+        # 0/negative would make every session instantly expired --
+        # silently unusable; error out (decision #22 philosophy)
+        raise ConfigError('session_lifetime must be positive in %s' % path)
     # explicit int conversion for max_body (request body size limit
     # in bytes; <= 0 means unlimited)
     try:
         conf['max_body'] = int(str(conf['max_body']).strip())
     except ValueError:
         raise ConfigError('max_body must be an integer in %s' % path)
+    # validate static_types format at startup (fail fast); the parsed
+    # table is rebuilt by MakoServer from the same string
+    try:
+        parse_static_types(conf.get('static_types', ''))
+    except ValueError as e:
+        raise ConfigError('%s in %s' % (e, path))
     # validate session_mode
     mode = str(conf['session_mode']).strip().lower()
     if mode not in ('sliding', 'absolute'):
@@ -394,7 +463,18 @@ class AccessLogMiddleware:
                 if str(name).lower() == 'content-length':
                     meta['bytes'] = str(value)
             return start_response(status, headers, exc_info)
-        result = self.__app(environ, capture)
+        try:
+            result = self.__app(environ, capture)
+        except BaseException:
+            # an exception escaping the app must not make the request
+            # vanish from the access log: record it as 500, re-raise
+            meta['status'] = '500'
+            self.__write_line(environ, meta)
+            raise
+        self.__write_line(environ, meta)
+        return result
+
+    def __write_line (self, environ, meta):
         try:
             uri = environ.get('REQUEST_URI') or environ.get('RAW_URI')
             if not uri:
@@ -412,7 +492,6 @@ class AccessLogMiddleware:
                     fp.write(line)
         except OSError:
             pass
-        return result
 
 
 #======================================================================
@@ -482,19 +561,34 @@ class TemplateStore:
 def make_echo (buf):
     """Build echo(*args): mimic PHP echo, text only; None prints
     nothing, other values are str()-ed; bytes-like raises TypeError
-    (binary output goes through RESP.writeraw/echoraw)."""
+    (binary output goes through RESP.writeraw/echoraw).
+
+    The writer is late-bound: echo starts on buf.write and is
+    re-targeted to Context.write via echo.bind(ctx.write) once the
+    Mako Context exists, so echo output respects the context buffer
+    stack -- capture(), buffered defs and filter= modifiers all see
+    it -- instead of leaking straight into the bottom buffer (spec
+    decision #33).
+    """
+    state = [buf.write]
+
     def echo (*args):
+        write = state[0]
         for item in args:
             if item is None:
                 continue
             if isinstance(item, str):
-                buf.write(item)
+                write(item)
             elif isinstance(item, (bytes, bytearray, memoryview)):
                 raise TypeError(
                     'echo() accepts text only; use '
                     'RESP.writeraw()/echoraw() for binary output')
             else:
-                buf.write(str(item))
+                write(str(item))
+
+    def bind (writer):
+        state[0] = writer
+    echo.bind = bind
     return echo
 
 
@@ -573,14 +667,11 @@ class RespObject:
         self.__cookies = {}     # name -> full cookie string, same name overwrites
         self.__raw_chunks = []  # independent binary buffer (writeraw)
         self.__raw_used = False
-        # canonical name for escape: the very same function object as
-        # the injected escape (like the echo/RESP.write pair); a pure
-        # conversion helper, not response control, so it stays usable
-        # in CLI mode
+        # canonical names as instance attributes: RESP.write IS the
+        # very same function object as the injected echo (and
+        # RESP.escape the same as escape) -- shadowing-proof fallback
+        self.write = echo_func
         self.escape = html_escape
-
-    def write (self, *args):
-        self.__echo(*args)
 
     def writeraw (self, *args):
         """Append bytes-like args to the independent binary buffer.
@@ -614,7 +705,12 @@ class RespObject:
     def status (self, code):
         if self.__cli:
             return
-        self.__status = int(code)
+        code = int(code)
+        if code < 100 or code > 599:
+            # out-of-range codes break WSGI hosts/clients in
+            # unpredictable ways -- fail fast (-> 500)
+            raise ValueError('status code out of range: %d' % code)
+        self.__status = code
 
     def redirect (self, url, code=302):
         self.header('Location', url)
@@ -641,13 +737,29 @@ class RespObject:
         # setrawcookie()
         parts = ['%s=%s' % (name, urllib.parse.quote(str(value), safe=''))]
         if expires is not None:
-            if isinstance(expires, (int, float)):
+            if isinstance(expires, datetime.datetime):
+                # naive datetimes are taken as UTC (Werkzeug http_date
+                # convention); aware ones are normalized to UTC
+                if expires.tzinfo is None:
+                    stamp = expires.replace(tzinfo=datetime.timezone.utc)
+                else:
+                    stamp = expires.astimezone(datetime.timezone.utc)
+                parts.append('Expires=' + stamp.strftime('%a, %d %b %Y %H:%M:%S GMT'))
+            elif isinstance(expires, (int, float)):
                 # fromtimestamp + utc tz (utcfromtimestamp deprecated in 3.12)
                 stamp = datetime.datetime.fromtimestamp(
                     expires, datetime.timezone.utc)
                 parts.append('Expires=' + stamp.strftime('%a, %d %b %Y %H:%M:%S GMT'))
             else:
-                parts.append('Expires=%s' % expires)
+                # anything else would emit an invalid cookie date that
+                # browsers silently ignore -- fail fast instead;
+                # a preformatted IMF-fixdate string passes through
+                if isinstance(expires, str):
+                    parts.append('Expires=%s' % expires)
+                else:
+                    raise TypeError(
+                        'setcookie() expires must be an int/float '
+                        'timestamp, a datetime or a preformatted string')
         if max_age is not None:
             parts.append('Max-Age=%d' % int(max_age))
         if path:
@@ -835,9 +947,21 @@ class MakoServer:
         if config.get('secret'):
             secret = config['secret'].encode('utf-8')
         else:
-            secret = derive_host_secret()
+            # per-site key (decision #34): mix the document root into
+            # the host fingerprint so co-hosted sites (other mounts /
+            # ports on the same machine) cannot validate or forge each
+            # other's session cookies; an explicit secret in the
+            # config keeps full control (deliberate sharing possible)
+            secret = hmac.new(derive_host_secret(),
+                              os.path.normcase(self.root_real).encode('utf-8'),
+                              hashlib.sha256).digest()
         self.codec = SessionCodec(secret, config['session_lifetime'],
                                   config['session_mode'], config['session_cookie'])
+        # per-site static whitelist: builtin table extended/overridden
+        # by the static_types config key (already validated at load
+        # time, decision #39)
+        self.static_types = dict(STATIC_TYPES)
+        self.static_types.update(parse_static_types(config.get('static_types', '')))
         # runtime sensitive-path block set (stores normcase(realpath))
         self.blocked = set()
         if conf_path:
@@ -872,6 +996,12 @@ class MakoServer:
             html.escape(path), html.escape(tb))
         return flask.Response(body, status=500,
                               content_type='text/html; charset=utf-8')
+
+    def internal_error (self):
+        """Public entry to the framework 500 fallback (used by the
+        view-level catch-all, decision #35): logs the traceback to
+        the error log and builds the spec 9.1 error page."""
+        return self.__internal_error()
 
     def __is_blocked (self, real):
         return os.path.normcase(real) in self.blocked
@@ -945,7 +1075,7 @@ class MakoServer:
     def __serve_static (self, real):
         base = os.path.basename(real).lower()
         ext = os.path.splitext(base)[1]
-        ctype = STATIC_TYPES.get(ext)
+        ctype = self.static_types.get(ext)
         if ctype is None:
             # outside the whitelist -> 404 (fail-closed, same response
             # as a missing file)
@@ -1052,9 +1182,18 @@ class MakoServer:
             echo, resp, script_path, script_suffix, path_info)
         try:
             # public Mako API only: the documented "using the Context
-            # programmatically" pattern (Context + render_context)
+            # programmatically" pattern (Context + render_context);
+            # echo is re-bound to ctx.write so it follows the buffer
+            # stack (capture / buffered / filtered defs, decision #33)
             ctx = mako_runtime.Context(buf, **bridge)
+            echo.bind(ctx.write)
             tpl.render_context(ctx)
+        except SystemExit as e:
+            # PHP exit()/die() muscle memory (decision #36): exit code
+            # 0/None terminates rendering normally and keeps the
+            # buffered output; anything else is an error -> 500
+            if e.code not in (None, 0):
+                return self.__internal_error()
         except Exception:
             # discard partial output, return a clean 500
             return self.__internal_error()
@@ -1078,10 +1217,16 @@ class MakoServer:
         server = {}
         for key in ('REQUEST_METHOD', 'QUERY_STRING', 'CONTENT_TYPE',
                     'CONTENT_LENGTH', 'REMOTE_ADDR', 'SERVER_NAME',
-                    'SERVER_PORT'):
+                    'SERVER_PORT', 'SERVER_PROTOCOL'):
             if key in environ:
                 server[key] = environ[key]
         server['REQUEST_SCHEME'] = environ.get('wsgi.url_scheme', 'http')
+        # PHP staples: request start time and the HTTPS marker
+        now = time.time()
+        server['REQUEST_TIME'] = int(now)
+        server['REQUEST_TIME_FLOAT'] = now
+        if server['REQUEST_SCHEME'] == 'https':
+            server['HTTPS'] = 'on'
         for key, value in environ.items():
             if key.startswith('HTTP_') and isinstance(value, str):
                 server[key] = value
@@ -1280,11 +1425,26 @@ def create_app (root=None, conf_file=None, default_root=None,
     app.mako_server = server
     app.wsgi_app = PathInfoNormMiddleware(app.wsgi_app)
 
+    def _dispatch (url_path):
+        # view-level catch-all (decision #35): handle() branches such
+        # as __build_bridge / __assemble are not individually guarded;
+        # any unexpected exception must still produce the spec 9.1
+        # error page AND hit the error log (Flask's default 500 only
+        # goes to app.logger/stderr, unseen under WSGI hosts).
+        # HTTPExceptions (413 body limit etc.) pass through to
+        # Werkzeug's standard handling.
+        try:
+            return server.handle(url_path)
+        except HTTPException:
+            raise
+        except Exception:
+            return server.internal_error()
+
     def view_index ():
-        return server.handle('')
+        return _dispatch('')
 
     def view_path (url_path):
-        return server.handle(url_path)
+        return _dispatch(url_path)
 
     app.add_url_rule('/', 'mako_index', view_index, methods=ALL_METHODS,
                      provide_automatic_options=False)
@@ -1339,6 +1499,8 @@ def render_cli (script, args):
         'SERVER_PORT': '',
         'CONTENT_TYPE': '',
         'CONTENT_LENGTH': '',
+        'REQUEST_TIME': int(time.time()),
+        'REQUEST_TIME_FLOAT': time.time(),
         'argv': [script] + list(args),
     }
     bridge = {
@@ -1355,6 +1517,7 @@ def render_cli (script, args):
         '_SESSION': {},
         'RESP': resp,
     }
+    exit_code = 0
     try:
         if text is not None:
             # stdin source is kept verbatim (no rstrip), same as file
@@ -1364,11 +1527,23 @@ def render_cli (script, args):
                            input_encoding='utf-8')
         else:
             tpl = store.get_template(os.path.basename(script_abs))
-        # public Mako API only: Context + render_context
+        # public Mako API only: Context + render_context; echo is
+        # re-bound to ctx.write (buffer stack, decision #33)
         ctx = mako_runtime.Context(buf, **bridge)
+        echo.bind(ctx.write)
         tpl.render_context(ctx)
-    except SystemExit:
-        raise
+    except SystemExit as e:
+        # PHP exit()/die() semantics (decision #36): buffered output
+        # is flushed, then the process exits with the given code;
+        # sys.exit("message") keeps Python semantics (message to
+        # stderr, exit 1)
+        code = e.code
+        if code is None:
+            code = 0
+        if not isinstance(code, int):
+            sys.stderr.write('%s\n' % code)
+            code = 1
+        exit_code = code
     except BaseException:
         # no partial content on stdout; traceback goes to stderr
         traceback.print_exc()
@@ -1380,6 +1555,8 @@ def render_cli (script, args):
     else:
         sys.stdout.buffer.write(buf.getvalue().encode('utf-8'))
     sys.stdout.buffer.flush()
+    if exit_code:
+        sys.exit(exit_code)
 
 
 #======================================================================
@@ -1454,8 +1631,9 @@ def main (argv=None):
     if opts.script:
         render_cli(opts.script, opts.args)
         return 0
-    conf_path = find_config_file(opts.conf)
+    conf_path = None
     try:
+        conf_path = find_config_file(opts.conf)
         app = create_app(root=opts.root, conf_file=conf_path,
                          default_root=os.getcwd(), default_source='cwd')
     except ConfigError as e:
@@ -1470,25 +1648,39 @@ def main (argv=None):
 # Module level WSGI entry
 #======================================================================
 
-application = None
-
-
 def _wsgi_bootstrap ():
-    """Build the application in WSGI mode (when imported)."""
+    """Build the application in WSGI mode (first attribute access)."""
     conf_path = find_config_file()
     try:
         return create_app(conf_file=conf_path, default_root=MODULE_DIR,
                           default_source='script dir')
     except ConfigError as e:
+        # surface the failure through the WSGI host instead of
+        # sys.exit: killing the importing process would tear down
+        # co-hosted apps / test runners (decision #37)
         sys.stderr.write('makoserver: %s\n' % e)
-        sys.exit(1)
+        raise
 
 
-if __name__ != '__main__':
-    application = _wsgi_bootstrap()
-else:
+def __getattr__ (name):
+    # lazy WSGI entry (PEP 562, decision #37): a plain
+    # "import makoserver" must stay side-effect free (no config
+    # search chain, no startup validation, no host key derivation);
+    # only an actual attribute access by a WSGI host (mod_wsgi,
+    # "gunicorn makoserver:application") triggers the build, and the
+    # result is cached back into the module namespace
+    if name == 'application':
+        app = _wsgi_bootstrap()
+        globals()['application'] = app
+        return app
+    raise AttributeError('module %r has no attribute %r' % (__name__, name))
+
+
+if __name__ == '__main__':
     # CGI detection precedes argparse: mod_cgi invokes the script
-    # with no arguments, argv == ['makoserver.py']
-    if is_cgi_environment():
+    # with no arguments (argv == ['makoserver.py']); the argv guard
+    # keeps CI / webhook environments with leaked CGI-ish variables
+    # from hijacking an explicit "makoserver.py script.mako" run
+    if is_cgi_environment() and len(sys.argv) == 1:
         sys.exit(run_cgi())
     sys.exit(main())
