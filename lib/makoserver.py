@@ -94,12 +94,10 @@ from mako import exceptions as mako_exceptions
 
 __version__ = '1.0.0'
 
-# NOTE: "application" is deliberately NOT listed in __all__: it is a
-# lazy module attribute (PEP 562 __getattr__, decision #37) with no
-# module-level binding, which static checkers would flag as undefined.
-# WSGI hosts access it as a plain attribute (makoserver:application),
-# which works regardless of __all__.
-__all__ = ['MakoServer', 'create_app', '__version__']
+# "application" is a lazy WSGI wrapper (LazyApplication, decision
+# #37): a real module-level binding (mod_wsgi resolves it by direct
+# namespace dict lookup), building the actual app on first request
+__all__ = ['MakoServer', 'create_app', 'application', '__version__']
 
 
 #======================================================================
@@ -1649,7 +1647,7 @@ def main (argv=None):
 #======================================================================
 
 def _wsgi_bootstrap ():
-    """Build the application in WSGI mode (first attribute access)."""
+    """Build the application in WSGI mode (first request)."""
     conf_path = find_config_file()
     try:
         return create_app(conf_file=conf_path, default_root=MODULE_DIR,
@@ -1662,18 +1660,37 @@ def _wsgi_bootstrap ():
         raise
 
 
-def __getattr__ (name):
-    # lazy WSGI entry (PEP 562, decision #37): a plain
-    # "import makoserver" must stay side-effect free (no config
-    # search chain, no startup validation, no host key derivation);
-    # only an actual attribute access by a WSGI host (mod_wsgi,
-    # "gunicorn makoserver:application") triggers the build, and the
-    # result is cached back into the module namespace
-    if name == 'application':
-        app = _wsgi_bootstrap()
-        globals()['application'] = app
-        return app
-    raise AttributeError('module %r has no attribute %r' % (__name__, name))
+class LazyApplication:
+    """Module-level WSGI entry deferring app construction to the
+    first request (decision #37, amended).
+
+    A plain "import makoserver" stays side-effect free (no config
+    search chain, no startup validation, no host key derivation),
+    while "application" is still a REAL module-level binding: a PEP
+    562 module __getattr__ was tried first and failed in the field --
+    mod_wsgi resolves the target callable by a direct dictionary
+    lookup on the script's namespace ("Target WSGI script does not
+    contain WSGI application 'application'"), which never triggers
+    the module attribute protocol.
+    """
+
+    def __init__ (self):
+        self.app = None
+        self.__lock = threading.Lock()
+
+    def __call__ (self, environ, start_response):
+        app = self.app
+        if app is None:
+            # double-checked locking: first concurrent requests under
+            # threaded WSGI hosts must build exactly one app
+            with self.__lock:
+                if self.app is None:
+                    self.app = _wsgi_bootstrap()
+                app = self.app
+        return app(environ, start_response)
+
+
+application = LazyApplication()
 
 
 if __name__ == '__main__':
