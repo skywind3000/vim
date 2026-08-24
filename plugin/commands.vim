@@ -598,3 +598,20 @@ function! s:CondaDeactivate() abort
 endfunc
 
 
+"----------------------------------------------------------------------
+" FindFirstWideLine
+"----------------------------------------------------------------------
+command! -nargs=? FindFirstWideLine call s:FindFirstWideLine(<f-args>)
+function! s:FindFirstWideLine(...) abort
+	let width = (a:0 > 0)? str2nr(a:1) : 78
+	let lnum = module#misc#find_first_wide_line(width)
+	if lnum > 0
+		exec printf('%d', lnum)
+		call asclib#common#echo('Title', printf('First wide line: %d', lnum))
+	else
+		call asclib#common#echo('Title', 'No wide line found')
+	endif
+endfunc
+
+
+

@@ -45,11 +45,12 @@ call quickui#menu#install("&File", [
 call quickui#menu#install("&Edit", [
 			\ ['&Template Select', 'call module#action#template_select(&ft)', ''],
 			\ ['Copyright &Header', 'call feedkeys("\<esc> ec")', 'Insert copyright information at the beginning'],
-			\ ['Trailing &Space', 'call StripTrailingWhitespace()', ''],
+			\ ['Trailing &Space', 'StripTrailingWhitespace', ''],
 			\ ['Update &ModTime', 'UpdateLastModified', ''],
 			\ ['&Paste Mode Line', 'PasteVimModeLine', ''],
 			\ ['Format Js&on', '%!python -m json.tool', ''],
 			\ ['Find &non-ASCII Char', 'call feedkeys("\<esc>/[^\\x00-\\x7f]\<cr>")', ''],
+			\ ['&Find Wide Line', 'FindFirstWideLine 78', ''],
 			\ ['--'],
 			\ ['&Align Table', 'Tabularize /|', ''],
 			\ ['Align &Cheatsheet', 'MyCheatSheetAlign', ''],
@@ -258,7 +259,7 @@ endif
 
 
 "----------------------------------------------------------------------
-" fugitive 
+" fugitive
 "----------------------------------------------------------------------
 let g:context_menu_git = [
 			\ ["&Stage (add)\ts", 'exec "normal s"' ],
