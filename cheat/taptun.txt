@@ -1,0 +1,27 @@
+- Create tun device:
+
+  sudo ip tuntap add dev tun0 mode tun
+
+- Specify owner:
+
+  sudo ip tuntap add dev tun0 mode tun user $USER group $USER
+
+- Grant IP address:
+
+  sudo ip addr add 10.0.0.1/24 dev tun0
+
+- Bring up interface:
+
+  sudo ip link set tun0 up
+
+- Check integrity:
+
+  ip addr show tun0
+  ip link show tun0
+
+- Delete tun device:
+
+  sudo ip link set tun0 down
+  sudo ip tuntap del dev tun0 mode tun
+
+
