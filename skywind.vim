@@ -52,6 +52,11 @@ if has('patch-9.0.1')
 endif
 
 set cpt=.,w,k
+set path=.,,./**
+
+if !(has('win32') || has('win16') || has('win64') || has('win95'))
+	set path+=/usr/include
+endif
 
 if has('patch-8.2.4500')
 	set wildoptions+=pum,fuzzy
