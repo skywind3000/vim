@@ -146,6 +146,7 @@ augroup AscUnixGroup
 	au BufNewFile,BufRead *.odin setlocal filetype=odin
 	au BufNewFile,BufRead *.comp setlocal filetype=comp
 	au BufNewFIle,BufRead *.gpt setlocal filetype=gpt
+	au BufNewFIle,BufRead *.eta setlocal filetype=ejs
 	" au BufNewFile,BufRead *.md setlocal filetype=markdown
 	au BufNewFile,BufRead *.lua.rename setlocal filetype=lua
 	au BufNewFile,BufRead *.fmt setlocal filetype=protogen

@@ -132,3 +132,15 @@ function! module#action#escript_select() abort
 endfunc
 
 
+
+"----------------------------------------------------------------------
+" find first wide line
+"----------------------------------------------------------------------
+function! module#action#first_wide_line(width) abort
+	let lnum = module#misc#find_first_wide_line(a:width)
+	if lnum > 0
+		execute lnum
+	endif
+endfunc
+
+

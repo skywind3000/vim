@@ -121,3 +121,20 @@ function! module#misc#task_variable(name, value) abort
 endfunc
 
 
+"----------------------------------------------------------------------
+" find first line whose display width is greater than the given width
+"----------------------------------------------------------------------
+function! module#misc#find_first_wide_line(width) abort
+	let lnum = line('.') + 1
+	let last = line('$')
+	while lnum <= last
+		" strdisplaywidth 返回该行的虚拟显示宽度（考虑 tab、宽字符等）
+		if strdisplaywidth(getline(lnum)) > a:width
+			return lnum
+		endif
+		let lnum += 1
+	endwhile
+	return 0
+endfunc
+
+
