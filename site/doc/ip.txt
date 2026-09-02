@@ -1,6 +1,6 @@
 ##############################################################################
 # IP CHEATSHEET (中文速查表)  -  by skywind (created on 2024/11/12)
-# Version: 7, Last Modified: 2024/11/24 02:56:27
+# Version: 8, Last Modified: 2026/09/02 14:35:44
 # https://github.com/skywind3000/awesome-cheatsheets
 ##############################################################################
 
@@ -106,6 +106,22 @@ ip netns identify                             # 查看当前进程的网络命�
 ip netns identify PID                         # 查看指定进程的网络命名空间
 ip netns pids NAME                            # 查看网络命名空间中的进程
 ip -n s1 addr add 192.168.64.1/24 dev veth0   # 在网络命名空间中添加地址
+
+
+##############################################################################
+# ip tuntap
+##############################################################################
+
+ip tuntap add dev tun0 mode tun               # 创建一个 TUN 设备
+ip addr add 10.0.0.1/24 dev tun0              # 给 TUN 设备添加地址
+ip link set tun0 up                           # 把 TUN 设备开启
+ip addr show tun0                             # 显示 TUN 设备的地址
+ip link show tun0                             # 显示 TUN 设备的信息
+ip link set tun0 down                         # 把 TUN 设备关闭
+ip tuntap del dev tun0 mode tun               # 删除 TUN 设备
+
+# 创建一个 TUN 设备，并指定用户和组权限
+ip tuntap add dev tun0 mode tun user $USER group $USER
 
 
 ##############################################################################
