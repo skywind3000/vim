@@ -729,7 +729,13 @@ class configure (object):
         return result.returncode
 
     def system (self, cmd, cwd = None, env = None):
-        return self.execute(cmd, cwd, env)
+        hr = -1
+        try:
+            hr = self.execute(cmd, cwd, env)
+        except KeyboardInterrupt:
+            sys.stderr.write('\n')
+            hr = 130
+        return hr
 
     def show_env (self):
         import pprint
