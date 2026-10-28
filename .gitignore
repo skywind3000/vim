@@ -64,6 +64,9 @@ tags
 
 nul
 /site/specs/.gitkeep
-/.claude/*
-/.qoder/*
-/.opencode/*
+
+/.*/*
+!/.github/*
+
+/tools/test/_*
+
