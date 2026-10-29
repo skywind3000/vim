@@ -323,3 +323,17 @@ hi! default link KeyHint Statement
 hi! default link AtHint Identifier
 
 
+"----------------------------------------------------------------------
+" termdebug
+"----------------------------------------------------------------------
+if v:version >= 901
+	let g:termdebug_config = get(g:, 'termdebug_config', {})
+	let g:termdebug_config.use_prompt = v:true
+	let g:termdebug_config.map_K = v:true
+	let g:termdebug_config.map_minus = v:false
+	let g:termdebug_config.map_plus = v:false
+	let g:termdebug_config.winbar = v:false
+endif
+
+
+

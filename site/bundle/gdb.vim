@@ -11,11 +11,13 @@
 "----------------------------------------------------------------------
 " config 
 "----------------------------------------------------------------------
-let g:termdebug_config = {}
+let g:termdebug_config = get(g:, 'termdebug_config', {})
 
 let g:termdebug_config.use_prompt = v:true
 let g:termdebug_config.map_K = v:false
-let g:termdebug_config.winbar = 0
+let g:termdebug_config.map_minus = v:false
+let g:termdebug_config.map_plus = v:false
+let g:termdebug_config.winbar = v:true
 let g:termdebug_config.command = 'gdb'
 let g:termdebug_config.sign = '>>'
 
