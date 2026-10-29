@@ -82,10 +82,10 @@ function! module#gdb#start(cmd, bang, args)
 		exec 'Winbar'
 		let obj.source_wid = win_getid()
 		exec 'Var'
-		exec printf('wincmd w | call win_gotoid(%d)', obj.gdb_wid)
+		call win_gotoid(obj.gdb_wid)
 		exec 'normal! i'
 	else
-		exec printf('wincmd w | call win_gotoid(%d)', obj.origin_wid)
+		call win_gotoid(obj.origin_wid)
 		exec 'close!'
 		call win_gotoid(obj.gdb_wid)
 		exec 'wincmd H'
@@ -99,6 +99,22 @@ function! module#gdb#start(cmd, bang, args)
 		call win_gotoid(obj.gdb_wid)
 		exec 'normal! i'
 	endif
+	call s:setup_keymap()
+endfunc
+
+
+"----------------------------------------------------------------------
+" 
+"----------------------------------------------------------------------
+function! s:setup_keymap() abort
+	if !exists(':ToggleBreakpoint')
+		return
+	endif
+	tnoremap <silent> <F1> :call TermDebugSendCommand('info locals')<cr>
+	tnoremap <silent> <F9> :ToggleBreakpoint<cr>
+	tnoremap <silent> <F10> :TermdebugCommand next<cr>
+	tnoremap <silent> <F11> :TermdebugCommand step<cr>
+	tnoremap <silent> <F12> :TermdebugCommand finish<cr>
 endfunc
 
 

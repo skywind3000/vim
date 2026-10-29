@@ -12,7 +12,7 @@
 " 
 "----------------------------------------------------------------------
 function! module#mode#gdb_mode#help()
-	return 'F1: Info Locals, F2: Until, F3: Step, F4: Next'
+	return 'F1: Info Locals, F2: Next, F3: Step, F4: Finish'
 endfunc
 
 
@@ -21,9 +21,9 @@ endfunc
 "----------------------------------------------------------------------
 function! module#mode#gdb_mode#init()
 	noremap <F1> :call TermDebugSendCommand('info locals')<cr>
-	noremap <F2> :Until<cr>
+	noremap <F2> :Over<cr>
 	noremap <F3> :Step<cr>
-	noremap <F4> :Over<cr>
+	noremap <F4> :Finish<cr>
 endfunc
 
 
