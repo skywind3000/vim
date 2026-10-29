@@ -71,11 +71,12 @@ function! module#gdb#start(cmd, bang, args)
 	let obj.cmd = a:cmd
 	let obj.args = a:args
 	let obj.running = 1
+	let obj.origin_wid = win_getid()
 	exec cmdline
 	stopinsert
 	let obj.gdb_bid = bufnr('%')
 	let obj.gdb_wid = win_getid()
-	if s:windows
+	if s:windows != 0
 		exec 'wincmd o'
 		exec 'Source'
 		exec 'Winbar'
@@ -84,14 +85,18 @@ function! module#gdb#start(cmd, bang, args)
 		exec printf('wincmd w | call win_gotoid(%d)', obj.gdb_wid)
 		exec 'normal! i'
 	else
+		exec printf('wincmd w | call win_gotoid(%d)', obj.origin_wid)
+		exec 'close!'
+		call win_gotoid(obj.gdb_wid)
+		exec 'wincmd H'
 		exec 'topleft sp'
 		exec 'Source'
 		exec 'Winbar'
 		let obj.source_wid = win_getid()
-		exec 'Var'
 		exec 'wincmd p'
 		exec 'close'
-		exec printf('wincmd w | call win_gotoid(%d)', obj.gdb_wid)
+		exec 'Var'
+		call win_gotoid(obj.gdb_wid)
 		exec 'normal! i'
 	endif
 endfunc
