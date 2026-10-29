@@ -110,11 +110,20 @@ function! s:setup_keymap() abort
 	if !exists(':ToggleBreakpoint')
 		return
 	endif
-	tnoremap <silent> <F1> :call TermDebugSendCommand('info locals')<cr>
+	tnoremap <silent> <F1> :call module#gdb#help()<cr>
 	tnoremap <silent> <F9> :ToggleBreakpoint<cr>
 	tnoremap <silent> <F10> :TermdebugCommand next<cr>
 	tnoremap <silent> <F11> :TermdebugCommand step<cr>
 	tnoremap <silent> <F12> :TermdebugCommand finish<cr>
+endfunc
+
+
+"----------------------------------------------------------------------
+" 
+"----------------------------------------------------------------------
+function! module#gdb#help()
+	redraw
+	echo 'F1: Help, F9: Toggle Breakpoint, F10: Next, F11: Step, F12: Finish'
 endfunc
 
 
