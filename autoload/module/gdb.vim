@@ -65,6 +65,7 @@ function! module#gdb#start(cmd, bang, args)
 	let g:termdebug_config.winbar = v:false
 	let cmdline = printf("%s%s %s", a:cmd, a:bang ? '!' : '', a:args)
 	tab split
+	exec 'tabmove -1'
 	let obj = s:tabpage_object()
 	let obj.cmdline = cmdline
 	let obj.cmd = a:cmd
@@ -132,6 +133,11 @@ endfunc
 function! s:term_stop_post()
 	" echom printf('stop_post: bt=%s bid=%d', &bt, bufnr('%'))
 	let s:termdebug_running = 0
+	let obj = s:tabpage_object()
+	if has_key(obj, 'running')
+		let obj.running = 0
+		exec 'silent! tabclose!'
+	endif
 endfunc
 
 
