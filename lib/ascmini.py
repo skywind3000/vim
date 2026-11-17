@@ -382,7 +382,7 @@ class __PosixKit (object):
     def load_file_content (self, filename, mode = 'r'):
         if hasattr(filename, 'read'):
             try: content = filename.read()
-            except: content = None
+            except Exception: content = None
             return content
         try:
             if '~' in filename:
@@ -390,7 +390,7 @@ class __PosixKit (object):
             fp = open(filename, mode)
             content = fp.read()
             fp.close()
-        except:
+        except Exception:
             content = None
         return content
 

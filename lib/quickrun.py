@@ -763,33 +763,35 @@ class configure (object):
         content = self.load_file_content(filename, 'rb')
         if content is None:
             return None
-        # BOM detection: UTF-8 / UTF-16 LE / UTF-16 BE
-        if content[:3] == b'\xef\xbb\xbf':
-            return content[3:].decode('utf-8')
-        if content[:2] == b'\xff\xfe':
-            return content[2:].decode('utf-16-le')
-        if content[:2] == b'\xfe\xff':
-            return content[2:].decode('utf-16-be')
         if encoding is not None:
+            # explicit encoding wins over the bom and the guesses
             return content.decode(encoding, 'ignore')
-        # try common encodings in order; latin1 never fails (last resort)
-        guess = ['utf-8', 'gbk']
+        # byte order marks are authoritative
+        if content[:3] == b'\xef\xbb\xbf':
+            return content.decode('utf-8-sig', 'replace')
+        if content[:4] == b'\xff\xfe\x00\x00' or content[:4] == b'\x00\x00\xfe\xff':
+            return content.decode('utf-32', 'replace')
+        if content[:2] == b'\xff\xfe' or content[:2] == b'\xfe\xff':
+            return content.decode('utf-16', 'replace')
+        # strict utf-8 is the only informative probe: gbk and latin1
+        # accept nearly anything, so their success proves little
+        guess = ['utf-8']
         try:
             import locale
-            pe = locale.getpreferredencoding()
-            if pe:
-                guess.append(pe)
+            guess.append(locale.getpreferredencoding())
         except Exception:
             pass
+        guess.append('gbk')
         visit = {}
         for name in guess:
-            if not name or name in visit:
+            if not name or name.lower() in visit:
                 continue
-            visit[name] = 1
+            visit[name.lower()] = 1
             try:
                 return content.decode(name)
-            except (UnicodeDecodeError, LookupError):
+            except Exception:
                 pass
+        # latin1 maps every byte, so even a broken file survives intact
         return content.decode('latin1')
 
     def extract_comments (self, filename):
