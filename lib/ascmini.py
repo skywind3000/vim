@@ -425,6 +425,8 @@ class __PosixKit (object):
             return None
         if not isinstance(payload, bytes):
             return str(payload)
+        if payload == b'':
+            return ''
         # explicit encoding wins over the bom and the guesses
         if encoding is not None:
             return content.decode(encoding, 'ignore')
@@ -445,9 +447,9 @@ class __PosixKit (object):
         visit = {}
         text = None
         for name in guess:
-            if name in visit:
+            if (not name) or (name.lower() in visit):
                 continue
-            visit[name] = 1
+            visit[name.lower()] = 1
             try:
                 text = content.decode(name)
                 return text
