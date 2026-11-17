@@ -425,31 +425,36 @@ class __PosixKit (object):
             return None
         if not isinstance(payload, bytes):
             return str(payload)
-        if content[:3] == b'\xef\xbb\xbf':
-            return content[3:].decode('utf-8', 'ignore')
-        elif encoding is not None:
+        # explicit encoding wins over the bom and the guesses
+        if encoding is not None:
             return content.decode(encoding, 'ignore')
-        guess = [sys.getdefaultencoding(), 'utf-8']
-        if sys.stdout and sys.stdout.encoding:
-            guess.append(sys.stdout.encoding)
+        # byte order marks are authoritative
+        if content[:3] == b'\xef\xbb\xbf':
+            return content.decode('utf-8-sig', 'replace')
+        if content[:4] == b'\xff\xfe\x00\x00' or content[:4] == b'\x00\x00\xfe\xff':
+            return content.decode('utf-32', 'replace')
+        if content[:2] == b'\xff\xfe' or content[:2] == b'\xfe\xff':
+            return content.decode('utf-16', 'replace')
+        guess = ['utf-8']
         try:
             import locale
             guess.append(locale.getpreferredencoding())
-        except:
+        except Exception:
             pass
+        guess.append('gbk')
         visit = {}
         text = None
-        for name in guess + ['gbk', 'ascii', 'latin1']:
+        for name in guess:
             if name in visit:
                 continue
             visit[name] = 1
             try:
                 text = content.decode(name)
-                break
-            except:
+                return text
+            except Exception:
                 pass
-        if text is None:
-            text = content.decode('utf-8', 'ignore')
+        # latin1 maps every byte, so even a broken file survives intact
+        text = content.decode('latin1', 'ignore')
         return text
 
     # find file recursive
