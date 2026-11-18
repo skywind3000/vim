@@ -304,6 +304,10 @@ class DotEnvParser:
             return ''
         if '=' not in line:
             return ''
+        if line.startswith('export ') or line.startswith('export\t'):
+            line = line[6:].strip('\r\n\t ')
+        elif line.startswith('set ') or line.startswith('set\t'):
+            line = line[3:].strip('\r\n\t ')
         key, _, value = line.partition('=')
         key = key.strip('\r\n\t ')
         if not key:
