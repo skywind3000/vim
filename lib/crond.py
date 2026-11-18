@@ -46,6 +46,11 @@ UNIX = (sys.platform[:3] != 'win') and True or False
 #----------------------------------------------------------------------
 # crontab
 #----------------------------------------------------------------------
+# 支持的 @-前缀入口，须与 check() 中的展开逻辑保持同步
+AT_ENTRIES = ('@reboot', '@shutdown', '@yearly', '@annually',
+              '@monthly', '@weekly', '@daily', '@midnight', '@hourly')
+
+
 class crontab (object):
 
     def __init__ (self):
@@ -127,6 +132,9 @@ class crontab (object):
 
     # parse month and week information
     def check_token (self, text, minmax, value):
+        # 不短路：逗号列表中每个 token 都要过语法校验，
+        # 避免前面的 token 匹配后掩盖后面的语法错误（如 '*,x'）
+        matched = False
         for text in text.strip('\r\n\t ').split(','):
             text = text.lower()
             for x, y in self.daynames.items():
@@ -137,8 +145,8 @@ class crontab (object):
             if hr is None:
                 return None
             if hr:
-                return True
-        return False
+                matched = True
+        return matched
 
     # split rule and command
     def split (self, text):
@@ -169,6 +177,19 @@ class crontab (object):
         if len(data) == need:
             data.append('')
         return tuple(data[:need + 1])
+
+    # 语法校验：探测整个值域，字段至少能匹配一个值返回 True，
+    # 语法错误返回 None，语法合法但永不匹配返回 False。
+    # 复用 check_token 保证校验语义与运行时判定完全一致
+    def validate_field (self, text, minmax):
+        matched = False
+        for value in range(minmax[0], minmax[1] + 1):
+            hr = self.check_token(text, minmax, value)
+            if hr is None:
+                return None
+            if hr:
+                matched = True
+        return matched
 
     # input a datetime tuple like (2013, 10, 21, 16, 35)
     # returns True if the text match the given date-time.
@@ -219,21 +240,31 @@ class crontab (object):
         if not hr: return hr
         hr = self.check_token(data[1], (0, 23), hour)
         if not hr: return hr
-        hr = self.check_token(data[2], (0, 31), day)
-        if not hr: return hr
+        hrd = self.check_token(data[2], (1, 31), day)
+        if hrd is None: return None
         hr = self.check_token(data[3], (1, 12), month)
         if not hr: return hr
-        hr = self.check_token(data[4], (0, 6), weekday)
-        if not hr: return hr
-        return True
+        hrw = self.check_token(data[4], (0, 6), weekday)
+        if hrw is None: return None
+        # crontab(5) 语义：dom 与 dow 任一字段以 '*' 开头时取 AND；
+        # 两者都受限（都不是 '*' 开头）时取 OR，任一匹配即触发，
+        # 如 '0 0 1 * 1' 表示每月 1 号或每周一
+        if data[2][:1] == '*' or data[4][:1] == '*':
+            return (hrd and hrw)
+        return (hrd or hrw)
 
-    # 调用 crontab程序
-    def call (self, command):
+    # 调用 crontab程序，cwd 指定任务的工作目录（仅作用于子进程，
+    # 不修改本进程的 cwd）；fork/exec 失败时返回 None 而非抛异常
+    def call (self, command, cwd = None):
         import subprocess
-        if sys.version_info[0] < 3:
-            pid = subprocess.Popen(command, shell = True, close_fds = True)
-        else:
-            pid = subprocess.Popen(command, shell = True)
+        try:
+            if sys.version_info[0] < 3:
+                pid = subprocess.Popen(command, shell = True, close_fds = True, cwd = cwd)
+            else:
+                pid = subprocess.Popen(command, shell = True, cwd = cwd)
+        except OSError as e:
+            errmsg('exec failed: %s: %r' % (e, command))
+            return None
         return pid
 
     # 单位时间触发，返回成功调度的任务
@@ -241,7 +272,7 @@ class crontab (object):
         runlist = []
         if not schedule:
             return []
-        savedir = os.getcwd()
+        cwd = workdir or None
         if timestamp - self.timestamp >= 300:
             self.timestamp = long(timestamp)
             self.timestamp = self.timestamp - (self.timestamp % 10)
@@ -251,38 +282,36 @@ class crontab (object):
                 datetuple = now[:5]
                 for obj in schedule:
                     if self.check(obj['cron'], datetuple, 1):
-                        if workdir:
-                            os.chdir(workdir)
                         command = obj['command']
                         execute = command
                         for k, v in env.items():
                             execute = execute.replace('$(%s)'%k, str(v))
-                        self.call(execute)
-                        if workdir:
-                            os.chdir(savedir)
-                        obj['runtimes'] += 1
-                        t = (obj['cron'], command, execute, obj['lineno'])
-                        runlist.append(t + (obj['runtimes'], ))
+                        # cwd 只作用于子进程，本进程工作目录不受影响
+                        pid = self.call(execute, cwd)
+                        if pid is not None:
+                            obj['runtimes'] += 1
+                            t = (obj['cron'], command, execute, obj['lineno'])
+                            runlist.append(t + (obj['runtimes'], ))
                 self.lastmin = now.tm_min
             self.timestamp += 10
         return runlist
 
-    # 开启关闭时调用，返回在关闭时调度的任务，开启mode=0，关闭 mode=1
+    # 开启关闭时调用，返回在关闭时调度的任务，开启mode=0，关闭 mode=-1
     def event (self, schedule, mode, workdir = '.', env = {}, wait = False):
         runlist = []
         pids = []
-        savedir = os.getcwd()
+        cwd = workdir or None
         for obj in schedule:
             if self.check(obj['cron'], (0, 0, 0, 0, 0), mode):
-                if workdir:
-                    os.chdir(workdir)
                 command = obj['command']
                 execute = command
                 for k, v in env.items():
                     execute = execute.replace('$(%s)'%k, str(v))
-                pids.append(self.call(execute))
-                if workdir:
-                    os.chdir(savedir)
+                # cwd 只作用于子进程，本进程工作目录不受影响
+                pid = self.call(execute, cwd)
+                if pid is None:
+                    continue
+                pids.append(pid)
                 obj['runtimes'] += 1
                 t = (obj['cron'], command, execute, obj['lineno'])
                 runlist.append(t + (obj['runtimes'], ))
@@ -306,6 +335,20 @@ class crontab (object):
             hr = self.split(line)
             if hr is None:
                 return ln
+            # 命令不能为空：'0 5 * * *' 与 '@reboot' 都拒绝
+            if not hr[-1]:
+                return ln
+            if hr[0][:1] == '@':
+                # 未知 @-入口直接报错（须与 check() 展开保持同步）
+                if hr[0].lower() not in AT_ENTRIES:
+                    return ln
+            else:
+                # 装载时校验 5 个时间字段，语法错误直接报行号，
+                # 避免任务在运行时静默失效
+                ranges = ((0, 59), (0, 23), (1, 31), (1, 12), (0, 6))
+                for i in range(5):
+                    if self.validate_field(hr[i], ranges[i]) is not True:
+                        return ln
             obj = {}
             obj['cron'] = line
             obj['command'] = hr[-1]
