@@ -423,8 +423,8 @@ class __PosixKit (object):
                 return content
         if content is None:
             return None
-        if not isinstance(payload, bytes):
-            return str(payload)
+        if not isinstance(content, bytes):
+            return str(content)
         # explicit encoding wins over the bom and the guesses
         if encoding is not None:
             return content.decode(encoding, 'ignore')
