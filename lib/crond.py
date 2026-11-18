@@ -332,33 +332,36 @@ def load_file_text(filename, encoding = None):
         pass
     if content is None:
         return None
+    if encoding is not None:
+        # explicit encoding wins over the bom and the guesses
+        return content.decode(encoding, 'ignore')
+    # byte order marks are authoritative
     if content[:3] == b'\xef\xbb\xbf':
-        text = content[3:].decode('utf-8')
-    elif encoding is not None:
-        text = content.decode(encoding, 'ignore')
-    else:
-        text = None
-        guess = [sys.getdefaultencoding(), 'utf-8']
-        if sys.stdout and sys.stdout.encoding:
-            guess.append(sys.stdout.encoding)
+        return content.decode('utf-8-sig', 'replace')
+    if content[:4] == b'\xff\xfe\x00\x00' or content[:4] == b'\x00\x00\xfe\xff':
+        return content.decode('utf-32', 'replace')
+    if content[:2] == b'\xff\xfe' or content[:2] == b'\xfe\xff':
+        return content.decode('utf-16', 'replace')
+    # strict utf-8 is the only informative probe: gbk and latin1
+    # accept nearly anything, so their success proves little
+    guess = ['utf-8']
+    try:
+        import locale
+        guess.append(locale.getpreferredencoding())
+    except Exception:
+        pass
+    guess.append('gbk')
+    visit = {}
+    for name in guess:
+        if not name or name.lower() in visit:
+            continue
+        visit[name.lower()] = 1
         try:
-            import locale
-            guess.append(locale.getpreferredencoding())
-        except:
+            return content.decode(name)
+        except Exception:
             pass
-        visit = {}
-        for name in guess + ['gbk', 'ascii', 'latin1']:
-            if name in visit:
-                continue
-            visit[name] = 1
-            try:
-                text = content.decode(name)
-                break
-            except:
-                pass
-        if text is None:
-            text = content.decode('utf-8', 'ignore')
-    return text
+    # latin1 maps every byte, so even a broken file survives intact
+    return content.decode('latin1')
 
 
 #----------------------------------------------------------------------

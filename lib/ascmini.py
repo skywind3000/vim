@@ -503,32 +503,7 @@ class __PosixKit (object):
         content = self.load_file_content(filename, 'rb')
         if content is None:
             return None
-        if content[:3] == b'\xef\xbb\xbf':
-            text = content[3:].decode('utf-8')
-        elif encoding is not None:
-            text = content.decode(encoding, 'ignore')
-        else:
-            text = None
-            guess = [sys.getdefaultencoding(), 'utf-8']
-            if sys.stdout and sys.stdout.encoding:
-                guess.append(sys.stdout.encoding)
-            try:
-                import locale
-                guess.append(locale.getpreferredencoding())
-            except:
-                pass
-            visit = {}
-            for name in guess + ['gbk', 'ascii', 'latin1']:
-                if name in visit:
-                    continue
-                visit[name] = 1
-                try:
-                    text = content.decode(name)
-                    break
-                except:
-                    pass
-            if text is None:
-                text = content.decode('utf-8', 'ignore')
+        text = self.string_auto_decode(content, encoding)
         return text
 
     # save file text
